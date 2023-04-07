@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     ROOT_PATH: str = "/api/"
     APPLICATION_URL: str
+    DEBUG: bool = False
 
     @property
     def api_url(self) -> str:
