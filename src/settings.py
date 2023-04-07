@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urljoin
 
 from pydantic import BaseSettings
 from pydantic.tools import lru_cache
@@ -13,6 +14,13 @@ else:
 
 class Settings(BaseSettings):
     """Настройки проекта."""
+
+    ROOT_PATH: str = "/api/"
+    APPLICATION_URL: str
+
+    @property
+    def api_url(self) -> str:
+        return urljoin(self.APPLICATION_URL, self.ROOT_PATH)
 
     class Config:
         env_file = ENV_FILE
