@@ -15,6 +15,9 @@
     <li>
       <a href="#переменные-окружения-env">Переменные окружения (.env)</a>
     </li>
+    <li>
+      <a href="#настройка-pre-commit">Настройка pre-commit</a>
+    </li>
   </ol>
 </details>
 
