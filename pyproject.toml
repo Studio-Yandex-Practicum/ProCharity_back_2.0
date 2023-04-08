@@ -11,6 +11,7 @@ python = "^3.11"
 poetry = "^1.4.2"
 fastapi = "^0.95.0"
 uvicorn = "^0.21.1"
+python-telegram-bot = "^20.2"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"
