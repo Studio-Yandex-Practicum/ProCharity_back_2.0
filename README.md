@@ -82,5 +82,5 @@ POSTGRES_DB=procharity_back_db_local  # Название базы данных
 POSTGRES_USER=postgres  # Логин для подключения к базе данных
 POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
 DB_HOST=localhost  # Название сервиса (контейнера)
-DB_PORT=6100  # Порт для подключения к базе данных
+DB_PORT=5432  # Порт для подключения к базе данных
 ```
