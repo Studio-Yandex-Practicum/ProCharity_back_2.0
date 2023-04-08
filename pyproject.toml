@@ -14,6 +14,8 @@ isort = "^5.12.0"
 python-dotenv = "^1.0.0"
 sqlalchemy = "^2.0.9"
 alembic = "^1.10.3"
+asyncpg = "^0.27.0"
+greenlet = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 poetry = "^1.4.2"
