@@ -7,11 +7,13 @@ readme = "README.md"
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
-python = "3.11.2"
+python = "~3.11"
 
 black = "^23.3.0"
 isort = "^5.12.0"
 python-dotenv = "^1.0.0"
+sqlalchemy = "^2.0.9"
+alembic = "^1.10.3"
 
 [tool.poetry.group.dev.dependencies]
 poetry = "^1.4.2"
