@@ -9,7 +9,3 @@ class Base:
     id = Column(Integer, primary_key=True)
     __name__: str
 
-
-class Category1(Base):
-    __tablename__='ctaegory'
-    name = Column(Integer, nullable=False)
