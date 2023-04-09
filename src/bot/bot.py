@@ -1,17 +1,13 @@
-from telegram.ext import Application
+from telegram.ext import Application, CommandHandler
 
 from src.settings import settings
 
+from .handlers import start_callback
 
-def create_bot() -> Application:
+
+async def create_bot() -> Application:
     bot = Application.builder().token(settings.BOT_TOKEN).build()
-    # TODO: Добавить хэндлеры
-    # bot.add_handler(...)
-    return bot
-
-
-async def start_bot() -> Application:
-    bot = create_bot()
+    bot.add_handler(CommandHandler("start", start_callback))
     await bot.initialize()
     if settings.BOT_WEBHOOK_MODE:
         bot.updater = None
@@ -21,5 +17,11 @@ async def start_bot() -> Application:
         )
     else:
         await bot.updater.start_polling()
+
+    return bot
+
+
+async def start_bot() -> Application:
+    bot = await create_bot()
     await bot.start()
     return bot
