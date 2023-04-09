@@ -2,6 +2,7 @@ from typing import Any
 from http import HTTPStatus
 from starlette.exceptions import HTTPException
 from uuid import UUID
+from src.core.db.models import Base as DatabaseModel
 
 
 class ApplicationException(HTTPException):
