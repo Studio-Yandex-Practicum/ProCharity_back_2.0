@@ -15,6 +15,8 @@ else:
 class Settings(BaseSettings):
     """Настройки проекта."""
 
+    APPLICATION_URL: str
+    ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
     # Параметры подключения к БД
@@ -23,6 +25,10 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     DB_HOST: str
     DB_PORT: str
+
+    # Настройки бота
+    BOT_TOKEN: str
+    BOT_WEBHOOK_MODE: bool = False
 
     @property
     def database_url(self) -> str:
