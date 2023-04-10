@@ -1,5 +1,5 @@
 import abc
-from typing import Optional, TypeVar
+from typing import TypeVar
 from uuid import UUID
 
 from sqlalchemy import select
@@ -18,7 +18,7 @@ class AbstractRepository(abc.ABC):
         self._session = session
         self._model = model
 
-    async def get_or_none(self, id: UUID) -> Optional[DatabaseModel]:
+    async def get_or_none(self, id: UUID) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия возвращает None."""
         db_obj = await self._session.execute(select(self._model).where(self._model.id == id))
         return db_obj.scalars().first()
