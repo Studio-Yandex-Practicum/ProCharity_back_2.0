@@ -1,0 +1,1 @@
+from src.api.router import category_router  # noqa
