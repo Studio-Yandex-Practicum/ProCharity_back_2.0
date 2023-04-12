@@ -18,16 +18,16 @@ class AbstractRepository(abc.ABC):
         self._session = session
         self._model = model
 
-    async def get_or_none(self, id: UUID) -> DatabaseModel | None:
+    async def get_or_none(self, _id: UUID) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия возвращает None."""
-        db_obj = await self._session.execute(select(self._model).where(self._model.id == id))
+        db_obj = await self._session.execute(select(self._model).where(self._model.id == _id))
         return db_obj.scalars().first()
 
-    async def get(self, id: UUID) -> DatabaseModel:
+    async def get(self, _id: UUID) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта бросает ошибку."""
-        db_obj = await self.get_or_none(id)
+        db_obj = await self.get_or_none(_id)
         if db_obj is None:
-            raise NotFoundException(object_name=self._model.__name__, object_id=id)
+            raise NotFoundException(object_name=self._model.__name__, object_id=_id)
         return db_obj
 
     async def create(self, instance: DatabaseModel) -> DatabaseModel:
@@ -35,15 +35,15 @@ class AbstractRepository(abc.ABC):
         self._session.add(instance)
         try:
             await self._session.commit()
-        except IntegrityError:
-            raise AlreadyExistsException(instance)
+        except IntegrityError as exc:
+            raise AlreadyExistsException(instance) from exc
 
         await self._session.refresh(instance)
         return instance
 
-    async def update(self, id: UUID, instance: DatabaseModel) -> DatabaseModel:
+    async def update(self, _id: UUID, instance: DatabaseModel) -> DatabaseModel:
         """Обновляет существующий объект модели в базе."""
-        instance.id = id
+        instance.id = _id
         instance = await self._session.merge(instance)
         await self._session.commit()
         return instance  # noqa: R504

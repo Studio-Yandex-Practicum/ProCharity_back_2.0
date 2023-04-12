@@ -6,6 +6,33 @@ authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 packages = [{include = "src"}]
 
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+    | .env
+    | .env.example
+    | .git
+    | __pycache__
+    | venv/
+    | env/
+    | .*/tests/*
+    | .*/migrations/*
+    | .*/migrations/*
+  )/
+)
+'''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 120
+skip = ['src/core/db/migrations/',]
+
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.95.0"
