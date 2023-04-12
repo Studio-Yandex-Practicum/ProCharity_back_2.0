@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, Extra, root_validator
 from typing import Optional
+
+from pydantic import BaseModel, Extra, Field, root_validator
 
 
 class CaregoryRequest(BaseModel):
@@ -12,8 +13,8 @@ class CaregoryRequest(BaseModel):
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
-        if values['parent_id'] and values['parent_id'] == values['id']:
-            raise ValueError('Категория не может быть дочерней для самой себя.')
+        if values["parent_id"] and values["parent_id"] == values["id"]:
+            raise ValueError("Категория не может быть дочерней для самой себя.")
         return values
 
 

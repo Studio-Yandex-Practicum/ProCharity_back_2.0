@@ -1,18 +1,19 @@
-from src.core.db.repository.category_repository import CategoryRepository
 from fastapi import Depends
-from src.core.db.models import Category
+
 from src.api.schemas import CaregoryRequest
+from src.core.db.models import Category
+from src.core.db.repository.category_repository import CategoryRepository
 
 
 class CategoryService:
     def __init__(self, category_repository: CategoryRepository = Depends()):
         self.__category_repository = category_repository
 
-    async def actualize_categories(self, new_categories_request: list[CaregoryRequest]) -> Category:
+    async def actualize_categories(self, new_categories_request: list[CaregoryRequest]) -> Category:  # noqa: C901
         new_categories = []
         for category in new_categories_request:
             new_category_data = category.dict()
-            new_category_data['archive'] = False
+            new_category_data["archive"] = False
             new_category = Category(**new_category_data)
             new_categories.append(new_category)
 

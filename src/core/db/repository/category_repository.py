@@ -1,10 +1,12 @@
-from src.core.db.repository.base import AbstractRepository
-from src.core.db.models import Category
-from src.core.db.db import get_session
-from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import UUID
+
 from fastapi import Depends
 from sqlalchemy import select
-from uuid import UUID
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.core.db.db import get_session
+from src.core.db.models import Category
+from src.core.db.repository.base import AbstractRepository
 
 
 class CategoryRepository(AbstractRepository):
