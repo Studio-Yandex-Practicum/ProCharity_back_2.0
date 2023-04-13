@@ -1,12 +1,15 @@
-version: '3.8'
+version: '3.7'
 
 services:
-  db:
-    image: postgres:latest
-    container_name: procharity_postgres
+  postgres:
+    image: postgres:13.2
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     env_file:
       - .env
+
+volumes:
+  postgres_data:
