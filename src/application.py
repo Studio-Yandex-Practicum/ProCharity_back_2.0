@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import router
 from src.bot.bot import start_bot
+from src.core.logging import setup_logging
 from src.settings import settings
 
 
@@ -23,6 +24,7 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def on_startup():
         """Действия при запуске сервера."""
+        setup_logging()
         bot_instance = await start_bot()
         # storing bot_instance to extra state of FastAPI app instance
         # refer to https://www.starlette.io/applications/#storing-state-on-the-app-instance
