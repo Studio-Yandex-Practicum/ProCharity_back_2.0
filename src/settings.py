@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
     BOT_WEBHOOK_MODE: bool = False
 
+    # Настройки логирования
+    LOG_LOCATION = BASE_DIR / "logs/{time}.log"
+    LOG_ROTATION = "5 MB"
+    LOG_RETENTION = 10
+    LOG_COMPRESSION = "tar.gz"
+    LOG_LEVEL = "WARNING"
+
     @property
     def database_url(self) -> str:
         """Получить ссылку для подключения к DB."""
