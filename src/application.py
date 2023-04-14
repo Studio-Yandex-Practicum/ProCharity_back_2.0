@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import router
-from src.bot.bot import start_bot
+from src.bot import start_bot
 from src.core.logging import setup_logging
 from src.settings import settings
 

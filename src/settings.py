@@ -1,21 +1,20 @@
-import os
 from pathlib import Path
 from urllib.parse import urljoin
 
 from pydantic import BaseSettings
 from pydantic.tools import lru_cache
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-if os.path.exists(str(BASE_DIR / ".env")):
-    ENV_FILE = ".env"
+BASE_DIR = Path(__file__).resolve().parent.parent
+if Path.exists(BASE_DIR / ".env"):
+    ENV_FILE = BASE_DIR / ".env"
 else:
-    ENV_FILE = ".env.example"
+    ENV_FILE = BASE_DIR / ".env.example"
 
 
 class Settings(BaseSettings):
     """Настройки проекта."""
 
-    APPLICATION_URL: str
+    APPLICATION_URL: str = "localhost"
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 

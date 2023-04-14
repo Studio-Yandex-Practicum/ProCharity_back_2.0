@@ -1,6 +1,3 @@
 from .base import AbstractRepository
 
-
-__all__ = (
-    "AbstractRepository",
-)
+__all__ = ("AbstractRepository",)
