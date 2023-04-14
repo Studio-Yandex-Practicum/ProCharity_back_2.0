@@ -10,4 +10,4 @@ RUN pip3 install -r /app/requirements.txt --no-cache-dir
 
 COPY . .
 
-CMD ["uvicorn src:app", "-b", "0.0.0.0:8000", "-t", "60"]
+CMD ["uvicorn src:app", "0.0.0.0:8000"]
