@@ -3,13 +3,7 @@ from fastapi import APIRouter, Depends
 from src.api.schemas import CaregoryRequest, CategoryResponse
 from src.core.services.category_service import CategoryService
 
-router = APIRouter()
 category_router = APIRouter(prefix="/categories", tags=["Categories"])
-
-
-@router.get("/")
-async def root() -> dict[str, str]:
-    return {"message": "Hello World"}
 
 
 @category_router.get(

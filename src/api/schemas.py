@@ -3,13 +3,29 @@ from typing import Optional
 from pydantic import BaseModel, Extra, Field, root_validator
 
 
-class CaregoryRequest(BaseModel):
+class ResponseBase(BaseModel):
+    """Базовый класс для модели ответа."""
+
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class RequestBase(BaseModel):
+    """Базовый класс для модели запроса."""
+
     id: int = Field(..., ge=1, lt=10**10)
-    name: str = Field(..., min_length=2, max_length=100)
-    parent_id: Optional[int] = Field(None, ge=1, lt=10**10)
 
     class Config:
         extra = Extra.forbid
+
+
+class CaregoryRequest(RequestBase):
+    """Класс модели запроса для Category."""
+
+    name: str = Field(..., min_length=2, max_length=100)
+    parent_id: Optional[int] = Field(None, ge=1, lt=10**10)
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
@@ -18,11 +34,9 @@ class CaregoryRequest(BaseModel):
         return values
 
 
-class CategoryResponse(BaseModel):
-    id: int
+class CategoryResponse(ResponseBase):
+    """Класс модели ответа для Category."""
+
     name: str
     parent_id: Optional[int]
     archive: bool
-
-    class Config:
-        orm_mode = True
