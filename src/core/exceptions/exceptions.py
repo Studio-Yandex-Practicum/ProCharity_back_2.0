@@ -1,7 +1,9 @@
-from typing import Any
 from http import HTTPStatus
-from starlette.exceptions import HTTPException
+from typing import Any
 from uuid import UUID
+
+from starlette.exceptions import HTTPException
+
 from src.core.db.models import Base as DatabaseModel
 
 
