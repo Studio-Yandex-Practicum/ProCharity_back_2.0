@@ -1,6 +1,6 @@
 from sqlalchemy import BigInteger, Boolean, Column, Date, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, Mapped, mapped_column
 from sqlalchemy.sql import expression, func
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
@@ -41,7 +41,8 @@ class Task(Base):
     title = Column(String)
     name_organization = Column(String)
     deadline = Column(Date)
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    category = Mapped["Category"] = relationship(back_populates="tasks")
     bonus = Column(Integer)
     location = Column(String)
     link = Column(String)
@@ -67,7 +68,7 @@ class Category(Base):
     name = Column(String(100))
     archive = Column(Boolean())
     users = relationship("User", secondary="users_categories", backref=backref("categories"))
-    tasks = relationship("Task", backref=backref("categories"))
+    tasks = Mapped[list["Task"]] = relationship(back_populates="category")
     parent_id = Column(Integer, ForeignKey("categories.id"))
     children = relationship(
         "Category",
