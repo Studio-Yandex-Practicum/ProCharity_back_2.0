@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.api.schemas import CaregoryRequest, CategoryResponse
-from src.core.services.category_service import CategoryService
+from src.core.services.category import CategoryService
 
 category_router = APIRouter(prefix="/categories", tags=["Categories"])
 

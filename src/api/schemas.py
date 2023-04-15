@@ -6,8 +6,6 @@ from pydantic import BaseModel, Extra, Field, root_validator
 class ResponseBase(BaseModel):
     """Базовый класс для модели ответа."""
 
-    id: int
-
     class Config:
         orm_mode = True
 
@@ -15,15 +13,13 @@ class ResponseBase(BaseModel):
 class RequestBase(BaseModel):
     """Базовый класс для модели запроса."""
 
-    id: int = Field(..., ge=1, lt=10**10)
-
     class Config:
         extra = Extra.forbid
 
 
 class CaregoryRequest(RequestBase):
     """Класс модели запроса для Category."""
-
+    id: int = Field(..., ge=1, lt=10**10)
     name: str = Field(..., min_length=2, max_length=100)
     parent_id: Optional[int] = Field(None, ge=1, lt=10**10)
 
@@ -36,7 +32,7 @@ class CaregoryRequest(RequestBase):
 
 class CategoryResponse(ResponseBase):
     """Класс модели ответа для Category."""
-
+    id: int
     name: str
     parent_id: Optional[int]
     archive: bool
