@@ -95,13 +95,12 @@ ProCharity (НКО Фонд Друзья).
     ```
 
     > **Note**
-    > Документация по установке Poetry https://python-poetry.org/docs/#installation
+    > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
 
-3. Переименовать `.env.example` в `.env` и задать переменные окружения.
+3. Переименовать [`.env.example`](.env.example) в `.env` и задать переменные окружения.
 
     ```dotenv
     BOT_TOKEN=<Токен аутентификации бота>
-    APPLICATION_URL=https://example.com  # Необязательно, пример
     ```
 
     > **Note**
@@ -111,10 +110,6 @@ ProCharity (НКО Фонд Друзья).
     > **Note**
     > Для получения токена аутентификации бота обратитесь к 
     > разделу "[Регистрация бота Telegram](#регистрация-бота-telegram)".
-
-    > **Warning**
-    > Необходимо доменное имя с установленным SSL-сертификатом.
-    > Иначе обратитесь к разделу "[Использование Ngrok](#использование-ngrok)".
 
 ### Запуск
 
@@ -145,7 +140,7 @@ http://localhost:8000.
 
 ### Регистрация бота Telegram
 
-1. Найдите в Telegram бота @BotFather и откройте с ним чат.
+1. Найдите в Telegram бота [@BotFather](https://t.me/botfather) и откройте с ним чат.
 
 2. Напишите ему /newbot.
 
@@ -160,7 +155,7 @@ http://localhost:8000.
 окружения BOT_TOKEN (см. в разделе "[Установка и Запуск] (#установка)").
 
     > **Note**
-    > Полная документация о боте BotFather: https://core.telegram.org/bots/features#botfather
+    > [Документация о боте BotFather](https://core.telegram.org/bots/features#botfather)
 
 ### Режимы работы бота
 
@@ -168,33 +163,32 @@ http://localhost:8000.
 
 Выполнить скрипт запуска.
 
-    ```shell
-    python src/run.py
-    ```
+```shell
+python src/run.py
+```
 
-    > **Warning**:
-    > Возможно только в режиме [polling](#polling).
+> **Warning**:
+> Возможно только в режиме [polling](#polling).
 
 #### Polling
 
 Задать значение переменной окружения (.env).
 
-    ```dotenv
-    BOT_WEBHOOK_MODE=False
-    ```
+```dotenv
+BOT_WEBHOOK_MODE=False
+```
 
 #### Webhook
 
 Задать значение переменным окружения (.env).
 
-    ```dotenv
-    BOT_WEBHOOK_MODE=True
-    APPLICATION_URL=https://example.com  # Пример
-    ```
+```dotenv
+BOT_WEBHOOK_MODE=True
+APPLICATION_URL=http://example.com  # Пример
+```
 
-    > **Warning**
-    > Необходимо доменное имя с установленным SSL-сертификатом.
-    > Иначе обратитесь к разделу "[Использование Ngrok](#использование-ngrok)".
+> **Info**
+> Для теста через HTTPS можно использовать Ngrok (см. раздел "[Использование Ngrok](#использование-ngrok)").
 
 ### Работа с базой данных
 
@@ -225,9 +219,9 @@ http://localhost:8000.
 
 Откатить последнюю миграцию:
 
-    ```shell
-    alembic downgrade -1
-    ```
+```shell
+alembic downgrade -1
+```
 
 ### Работа с Poetry
 
