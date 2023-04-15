@@ -186,7 +186,7 @@ BOT_WEBHOOK_MODE=True
 APPLICATION_URL=http://example.com  # Пример
 ```
 
-> **Info**
+> **Note**
 > Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/) 
 > (см. раздел "[Использование Ngrok](#использование-ngrok)").
 
