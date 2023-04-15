@@ -181,14 +181,13 @@ BOT_WEBHOOK_MODE=False
 
 Задать значение переменным окружения (`.env`).
 
-> **Note**
-> [Подробнее о webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
-
-
 ```dotenv
 BOT_WEBHOOK_MODE=True
 APPLICATION_URL=http://example.com  # Пример
 ```
+
+> **Note**
+> [Подробнее о webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
 
 > **Note**
 > Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/) 
