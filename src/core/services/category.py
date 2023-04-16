@@ -22,17 +22,22 @@ class CategoryService:
         unarchive_categories_id_db = await self.__category_repository.get_unarchive_categories_id()
         categories_db_dict = {category.id: category for category in categories_db}
 
+        print(new_categories, categories_db_dict, categories_id_db)
         categories_to_add, categories_to_update = await self.get_categories_to_add_or_update(
             new_categories, categories_db_dict, categories_id_db
         )
         categories_to_archive_id = await self.get_categories_to_archive_id(
             unarchive_categories_id_db, new_categories_dict
         )
-        await self.add_categories(categories_to_add)
-        await self.update_categories(categories_to_update)
-        await self.archive_categories(categories_to_archive_id)
 
-    async def get_categories_to_add_or_update(new_categories, categories_db_dict, categories_id_db):
+        if categories_to_add:
+            await self.__category_repository.create_all(categories_to_add)
+        if categories_to_update:
+            await self.__category_repository.update_all_categories(categories_to_update)
+        if categories_to_archive_id:
+            await self.__category_repository.archive_categories(categories_to_archive_id)
+
+    async def get_categories_to_add_or_update(self, new_categories, categories_db_dict, categories_id_db):
         categories_to_add = []
         categories_to_update = []
         for category in new_categories:
@@ -46,24 +51,12 @@ class CategoryService:
                 categories_to_update.append(category)
         return (categories_to_add, categories_to_update)
 
-    async def get_categories_to_archive_id(unarchive_categories_id_db, new_categories_dict):
+    async def get_categories_to_archive_id(self, unarchive_categories_id_db, new_categories_dict):
         categories_to_archive_id = []
         for idx in unarchive_categories_id_db:
             if not new_categories_dict.get(idx):
                 categories_to_archive_id.append(idx)
         return categories_to_archive_id
-
-    async def add_categories(self, categories_to_add):
-        if categories_to_add:
-            await self.__category_repository.create_all(categories_to_add)
-
-    async def update_categories(self, categories_to_update):
-        if categories_to_update:
-            await self.__category_repository.update_all_categories(categories_to_update)
-
-    async def archive_categories(self, categories_to_archive_id):
-        if categories_to_archive_id:
-            await self.__category_repository.archive_categories(categories_to_archive_id)
 
     async def get_all_categories(self) -> list[Category]:
         categories = await self.__category_repository.get_all()

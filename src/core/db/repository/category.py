@@ -15,14 +15,9 @@ class CategoryRepository(AbstractRepository):
         super().__init__(session, Category)
 
     async def get_unarchive_categories_id(self) -> list[int]:
-        """Получает из базы id всех незаархивированных категорий."""
+        """Получает из базы id всех не заархивированных категорий."""
         unarchive_categories_id = await self._session.execute(select(Category.id).where(Category.archive == false()))
         return unarchive_categories_id.scalars().all()
-
-    async def create_all(self, new_categories: list[Category]) -> None:
-        """Создает несколько категорий в базе данных."""
-        self._session.add_all(new_categories)
-        await self._session.commit()
 
     async def update_all_categories(self, categories_to_update: list[Category]) -> None:
         """Обновляет несколько категорий."""
@@ -39,9 +34,9 @@ class CategoryRepository(AbstractRepository):
         await self._session.execute(statement)
         await self._session.commit()
 
-    async def archive_categories(self, categories_to_archive_id: list[int]) -> None:
+    async def archive_categories(self, categories: list[int]) -> None:
         """Добавляет несколько категорий в архив."""
         await self._session.execute(
-            update(Category).where(Category.id.in_(categories_to_archive_id)).values({"archive": True})
+            update(Category).where(Category.id.in_(categories)).values({"archive": True})
         )
         await self._session.commit()

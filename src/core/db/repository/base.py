@@ -58,3 +58,8 @@ class AbstractRepository(abc.ABC):
         """Возвращает все объекты модели из базы данных."""
         objects = await self._session.execute(select(self._model))
         return objects.scalars().all()
+
+    async def create_all(self, new_categories: list[DatabaseModel]) -> None:
+        """Создает несколько объектов модели в базе данных."""
+        self._session.add_all(new_categories)
+        await self._session.commit()
