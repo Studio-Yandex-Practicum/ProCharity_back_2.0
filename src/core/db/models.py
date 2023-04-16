@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import as_declarative
 from sqlalchemy.orm import backref, relationship, Mapped, mapped_column
 from sqlalchemy.sql import expression, func
 from sqlalchemy.sql.sqltypes import TIMESTAMP
+from sqlalchemy import Table, Column as Col
 
 
 @as_declarative()
@@ -11,6 +12,14 @@ class Base:
 
     id = Column(Integer, primary_key=True)
     __name__: str
+
+
+users_categories = Table(
+    "users_categories",
+    Base.metadata,
+    Col("category_id", ForeignKey("categories.id")),
+    Col("user_id", ForeignKey("users.id"))
+)
 
 
 class User(Base):
@@ -29,6 +38,9 @@ class User(Base):
     external_signup_date = Column(TIMESTAMP, nullable=True)
     banned = Column(Boolean, server_default=expression.false(), nullable=False)
 
+    categories: Mapped[list["Category"]] = relationship(
+        secondary=users_categories, back_populates="users")
+
     def __repr__(self):
         return f"<User {self.telegram_id}>"
 
@@ -41,8 +53,10 @@ class Task(Base):
     title = Column(String)
     name_organization = Column(String)
     deadline = Column(Date)
+
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category = Mapped["Category"] = relationship(back_populates="tasks")
+    category: Mapped["Category"] = relationship(back_populates="tasks")
+
     bonus = Column(Integer)
     location = Column(String)
     link = Column(String)
@@ -67,16 +81,21 @@ class Category(Base):
 
     name = Column(String(100))
     archive = Column(Boolean())
-    users = relationship("User", secondary="users_categories", backref=backref("categories"))
-    tasks = Mapped[list["Task"]] = relationship(back_populates="category")
-    parent_id = Column(Integer, ForeignKey("categories.id"))
-    children = relationship(
-        "Category",
-        uselist=True,
-        backref=backref("parent", remote_side=[id]),
-        lazy="subquery",
-        join_depth=1,
+
+    users: Mapped[list["User"]] = relationship(
+        secondary="users_categories", back_populates="categories"
     )
+
+    tasks: Mapped[list["Task"]] = relationship(back_populates="category")
+
+    # parent_id = Column(Integer, ForeignKey("categories.id"))
+    # children = relationship(
+    #     "Category",
+    #     uselist=True,
+    #     backref=backref("parent", remote_side=[id]),
+    #     lazy="subquery",
+    #     join_depth=1,
+    # )
 
     def __repr__(self):
         return f"<Category {self.name}>"
