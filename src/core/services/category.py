@@ -16,26 +16,24 @@ class CategoryService:
         for category in categories:
             new_categories.append(Category(**category.dict(), archive=False))
 
-        new_categories_dict = {category.id: category for category in new_categories}
         categories_db = await self.__category_repository.get_all()
-        categories_id_db = [category.id for category in categories_db]
-        unarchive_categories_id_db = await self.__category_repository.get_unarchive_categories_id()
-        categories_db_dict = {category.id: category for category in categories_db}
 
-        print(new_categories, categories_db_dict, categories_id_db)
-        categories_to_add, categories_to_update = await self.get_categories_to_add_or_update(
-            new_categories, categories_db_dict, categories_id_db
+        to_add, to_update = await self.get_categories_to_add_or_update(
+            new_categories,
+            {category.id: category for category in categories_db},
+            [category.id for category in categories_db]
         )
-        categories_to_archive_id = await self.get_categories_to_archive_id(
-            unarchive_categories_id_db, new_categories_dict
+        to_archive_id = await self.get_categories_to_archive_id(
+            await self.__category_repository.get_unarchive_categories_id(),
+            {category.id: category for category in new_categories}
         )
 
-        if categories_to_add:
-            await self.__category_repository.create_all(categories_to_add)
-        if categories_to_update:
-            await self.__category_repository.update_all_categories(categories_to_update)
-        if categories_to_archive_id:
-            await self.__category_repository.archive_categories(categories_to_archive_id)
+        if to_add:
+            await self.__category_repository.create_all(to_add)
+        if to_update:
+            await self.__category_repository.update_all_categories(to_update)
+        if to_archive_id:
+            await self.__category_repository.archive_categories(to_archive_id)
 
     async def get_categories_to_add_or_update(self, new_categories, categories_db_dict, categories_id_db):
         categories_to_add = []
