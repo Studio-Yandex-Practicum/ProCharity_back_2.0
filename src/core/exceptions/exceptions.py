@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from typing import Any
-from uuid import UUID
 
 from starlette.exceptions import HTTPException
 
@@ -17,7 +16,7 @@ class ApplicationException(HTTPException):
 
 
 class NotFoundException(ApplicationException):
-    def __init__(self, object_name: str, object_id: UUID):
+    def __init__(self, object_name: str, object_id: int):
         self.status_code = HTTPStatus.NOT_FOUND
         self.detail = f"Объект {object_name} с id: {object_id} не найден"
 
