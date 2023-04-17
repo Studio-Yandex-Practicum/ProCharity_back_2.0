@@ -1,8 +1,8 @@
-"""Create in DB models
+"""empty message
 
-Revision ID: 09b3aa3486c7
+Revision ID: b5085c436c0d
 Revises: 
-Create Date: 2023-04-09 22:41:41.390194
+Create Date: 2023-04-17 18:39:32.785950
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '09b3aa3486c7'
+revision = 'b5085c436c0d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,13 +21,12 @@ def upgrade() -> None:
     op.create_table('categories',
     sa.Column('name', sa.String(length=100), nullable=True),
     sa.Column('archive', sa.Boolean(), nullable=True),
-    sa.Column('parent_id', sa.Integer(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['parent_id'], ['categories.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id')
     )
     op.create_table('users',
-    sa.Column('telegram_id', sa.BigInteger(), nullable=False),
+    sa.Column('telegram_id', sa.BigInteger(), nullable=True),
     sa.Column('username', sa.String(length=32), nullable=True),
     sa.Column('email', sa.String(length=48), nullable=True),
     sa.Column('external_id', sa.Integer(), nullable=True),
@@ -38,16 +37,18 @@ def upgrade() -> None:
     sa.Column('external_signup_date', sa.TIMESTAMP(), nullable=True),
     sa.Column('banned', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint('telegram_id', 'id'),
+    sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('external_id'),
+    sa.UniqueConstraint('id'),
+    sa.UniqueConstraint('telegram_id'),
     sa.UniqueConstraint('username')
     )
     op.create_table('tasks',
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('name_organization', sa.String(), nullable=True),
     sa.Column('deadline', sa.Date(), nullable=True),
-    sa.Column('category_id', sa.Integer(), nullable=True),
+    sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('bonus', sa.Integer(), nullable=True),
     sa.Column('location', sa.String(), nullable=True),
     sa.Column('link', sa.String(), nullable=True),
@@ -57,7 +58,8 @@ def upgrade() -> None:
     sa.Column('updated_date', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id')
     )
     # ### end Alembic commands ###
 
