@@ -16,20 +16,26 @@ async def main():
         task = Task(
             title="Важный таск"
         )
-        category = Category(
+        category1 = Category(
             name="test",
             archive=False,
             users=[user],
             tasks=[task]
         )
 
+        category2 = Category(
+            name="test",
+            archive=False,
+            children=[category1]
+        )
         session.add(user)
         session.add(task)
-        session.add(category)
-
+        session.add(category1)
+        session.add(category2)
         await session.commit()
 
-        await session.delete(category)
+        await session.delete(category1)
+        await session.delete(category2)
         await session.delete(user)
         await session.delete(task)
         await session.commit()

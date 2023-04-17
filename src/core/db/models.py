@@ -1,6 +1,6 @@
 from sqlalchemy import BigInteger, Boolean, Column, Date, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 from sqlalchemy.sql import expression, func
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
@@ -84,14 +84,14 @@ class Category(Base):
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
-    # parent_id = Column(Integer, ForeignKey("categories.id"))
-    # children = relationship(
-    #     "Category",
-    #     uselist=True,
-    #     backref=backref("parent", remote_side=[id]),
-    #     lazy="subquery",
-    #     join_depth=1,
-    # )
+    parent_id = Column(Integer, ForeignKey("categories.id"))
+    children = relationship(
+        "Category",
+        uselist=True,
+        backref=backref("parent", remote_side="Category.id"),
+        lazy="subquery",
+        join_depth=1,
+    )
 
     def __repr__(self):
         return f"<Category {self.name}>"
