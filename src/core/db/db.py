@@ -4,9 +4,8 @@ from src.settings import settings
 
 engine = create_async_engine(settings.database_url)
 
-AsyncSession = async_sessionmaker(engine, expire_on_commit=False)
-
 
 async def get_session() -> AsyncSession:
-    async with AsyncSession() as session:
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
+    async with async_session() as session:
         yield session
