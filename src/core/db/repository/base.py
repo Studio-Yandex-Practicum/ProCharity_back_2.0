@@ -1,6 +1,5 @@
 import abc
 from typing import TypeVar
-from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -18,12 +17,12 @@ class AbstractRepository(abc.ABC):
         self._session = session
         self._model = model
 
-    async def get_or_none(self, _id: UUID) -> DatabaseModel | None:
+    async def get_or_none(self, _id: int) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия возвращает None."""
         db_obj = await self._session.execute(select(self._model).where(self._model.id == _id))
         return db_obj.scalars().first()
 
-    async def get(self, _id: UUID) -> DatabaseModel:
+    async def get(self, _id: int) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта бросает ошибку."""
         db_obj = await self.get_or_none(_id)
         if db_obj is None:
@@ -41,7 +40,7 @@ class AbstractRepository(abc.ABC):
         await self._session.refresh(instance)
         return instance
 
-    async def update(self, _id: UUID, instance: DatabaseModel) -> DatabaseModel:
+    async def update(self, _id: int, instance: DatabaseModel) -> DatabaseModel:
         """Обновляет существующий объект модели в базе."""
         instance.id = _id
         instance = await self._session.merge(instance)
