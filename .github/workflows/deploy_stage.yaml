@@ -3,7 +3,7 @@ name: Stage backend build and deploy
 on:
   pull_request:
     branches:
-      - develop
+      - develop-test
     types: [ closed ]
 
 env:
