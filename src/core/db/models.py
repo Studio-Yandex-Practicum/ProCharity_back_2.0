@@ -84,7 +84,7 @@ class Category(Base):
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
-    parent_id = Column(Integer, ForeignKey("categories.id"))
+    parent_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     children = relationship(
         "Category",
         uselist=True,
