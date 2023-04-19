@@ -1,10 +1,19 @@
 name: Stage backend build and deploy
 
 on:
-  pull_request:
-    branches:
-      - develop-test
-    types: [ closed ]
+  #  push:
+  #    branches:
+  #      - develop
+  #
+  #  pull_request:
+  #    branches:
+  #      - develop
+  #      - 'feature/**'
+  #      - 'fix/**'
+  #      - 'refactoring/**'
+  #    types: [closed]
+
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -12,7 +21,6 @@ env:
   IMAGE_NAME: ProCharity_back_2.0_backend
   DEPLOY_PATH: /procharity2/full
   WORK_DIR: /ProCharity_back_2.0
-#  HEALTHCHECK_URL: https://lombaryery.tk/api/healthcheck
 
 defaults:
   run:
@@ -78,21 +86,18 @@ jobs:
             cd ${{ env.DEPLOY_PATH }}
             mv docker-compose.stage.yaml docker-compose.yaml
             rm -f .env
-            touch .env
-            echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
-            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
-            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
-            echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-            echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            echo BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
-            echo BOT_WEBHOOK_MODE=${{ secrets.BOT_WEBHOOK_MODE }} >> .env
-            echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> .env
-#            echo HEALTHCHECK_API_URL=${{ secrets.HEALTHCHECK_API_URL }} >> .env
-#            echo MAIL_LOGIN=${{ secrets.MAIL_LOGIN }} >> .env
-#            echo MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} >> .env
-            echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-            echo ROOT_PATH=${{ secrets.ROOT_PATH }} >> .env
-#            echo TZ=${{ secrets.TZ }} >> .env
+            cat > .env <<- EOM
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+            BOT_WEBHOOK_MODE=${{ secrets.BOT_WEBHOOK_MODE }}
+            APPLICATION_URL=${{ secrets.APPLICATION_URL }}
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            ROOT_PATH=${{ secrets.ROOT_PATH }}
+            EOM
   start_application:
     name: Start application
     if: github.event.pull_request.merged == true
@@ -126,8 +131,3 @@ jobs:
       - name: Sleep for 30 seconds
         run: sleep 30s
         shell: bash
-#      - name: Get the status of healthcheck
-#        uses: im-open/url-status-check@v1.1.0
-#        with:
-#          url: ${{ env.HEALTHCHECK_URL }}
-#          fail-on-bad-status: true
