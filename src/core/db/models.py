@@ -1,8 +1,7 @@
-from sqlalchemy import BigInteger, Boolean, Column, Date, ForeignKey, Integer, String, Table
+from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table
 from sqlalchemy.ext.declarative import as_declarative
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 from sqlalchemy.sql import expression, func
-from sqlalchemy.sql.sqltypes import TIMESTAMP
 from datetime import date
 
 
@@ -18,7 +17,7 @@ users_categories = Table(
     "users_categories",
     Base.metadata,
     Column("category_id", ForeignKey("categories.id"), primary_key=True, unique=True),
-    Column("user_id", ForeignKey("users.id"), primary_key=True, unique=True)
+    Column("user_id", ForeignKey("users.id"), primary_key=True, unique=True),
 )
 
 
