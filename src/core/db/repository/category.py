@@ -14,8 +14,6 @@ class CategoryRepository(AbstractRepository):
         super().__init__(session, Category)
 
     async def archive_all(self) -> None:
-        """Добавляет несколько категорий в архив."""
-        await self._session.execute(
-            update(Category).values({"archive": True})
-        )
+        """Добавляет все категории в архив."""
+        await self._session.execute(update(Category).values({"archive": True}))
         await self._session.commit()

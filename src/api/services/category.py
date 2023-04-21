@@ -20,7 +20,7 @@ class CategoryService:
                 to_create.append(Category(**category.dict(), archive=False))
             else:
                 category_dict = category.dict()
-                category_dict['archive'] = False
+                category_dict["archive"] = False
                 to_update.append(category_dict)
         if to_create:
             await self.__category_repository.create_all(to_create)
