@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api import category_router
+from src.api.router import category_router
 from src.bot.bot import start_bot
 from src.settings import settings
 
