@@ -43,6 +43,7 @@ asyncpg = "^0.27.0"
 greenlet = "^2.0.2"
 python-telegram-bot = {extras = ["rate-limiter"], version = "^20.2"}
 structlog = "^23.1.0"
+asgi-correlation-id = "^4.2.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"
