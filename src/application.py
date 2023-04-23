@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api import router
-from src.bot import start_bot
+from src.api.router import category_router
+from src.bot.bot import start_bot
 from src.settings import settings
 
 
@@ -18,11 +18,12 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(router=router.router, prefix="/api")
+    app.include_router(router=category_router, prefix="/api")
 
     @app.on_event("startup")
     async def on_startup():
         """Действия при запуске сервера."""
+        pass
         bot_instance = await start_bot()
         # storing bot_instance to extra state of FastAPI app instance
         # refer to https://www.starlette.io/applications/#storing-state-on-the-app-instance
