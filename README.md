@@ -113,13 +113,20 @@ ProCharity (НКО Фонд Друзья).
 
 ### Запуск
 
-1. Применить миграции базы данных.
+1. Запустить Docker с БД.
+
+    ```
+    sudo docker compose -f infra/docker-pg.yml up -d
+    ```
+
+
+2. Применить миграции базы данных.
 
     ```shell
     alembic upgrade head
     ```
 
-2. Запустить сервер приложения.
+3. Запустить сервер приложения.
 
     ```shell
     uvicorn src:app --reload
@@ -254,152 +261,6 @@ poetry add <package_name>
 ```shell
 poetry run <script_name>.py
 ```
-
-### Команды для работы с Docker
-
-#### _Установка Docker на Linux:_
-```
-# Установка утилиты для скачивания файлов
-sudo apt install curl
-# Эта команда скачает скрипт для установки докера
-curl -fsSL https://get.docker.com -o get-docker.sh
-# Эта команда запустит его
-sh get-docker.sh
-```
-
-Для удаления старых версий Docker выполните команду:
-```sudo apt remove docker docker-engine docker.io containerd runc```
-
-Обновить список пакетов можно командой:
-```sudo apt update```
-
-Установите пакеты для работы через протокол https, это нужно для получения доступа к репозиторию докера:
-```
-sudo apt install \
-  apt-transport-https \
-  ca-certificates \
-  curl \
-  gnupg-agent \
-  software-properties-common -y
-```
-
-Добавьте ключ GPG для подтверждения подлинности в процессе установки:
-
-```curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -```
-
-Добавьте репозиторий Docker в пакеты ```apt``` и обновите индекс пакетов:
-
-```
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
-sudo apt update
-```
-
-Установите Docker и вместе с ним Docker Compose:
-
-```sudo apt install docker-ce docker-compose -y```
-
-Убедитесь, что Docker работает:
-
-```sudo systemctl status docker```
-
-#### _Команды для работы с образами и контейнерами:_
-
-Для просмотра всех хранящихся образов используйте команду:
-
-```docker image ls```
-
-Узнать ID образов можно с помощью команды:
-
-```docker images -a```
-
-Для удаления образа используется команда:
-
-```docker image rm <ID_образа> ```
-
-
-Для создания контейнера используйте команду:
-
-```docker run <имя_образа> ```
-
-Список запущенных контейнеров можно посмотреть с помощью команды:
-
-``` docker container ls ```
-
-При использовании следующей команды все процессы в контейнере останавливаются:
-
-``` docker stop <ID_контейнера> ```
-
-Окончательное удаление контейнера выполняется с помощью команды:
-
-``` docker rm <ID_контейнера> ```
-
-В директории, где сохранён Dockerfile выполните команду сборки образа:
-
-``` docker build -t <имя_образа> . ```
-
-Запустить контейнер локально можно командой:
-
-```docker run --name <имя_контейнера> -it -p 8000:8000 <образ_,_из_которого_будет_запущен_контейнер> ```
-
-Для остановки контейнера используется команда:
-
-```docker container stop <ID_контейнера>```
-
-Остановленный контейнер запускается с помощью команды:
-
-```docker container start <ID_контейнера>```
-
-Для входа в контейнер используется команда:
-
-```docker exec -it <ID_контейнера> bash ```
-
-
-Docker-compose запускается и останавливается командами:
-
-```docker-compose up``` и ```docker-compose stop```/сочетание клавиш Ctrl+C
-
-Пересборка контейнеров выполняется с помощью команды:
-
-```docker-compose up -d --build ```
-
-Команды внутри контейнеров выполняют посредством подкоманды ```docker-compose exec```.
-Выполнение миграций, создание суперпользователя и сбор статики выполняется с помощью следующих команд:
-
-```
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py createsuperuser
-docker-compose exec web python manage.py collectstatic --no-input
-```
-
-Остановить собранные контейнеры можно командой:
-
-```docker-compose down -v```
-
-Посмотреть логи можно с помощью команды:
-
-```docker logs --follow <имя_контейнера> ```
-
-Сохранение логов в файл выполняется командой:
-
-```docker logs <имя_контейнера> > docker.log```
-
-Мониторинг запущенных контейнеров:
-
-```docker stats```
-
-Неактивные (остановленные) контейнеры удаляются с помощью команды:
-
-```docker container prune```
-
-Ненужные образы, которые, возможно, использовались как промежуточные, удаляются командой:
-
-```docker image prune```
-
-Удалить вообще всё, что не используется (неиспользуемые образы, остановленные контейнеры, тома, которые не использует ни один контейнер, билд-кеш), можно командой:
-
-```docker system prune```
-
 
 ### Использование Ngrok
 
