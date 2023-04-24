@@ -117,9 +117,15 @@ ProCharity (НКО Фонд Друзья).
 
     ```shell
     alembic upgrade head
-    ```
+    
 
-2. Запустить сервер приложения.
+2. Запустить Docker с БД.
+
+    ```shell
+    sudo docker compose -f infra/docker-pg.yml up -d
+    ````
+
+3. Запустить сервер приложения.
 
     ```shell
     uvicorn src:app --reload
