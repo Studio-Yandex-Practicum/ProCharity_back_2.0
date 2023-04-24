@@ -113,18 +113,17 @@ ProCharity (НКО Фонд Друзья).
 
 ### Запуск
 
-1. Запустить Docker с БД.
-
-    ```
-    sudo docker compose -f infra/docker-pg.yml up -d
-    ```
-
-
-2. Применить миграции базы данных.
+1. Применить миграции базы данных.
 
     ```shell
     alembic upgrade head
-    ```
+    
+
+2. Запустить Docker с БД.
+
+    ```shell
+    sudo docker compose -f infra/docker-pg.yml up -d
+    ````
 
 3. Запустить сервер приложения.
 
