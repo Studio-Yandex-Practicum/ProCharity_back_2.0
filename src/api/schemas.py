@@ -46,15 +46,15 @@ class CategoryResponse(ResponseBase):
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: int = Field(..., ge=1, lt=10**10)
-    title: str = Field(..., min_length=2, max_length=100)
-    name_organization: str = Field(..., min_length=2, max_length=100)
-    deadline: date
+    id: int = Field(..., ge=1, le=10**10)
+    title: str
+    name_organization: str
+    deadline: date = Field(..., format=FORMAT)
     category_id: int = Field(..., ge=1, lt=10**10)
-    bonus: int = Field(..., ge=1, lt=10**10)
-    location: str = Field(..., min_length=2, max_length=100)
-    link: str = Field(..., min_length=2, max_length=100)
-    description: str = Field(..., min_length=2, max_length=100)
+    bonus: int = Field(..., ge=1, le=10)
+    location: str
+    link: str
+    description: str
 
     @root_validator(skip_on_failure=True)
     def validate_deadline(cls, values):
