@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.router import category_router
+from src.api.router import category_router, task_router
 from src.bot.bot import start_bot
 from src.settings import settings
 
@@ -19,6 +19,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(router=category_router, prefix="/api")
+    app.include_router(router=task_router, prefix="/api")
 
     @app.on_event("startup")
     async def on_startup():

@@ -1,6 +1,9 @@
+from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, root_validator
+
+from .constants import FORMAT
 
 
 class ResponseBase(BaseModel):
@@ -19,6 +22,7 @@ class RequestBase(BaseModel):
 
 class CaregoryRequest(RequestBase):
     """Класс модели запроса для Category."""
+
     id: int = Field(..., ge=1, lt=10**10)
     name: str = Field(..., min_length=2, max_length=100)
     parent_id: Optional[int] = Field(None, ge=1, lt=10**10)
@@ -32,7 +36,42 @@ class CaregoryRequest(RequestBase):
 
 class CategoryResponse(ResponseBase):
     """Класс модели ответа для Category."""
+
     id: int
     name: str
     parent_id: Optional[int]
+    archive: bool
+
+
+class TaskRequest(RequestBase):
+    """Класс модели запроса для Task."""
+
+    id: int = Field(..., ge=1, lt=10**10)
+    title: str = Field(..., min_length=2, max_length=100)
+    name_organization: str = Field(..., min_length=2, max_length=100)
+    deadline: date
+    category_id: int = Field(..., ge=1, lt=10**10)
+    bonus: int = Field(..., ge=1, lt=10**10)
+    location: str = Field(..., min_length=2, max_length=100)
+    link: str = Field(..., min_length=2, max_length=100)
+    description: str = Field(..., min_length=2, max_length=100)
+
+    @root_validator(skip_on_failure=True)
+    def validate_deadline(cls, values):
+        if values["deadline"].strftime(FORMAT) < date.today().strftime(FORMAT):
+            raise ValueError("Дата должна быть больше текущей.")
+        return values
+
+
+class TaskResponse(ResponseBase):
+    """Класс модели ответа для Task."""
+
+    title: str
+    name_organization: str
+    deadline: date
+    category_id: int
+    bonus: int
+    location: str
+    link: str
+    description: str
     archive: bool
