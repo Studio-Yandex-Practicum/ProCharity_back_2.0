@@ -1,7 +1,8 @@
 import asyncio
+import string
 
 from datetime import datetime, timedelta
-from random import randint, choice
+from random import randint, choice, random, choices
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -11,8 +12,9 @@ from sqlalchemy.ext.asyncio import (
 
 from src.core.db.models import Category, Task
 from src.settings import settings
+from src.core.db.db import engine
 
-engine = create_async_engine(settings.database_url)
+CHARACTERS = string.ascii_uppercase + string.digits
 
 CATEGORIES_TEST_DATA = [
     {"id": "1", "name": "Дизайн и верстка"},
@@ -26,7 +28,6 @@ CATEGORIES_TEST_DATA = [
     {"id": "9", "name": "Финансы и фандрайзинг"},
     {"id": "10", "name": "Менеджмент"}
     ]
-COUNT_CATEGORIES = 10
 TEST_LOCATION = [
     "Москва",
     "Санкт-Петербург",
@@ -124,8 +125,8 @@ async def get_task_name_by_id(category_id):
     """Function for selecting tasks from the TEST_TASKS list."""
     for task in TEST_TASKS:
         if int(task["id"]) == category_id:
-            return choice(task["tasks"])
-    return "Category not found"
+            for i in task["tasks"]:
+                yield i
 
 
 async def filling_category_in_db(
@@ -153,40 +154,22 @@ async def filling_task_in_db(
     location, description, archive.
      """
     async with async_session() as session:
-        for task_num in range(1, 51):
-            category_id = randint(1, COUNT_CATEGORIES)
-            title = await get_task_name_by_id(category_id)
-            name_organization = f'{choice(TEST_ORGANIZATION)}'
-            deadline = datetime.now() + timedelta(days=randint(1, 30))
-            bonus = randint(100, 1000)
-            location = f'Location {choice(TEST_LOCATION)}'
-            link = f'http://example.com/task/{task_num}'
-            description = f'Description {title}'
-            archive = choice([True, False])
-            task = Task(
-                name_organization=name_organization,
-                deadline=deadline,
-                category_id=category_id,
-                title=title,
-                bonus=bonus,
-                location=location,
-                link=link,
-                description=description,
-                archive=archive
-            )
-            # Check if task with the same title and category_id already exists
-            existing_task = await session.execute(
-                select(Task).where((Task.title == title))
-            )
-            while existing_task.fetchone() is not None:
-                # If task already exists, generate a new title and category
-                category_id = randint(1, COUNT_CATEGORIES)
-                title = await get_task_name_by_id(category_id)
-                existing_task = await session.execute(select(Task).where(
-                    (Task.title == title) &
-                    (Task.category_id == category_id)))
-            session.add(task)
-        await session.commit()
+        for category_id in range(1, len(CATEGORIES_TEST_DATA) + 1):
+            async for title in get_task_name_by_id(category_id):
+                task = Task(
+                    name_organization=f'{choice(TEST_ORGANIZATION)}',
+                    deadline=datetime.now() + timedelta(days=10),
+                    category_id=category_id,
+                    title=title,
+                    bonus=randint(100, 1000),
+                    location=f'{choice(TEST_LOCATION)}',
+                    link=f"http://example.com/task/"
+                    f"{''.join(choices(CHARACTERS, k=6))}",
+                    description=f"Description {title}",
+                    archive=choice([True, False])
+                )
+                session.add(task)
+            await session.commit()
 
 
 async def delete_all_data(async_session: AsyncSession) -> None:
