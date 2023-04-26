@@ -1,5 +1,6 @@
 import asyncio
 import string
+from fastapi import Depends
 
 from datetime import datetime, timedelta
 from random import randint, choice, random, choices
@@ -11,8 +12,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.core.db.models import Category, Task
-from src.settings import settings
-from src.core.db.db import engine
+from src.core.db import get_session
+
 
 CHARACTERS = string.ascii_uppercase + string.digits
 
@@ -130,65 +131,63 @@ async def get_task_name_by_id(category_id):
 
 
 async def filling_category_in_db(
-        async_session: async_sessionmaker[AsyncSession],
+        session: async_sessionmaker[AsyncSession],
         ) -> None:
     """Filling the database with test data Categories.
     The fields id, name, archive are filled in.
     """
-    async with async_session() as session:
-        for category in CATEGORIES_TEST_DATA:
-            category_obj = Category(
-                name=category['name'],
-                archive=choice([True, False]),
-                id=int(category['id']),
-            )
-            session.add(category_obj)
-        await session.commit()
+    for category in CATEGORIES_TEST_DATA:
+        category_obj = Category(
+            name=category['name'],
+            archive=choice([True, False]),
+            id=int(category['id']),
+        )
+        session.add(category_obj)
+    await session.commit()
 
 
 async def filling_task_in_db(
-        async_session: async_sessionmaker[AsyncSession],
+        session: async_sessionmaker[AsyncSession],
         ) -> None:
     """Filling the database with test data: Tasks.
     The fields title, name_organization, deadline, category,
     location, description, archive.
      """
-    async with async_session() as session:
-        for category_id in range(1, len(CATEGORIES_TEST_DATA) + 1):
-            async for title in get_task_name_by_id(category_id):
-                task = Task(
-                    name_organization=f'{choice(TEST_ORGANIZATION)}',
-                    deadline=datetime.now() + timedelta(days=10),
-                    category_id=category_id,
-                    title=title,
-                    bonus=randint(100, 1000),
-                    location=f'{choice(TEST_LOCATION)}',
-                    link=f"http://example.com/task/"
-                    f"{''.join(choices(CHARACTERS, k=6))}",
-                    description=f"Description {title}",
-                    archive=choice([True, False])
-                )
-                session.add(task)
-            await session.commit()
-
-
-async def delete_all_data(async_session: AsyncSession) -> None:
-    """The function deletes data from the tables Category, Tasks."""
-    async with async_session() as session:
-        await session.execute(
-            text("""TRUNCATE TABLE tasks, categories CASCADE""")
-        )
+    for category_id in range(1, len(CATEGORIES_TEST_DATA) + 1):
+        async for title in get_task_name_by_id(category_id):
+            task = Task(
+                name_organization=f'{choice(TEST_ORGANIZATION)}',
+                deadline=datetime.now() + timedelta(days=10),
+                category_id=category_id,
+                title=title,
+                bonus=randint(100, 1000),
+                location=f'{choice(TEST_LOCATION)}',
+                link=f"http://example.com/task/"
+                f"{''.join(choices(CHARACTERS, k=6))}",
+                description=f"Description {title}",
+                archive=choice([True, False])
+            )
+            session.add(task)
         await session.commit()
 
 
+async def delete_all_data(session: async_sessionmaker[AsyncSession],) -> None:
+    """The function deletes data from the tables Category, Tasks."""
+    await session.execute(
+        text("""TRUNCATE TABLE tasks, categories CASCADE""")
+    )
+    await session.commit()
+
+
 async def run():
-    async_session = async_sessionmaker(engine, expire_on_commit=False)
-    await delete_all_data(async_session)
-    print("Deleted data from the Tasks, Categories table.")
-    await filling_category_in_db(async_session)
-    print("The table with the Categories is full.")
-    await filling_task_in_db(async_session)
-    print("The Tasks table is full.")
+    sessions = get_session()
+    async for session in sessions:
+        await delete_all_data(session)
+        print("Deleted data from the Tasks, Categories table.")
+        await filling_category_in_db(session)
+        print("The table with the Categories is full.")
+        await filling_task_in_db(session)
+        print("The Tasks table is full.")
 
 if __name__ == "__main__":
     asyncio.run(run())
