@@ -46,12 +46,12 @@ class CategoryResponse(ResponseBase):
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: int = Field(..., ge=1, le=10**10)
+    id: int = Field(..., ge=1, lt=10**10)
     title: str
     name_organization: str
     deadline: date = Field(..., format=FORMAT)
     category_id: int = Field(..., ge=1, lt=10**10)
-    bonus: int = Field(..., ge=1, le=10)
+    bonus: int = Field(..., ge=1, lt=11)
     location: str
     link: str
     description: str
