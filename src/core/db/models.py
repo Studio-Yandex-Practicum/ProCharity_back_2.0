@@ -1,17 +1,15 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import relationship, Mapped, mapped_column, backref, declarative_base
+from sqlalchemy.orm import relationship, Mapped, mapped_column, backref, DeclarativeBase
 from sqlalchemy.sql import expression, func
 from datetime import date
 
 
-class PreBase:
+class Base(DeclarativeBase):
     """Основа для базового класса."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
     __name__: Mapped[str]
 
-
-Base = declarative_base(cls=PreBase)
 
 users_categories = Table(
     "users_categories",
