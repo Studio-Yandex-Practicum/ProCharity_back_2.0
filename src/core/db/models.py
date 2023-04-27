@@ -1,17 +1,17 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table
-from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
+from sqlalchemy.orm import relationship, Mapped, mapped_column, backref, declarative_base
 from sqlalchemy.sql import expression, func
 from datetime import date
 
 
-@as_declarative()
-class Base:
-    """Базовая модель."""
+class PreBase:
+    """Основа для базового класса."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
     __name__: Mapped[str]
 
+
+Base = declarative_base(cls=PreBase)
 
 users_categories = Table(
     "users_categories",
@@ -33,7 +33,7 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
     date_registration: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
-    external_signup_date: Mapped[date] = mapped_column(nullable=False)
+    external_signup_date: Mapped[date] = mapped_column(nullable=True)
     banned: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
 
     categories: Mapped[list["Category"]] = relationship(
