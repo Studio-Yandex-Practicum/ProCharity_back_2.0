@@ -1,17 +1,17 @@
 name: Stage backend build and deploy
 
 on:
-  #  push:
-  #    branches:
-  #      - develop
-  #
-  #  pull_request:
-  #    branches:
-  #      - develop
-  #      - 'feature/**'
-  #      - 'fix/**'
-  #      - 'refactoring/**'
-  #    types: [closed]
+  push:
+    branches:
+      - develop
+
+  pull_request:
+    branches:
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactoring/**'
+    types: [closed]
 
   workflow_dispatch:
 
