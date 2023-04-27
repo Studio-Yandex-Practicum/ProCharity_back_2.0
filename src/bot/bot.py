@@ -1,13 +1,15 @@
-from telegram.ext import AIORateLimiter, Application, CommandHandler
+from telegram.ext import AIORateLimiter, Application, CommandHandler, CallbackQueryHandler
 
 from src.settings import settings
 
-from .handlers import start_callback
+from .handlers import start_callback, menu_callback, button
 
 
 def create_bot() -> Application:
     bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
     bot.add_handler(CommandHandler("start", start_callback))
+    bot.add_handler(CommandHandler("menu", menu_callback))
+    bot.add_handler(CallbackQueryHandler(button))
     return bot
 
 
