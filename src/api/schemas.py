@@ -58,8 +58,8 @@ class TaskRequest(RequestBase):
 
     @root_validator(skip_on_failure=True)
     def validate_deadline(cls, values):
-        if values["deadline"].strftime(DATE_FORMAT) < date.today().strftime(DATE_FORMAT):
-            raise ValueError("Дата должна быть больше текущей.")
+        if values["deadline"] < date.today():
+            raise ValueError("Дата не может быть меньше текущей.")
         return values
 
 
