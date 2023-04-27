@@ -1,12 +1,12 @@
 from fastapi import Depends
 
 from src.api.schemas import TaskRequest
-from src.api.services.base import BaseService
+from src.api.services.base import ContentService
 from src.core.db.models import Task
 from src.core.db.repository.task import TaskRepository
 
 
-class TaskService(BaseService):
+class TaskService(ContentService):
     """Сервис для работы с моделью Task."""
 
     def __init__(self, task_repository: TaskRepository = Depends()) -> None:

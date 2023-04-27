@@ -1,5 +1,4 @@
 from fastapi import Depends
-from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.db import get_session
@@ -13,7 +12,4 @@ class CategoryRepository(AbstractRepository):
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, Category)
 
-    async def archive_all(self) -> None:
-        """Добавляет все категории в архив."""
-        await self._session.execute(update(Category).values({"archive": True}))
-        await self._session.commit()
+        pass

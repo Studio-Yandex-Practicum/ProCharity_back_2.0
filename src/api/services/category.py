@@ -1,12 +1,12 @@
 from fastapi import Depends
 
 from src.api.schemas import CaregoryRequest
-from src.api.services.base import BaseService
+from src.api.services.base import ContentService
 from src.core.db.models import Category
 from src.core.db.repository.category import CategoryRepository
 
 
-class CategoryService(BaseService):
+class CategoryService(ContentService):
     """Сервис для работы с моделью Category."""
 
     def __init__(self, category_repository: CategoryRepository = Depends()):

@@ -1,8 +1,8 @@
 from fastapi import Depends
 
 
-class BaseService:
-    """Базовый класс сервисов."""
+class ContentService:
+    """Базовый класс для контента."""
 
     def __init__(self, repository: any = Depends()):
         self._repository = repository

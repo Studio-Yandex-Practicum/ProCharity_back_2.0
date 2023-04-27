@@ -67,3 +67,8 @@ class AbstractRepository(abc.ABC):
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
         await self._session.commit()
+
+    async def archive_all(self) -> None:
+        """Добавляет все объекты модели в архив."""
+        await self._session.execute(update(self._model).values({"archive": True}))
+        await self._session.commit()

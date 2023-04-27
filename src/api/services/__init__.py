@@ -1,5 +1,5 @@
-from .base import BaseService
+from .base import ContentService
 from .category import CategoryService
 from .task import TaskService
 
-__all__ = ("BaseService", "CategoryService", "TaskService")
+__all__ = ("ContentService", "CategoryService", "TaskService")

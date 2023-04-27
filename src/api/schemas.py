@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, root_validator
 
-from .constants import FORMAT
+from .constants import DATE_FORMAT
 
 
 class ResponseBase(BaseModel):
@@ -49,7 +49,7 @@ class TaskRequest(RequestBase):
     id: int = Field(..., ge=1, lt=10**10)
     title: str
     name_organization: str
-    deadline: date = Field(..., format=FORMAT)
+    deadline: date = Field(..., format=DATE_FORMAT)
     category_id: int = Field(..., ge=1, lt=10**10)
     bonus: int = Field(..., ge=1, lt=11)
     location: str
@@ -58,7 +58,7 @@ class TaskRequest(RequestBase):
 
     @root_validator(skip_on_failure=True)
     def validate_deadline(cls, values):
-        if values["deadline"].strftime(FORMAT) < date.today().strftime(FORMAT):
+        if values["deadline"].strftime(DATE_FORMAT) < date.today().strftime(DATE_FORMAT):
             raise ValueError("Дата должна быть больше текущей.")
         return values
 
