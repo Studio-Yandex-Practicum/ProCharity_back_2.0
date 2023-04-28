@@ -18,13 +18,11 @@ class AbstractRepository(abc.ABC):
         self._session = session
         self._model = model
 
-    @auto_commit
     async def get_or_none(self, _id: int) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия возвращает None."""
         db_obj = await self._session.execute(select(self._model).where(self._model.id == _id))
         return db_obj.scalars().first()
 
-    @auto_commit
     async def get(self, _id: int) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта бросает ошибку."""
         db_obj = await self.get_or_none(_id)
@@ -57,13 +55,11 @@ class AbstractRepository(abc.ABC):
         await self._session.execute(update(self._model), instances)
         return instances
 
-    @auto_commit
     async def get_all(self) -> list[DatabaseModel]:
         """Возвращает все объекты модели из базы данных."""
         objects = await self._session.execute(select(self._model))
         return objects.scalars().all()
 
-    @auto_commit
     async def get_all_ids(self) -> list[int]:
         """Возвращает id всех объекты модели из базы данных."""
         ids = await self._session.execute(select(self._model.id))
