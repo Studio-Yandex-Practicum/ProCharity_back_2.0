@@ -5,11 +5,11 @@ from src.api.services.category import CategoryService
 from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
 
-api_router = APIRouter()
+api_router = APIRouter(prefix="/api", tags=["API"])
 
 
 @api_router.get(
-    "/categories/",
+    "/categories",
     response_model=list[CategoryResponse],
     response_model_exclude_none=True,
     description="Получает список всех категорий.",
@@ -18,14 +18,14 @@ async def get_categories(category_service: CategoryService = Depends()) -> list[
     return await category_service.get_all()
 
 
-@api_router.post("/categories/", description="Актуализирует список категорий.")
+@api_router.post("/categories", description="Актуализирует список категорий.")
 async def actualize_categories(
     categories: list[CategoryRequest], category_service: CategoryService = Depends()
 ) -> None:
     await category_service.actualize_objects(categories, Category)
 
 
-@api_router.post("/tasks/", description="Актуализирует список задач.")
+@api_router.post("/tasks", description="Актуализирует список задач.")
 async def actualize_tasks(tasks: list[TaskRequest], task_service: TaskService = Depends()) -> None:
     await task_service.actualize_objects(tasks, Task)
 
@@ -41,7 +41,7 @@ async def get_tasks_for_user(user_id: int, task_service: TaskService = Depends()
 
 
 @api_router.get(
-    "/tasks/",
+    "/tasks",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
     description="Получает список всех задач.",
