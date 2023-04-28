@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.db import get_session
 from src.core.db.models import Category, Task
-from src.core.db.repository.base import AbstractRepository
+from src.core.db.repository.base import ContentRepository
 
 
-class TaskRepository(AbstractRepository):
+class TaskRepository(ContentRepository):
     """Репозиторий для работы с моделью Task."""
 
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:

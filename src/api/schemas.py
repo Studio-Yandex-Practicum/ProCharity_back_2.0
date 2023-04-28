@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Extra, Field, root_validator
+from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
 from .constants import DATE_FORMAT
 
@@ -20,7 +20,7 @@ class RequestBase(BaseModel):
         extra = Extra.forbid
 
 
-class CaregoryRequest(RequestBase):
+class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
     id: int = Field(..., ge=1, lt=10**10)
@@ -46,21 +46,30 @@ class CategoryResponse(ResponseBase):
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: int = Field(..., ge=1, lt=10**10)
-    title: str
-    name_organization: str
+    id: NonNegativeInt = Field(...)
+    title: StrictStr = Field(...)
+    name_organization: StrictStr = Field(...)
     deadline: date = Field(..., format=DATE_FORMAT)
-    category_id: int = Field(..., ge=1, lt=10**10)
-    bonus: int = Field(..., ge=1, lt=11)
-    location: str
-    link: str
-    description: str
+    category_id: NonNegativeInt = Field(...)
+    bonus: NonNegativeInt = Field(...)
+    location: StrictStr = Field(...)
+    link: HttpUrl = Field(...)
+    description: Optional[StrictStr] = None
 
-    @root_validator(skip_on_failure=True)
-    def validate_deadline(cls, values):
-        if values["deadline"] < date.today():
-            raise ValueError("Дата не может быть меньше текущей.")
-        return values
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": 1,
+                "title": "Task Title",
+                "name_organization": "My Organization",
+                "deadline": "2025-12-31",
+                "category_id": 1,
+                "bonus": 5,
+                "location": "My Location",
+                "link": "https://example.com",
+                "description": "Task description",
+            }
+        }
 
 
 class TaskResponse(ResponseBase):

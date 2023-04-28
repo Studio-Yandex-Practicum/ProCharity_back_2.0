@@ -21,6 +21,5 @@ class ContentService:
         if to_update:
             await self._repository.update_all(to_update)
 
-    async def get_all_objects(self) -> list[any]:
-        objects = await self._repository.get_all()
-        return objects
+    async def get_all(self) -> list[any]:
+        return await self._repository.get_all()
