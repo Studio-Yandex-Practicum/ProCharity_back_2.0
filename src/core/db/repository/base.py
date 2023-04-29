@@ -58,12 +58,19 @@ class AbstractRepository(abc.ABC):
         objects = await self._session.execute(select(self._model))
         return objects.scalars().all()
 
-    async def get_all_ids(self) -> list[int]:
-        """Возвращает id всех объекты модели из базы данных."""
-        ids = await self._session.execute(select(self._model.id))
-        return ids.scalars().all()
-
     async def create_all(self, objects: list[DatabaseModel]) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
         await self._session.commit()
+
+
+class ContentRepository(AbstractRepository):
+    async def archive_all(self) -> None:
+        """Добавляет все объекты модели в архив."""
+        await self._session.execute(update(self._model).values({"archive": True}))
+        await self._session.commit()
+
+    async def get_all_ids(self) -> list[int]:
+        """Возвращает id всех объектов модели из базы данных."""
+        ids = await self._session.execute(select(self._model.id))
+        return ids.scalars().all()
