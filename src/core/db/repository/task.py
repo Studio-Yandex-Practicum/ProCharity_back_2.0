@@ -13,7 +13,7 @@ class TaskRepository(ContentRepository):
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, Task)
 
-    async def get_tasks_in_categories_which_user_subscribe(self, user_id: int) -> list[Task]:
+    async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         """Получить список задач из категорий на которые подписан пользователь."""
         tasks = await self._session.execute(select(Task).join(Category).where(Category.users.any(id=user_id)))
         return tasks.scalars().all()

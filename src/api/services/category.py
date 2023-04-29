@@ -9,5 +9,3 @@ class CategoryService(ContentService):
 
     def __init__(self, category_repository: CategoryRepository = Depends()):
         super().__init__(category_repository)
-
-        pass

@@ -11,5 +11,3 @@ class CategoryRepository(ContentRepository):
 
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, Category)
-
-        pass

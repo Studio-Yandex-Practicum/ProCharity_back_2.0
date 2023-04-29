@@ -12,4 +12,4 @@ class TaskService(ContentService):
         super().__init__(task_repository)
 
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
-        return await self._repository.get_tasks_in_categories_which_user_subscribe(user_id)
+        return await self._repository.get_tasks_for_user(user_id)
