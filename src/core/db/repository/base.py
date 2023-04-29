@@ -31,7 +31,7 @@ class AbstractRepository(abc.ABC):
         return db_obj
 
     @auto_commit
-    async def create(self, instance: DatabaseModel, commit=True) -> DatabaseModel:
+    async def create(self, instance: DatabaseModel) -> DatabaseModel:
         """Создает новый объект модели и сохраняет в базе."""
         self._session.add(instance)
         try:
@@ -43,14 +43,14 @@ class AbstractRepository(abc.ABC):
         return instance
 
     @auto_commit
-    async def update(self, _id: int, instance: DatabaseModel, commit=True) -> DatabaseModel:
+    async def update(self, _id: int, instance: DatabaseModel) -> DatabaseModel:
         """Обновляет существующий объект модели в базе."""
         instance.id = _id
         instance = await self._session.merge(instance)
         return instance  # noqa: R504
 
     @auto_commit
-    async def update_all(self, instances: list[dict], commit=True) -> list[DatabaseModel]:
+    async def update_all(self, instances: list[dict]) -> list[DatabaseModel]:
         """Обновляет несколько измененных объектов модели в базе."""
         await self._session.execute(update(self._model), instances)
         return instances
@@ -66,6 +66,18 @@ class AbstractRepository(abc.ABC):
         return ids.scalars().all()
 
     @auto_commit
-    async def create_all(self, objects: list[DatabaseModel], commit=True) -> None:
+    async def create_all(self, objects: list[DatabaseModel]) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
+
+
+class ContentRepository(AbstractRepository):
+    async def archive_all(self) -> None:
+        """Добавляет все объекты модели в архив."""
+        await self._session.execute(update(self._model).values({"archive": True}))
+        await self._session.commit()
+
+    async def get_all_ids(self) -> list[int]:
+        """Возвращает id всех объектов модели из базы данных."""
+        ids = await self._session.execute(select(self._model.id))
+        return ids.scalars().all()
