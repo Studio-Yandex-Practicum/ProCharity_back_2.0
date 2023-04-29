@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - develop
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactoring/**'
 
   pull_request:
     branches:
       - develop
-      - 'feature/**'
-      - 'fix/**'
-      - 'refactoring/**'
+    types: [closed]
 
   workflow_dispatch:
 
