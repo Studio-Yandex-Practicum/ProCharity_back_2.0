@@ -31,11 +31,11 @@ class AbstractRepository(abc.ABC):
         return db_obj
 
     @auto_commit
-    async def create(self, instance: DatabaseModel) -> DatabaseModel:
+    async def create(self, instance: DatabaseModel, commit=True) -> DatabaseModel:
         """Создает новый объект модели и сохраняет в базе."""
         self._session.add(instance)
         try:
-            await self._session.commit()
+            await auto_commit()
         except IntegrityError as exc:
             raise AlreadyExistsException(instance) from exc
 
@@ -43,14 +43,14 @@ class AbstractRepository(abc.ABC):
         return instance
 
     @auto_commit
-    async def update(self, _id: int, instance: DatabaseModel) -> DatabaseModel:
+    async def update(self, _id: int, instance: DatabaseModel, commit=True) -> DatabaseModel:
         """Обновляет существующий объект модели в базе."""
         instance.id = _id
         instance = await self._session.merge(instance)
         return instance  # noqa: R504
 
     @auto_commit
-    async def update_all(self, instances: list[dict]) -> list[DatabaseModel]:
+    async def update_all(self, instances: list[dict], commit=True) -> list[DatabaseModel]:
         """Обновляет несколько измененных объектов модели в базе."""
         await self._session.execute(update(self._model), instances)
         return instances
@@ -66,6 +66,6 @@ class AbstractRepository(abc.ABC):
         return ids.scalars().all()
 
     @auto_commit
-    async def create_all(self, objects: list[DatabaseModel]) -> None:
+    async def create_all(self, objects: list[DatabaseModel], commit=True) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
