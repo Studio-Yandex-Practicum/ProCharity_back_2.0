@@ -60,6 +60,7 @@ class AbstractRepository(abc.ABC):
         objects = await self._session.execute(select(self._model))
         return objects.scalars().all()
 
+    @auto_commit
     async def create_all(self, objects: list[DatabaseModel]) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
