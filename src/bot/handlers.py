@@ -45,7 +45,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def send_callback_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:  # TODO delete this
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     await query.answer()
