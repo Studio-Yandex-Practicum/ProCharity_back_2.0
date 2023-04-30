@@ -11,7 +11,7 @@ on:
   pull_request:
     branches:
       - develop
-    types: [closed]
+    types: [ closed ]
 
   workflow_dispatch:
 
@@ -29,7 +29,7 @@ defaults:
 jobs:
   build_and_push_docker_image:
     name: Push Docker image to GitHub Packages
-    if: github.event.pull_request.merged == true
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment:
       name: Stage
@@ -58,7 +58,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
   deploy:
     name: Deploy
-    if: github.event.pull_request.merged == true
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     needs: build_and_push_docker_image
     environment:
@@ -100,7 +100,7 @@ jobs:
             EOM
   start_application:
     name: Start application
-    if: github.event.pull_request.merged == true
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment:
       name: Stage
