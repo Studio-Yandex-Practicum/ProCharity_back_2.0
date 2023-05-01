@@ -114,11 +114,11 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            docker image prune -f
-            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
-            docker-compose --file docker-compose.yaml stop
-            docker-compose --file docker-compose.yaml rm backend
-            docker-compose --file docker-compose.yaml up -d
+            sudo docker image prune -f
+            sudo docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+            sudo docker compose --file docker-compose.yaml stop
+            sudo docker compose --file docker-compose.yaml rm backend
+            sudo docker compose --file docker-compose.yaml up -d
       - name: Making migrations
         uses: appleboy/ssh-action@master
         with:
@@ -127,7 +127,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            docker-compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
+            sudo docker compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
       - name: Sleep for 30 seconds
         run: sleep 30s
         shell: bash
