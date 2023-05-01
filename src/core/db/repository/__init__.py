@@ -1,3 +1,5 @@
-from .base import AbstractRepository
+from .base import AbstractRepository, ContentRepository
+from .category import CategoryRepository
+from .task import TaskRepository
 
-__all__ = ("AbstractRepository",)
+__all__ = ("AbstractRepository", "ContentRepository", "CategoryRepository", "TaskRepository")

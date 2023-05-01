@@ -1,7 +1,7 @@
 import abc
 from typing import TypeVar
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -47,9 +47,9 @@ class AbstractRepository(abc.ABC):
         await self._session.commit()
         return instance  # noqa: R504
 
-    async def update_all(self, instances: list[DatabaseModel]) -> list[DatabaseModel]:
+    async def update_all(self, instances: list[dict]) -> list[DatabaseModel]:
         """Обновляет несколько измененных объектов модели в базе."""
-        self._session.add_all(instances)
+        await self._session.execute(update(self._model), instances)
         await self._session.commit()
         return instances
 
@@ -57,3 +57,20 @@ class AbstractRepository(abc.ABC):
         """Возвращает все объекты модели из базы данных."""
         objects = await self._session.execute(select(self._model))
         return objects.scalars().all()
+
+    async def create_all(self, objects: list[DatabaseModel]) -> None:
+        """Создает несколько объектов модели в базе данных."""
+        self._session.add_all(objects)
+        await self._session.commit()
+
+
+class ContentRepository(AbstractRepository):
+    async def archive_all(self) -> None:
+        """Добавляет все объекты модели в архив."""
+        await self._session.execute(update(self._model).values({"archive": True}))
+        await self._session.commit()
+
+    async def get_all_ids(self) -> list[int]:
+        """Возвращает id всех объектов модели из базы данных."""
+        ids = await self._session.execute(select(self._model.id))
+        return ids.scalars().all()
