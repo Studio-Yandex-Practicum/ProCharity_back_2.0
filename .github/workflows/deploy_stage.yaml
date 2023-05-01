@@ -73,7 +73,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "infra/docker-compose.staging.yaml,infra/nginx/nginx.local.conf"
+          source: "infra/docker-compose.staging.yml,infra/nginx/nginx.local.conf"
           target: ${{ env.DEPLOY_PATH }}
 
       - name: Create .env file
@@ -84,7 +84,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv docker-compose.staging.yaml docker-compose.yaml
+            mv docker-compose.staging.yml docker-compose.yaml
             rm -f .env
             cat > .env <<- EOM
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
