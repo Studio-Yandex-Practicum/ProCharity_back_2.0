@@ -84,7 +84,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv docker-compose.staging.yml docker-compose.yaml
+            mv infra/docker-compose.staging.yml docker-compose.yaml
             rm -f .env
             cat > .env <<- EOM
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
