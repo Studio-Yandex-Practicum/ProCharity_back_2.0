@@ -1,5 +1,7 @@
-from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import relationship, Mapped, mapped_column, backref, DeclarativeBase
+from sqlalchemy import (
+    BigInteger, Column, Date, ForeignKey, Integer, String, Table)
+from sqlalchemy.orm import (
+    relationship, Mapped, mapped_column, backref, DeclarativeBase)
 from sqlalchemy.sql import expression, func
 from datetime import date
 
@@ -14,7 +16,9 @@ class Base(DeclarativeBase):
 users_categories = Table(
     "users_categories",
     Base.metadata,
-    Column("category_id", ForeignKey("categories.id"), primary_key=True, unique=True),
+    Column(
+        "category_id", ForeignKey("categories.id"),
+        primary_key=True, unique=True),
     Column("user_id", ForeignKey("users.id"), primary_key=True, unique=True),
 )
 
@@ -24,15 +28,18 @@ class User(Base):
 
     __tablename__ = "users"
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    username: Mapped[str] = mapped_column(String(32), unique=True, nullable=True)
+    username: Mapped[str] = mapped_column(
+        String(32), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
     external_id: Mapped[int] = mapped_column(unique=True, nullable=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
-    date_registration: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
+    date_registration: Mapped[date] = mapped_column(
+        server_default=func.current_timestamp(), nullable=False)
     external_signup_date: Mapped[date] = mapped_column(nullable=True)
-    banned: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
+    banned: Mapped[bool] = mapped_column(
+        server_default=expression.false(), nullable=False)
 
     categories: Mapped[list["Category"]] = relationship(
         secondary="users_categories", back_populates="users")
