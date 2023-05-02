@@ -5,8 +5,7 @@ volumes:
 
 services:
   backend:
-    build:
-      context: ../Dockerfile
+    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:latest
     container_name: procharity_bot_backend
     restart: always
     depends_on:
