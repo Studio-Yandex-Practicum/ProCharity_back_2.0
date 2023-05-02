@@ -2,7 +2,7 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.router import category_router
+from src.api.router import api_router
 from src.bot.bot import start_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
@@ -25,7 +25,7 @@ def create_app() -> FastAPI:
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(CorrelationIdMiddleware)
 
-    app.include_router(router=category_router, prefix="/api")
+    app.include_router(api_router)
 
     @app.on_event("startup")
     async def on_startup():
