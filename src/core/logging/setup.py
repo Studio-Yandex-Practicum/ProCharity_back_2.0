@@ -52,7 +52,9 @@ def setup_logging():
     if settings.LOG_TO_JSON:
         log_renderer = structlog.processors.JSONRenderer()
     else:
-        log_renderer = structlog.dev.ConsoleRenderer(colors=False)
+        log_renderer = structlog.dev.ConsoleRenderer(
+            exception_formatter=structlog.dev.rich_traceback
+        )
 
     formatter = structlog.stdlib.ProcessorFormatter(
         foreign_pre_chain=shared_processors,
