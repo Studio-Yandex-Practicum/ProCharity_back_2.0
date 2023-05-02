@@ -35,7 +35,7 @@ class AbstractRepository(abc.ABC):
         """Создает новый объект модели и сохраняет в базе."""
         self._session.add(instance)
         try:
-            await auto_commit()
+            self._session.commit()
         except IntegrityError as exc:
             raise AlreadyExistsException(instance) from exc
 

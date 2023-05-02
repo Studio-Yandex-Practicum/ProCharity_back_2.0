@@ -1,10 +1,10 @@
 from functools import wraps
 
 
-def auto_commit(func):
+async def auto_commit(func):
     @wraps(func)
-    async def auto_commit_wraps(self, commit=True):
+    async def auto_commit_wraps(self, objects, commit=True):
+        await func(self, objects)
         if commit:
             await self._session.commit()
-        return func
     return auto_commit_wraps
