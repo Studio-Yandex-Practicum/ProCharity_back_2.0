@@ -48,10 +48,17 @@ class User(Base):
         return f"<User {self.telegram_id}>"
 
 
-class Task(Base):
+class Content(Base):
+    __tablename__ = 'contents'
+    is_archive: Mapped[bool]
+
+
+class Task(Content):
     """Модель задач."""
 
     __tablename__ = "tasks"
+    content_id = mapped_column(ForeignKey("contents.id"), primary_key=True)
+    content: Mapped["Content"] = relationship(back_populates="tasks")
     title = Mapped[str]
     name_organization = Mapped[str]
     deadline = Mapped[Date]
@@ -63,7 +70,7 @@ class Task(Base):
     location = Mapped[str]
     link = Mapped[str]
     description = Mapped[str]
-    archive = Mapped[bool]
+    is_archive = Mapped[bool]
     created_date: Mapped[date] = mapped_column(
         server_default=func.current_timestamp(), nullable=False
     )
@@ -77,12 +84,14 @@ class Task(Base):
         return f"<Task {self.title}>"
 
 
-class Category(Base):
+class Category(Content):
     """Модель категорий."""
 
     __tablename__ = "categories"
+    content_id = Column(Integer, ForeignKey('contents.id'), primary_key=True)
+    content: Mapped["Content"] = relationship(back_populates="categories")
     name: Mapped[str] = mapped_column(String(100))
-    archive: Mapped[bool]
+    is_archive: Mapped[bool]
 
     users: Mapped[list["User"]] = relationship(
         secondary="users_categories", back_populates="categories"

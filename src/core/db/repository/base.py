@@ -1,7 +1,7 @@
 import abc
 from typing import TypeVar
 
-from sqlalchemy import select, update, and_
+from sqlalchemy import select, update, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -64,22 +64,36 @@ class AbstractRepository(abc.ABC):
         await self._session.commit()
 
 
-class ContentRepository(abc.ABC, AbstractRepository):
+class ContentRepository(AbstractRepository, abc.ABC):
     async def archive_all(self) -> None:
         """Добавляет все объекты модели в архив."""
-        await self._session.execute(update(self._model).values({"is_archive": True}))
+        await self._session.execute(
+            update(self._model)
+            .where(self._model.is_archive == False)
+            .values({"is_archive": True}))
         await self._session.commit()
 
     async def get_all_ids(self) -> list[int]:
         """Возвращает id всех объектов модели из базы данных."""
-        ids = await self._session.execute(select(self._model.id))
+        ids = await self._session.execute(
+            select(self._model.id)
+            .where(self._model.is_archive == False)
+        )
         return ids.scalars().all()
 
-    async def get_filtered(self, ids: list[int], is_archived: bool) -> list[DatabaseModel]:
-        """Возвращает объекты модели из базы данных, соответствующие указанным фильтрам."""
+    async def get_where_in_ids_or_is_arhcived(self, ids: list[int], is_archived: bool) -> list[DatabaseModel]:
+        """
+    Возвращает список объектов модели из базы данных, соответствующих следующим условиям:
+    1. ID объекта содержится в указанном списке `ids` или
+    2. Статус архивации объекта соответствует значению `is_archived`.
+
+    :param ids: Список идентификаторов объектов, которые нужно вернуть.
+    :param is_archived: Статус архивации объектов для выборки.
+    :return: Список объектов модели, соответствующих указанным условиям.
+    """
         objects = await self._session.execute(
             select(self._model).where(
-                and_(self._model.id.in_(ids), self._model.is_archive == is_archived)
+                or_(self._model.id.in_(ids), self._model.is_archive == is_archived)
             )
         )
         return objects.scalars().all()

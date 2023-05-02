@@ -1,6 +1,7 @@
 import abc
 
 from fastapi import Depends
+from src.core.db.models import Content
 
 
 class ContentService(abc.ABC):
@@ -9,13 +10,14 @@ class ContentService(abc.ABC):
     def __init__(self, repository: any = Depends()):
         self._repository = repository
 
-    async def actualize_objects(self, objects: list[any], model_class: any) -> None:
+    async def actualize_objects(self, objects: list[Content]) -> None:  # Используйте Content вместо any
         to_create, to_update = [], []
         await self._repository.archive_all()
         already_have = await self._repository.get_all_ids()
         for obj in objects:
             if obj.id not in already_have:
-                to_create.append(model_class(**obj.dict(), is_archive=False))
+                # Используйте _repository._model вместо model_class
+                to_create.append(self._repository._model(**obj.dict(), is_archive=False))
             else:
                 to_update.append({**obj.dict(), "is_archive": False})
         if to_create:
@@ -23,5 +25,5 @@ class ContentService(abc.ABC):
         if to_update:
             await self._repository.update_all(to_update)
 
-    async def get_all(self, ids: list[int], is_archived: bool) -> list[any]:
-        return await self._repository.get_filtered(ids, is_archived)
+    async def get_all(self) -> list[any]:
+        return await self._repository.get_all()
