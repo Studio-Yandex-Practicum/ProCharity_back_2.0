@@ -1,8 +1,14 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
+from constaints.callback_data import (VIEW, CHANGE, SEND,
+                                      ASK, ABOUT, SUBSCRIPTION)
+from buttons import (VIEW_OPENED_JOBS, CHANGE_COMPETENCIES,
+                     SEND_SUGGESTION_BUG, ASK_QUESTION,
+                     ABOUT_PLATFORM, START_STOP_SUBSCRIPTION)
 
-async def start_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Привет! Это бот платформы интеллектуального волонтерства " "ProCharity",
@@ -13,28 +19,28 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Create button menu."""
     keyboard = [
         [InlineKeyboardButton(
-            "Посмотреть открытые задания",
-            callback_data="view_tasks"
+            VIEW_OPENED_JOBS,
+            callback_data=VIEW
         )],
         [InlineKeyboardButton(
-            "Изменить компетенции",
-            callback_data="change_category"
+            CHANGE_COMPETENCIES,
+            callback_data=CHANGE
         )],
         [InlineKeyboardButton(
-            "Отправить предложение/ошибку",
-            callback_data="send_error_or_proposal"
+            SEND_SUGGESTION_BUG,
+            callback_data=SEND
         )],
         [InlineKeyboardButton(
-            "Задать свой вопрос",
-            callback_data="ask_your_question"
+            ASK_QUESTION,
+            callback_data=ASK
         )],
         [InlineKeyboardButton(
-            "О платформе",
-            callback_data="about_project"
+            ABOUT_PLATFORM,
+            callback_data=ABOUT
         )],
         [InlineKeyboardButton(
-            "⏹️ Остановить / ▶️ включить подписку на задания",
-            callback_data="job_subscription"
+            START_STOP_SUBSCRIPTION,
+            callback_data=SUBSCRIPTION
         )],
     ]
 
@@ -45,7 +51,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def send_callback_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:  # TODO delete this
+async def send_answer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:  # TODO delete this
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     await query.answer()

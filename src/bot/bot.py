@@ -2,14 +2,14 @@ from telegram.ext import AIORateLimiter, Application, CommandHandler, CallbackQu
 
 from src.settings import settings
 
-from .handlers import start_callback, menu_callback, send_callback_data
+from .handlers import start_command, menu_callback, send_answer
 
 
 def create_bot() -> Application:
     bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
-    bot.add_handler(CommandHandler("start", start_callback))
+    bot.add_handler(CommandHandler("start", start_command))
     bot.add_handler(CommandHandler("menu", menu_callback))
-    bot.add_handler(CallbackQueryHandler(send_callback_data))
+    bot.add_handler(CallbackQueryHandler(send_answer))
     return bot
 
 

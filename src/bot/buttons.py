@@ -1,0 +1,6 @@
+VIEW_OPENED_JOBS = "Посмотреть открытые задания"
+CHANGE_COMPETENCIES = "Изменить компетенции"
+SEND_SUGGESTION_BUG = "Отправить предложение/ошибку"
+ASK_QUESTION = "Задать свой вопрос"
+ABOUT_PLATFORM = "О платформе"
+START_STOP_SUBSCRIPTION = "⏹️ Остановить / ▶️ включить подписку на задания"

@@ -1,0 +1,6 @@
+VIEW = "view_tasks"
+CHANGE = "change_category"
+SEND = "send_error_or_proposal"
+ASK = "ask_your_question"
+ABOUT = "about_project"
+SUBSCRIPTION = "job_subscription"
