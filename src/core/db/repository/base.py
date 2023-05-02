@@ -1,7 +1,7 @@
 import abc
 from typing import TypeVar
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -64,13 +64,22 @@ class AbstractRepository(abc.ABC):
         await self._session.commit()
 
 
-class ContentRepository(AbstractRepository):
+class ContentRepository(abc.ABC, AbstractRepository):
     async def archive_all(self) -> None:
         """Добавляет все объекты модели в архив."""
-        await self._session.execute(update(self._model).values({"archive": True}))
+        await self._session.execute(update(self._model).values({"is_archive": True}))
         await self._session.commit()
 
     async def get_all_ids(self) -> list[int]:
         """Возвращает id всех объектов модели из базы данных."""
         ids = await self._session.execute(select(self._model.id))
         return ids.scalars().all()
+
+    async def get_filtered(self, ids: list[int], is_archived: bool) -> list[DatabaseModel]:
+        """Возвращает объекты модели из базы данных, соответствующие указанным фильтрам."""
+        objects = await self._session.execute(
+            select(self._model).where(
+                and_(self._model.id.in_(ids), self._model.is_archive == is_archived)
+            )
+        )
+        return objects.scalars().all()
