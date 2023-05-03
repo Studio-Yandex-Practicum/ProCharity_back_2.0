@@ -1,13 +1,10 @@
 import logging
-import os
 import sys
 
 import structlog
 from structlog.types import EventDict, Processor
 
 from src.settings import settings
-
-os.makedirs(settings.LOG_DIR, exist_ok=True)
 
 
 def _drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:
@@ -30,6 +27,7 @@ def setup_logging():
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.stdlib.ExtraAdder(),
+        _drop_color_message_key,
         timestamper,
         structlog.processors.StackInfoRenderer(),
     ]
@@ -91,8 +89,6 @@ def setup_uvicorn_logging():
     """Настройки логирования uvicorn."""
     if not structlog.is_configured():
         setup_logging()
-    cfg = structlog.get_config()
-    cfg["processors"].insert(-1, _drop_color_message_key)
     for _log in logging.root.manager.loggerDict.keys():
         logging.getLogger(_log).handlers.clear()
         logging.getLogger(_log).propagate = True
