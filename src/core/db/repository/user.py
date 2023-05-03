@@ -22,13 +22,7 @@ class UserRepository(AbstractRepository):
         Если ранее существовавший юзер делает /start в боте, то проверяется/обновляется username
         и сбрасывается флаг "banned" - признак, что бот у него был заблокирован.
         """
-        user_changed = False
-        if user.username != username:
-            user.username = username
-            user_changed = True
-        if user.banned:
-            user.banned = False
-            user_changed = True
-        if user_changed:
+        if user.username != username or user.banned:
+            user.username, user.banned = username, False
             await self.update(user.id, user)
         return user

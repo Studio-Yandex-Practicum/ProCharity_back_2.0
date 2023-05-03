@@ -15,9 +15,16 @@ async def start_callback(
         telegram_id=update.effective_chat.id,
         username=update.effective_chat.username,
     )
-    callback_data = bot_constants.COMMAND__GREETING
-    button = [[InlineKeyboardButton(text="Начнём", callback_data=callback_data)]]
-    keyboard = InlineKeyboardMarkup(button)
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    text="Начнём",
+                    callback_data=bot_constants.COMMAND__GREETING,
+                )
+            ]
+        ]
+    )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Привет! 👋 \n\n"

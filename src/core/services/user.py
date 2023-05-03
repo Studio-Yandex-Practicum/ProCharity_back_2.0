@@ -12,7 +12,7 @@ class UserService:
     def __init__(self, sessionmaker: Generator[AsyncSession, None, None] = get_session) -> None:
         self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
 
-    async def register_user(self, telegram_id: int, username: str = "") -> None:
+    async def register_user(self, telegram_id: int, username: str = "") -> User:
         """Регистрирует нового пользователя по telegram_id.
 
         Если пользователь найден, обновляет имя и флаг "заблокирован".
@@ -21,9 +21,8 @@ class UserService:
             user_repository = UserRepository(session)
             user = await user_repository.get_by_telegram_id(telegram_id)
             if user is not None:
-                await user_repository.restore_existing_user(user=user, username=username)
-                return None
+                return await user_repository.restore_existing_user(user=user, username=username)
             user = User()
             user.telegram_id = telegram_id
             user.username = username
-            await user_repository.create(user)
+            return await user_repository.create(user)
