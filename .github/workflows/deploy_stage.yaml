@@ -20,7 +20,7 @@ env:
   REP_OWNER: studio-yandex-practicum
   IMAGE_NAME: procharity_back_2.0_backend
   DEPLOY_PATH: /procharity2/full
-  WORK_DIR: /ProCharity_back_2.0
+  WORK_DIR: /app
 
 defaults:
   run:
