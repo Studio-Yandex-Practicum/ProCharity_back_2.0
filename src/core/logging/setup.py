@@ -1,7 +1,6 @@
 import logging
 import os
 import sys
-from logging.handlers import RotatingFileHandler
 
 import structlog
 from structlog.types import EventDict, Processor
@@ -64,17 +63,9 @@ def setup_logging():
     )
 
     stream_handler = logging.StreamHandler()
-    file_handler = RotatingFileHandler(
-        os.path.join(settings.LOG_DIR, settings.LOG_FILE),
-        maxBytes=settings.LOG_FILE_SIZE,
-        backupCount=settings.LOG_FILES_TO_KEEP,
-        encoding="UTF-8",
-    )
     stream_handler.setFormatter(formatter)
-    file_handler.setFormatter(formatter)
     root_logger = logging.getLogger()
     root_logger.addHandler(stream_handler)
-    root_logger.addHandler(file_handler)
     root_logger.setLevel(settings.LOG_LEVEL.upper())
 
     def handle_exception(exc_type, exc_value, exc_traceback):
