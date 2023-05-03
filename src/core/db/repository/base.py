@@ -65,21 +65,31 @@ class AbstractRepository(abc.ABC):
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
-    async def archive_all(self) -> None:
-        """Добавляет все объекты модели в архив."""
+    async def set_all_archive_status_true(self, ids: list[int]) -> None:
+        """Устанавливает статус архивации объектов модели с указанными идентификаторами на True."""
         await self._session.execute(
             update(self._model)
-            .where(self._model.is_archive == False)
+            .where(
+                or_(
+                    self._model.is_archive == False,
+                    self._model.id.in_(ids)
+                )
+            )
             .values({"is_archive": True}))
         await self._session.commit()
 
-    async def get_all_ids(self) -> list[int]:
-        """Возвращает id всех объектов модели из базы данных."""
-        ids = await self._session.execute(
+    async def get_all_non_archived_ids(self, ids: list[int]) -> list[int]:
+        """Возвращает список идентификаторов неархивированных объектов модели
+        из базы данных с указанными идентификаторами."""
+        filtered_ids = await self._session.execute(
             select(self._model.id)
-            .where(self._model.is_archive == False)
+            .where(
+                or_(self._model.is_archive == False,
+                    self._model.id.in_(ids)
+                    )
+            )
         )
-        return ids.scalars().all()
+        return filtered_ids.scalars().all()
 
     async def get_where_in_ids_or_is_arhcived(self, ids: list[int], is_archived: bool) -> list[DatabaseModel]:
         """

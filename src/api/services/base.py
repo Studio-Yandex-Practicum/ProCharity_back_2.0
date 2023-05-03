@@ -10,13 +10,12 @@ class ContentService(abc.ABC):
     def __init__(self, repository: any = Depends()):
         self._repository = repository
 
-    async def actualize_objects(self, objects: list[Content]) -> None:  # Используйте Content вместо any
+    async def actualize_objects(self, objects: list[Content]) -> None:
         to_create, to_update = [], []
-        await self._repository.archive_all()
-        already_have = await self._repository.get_all_ids()
+        await self._repository.set_all_archive_status_true()
+        already_have = await self._repository.get_all_non_archived_ids()
         for obj in objects:
             if obj.id not in already_have:
-                # Используйте _repository._model вместо model_class
                 to_create.append(self._repository._model(**obj.dict(), is_archive=False))
             else:
                 to_update.append({**obj.dict(), "is_archive": False})
@@ -25,5 +24,5 @@ class ContentService(abc.ABC):
         if to_update:
             await self._repository.update_all(to_update)
 
-    async def get_all(self) -> list[any]:
+    async def get_all(self) -> list[Content]:
         return await self._repository.get_all()

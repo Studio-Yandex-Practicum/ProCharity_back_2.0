@@ -4,7 +4,7 @@ from sqlalchemy.orm import (
     relationship, Mapped, mapped_column, backref, DeclarativeBase)
 from sqlalchemy.sql import expression, func
 from datetime import date
-
+from abc import ABC
 
 class Base(DeclarativeBase):
     """Основа для базового класса."""
@@ -48,8 +48,8 @@ class User(Base):
         return f"<User {self.telegram_id}>"
 
 
-class Content(Base):
-    __tablename__ = 'contents'
+class Content(Base, ABC):
+    __abstract__ = True
     is_archive: Mapped[bool]
 
 
@@ -57,8 +57,6 @@ class Task(Content):
     """Модель задач."""
 
     __tablename__ = "tasks"
-    content_id = mapped_column(ForeignKey("contents.id"), primary_key=True)
-    content: Mapped["Content"] = relationship(back_populates="tasks")
     title = Mapped[str]
     name_organization = Mapped[str]
     deadline = Mapped[Date]
@@ -88,8 +86,6 @@ class Category(Content):
     """Модель категорий."""
 
     __tablename__ = "categories"
-    content_id = Column(Integer, ForeignKey('contents.id'), primary_key=True)
-    content: Mapped["Content"] = relationship(back_populates="categories")
     name: Mapped[str] = mapped_column(String(100))
     is_archive: Mapped[bool]
 
