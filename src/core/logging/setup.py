@@ -11,7 +11,7 @@ from src.settings import settings
 os.makedirs(settings.LOG_DIR, exist_ok=True)
 
 
-def drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:
+def _drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:
     """
     Uvicorn логирует сообщение повторно в дополнительной секции
     `color_message`, но нам это не нужно. Данная функция ("процессор")
@@ -31,7 +31,6 @@ def setup_logging():
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.stdlib.ExtraAdder(),
-        drop_color_message_key,
         timestamper,
         structlog.processors.StackInfoRenderer(),
     ]
@@ -78,13 +77,6 @@ def setup_logging():
     root_logger.addHandler(file_handler)
     root_logger.setLevel(settings.LOG_LEVEL.upper())
 
-    for _log in logging.root.manager.loggerDict.keys():
-        logging.getLogger(_log).handlers.clear()
-        logging.getLogger(_log).propagate = True
-
-    logging.getLogger("uvicorn.access").handlers.clear()
-    logging.getLogger("uvicorn.access").propagate = False
-
     def handle_exception(exc_type, exc_value, exc_traceback):
         """
         Логирует любое непойманное исключение вместо его вывода на печать
@@ -102,3 +94,17 @@ def setup_logging():
         )
 
     sys.excepthook = handle_exception
+
+
+def setup_uvicorn_logging():
+    """Настройки логирования uvicorn."""
+    if not structlog.is_configured():
+        setup_logging()
+    cfg = structlog.get_config()
+    cfg["processors"].insert(-1, _drop_color_message_key)
+    for _log in logging.root.manager.loggerDict.keys():
+        logging.getLogger(_log).handlers.clear()
+        logging.getLogger(_log).propagate = True
+
+    logging.getLogger("uvicorn.access").handlers.clear()
+    logging.getLogger("uvicorn.access").propagate = False
