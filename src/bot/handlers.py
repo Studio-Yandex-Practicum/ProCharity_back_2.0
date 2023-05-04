@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from buttons import KEYBOARD
+from src.bot.buttons import MENU_KEYBOARD
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -13,7 +13,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Create button menu."""
-    keyboard = KEYBOARD
+    keyboard = MENU_KEYBOARD
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
