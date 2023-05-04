@@ -17,8 +17,8 @@ def _drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:
     return event_dict
 
 
-def setup_logging():
-    """Настройки логирования."""
+def _setup_structlog() -> structlog.stdlib.ProcessorFormatter:
+    """Настройки structlog."""
     timestamper = structlog.processors.TimeStamper(fmt="iso")
 
     shared_processors: list[Processor] = [
@@ -59,12 +59,36 @@ def setup_logging():
             log_renderer,
         ],
     )
+    return formatter
 
+
+def _setup_root_logging(
+    formatter: structlog.stdlib.ProcessorFormatter,
+) -> logging.Logger:
+    """Настройки корневого логгера."""
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
     root_logger = logging.getLogger()
     root_logger.addHandler(stream_handler)
     root_logger.setLevel(settings.LOG_LEVEL.upper())
+    return root_logger
+
+
+def _setup_uvicorn_logging():
+    """Настройки логирования uvicorn."""
+    for _log in logging.root.manager.loggerDict.keys():
+        logging.getLogger(_log).handlers.clear()
+        logging.getLogger(_log).propagate = True
+
+    logging.getLogger("uvicorn.access").handlers.clear()
+    logging.getLogger("uvicorn.access").propagate = False
+
+
+def setup_logging():
+    """Основные настройки логирования."""
+    formatter = _setup_structlog()
+    root_logger = _setup_root_logging(formatter)
+    _setup_uvicorn_logging()
 
     def handle_exception(exc_type, exc_value, exc_traceback):
         """
@@ -83,15 +107,3 @@ def setup_logging():
         )
 
     sys.excepthook = handle_exception
-
-
-def setup_uvicorn_logging():
-    """Настройки логирования uvicorn."""
-    if not structlog.is_configured():
-        setup_logging()
-    for _log in logging.root.manager.loggerDict.keys():
-        logging.getLogger(_log).handlers.clear()
-        logging.getLogger(_log).propagate = True
-
-    logging.getLogger("uvicorn.access").handlers.clear()
-    logging.getLogger("uvicorn.access").propagate = False
