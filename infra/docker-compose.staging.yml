@@ -13,18 +13,9 @@ services:
           condition: service_healthy
     ports:
         - "8000:8000"
-    environment:
-      - POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-      - POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-      - POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-      - DB_HOST=${{ secrets.DB_HOST }}
-      - DB_PORT=${{ secrets.DB_PORT }}
-      - BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
-      - BOT_WEBHOOK_MODE=${{ secrets.BOT_WEBHOOK_MODE }}
-      - APPLICATION_URL=${{ secrets.APPLICATION_URL }}
-      - SECRET_KEY=${{ secrets.SECRET_KEY }}
-      - ROOT_PATH=${{ secrets.ROOT_PATH }}
-
+    env_file:
+        - .env
+ 
   postgres:
     image: postgres:13.2
     container_name: procharity_postgres
