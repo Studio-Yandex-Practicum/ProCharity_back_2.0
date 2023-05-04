@@ -30,12 +30,11 @@ class AbstractRepository(abc.ABC):
             raise NotFoundException(object_name=self._model.__name__, object_id=_id)
         return db_obj
 
-    @auto_commit
     async def create(self, instance: DatabaseModel) -> DatabaseModel:
         """Создает новый объект модели и сохраняет в базе."""
         self._session.add(instance)
         try:
-            self._session.commit()
+            auto_commit()
         except IntegrityError as exc:
             raise AlreadyExistsException(instance) from exc
 
