@@ -47,8 +47,8 @@ class Settings(BaseSettings):
         """Получить url-ссылку на эндпоинт для работы telegram в режиме webhook."""
         return urljoin(self.api_url, "telegram/webhook")
 
-    class Config:
-        env_file = ENV_FILE
+    # class Config:
+    #     env_file = ENV_FILE
 
 
 @lru_cache()
