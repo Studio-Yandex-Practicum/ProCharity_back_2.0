@@ -1,4 +1,6 @@
-from telegram.ext import AIORateLimiter, Application, CommandHandler, CallbackQueryHandler
+import logging
+
+from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler
 
 from src.settings import settings
 from .handlers import start_callback, menu_callback, categories_callback, subcategories_callback
@@ -26,4 +28,5 @@ async def start_bot() -> Application:
         await bot.initialize()
         await bot.updater.start_polling()
     await bot.start()
+    logging.info("Bot started")
     return bot
