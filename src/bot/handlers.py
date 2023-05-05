@@ -19,7 +19,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )],
         [InlineKeyboardButton(
             "Изменить компетенции",
-            callback_data="change_category"
+            callback_data='change_category'
         )],
         [InlineKeyboardButton(
             "Отправить предложение/ошибку",
@@ -52,7 +52,7 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     categories = await category_service.get_unarchived_parents()
 
     categories_buttons = [
-        [InlineKeyboardButton(category.name, callback_data=str(category.id))] for category in categories]
+        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories]
     keyboard.extend(categories_buttons)
 
     keyboard.extend([
@@ -62,7 +62,7 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
         )],
         [InlineKeyboardButton(
             "Готово 👌",
-            callback_data="change_category"
+            callback_data="confirm_categories"
         )]])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -75,8 +75,25 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-async def send_callback_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:  # TODO delete this
-    """Parses the CallbackQuery and updates the message text."""
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text(text=f"Selected option: {query.data}")
+async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = []
+    category_service = CategoryService()
+    parent_id = int(update.callback_query.data.split('_')[1])
+    subcategories = await category_service.get_unarchived_subcategories(parent_id)
+
+    categories_buttons = [
+        [InlineKeyboardButton(category.name, callback_data=f'category_{parent_id}')] for category in subcategories]
+    keyboard.extend(categories_buttons)
+
+    keyboard.append(
+        [InlineKeyboardButton(
+            "Назад ⬅️",
+            callback_data="change_category"
+        )])
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.callback_query.message.edit_text(
+        "Выберите категории",
+        reply_markup=reply_markup
+    )

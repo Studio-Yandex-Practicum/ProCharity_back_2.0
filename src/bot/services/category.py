@@ -17,3 +17,8 @@ class CategoryService:
         async with self._sessionmaker() as session:
             repository = CategoryRepository(session)
             return await repository.get_unarchived_parents()
+
+    async def get_unarchived_subcategories(self, parent_id) -> list[Category]:
+        async with self._sessionmaker() as session:
+            repository = CategoryRepository(session)
+            return await repository.get_unarchived_subcategories(parent_id)
