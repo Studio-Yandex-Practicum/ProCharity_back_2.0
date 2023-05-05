@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv infra/docker-compose.staging.yml docker-compose.yaml
+            mv infra/docker-compose.staging.yml infra/docker-compose.yaml
             rm -f .env
             cat > .env <<- EOM
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
@@ -113,9 +113,9 @@ jobs:
             cd ${{ env.DEPLOY_PATH }}
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker image prune -f
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose --file docker-compose.yaml stop
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose --file docker-compose.yaml rm backend
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose --file docker-compose.yaml up -d
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose --file infra/docker-compose.yaml stop
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose --file infra/docker-compose.yaml rm backend
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose --file infra/docker-compose.yaml up -d
       - name: Making migrations
         uses: appleboy/ssh-action@master
         with:
