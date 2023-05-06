@@ -1,6 +1,5 @@
 import asyncio
 import string
-from fastapi import Depends
 
 from datetime import datetime, timedelta
 from random import randint, choice, random, choices
@@ -181,7 +180,7 @@ async def delete_all_data(session: async_sessionmaker[AsyncSession],) -> None:
 
 async def run():
     sessions = get_session()
-    async for session in sessions:
+    async with sessions as session:
         await delete_all_data(session)
         print("Deleted data from the Tasks, Categories table.")
         await filling_category_in_db(session)
