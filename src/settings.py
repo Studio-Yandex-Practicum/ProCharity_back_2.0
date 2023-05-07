@@ -1,7 +1,14 @@
+from pathlib import Path
 from urllib.parse import urljoin
 
 from pydantic import BaseSettings
 from pydantic.tools import lru_cache
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if Path.exists(BASE_DIR / ".env"):
+    ENV_FILE = BASE_DIR / ".env"
+else:
+    ENV_FILE = BASE_DIR / ".env.example"
 
 
 class Settings(BaseSettings):
@@ -39,6 +46,9 @@ class Settings(BaseSettings):
     def telegram_webhook_url(self) -> str:
         """Получить url-ссылку на эндпоинт для работы telegram в режиме webhook."""
         return urljoin(self.api_url, "telegram/webhook")
+
+    # class Config:
+    #     env_file = ENV_FILE
 
 
 @lru_cache()
