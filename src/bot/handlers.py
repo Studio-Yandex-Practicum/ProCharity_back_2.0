@@ -3,6 +3,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from src.bot import constants as bot_constants
+from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
 from src.core.services.user import UserService
 
 
@@ -54,9 +55,20 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Выбери, что тебя интересует:", reply_markup=reply_markup)
 
 
-async def send_callback_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:  # TODO delete this
-    """Parse the CallbackQuery and update the message text."""
-    query = update.callback_query
-    await query.answer()
+async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    reply_markup = await get_categories_keyboard()
+    await update.message.reply_text(
+        "Чтобы я знал, с какими задачами ты готов помогать, "
+        "выбери свои профессиональные компетенции (можно выбрать "
+        "несколько). После этого, нажми на пункт \"Готово 👌\"",
+        reply_markup=reply_markup
+    )
 
-    await query.edit_message_text(text=f"Selected option: {query.data}")
+
+async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    parent_id = int(update.callback_query.data.split('_')[1])
+    reply_markup = await get_subcategories_keyboard(parent_id)
+    await update.callback_query.message.edit_text(
+        "Выберите категории",
+        reply_markup=reply_markup
+    )
