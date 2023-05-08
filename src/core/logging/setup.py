@@ -1,10 +1,14 @@
 import logging
+import logging.config
+import os
 import sys
 
 import structlog
 from structlog.types import EventDict, Processor
 
 from src.settings import settings
+
+os.makedirs(settings.LOG_DIR, exist_ok=True)
 
 
 def _drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:
@@ -17,61 +21,85 @@ def _drop_color_message_key(_, __, event_dict: EventDict) -> EventDict:
     return event_dict
 
 
-def _setup_structlog() -> structlog.stdlib.ProcessorFormatter:
+TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
+
+PRE_CHAIN: list[Processor] = [
+    structlog.contextvars.merge_contextvars,
+    structlog.stdlib.add_logger_name,
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.PositionalArgumentsFormatter(),
+    structlog.stdlib.ExtraAdder(),
+    _drop_color_message_key,
+    TIMESTAMPER,
+    structlog.processors.StackInfoRenderer(),
+]
+
+
+LOGGING_DICTCONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processors": [
+                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                structlog.dev.ConsoleRenderer(
+                    colors=False,
+                    exception_formatter=structlog.dev.plain_traceback,
+                ),
+            ],
+            "foreign_pre_chain": PRE_CHAIN,
+        },
+        "colored": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processors": [
+                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                structlog.dev.ConsoleRenderer(colors=True),
+            ],
+            "foreign_pre_chain": PRE_CHAIN,
+        },
+    },
+    "handlers": {
+        "default": {
+            "level": settings.LOG_LEVEL,
+            "class": "logging.StreamHandler",
+            "formatter": "colored",
+        },
+        "file": {
+            "level": settings.LOG_LEVEL,
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(settings.LOG_DIR, settings.LOG_FILE),
+            "mode": "a",
+            "maxBytes": settings.LOG_FILE_SIZE,
+            "backupCount": settings.LOG_FILES_TO_KEEP,
+            "encoding": "UTF-8",
+            "formatter": "plain",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["default", "file"],
+            "level": settings.LOG_LEVEL,
+            "propagate": True,
+        },
+    },
+}
+
+
+def _setup_structlog():
     """Настройки structlog."""
-    timestamper = structlog.processors.TimeStamper(fmt="iso")
 
-    shared_processors: list[Processor] = [
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.stdlib.ExtraAdder(),
-        _drop_color_message_key,
-        timestamper,
-        structlog.processors.StackInfoRenderer(),
-    ]
-
-    if settings.LOG_TO_JSON:
-        shared_processors.append(structlog.processors.format_exc_info)
+    logging.config.dictConfig(LOGGING_DICTCONFIG)
 
     structlog.configure(
-        processors=shared_processors
+        processors=PRE_CHAIN
         + [
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
-
-    log_renderer: structlog.types.Processor
-    if settings.LOG_TO_JSON:
-        log_renderer = structlog.processors.JSONRenderer()
-    else:
-        log_renderer = structlog.dev.ConsoleRenderer(
-            exception_formatter=structlog.dev.rich_traceback
-        )
-
-    formatter = structlog.stdlib.ProcessorFormatter(
-        foreign_pre_chain=shared_processors,
-        processors=[
-            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            log_renderer,
-        ],
-    )
-    return formatter
-
-
-def _setup_root_logging(
-    formatter: structlog.stdlib.ProcessorFormatter,
-) -> logging.Logger:
-    """Настройки корневого логгера."""
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    root_logger = logging.getLogger()
-    root_logger.addHandler(stream_handler)
-    root_logger.setLevel(settings.LOG_LEVEL.upper())
-    return root_logger
 
 
 def _setup_uvicorn_logging():
@@ -86,9 +114,10 @@ def _setup_uvicorn_logging():
 
 def setup_logging():
     """Основные настройки логирования."""
-    formatter = _setup_structlog()
-    root_logger = _setup_root_logging(formatter)
+    _setup_structlog()
     _setup_uvicorn_logging()
+
+    root_logger = logging.getLogger()
 
     def handle_exception(exc_type, exc_value, exc_traceback):
         """

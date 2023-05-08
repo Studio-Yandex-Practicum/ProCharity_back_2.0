@@ -31,7 +31,11 @@ class Settings(BaseSettings):
 
     # Настройки логирования
     LOG_LEVEL: str = "INFO"
-    LOG_TO_JSON: bool = False
+    LOG_DIR: str | Path = BASE_DIR / "logs"
+    LOG_FILE: str = "app.log"
+    LOG_LEVEL: str = "INFO"
+    LOG_FILE_SIZE: int = 10 * 2**20
+    LOG_FILES_TO_KEEP: int = 5
 
     @property
     def database_url(self) -> str:
