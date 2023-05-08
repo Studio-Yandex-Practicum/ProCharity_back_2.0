@@ -10,4 +10,4 @@ RUN pip3 install -r /app/requirements.txt --no-cache-dir
 
 COPY . .
 
-CMD ["uvicorn src:app", "0.0.0.0:8000"]
+CMD ["uvicorn", "src:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]

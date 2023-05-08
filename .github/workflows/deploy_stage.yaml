@@ -4,23 +4,23 @@ on:
   push:
     branches:
       - develop
+      - 'feature/**'
+      - 'fix/**'
+      - 'refactoring/**'
 
   pull_request:
     branches:
       - develop
-      - 'feature/**'
-      - 'fix/**'
-      - 'refactoring/**'
-    types: [closed]
+    types: [ closed ]
 
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
   REP_OWNER: studio-yandex-practicum
-  IMAGE_NAME: ProCharity_back_2.0_backend
+  IMAGE_NAME: procharity_back_2.0_backend
   DEPLOY_PATH: /procharity2/full
-  WORK_DIR: /ProCharity_back_2.0
+  WORK_DIR: /app
 
 defaults:
   run:
@@ -29,24 +29,23 @@ defaults:
 jobs:
   build_and_push_docker_image:
     name: Push Docker image to GitHub Packages
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment:
-      name: Stage
+      name: deploy
 
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
 
       - name: Docker login
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: Dockerfile
@@ -58,11 +57,10 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
   deploy:
     name: Deploy
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     needs: build_and_push_docker_image
     environment:
-      name: Stage
+      name: deploy
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -73,7 +71,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "infra/docker-compose.staging.yaml,infra/nginx/nginx.local.conf"
+          source: "infra/docker-compose.staging.yml,infra/nginx/nginx.local.conf"
           target: ${{ env.DEPLOY_PATH }}
 
       - name: Create .env file
@@ -84,7 +82,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv docker-compose.stage.yaml docker-compose.yaml
+            mv infra/docker-compose.staging.yml infra/docker-compose.yaml
             rm -f .env
             cat > .env <<- EOM
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
@@ -100,10 +98,9 @@ jobs:
             EOM
   start_application:
     name: Start application
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment:
-      name: Stage
+      name: deploy
     needs: deploy
     steps:
       - name: Start application
@@ -113,12 +110,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd ${{ env.DEPLOY_PATH }}
+            cd ${{ env.DEPLOY_PATH }}/infra
             docker image prune -f
             docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
-            docker-compose --file docker-compose.yaml stop
-            docker-compose --file docker-compose.yaml rm backend
-            docker-compose --file docker-compose.yaml up -d
+            docker compose --file docker-compose.yaml stop
+            docker compose --file docker-compose.yaml rm backend
+            docker compose --file docker-compose.yaml up -d
       - name: Making migrations
         uses: appleboy/ssh-action@master
         with:
@@ -126,8 +123,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd ${{ env.DEPLOY_PATH }}
-            docker-compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
+            cd ${{ env.DEPLOY_PATH }}/infra
+            docker compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
       - name: Sleep for 30 seconds
         run: sleep 30s
         shell: bash
