@@ -1,16 +1,16 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, Update, InlineKeyboardMarkup
+from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
+
+from src.bot.buttons import MENU_KEYBOARD
 
 from src.bot import constants as bot_constants
 from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
 from src.core.services.user import UserService
 
 
-async def start_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-):
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     await user_service.register_user(
         telegram_id=update.effective_chat.id,
@@ -26,6 +26,7 @@ async def start_callback(
             ]
         ]
     )
+
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Привет! 👋 \n\n"
@@ -41,15 +42,8 @@ async def start_callback(
 
 async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Create button menu."""
-    keyboard = [
-        [InlineKeyboardButton("Посмотреть открытые задания", callback_data="view_tasks")],
-        [InlineKeyboardButton("Изменить компетенции", callback_data="change_category")],
-        [InlineKeyboardButton("Отправить предложение/ошибку", callback_data="send_error_or_proposal")],
-        [InlineKeyboardButton("Задать свой вопрос", callback_data="ask_your_question")],
-        [InlineKeyboardButton("О платформе", callback_data="about_project")],
-        [InlineKeyboardButton("⏹️ Остановить / ▶️ включить подписку на задания", callback_data="job_subscription")],
-    ]
 
+    keyboard = MENU_KEYBOARD
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text("Выбери, что тебя интересует:", reply_markup=reply_markup)
