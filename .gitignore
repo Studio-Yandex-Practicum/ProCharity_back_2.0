@@ -138,3 +138,6 @@ dmypy.json
 # vscode
 .vscode/
 .devcontainer/
+
+# logs
+logs/

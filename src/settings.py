@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
+    SECRET_KEY: str
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
@@ -28,6 +29,10 @@ class Settings(BaseSettings):
     # Настройки бота
     BOT_TOKEN: str
     BOT_WEBHOOK_MODE: bool = False
+
+    # Настройки логирования
+    LOG_LEVEL: str = "INFO"
+    LOG_TO_JSON: bool = False
 
     @property
     def database_url(self) -> str:

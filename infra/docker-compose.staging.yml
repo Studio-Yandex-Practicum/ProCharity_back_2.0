@@ -1,13 +1,16 @@
 version: "3.8"
 
+volumes:
+  postgres_data:
+
 services:
   backend:
-    build:
-      context: ../Dockerfile
+    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:latest
     container_name: procharity_bot_backend
     restart: always
     depends_on:
-        - postgres
+        postgres:
+          condition: service_healthy
     ports:
         - "8000:8000"
     env_file:
@@ -20,7 +23,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - ../.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:1.23.3-alpine
@@ -29,6 +37,6 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./infra/nginx/nginx.local.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.local.conf:/etc/nginx/conf.d/default.conf
     env_file:
-      - .env
+      - ../.env
