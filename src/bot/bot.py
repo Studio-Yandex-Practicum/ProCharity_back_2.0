@@ -3,7 +3,7 @@ import logging
 from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler
 
 from src.settings import settings
-from .handlers import start_callback, menu_callback, categories_callback, subcategories_callback
+from .handlers import start_command, menu_callback, categories_callback, subcategories_callback
 
 
 def create_bot() -> Application:
