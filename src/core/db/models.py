@@ -37,7 +37,6 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
-    date_registration: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
     external_signup_date: Mapped[date] = mapped_column(nullable=True)
     banned: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
 
@@ -58,11 +57,11 @@ class Task(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category"] = relationship(back_populates="tasks")
 
-    bonus = Mapped[int]
-    location = Mapped[str]
-    link = Mapped[str]
+    bonus: Mapped[int]
+    location: Mapped[str]
+    link: Mapped[str]
     description = Mapped[str]
-    archive = Mapped[bool]
+    archive: Mapped[bool]
 
     def __repr__(self):
         return f"<Task {self.title}>"
