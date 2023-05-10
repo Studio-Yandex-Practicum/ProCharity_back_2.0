@@ -7,7 +7,7 @@ from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboar
 from src.core.services.user import UserService
 
 
-async def start_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     await user_service.register_user(
         telegram_id=update.effective_chat.id,
