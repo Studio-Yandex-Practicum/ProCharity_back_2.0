@@ -2,8 +2,8 @@ import logging
 
 from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler
 
+from src.bot.handlers import categories_callback, menu_callback, start_command, subcategories_callback
 from src.settings import settings
-from .handlers import start_callback, menu_callback, categories_callback, subcategories_callback
 
 
 def create_bot() -> Application:
@@ -11,8 +11,8 @@ def create_bot() -> Application:
     bot.add_handler(CommandHandler("start", start_command))
     bot.add_handler(CommandHandler("menu", menu_callback))
     bot.add_handler(CommandHandler("categories", categories_callback))
-    bot.add_handler(CallbackQueryHandler(categories_callback, pattern='change_category'))
-    bot.add_handler(CallbackQueryHandler(subcategories_callback, pattern=r'category_\d+'))
+    bot.add_handler(CallbackQueryHandler(categories_callback, pattern="change_category"))
+    bot.add_handler(CallbackQueryHandler(subcategories_callback, pattern=r"category_\d+"))
     return bot
 
 
