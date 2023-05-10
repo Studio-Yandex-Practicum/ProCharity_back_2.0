@@ -1,12 +1,9 @@
 from telegram import InlineKeyboardButton, Update, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from telegram.ext import ContextTypes
 
-from src.bot.buttons import MENU_KEYBOARD
-
-from src.bot import constants as bot_constants
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
+from src.bot.constants import commands, states
+from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
 from src.core.services.user import UserService
 
 
@@ -21,7 +18,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [
                 InlineKeyboardButton(
                     text="Начнём",
-                    callback_data=bot_constants.COMMAND__GREETING,
+                    callback_data=commands.GREETING,
                 )
             ]
         ]
@@ -37,7 +34,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
-    return bot_constants.GREETING
+    return states.GREETING
 
 
 async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
