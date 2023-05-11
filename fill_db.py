@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker
 )
+from contextlib import asynccontextmanager
 
 from src.core.db.models import Category, Task
 from src.core.db import get_session
@@ -179,8 +180,8 @@ async def delete_all_data(session: async_sessionmaker[AsyncSession],) -> None:
 
 
 async def run():
-    sessions = get_session()
-    async with sessions as session:
+    session_manager = asynccontextmanager(get_session)
+    async with session_manager() as session:
         await delete_all_data(session)
         print("Deleted data from the Tasks, Categories table.")
         await filling_category_in_db(session)
