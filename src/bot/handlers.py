@@ -1,12 +1,9 @@
-from telegram import InlineKeyboardButton, Update, InlineKeyboardMarkup
-from telegram.ext import ContextTypes
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.bot.buttons import MENU_KEYBOARD
-
-from src.bot import constants as bot_constants
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
+from src.bot.constants import commands, states
+from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
 from src.core.services.user import UserService
 
 
@@ -21,7 +18,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [
                 InlineKeyboardButton(
                     text="Начнём",
-                    callback_data=bot_constants.COMMAND__GREETING,
+                    callback_data=commands.GREETING,
                 )
             ]
         ]
@@ -41,7 +38,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Create button menu."""
-
     keyboard = MENU_KEYBOARD
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -53,15 +49,12 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
-        "несколько). После этого, нажми на пункт \"Готово 👌\"",
-        reply_markup=reply_markup
+        'несколько). После этого, нажми на пункт "Готово 👌"',
+        reply_markup=reply_markup,
     )
 
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    parent_id = int(update.callback_query.data.split('_')[1])
+    parent_id = int(update.callback_query.data.split("_")[1])
     reply_markup = await get_subcategories_keyboard(parent_id)
-    await update.callback_query.message.edit_text(
-        "Выберите категории",
-        reply_markup=reply_markup
-    )
+    await update.callback_query.message.edit_text("Выберите категории", reply_markup=reply_markup)
