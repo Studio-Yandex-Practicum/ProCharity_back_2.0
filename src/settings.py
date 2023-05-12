@@ -5,16 +5,16 @@ from pydantic import BaseSettings
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_FILE = None
 if Path.exists(BASE_DIR / ".env"):
     ENV_FILE = BASE_DIR / ".env"
-else:
-    ENV_FILE = BASE_DIR / ".env.example"
 
 
 class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
+    SECRET_KEY: str
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
@@ -28,6 +28,14 @@ class Settings(BaseSettings):
     # Настройки бота
     BOT_TOKEN: str
     BOT_WEBHOOK_MODE: bool = False
+
+    # Настройки логирования
+    LOG_LEVEL: str = "INFO"
+    LOG_DIR: str | Path = BASE_DIR / "logs"
+    LOG_FILE: str = "app.log"
+    LOG_LEVEL: str = "INFO"
+    LOG_FILE_SIZE: int = 10 * 2**20
+    LOG_FILES_TO_KEEP: int = 5
 
     @property
     def database_url(self) -> str:

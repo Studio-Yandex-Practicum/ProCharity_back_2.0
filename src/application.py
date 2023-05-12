@@ -1,8 +1,11 @@
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.router import category_router
+from src.api.router import api_router
 from src.bot.bot import start_bot
+from src.core.logging.middleware import LoggingMiddleware
+from src.core.logging.setup import setup_logging
 from src.settings import settings
 
 
@@ -18,12 +21,15 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(router=category_router, prefix="/api")
+    setup_logging()
+    app.add_middleware(LoggingMiddleware)
+    app.add_middleware(CorrelationIdMiddleware)
+
+    app.include_router(api_router)
 
     @app.on_event("startup")
     async def on_startup():
         """Действия при запуске сервера."""
-        pass
         bot_instance = await start_bot()
         # storing bot_instance to extra state of FastAPI app instance
         # refer to https://www.starlette.io/applications/#storing-state-on-the-app-instance

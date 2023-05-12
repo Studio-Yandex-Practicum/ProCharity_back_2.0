@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import AlreadyExistsException, NotFoundException
+from src.core.utils import auto_commit
 
 DatabaseModel = TypeVar("DatabaseModel")
 
@@ -40,17 +41,17 @@ class AbstractRepository(abc.ABC):
         await self._session.refresh(instance)
         return instance
 
+    @auto_commit
     async def update(self, _id: int, instance: DatabaseModel) -> DatabaseModel:
         """Обновляет существующий объект модели в базе."""
         instance.id = _id
         instance = await self._session.merge(instance)
-        await self._session.commit()
         return instance  # noqa: R504
 
+    @auto_commit
     async def update_all(self, instances: list[dict]) -> list[DatabaseModel]:
         """Обновляет несколько измененных объектов модели в базе."""
         await self._session.execute(update(self._model), instances)
-        await self._session.commit()
         return instances
 
     async def get_all(self) -> list[DatabaseModel]:
@@ -58,12 +59,19 @@ class AbstractRepository(abc.ABC):
         objects = await self._session.execute(select(self._model))
         return objects.scalars().all()
 
-    async def get_all_ids(self) -> list[int]:
-        """Возвращает id всех объекты модели из базы данных."""
-        ids = await self._session.execute(select(self._model.id))
-        return ids.scalars().all()
-
+    @auto_commit
     async def create_all(self, objects: list[DatabaseModel]) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
-        await self._session.commit()
+
+
+class ContentRepository(AbstractRepository):
+    @auto_commit
+    async def archive_all(self) -> None:
+        """Добавляет все объекты модели в архив."""
+        await self._session.execute(update(self._model).values({"archive": True}))
+
+    async def get_all_ids(self) -> list[int]:
+        """Возвращает id всех объектов модели из базы данных."""
+        ids = await self._session.execute(select(self._model.id))
+        return ids.scalars().all()
