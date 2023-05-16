@@ -37,10 +37,10 @@ services:
       - NET_ADMIN
     environment:
       - TZ=Europe/Moscow
-      - URL=e2e5-185-119-1-24.ngrok-free.app
+      - URL=procharity.duckdns.com
       - VALIDATION=http
       - CERTPROVIDER=zerossl
-      - EMAIL=shipkov.alexey@gmail.com
+      - EMAIL=yandex-practicum@yandex.ru
     env_file:
       - ../.env
     volumes:
