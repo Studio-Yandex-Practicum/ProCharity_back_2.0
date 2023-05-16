@@ -51,16 +51,19 @@ async def get_categories_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_subcategories_keyboard(parent_id):
+async def get_subcategories_keyboard(parent_id, context):
     category_service = CategoryService()
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
     keyboard = []
     categories_buttons = [
-        [InlineKeyboardButton(category.name, callback_data=f'category_{parent_id}')] for category in subcategories]
+        [InlineKeyboardButton(category.name, callback_data=f'category_{category.id}')] for category in subcategories]
     keyboard.extend(categories_buttons)
+    context.user_data['parent_id'] = parent_id
+    print(context.user_data)
     keyboard.append(
         [InlineKeyboardButton(
-            "Назад ⬅️",
-            callback_data="change_category"
+        "Назад ⬅️",
+        callback_data=f'back_to_{parent_id}'
         )])
+    
     return InlineKeyboardMarkup(keyboard)

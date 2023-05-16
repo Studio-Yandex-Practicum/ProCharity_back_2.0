@@ -47,6 +47,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = await get_categories_keyboard()
+    context.user_data["parent_id"] = None
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
@@ -57,5 +58,5 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     parent_id = int(update.callback_query.data.split("_")[1])
-    reply_markup = await get_subcategories_keyboard(parent_id)
+    reply_markup = await get_subcategories_keyboard(parent_id, context)
     await update.callback_query.message.edit_text("Выберите категории", reply_markup=reply_markup)
