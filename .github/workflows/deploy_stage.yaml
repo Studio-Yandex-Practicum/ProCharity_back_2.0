@@ -111,8 +111,6 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            export APPLICATION_URL=${{ secrets.APPLICATION_URL }}
-            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             docker image prune -f
             docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
             docker compose --file docker-compose.yaml stop
@@ -125,8 +123,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            export APPLICATION_URL=${{ secrets.APPLICATION_URL }}
-            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             cd ${{ env.DEPLOY_PATH }}/infra
             docker compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
       - name: Sleep for 30 seconds
