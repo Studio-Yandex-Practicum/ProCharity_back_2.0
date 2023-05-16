@@ -110,8 +110,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            netstat | grep 80
             cd ${{ env.DEPLOY_PATH }}/infra
+            docker ps
             docker image prune -f
             docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
             docker compose --file docker-compose.yaml stop
