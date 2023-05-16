@@ -19,7 +19,8 @@ services:
     image: postgres:13.2
     container_name: procharity_postgres
     restart: always
-    user: postgres
+    ports:
+      - "9999:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
