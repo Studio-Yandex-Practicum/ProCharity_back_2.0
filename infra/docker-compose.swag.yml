@@ -20,13 +20,13 @@ services:
     container_name: procharity_postgres
     restart: always
     ports:
-      - "9999:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ../.env
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,14 +38,14 @@ services:
       - NET_ADMIN
     environment:
       - TZ=Europe/Moscow
-      - URL=procharity.duckdns.com
+      - URL=${APPLICATION_URL}
       - VALIDATION=http
       - CERTPROVIDER=zerossl
       - EMAIL=yandex-practicum@yandex.ru
     env_file:
       - ../.env
     volumes:
-      - /procharity2/full/nginx_logs:/var/log/nginx
+      - ../nginx_logs:/var/log/nginx
       - ./swag_nginx.conf:/config/nginx/site-confs/default.conf
       - keys:/config/keys
     ports:
