@@ -111,12 +111,13 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            docker ps
+            export APPLICATION_URL=${{ secrets.APPLICATION_URL }}
+            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             docker image prune -f
             docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
             docker compose --file docker-compose.yaml stop
             docker compose --file docker-compose.yaml rm backend
-            docker compose --env-file ../.env --file docker-compose.yaml up -d
+            docker compose --file docker-compose.yaml up -d
       - name: Making migrations
         uses: appleboy/ssh-action@master
         with:
