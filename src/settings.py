@@ -55,6 +55,16 @@ class Settings(BaseSettings):
         """Получить url-ссылку на эндпоинт для работы telegram в режиме webhook."""
         return urljoin(self.api_url, "telegram/webhook")
 
+    @property
+    def feedback_form_template_url(self) -> str:
+        """Получить url-ссылку на HTML шаблон формы обратной связи."""
+        return urljoin(self.api_url, "telegram/feedback_form")
+
+    @property
+    def feedback_form_template(self) -> Path:
+        """Получить HTML-шаблон формы обратной связи."""
+        return BASE_DIR / "src" / "bot" / "templates" / "feedback_form.html"
+
     class Config:
         env_file = ENV_FILE
 
