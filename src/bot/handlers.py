@@ -54,34 +54,31 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=reply_markup,
     )
-    
+
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    selected_category_id = int(update.callback_query.data.split("_")[1])
-    parent_id = int(update.callback_query.data.split("_")[1])
-    context.user_data['parent_id'] = parent_id
-    selected_categories = context.user_data.get('selected_categories', [])
+    query = update.callback_query
+    parent_id = int(query.data.split("_")[1])
+    context.user_data["parent_id"] = parent_id
 
-    if selected_category_id in selected_categories:
-        selected_categories.remove(selected_category_id)
-    else:
-        selected_categories.append(selected_category_id)
-
-    context.user_data['selected_categories'] = selected_categories
     reply_markup = await get_subcategories_keyboard(parent_id, context)
-    await update.callback_query.message.edit_text("Выберите категории", reply_markup=reply_markup)
+    await query.message.edit_text("Выберите категории", reply_markup=reply_markup)
 
 
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    subcategory_id = int(query.data.split('_')[2])
-    selected_categories = context.user_data.get('selected_categories', [])
-
+    subcategory_id = int(query.data.split("_")[2])
+    selected_categories = context.user_data.get("selected_categories", [])
     if subcategory_id in selected_categories:
-        selected_categories.remove(subcategory_id) 
+        selected_categories.remove(subcategory_id)
     else:
         selected_categories.append(subcategory_id)
+    context.user_data["selected_categories"] = selected_categories
 
-    context.user_data['selected_categories'] = selected_categories
-    keyboard = await get_subcategories_keyboard(context.user_data['parent_id'], context)
-    await query.edit_message_reply_markup(reply_markup=keyboard)
+    parent_id = context.user_data["parent_id"]
+    reply_markup = await get_subcategories_keyboard(parent_id, context)
+    if query.data.startswith("back_to_"):
+        parent_id = int(query.data.split("_")[2])
+        reply_markup = await get_categories_keyboard()
+
+    await query.message.edit_text(text="Выберите подкатегорию:", reply_markup=reply_markup)
