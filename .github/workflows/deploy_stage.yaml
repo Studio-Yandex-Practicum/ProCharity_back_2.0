@@ -118,7 +118,7 @@ jobs:
             docker compose --file docker-compose.yaml stop
             docker compose --file docker-compose.yaml rm backend
             docker stop $(docker ps -aq)
-            docker container rm $$(docker container ls -q) -f
+            docker container ls -q | xargs --no-run-if-empty docker container rm -f
             docker compose --file docker-compose.yaml --env-file ../.env up -d
       - name: Making migrations
         uses: appleboy/ssh-action@master
