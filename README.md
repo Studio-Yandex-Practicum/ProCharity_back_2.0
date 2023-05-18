@@ -80,52 +80,56 @@ ProCharity (НКО Фонд Друзья).
 
 ### Установка приложения
 
-1. Клонировать репозиторий.
+  1. Клонировать репозиторий.
 
-    ```shell
-    git clone https://github.com/Studio-Yandex-Practicum/ProCharity_back_2.0.git
-    cd ProCharity_back_2.0
-    ```
+      ```shell
+      git clone https://github.com/Studio-Yandex-Practicum/ProCharity_back_2.0.git
+      cd ProCharity_back_2.0
+      ```
 
-2. Установить зависимости и активировать виртуальное окружение.
+  2. Установить зависимости и активировать виртуальное окружение.
 
-    ```shell
-    poetry install
-    poetry shell
-    ```
+      ```shell
+      poetry install
+      poetry shell
+      ```
 
-    > **Note**
-    > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
+      > **Note**
+      > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
 
-3. Переименовать [`.env.example`](.env.example) в `.env` и задать переменные окружения.
+  3. Переименовать [`.env.example`](.env.example) в `.env` и задать переменные окружения.
 
-    ```dotenv
-    BOT_TOKEN=<Токен аутентификации бота>
-    ```
+      ```dotenv
+      BOT_TOKEN=<Токен аутентификации бота>
+      ```
 
-    > **Note**
-    > Полный список переменных окружения проекта находится в 
-    > разделе "[Переменные окружения (.env)](#переменные-окружения-env)".
+      > **Note**
+      > Полный список переменных окружения проекта находится в 
+      > разделе "[Переменные окружения (.env)](#переменные-окружения-env)".
 
-    > **Note**
-    > Для получения токена аутентификации бота обратитесь к 
-    > разделу "[Регистрация бота Telegram](#регистрация-бота-telegram)".
+      > **Note**
+      > Для получения токена аутентификации бота обратитесь к 
+      > разделу "[Регистрация бота Telegram](#регистрация-бота-telegram)".
 
 ### Запуск
 
-1. Применить миграции базы данных.
-
-    ```shell
-    alembic upgrade head
-    
-
-2. Запустить Docker с БД.
+1. Запустить Docker с БД.
 
     ```shell
     sudo docker compose -f infra/docker-pg.yml up -d
     ````
 
-3. Запустить сервер приложения.
+2. Применить миграции базы данных.
+
+    ```shell
+    alembic upgrade head
+
+3. Выполнить скрипт наполнения тестовой базы.
+  ```shell
+  python3 fill_db.py
+  ```
+
+4. Запустить сервер приложения.
 
     ```shell
     uvicorn src:app --reload
@@ -162,7 +166,8 @@ ProCharity (НКО Фонд Друзья).
     > **Note**
     > [Документация о боте BotFather](https://core.telegram.org/bots/features#botfather)
 
-### Режимы работы бота
+<details>
+  <summary><h3>Режимы работы бота</h3></summary>
 
 #### Запуск без API приложения
 
@@ -198,8 +203,10 @@ APPLICATION_URL=http://example.com  # Пример
 > **Note**
 > Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/) 
 > (см. раздел "[Использование Ngrok](#использование-ngrok)").
+</details>
 
-### Работа с базой данных
+<details>
+  <summary><h3>Работа с базой данных</h3></summary>
 
 #### Создание миграций
 
@@ -231,12 +238,20 @@ APPLICATION_URL=http://example.com  # Пример
 ```shell
 alembic downgrade -1
 ```
+</details>
 
-### Работа с Poetry
+<details>
+  <summary><h3>Работа с Poetry</h3></summary>
 
 В этом разделе представлены наиболее часто используемые команды.
 
 Подробнее: https://python-poetry.org/docs/cli/
+
+#### Установка Poetry для Python версии 3.11
+Установку необходимо выполнять через curl, как в документации.
+```shell
+poetry env use python3.11; poetry install
+```
 
 #### Активировать виртуальное окружение
 
@@ -259,9 +274,11 @@ poetry add <package_name>
 
 ```shell
 poetry run <script_name>.py
-```
+``` 
+</details>
 
-### Использование Ngrok
+<details>
+  <summary><h3>Использование Ngrok</h3></summary>
 
 Этот раздел будет полезен, если у вас нет доменного имени с установленным 
 SSL-сертификатом.
@@ -287,6 +304,7 @@ SSL-сертификатом.
     ```dotenv
     APPLICATION_URL=https://1234-56-78-9.eu.ngrok.io  # Пример
     ```
+</details>
 
 ### Переменные окружения (.env)
 
