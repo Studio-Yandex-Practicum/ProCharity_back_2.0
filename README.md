@@ -71,6 +71,7 @@ ProCharity (НКО Фонд Друзья).
 
     ```shell
     poetry install
+    poetry env use python3.11
     poetry shell
     ```
 
