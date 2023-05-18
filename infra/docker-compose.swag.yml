@@ -42,11 +42,13 @@ services:
       - VALIDATION=http
       - CERTPROVIDER=zerossl
       - EMAIL=yandex-practicum@yandex.ru
+      - NGINX_ENVSUBST_OUTPUT_DIR: /config/nginx/site-confs/
+      - APPLICATION_URL=${APPLICATION_URL}
     env_file:
       - ../.env
     volumes:
       - ../nginx_logs:/var/log/nginx
-      - ./swag_nginx.conf:/config/nginx/site-confs/default.conf
+      - ./swag_nginx.conf:/config/nginx/site-confs/default.conf.template
       - keys:/config/keys
     ports:
       - "443:443"
