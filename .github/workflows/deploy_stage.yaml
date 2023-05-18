@@ -21,6 +21,8 @@ env:
   IMAGE_NAME: procharity_back_2.0_backend
   DEPLOY_PATH: /procharity2/full
   WORK_DIR: /app
+  APPLICATION_URL: ${{ secrets.APPLICATION_URL }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
 
 defaults:
   run:
@@ -111,15 +113,9 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            export APPLICATION_URL=${{ secrets.APPLICATION_URL }}
-            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-            docker image prune -f
-            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
-            docker compose --file docker-compose.yaml stop
-            docker compose --file docker-compose.yaml rm backend
-            docker stop $(docker ps -aq)
-            docker container ls -q | xargs --no-run-if-empty docker container rm -f 
-            docker compose --file docker-compose.yaml --env-file ../.env up -d --remove-orphans
+            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest 
+            docker compose --file docker-compose.yaml --env-file ../.env up -d
+            docker system prune -a -f
       - name: Making migrations
         uses: appleboy/ssh-action@master
         with:
@@ -127,8 +123,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            export APPLICATION_URL=${{ secrets.APPLICATION_URL }}
-            export POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             cd ${{ env.DEPLOY_PATH }}/infra
             docker compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
       - name: Sleep for 30 seconds
