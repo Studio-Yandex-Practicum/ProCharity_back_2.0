@@ -141,3 +141,6 @@ dmypy.json
 
 # logs
 logs/
+
+# Mac meta files
+.DS_Store
