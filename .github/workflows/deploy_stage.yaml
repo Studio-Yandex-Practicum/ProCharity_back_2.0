@@ -21,8 +21,6 @@ env:
   IMAGE_NAME: procharity_back_2.0_backend
   DEPLOY_PATH: /procharity2/full
   WORK_DIR: /app
-  APPLICATION_URL: ${{ secrets.APPLICATION_URL }}
-  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
 
 defaults:
   run:
