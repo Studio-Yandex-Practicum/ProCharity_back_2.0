@@ -1,3 +1,5 @@
+import re
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
@@ -7,6 +9,9 @@ from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboar
 from src.core.services.user import UserService
 
 
+
+select_category_pattern = re.compile(r"select_category_(\d+)")
+back_to_category_pattern = re.compile(r"back_to_(\d+)")
 TEXT = ("Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"')
@@ -69,18 +74,23 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    subcategory_id = int(query.data.split("_")[2])
-    selected_categories = context.user_data.get("selected_categories", [])
-    if subcategory_id in selected_categories:
-        selected_categories.remove(subcategory_id)
-    else:
-        selected_categories.append(subcategory_id)
-    context.user_data["selected_categories"] = selected_categories
+    subcategory_match = select_category_pattern.match(query.data)
+    back_to_match = back_to_category_pattern.match(query.data)
 
-    parent_id = context.user_data["parent_id"]
-    reply_markup = await get_subcategories_keyboard(parent_id, context)
-    if query.data.startswith("back_to_"):
-        parent_id = int(query.data.split("_")[2])
+    if subcategory_match:
+        subcategory_id = int(subcategory_match.group(1))
+        selected_categories = context.user_data.get("selected_categories", [])
+        if subcategory_id in selected_categories:
+            selected_categories.remove(subcategory_id)
+        else:
+            selected_categories.append(subcategory_id)
+        context.user_data["selected_categories"] = selected_categories
+
+        parent_id = context.user_data["parent_id"]
+        reply_markup = await get_subcategories_keyboard(parent_id, context)
+
+    elif back_to_match:
+        parent_id = int(back_to_match.group(1))
         reply_markup = await get_categories_keyboard()
 
     await query.message.edit_text(text=TEXT, reply_markup=reply_markup)
