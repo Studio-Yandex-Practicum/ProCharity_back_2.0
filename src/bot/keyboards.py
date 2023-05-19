@@ -21,32 +21,30 @@ MENU_KEYBOARD = [
 async def get_categories_keyboard():
     category_service = CategoryService()
     categories = await category_service.get_unarchived_parents()
-    keyboard = []
-    categories_buttons = [
-        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
+    keyboard = [
+        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")]
+        for category in categories
     ]
-    keyboard.extend(categories_buttons)
     keyboard.extend(
         [
             [InlineKeyboardButton("Нет моих компетенций 😕", callback_data="add_categories")],
             [InlineKeyboardButton("Готово 👌", callback_data="confirm_categories")],
         ]
     )
+
     return InlineKeyboardMarkup(keyboard)
 
 
 async def get_subcategories_keyboard(parent_id, context):
     category_service = CategoryService()
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
-    keyboard = []
-    selected_categories = context.user_data.get("selected_categories", [])
 
-    for category in subcategories:
-        button_text = category.name
-        button_callback = f"select_category_{category.id}"
-        if category.id in selected_categories:
-            button_text = f"✅ {button_text}"
-        keyboard.append([InlineKeyboardButton(button_text, callback_data=button_callback)])
+    keyboard = [
+        [InlineKeyboardButton(category.name, callback_data=f"select_category_{category.id}")]
+        if category.id not in context.user_data.get("selected_categories", [])
+        else [InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")]
+        for category in subcategories
+    ]
 
     keyboard.append([InlineKeyboardButton("Назад ⬅️", callback_data=f"back_to_{parent_id}")])
     return InlineKeyboardMarkup(keyboard)

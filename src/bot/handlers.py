@@ -7,6 +7,11 @@ from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboar
 from src.core.services.user import UserService
 
 
+TEXT = ("Чтобы я знал, с какими задачами ты готов помогать, "
+        "выбери свои профессиональные компетенции (можно выбрать "
+        'несколько). После этого, нажми на пункт "Готово 👌"')
+
+
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     await user_service.register_user(
@@ -48,10 +53,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = await get_categories_keyboard()
     context.user_data["parent_id"] = None
-    await update.message.reply_text(
-        "Чтобы я знал, с какими задачами ты готов помогать, "
-        "выбери свои профессиональные компетенции (можно выбрать "
-        'несколько). После этого, нажми на пункт "Готово 👌"',
+    await update.message.reply_text(TEXT,
         reply_markup=reply_markup,
     )
 
@@ -62,7 +64,7 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data["parent_id"] = parent_id
 
     reply_markup = await get_subcategories_keyboard(parent_id, context)
-    await query.message.edit_text("Выберите категории", reply_markup=reply_markup)
+    await query.message.edit_text(TEXT, reply_markup=reply_markup)
 
 
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -81,4 +83,4 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         parent_id = int(query.data.split("_")[2])
         reply_markup = await get_categories_keyboard()
 
-    await query.message.edit_text(text="Выберите подкатегорию:", reply_markup=reply_markup)
+    await query.message.edit_text(text=TEXT, reply_markup=reply_markup)
