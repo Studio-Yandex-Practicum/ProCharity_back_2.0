@@ -9,12 +9,13 @@ from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboar
 from src.core.services.user import UserService
 
 
-
 select_category_pattern = re.compile(r"select_category_(\d+)")
 back_to_category_pattern = re.compile(r"back_to_(\d+)")
-TEXT = ("Чтобы я знал, с какими задачами ты готов помогать, "
-        "выбери свои профессиональные компетенции (можно выбрать "
-        'несколько). После этого, нажми на пункт "Готово 👌"')
+TEXT = (
+    "Чтобы я знал, с какими задачами ты готов помогать, "
+    "выбери свои профессиональные компетенции (можно выбрать "
+    'несколько). После этого, нажми на пункт "Готово 👌"'
+)
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -58,7 +59,8 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = await get_categories_keyboard()
     context.user_data["parent_id"] = None
-    await update.message.reply_text(TEXT,
+    await update.message.reply_text(
+        TEXT,
         reply_markup=reply_markup,
     )
 
@@ -79,12 +81,12 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
 
     if subcategory_match:
         subcategory_id = int(subcategory_match.group(1))
-        selected_categories = context.user_data.get("selected_categories", [])
+        selected_categories = set(context.user_data.get("selected_categories", []))
         if subcategory_id in selected_categories:
             selected_categories.remove(subcategory_id)
         else:
-            selected_categories.append(subcategory_id)
-        context.user_data["selected_categories"] = selected_categories
+            selected_categories.add(subcategory_id)
+        context.user_data["selected_categories"] = list(selected_categories)
 
         parent_id = context.user_data["parent_id"]
         reply_markup = await get_subcategories_keyboard(parent_id, context)

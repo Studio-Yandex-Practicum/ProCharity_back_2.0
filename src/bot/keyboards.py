@@ -22,8 +22,7 @@ async def get_categories_keyboard():
     category_service = CategoryService()
     categories = await category_service.get_unarchived_parents()
     keyboard = [
-        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")]
-        for category in categories
+        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
     ]
     keyboard.extend(
         [
