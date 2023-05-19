@@ -70,8 +70,8 @@ ProCharity (НКО Фонд Друзья).
 2. Установить зависимости и активировать виртуальное окружение.
 
     ```shell
-    poetry install
     poetry env use python3.11
+    poetry install
     poetry shell
     ```
 
