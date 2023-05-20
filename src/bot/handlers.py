@@ -78,7 +78,8 @@ async def ask_your_question(update: Update, context: CallbackContext):
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
                 text=text,
-                web_app=WebAppInfo(url=f"{settings.feedback_form_template_url}"),
+                # web_app=WebAppInfo(url=f"{settings.feedback_form_template_url}"),
+                web_app=WebAppInfo(url=f"https://python-telegram-bot.org/static/webappbot"),
             )
         ),
     )
@@ -87,13 +88,14 @@ async def ask_your_question(update: Update, context: CallbackContext):
 async def web_app_data(update: Update, context: CallbackContext):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
-        [InlineKeyboardButton(text="Открыть в меню", callback_data="menu")],
+        [InlineKeyboardButton(text="Открыть в меню", callback_data=callback_data.MENU)],
         [InlineKeyboardButton(text="Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
         text=f"Спасибо, я передал информацию команде ProCharity!"
-             f"Ответ придет на почту ", # {user_data.get['email']}
+             # Нужно поставить {} после добавления сертификата безопасности
+             f"Ответ придет на почту user_data.get['email']",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
