@@ -2,7 +2,7 @@ import abc
 from typing import TypeVar
 from datetime import datetime
 
-from sqlalchemy import select, update, or_, and_, not_
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
