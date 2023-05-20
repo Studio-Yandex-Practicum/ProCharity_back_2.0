@@ -73,7 +73,7 @@ class Category(Base):
     __tablename__ = "categories"
     __allow_unmapped__ = True
     name: Mapped[str] = mapped_column(String(100))
-    is_archived: Mapped[bool] = mapped_column(default=False)
+    is_archived: Mapped[bool] = mapped_column(nullable=True)
 
     users: Mapped[list["User"]] = relationship(secondary="users_categories", back_populates="categories")
 
