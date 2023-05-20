@@ -61,7 +61,7 @@ class Task(Base):
     location: Mapped[str]
     link: Mapped[str]
     description = Mapped[str]
-    archive: Mapped[bool]
+    is_archived: Mapped[bool]
 
     def __repr__(self):
         return f"<Task {self.title}>"
@@ -72,7 +72,7 @@ class Category(Base):
 
     __tablename__ = "categories"
     name: Mapped[str] = mapped_column(String(100))
-    archive: Mapped[bool]
+    is_archived: Mapped[bool]
 
     users: Mapped[list["User"]] = relationship(secondary="users_categories", back_populates="categories")
 
