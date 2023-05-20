@@ -1,5 +1,6 @@
 import abc
 from typing import TypeVar
+from datetime import datetime
 
 from sqlalchemy import select, update, or_, and_, not_
 from sqlalchemy.exc import IntegrityError
@@ -7,6 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
+
+from .constants import DATE_FORMAT
+
+
+CURRENT_DATE = datetime.now().strftime(DATE_FORMAT)
 
 DatabaseModel = TypeVar("DatabaseModel")
 
@@ -67,28 +73,23 @@ class AbstractRepository(abc.ABC):
 
 class ContentRepository(AbstractRepository, abc.ABC):
     @auto_commit
-    async def set_update_is_archived_false_to_true(self, ids: list[int]) -> None:
+    async def archive_by_ids(self, ids: list[int]) -> None:
         """Изменяет is_archived с False на True у не указанных ids."""
         await self._session.execute(
             update(self._model)
-            .where(
-                and_(
-                    self._model.is_archived == False,
-                    not_(self._model.id.in_(ids))
-                )
-            )
+            .where(self._model.is_archived == False)
+            .where(self._model.id.not_in(ids))
+            .where(str(self._model.deadline) == CURRENT_DATE)
             .values({"is_archived": True})
         )
 
-    async def get_ids_not_is_archived(self, ids: list[int]) -> list[int]:
-        """Возвращает id всех объектов модели из базы данных, которые не в архиве по указанным ids"""
-        filtred_ids = await self._session.execute(
+    async def get_all_non_archived_and_by_ids(self, ids: list[int]) -> list[int]:
+        """Возвращает id всех объектов модели из базы данных, которые не в архиве и по указанным ids"""
+        filtred_ids = await self._session.scalars(
             select(self._model.id)
             .where(
-                or_(
-                    self._model.id.in_(ids),
-                    self._model.is_archived == False
-                )
+                self._model.id.in_(ids)
+                | (self._model.is_archived == False)
             )
         )
-        return filtred_ids.scalars().all()
+        return filtred_ids

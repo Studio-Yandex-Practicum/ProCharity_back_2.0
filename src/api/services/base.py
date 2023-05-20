@@ -12,8 +12,8 @@ class ContentService(abc.ABC):
     async def actualize_objects(self, objects: list[any], model_class: any) -> None:
         to_create, to_update = [], []
         ids = [obj.id for obj in objects]
-        await self._repository.set_update_is_archived_false_to_true(ids)
-        already_have = await self._repository.get_ids_not_is_archived(ids)
+        await self._repository.archive_by_ids(ids)
+        already_have = await self._repository.get_all_non_archived_and_by_ids(ids)
         for obj in objects:
             if obj.id not in already_have:
                 to_create.append(model_class(**obj.dict(), is_archived=False))

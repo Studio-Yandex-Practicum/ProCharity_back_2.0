@@ -50,18 +50,18 @@ class Task(Base):
     """Модель задач."""
 
     __tablename__ = "tasks"
-    title = Mapped[str]
-    name_organization = Mapped[str]
-    deadline = Mapped[Date]
+    title: Mapped[str] = mapped_column(nullable=True)
+    name_organization: Mapped[str] = mapped_column(nullable=True)
+    deadline: Mapped[date] = mapped_column(Date, nullable=True)
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category"] = relationship(back_populates="tasks")
 
     bonus: Mapped[int]
-    location: Mapped[str]
+    location: Mapped[str] = mapped_column(nullable=True)
     link: Mapped[str]
-    description = Mapped[str]
-    is_archived: Mapped[bool]
+    description: Mapped[str] = mapped_column(nullable=True)
+    is_archived: Mapped[bool] = mapped_column(default=False)
 
     def __repr__(self):
         return f"<Task {self.title}>"
@@ -71,15 +71,16 @@ class Category(Base):
     """Модель категорий."""
 
     __tablename__ = "categories"
+    __allow_unmapped__ = True
     name: Mapped[str] = mapped_column(String(100))
-    is_archived: Mapped[bool]
+    is_archived: Mapped[bool] = mapped_column(default=False)
 
     users: Mapped[list["User"]] = relationship(secondary="users_categories", back_populates="categories")
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
     parent_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
-    children = relationship("Category", backref=backref("parent", remote_side="Category.id"))
+    children: relationship("Category", backref=backref("parent", remote_side="Category.id"))
 
     def __repr__(self):
         return f"<Category {self.name}>"
