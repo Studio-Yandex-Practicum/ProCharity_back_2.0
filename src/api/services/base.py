@@ -26,3 +26,4 @@ class ContentService(abc.ABC):
 
     async def get_all(self) -> list[any]:
         return await self._repository.get_all()
+    
