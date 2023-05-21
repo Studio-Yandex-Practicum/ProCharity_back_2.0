@@ -1,5 +1,6 @@
 import abc
 from typing import TypeVar
+from datetime import datetime
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
@@ -7,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
+
 
 DatabaseModel = TypeVar("DatabaseModel")
 
@@ -65,13 +67,24 @@ class AbstractRepository(abc.ABC):
         self._session.add_all(objects)
 
 
-class ContentRepository(AbstractRepository):
+class ContentRepository(AbstractRepository, abc.ABC):
     @auto_commit
-    async def archive_all(self) -> None:
-        """Добавляет все объекты модели в архив."""
-        await self._session.execute(update(self._model).values({"archive": True}))
+    async def archive_by_ids(self, ids: list[int]) -> None:
+        """Изменяет is_archived с False на True у не указанных ids."""
+        await self._session.execute(
+            update(self._model)
+            .where(self._model.is_archived == False)
+            .where(self._model.id.not_in(ids))
+            .values({"is_archived": True})
+        )
 
-    async def get_all_ids(self) -> list[int]:
-        """Возвращает id всех объектов модели из базы данных."""
-        ids = await self._session.execute(select(self._model.id))
-        return ids.scalars().all()
+    async def get_all_non_archived_and_by_ids(self, ids: list[int]) -> list[int]:
+        """Возвращает id всех объектов модели из базы данных, которые не в архиве и по указанным ids"""
+        filtred_ids = await self._session.scalars(
+            select(self._model.id)
+            .where(
+                self._model.id.in_(ids)
+                | (self._model.is_archived == False)
+            )
+        )
+        return filtred_ids

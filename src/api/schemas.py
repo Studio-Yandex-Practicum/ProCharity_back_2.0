@@ -40,7 +40,7 @@ class CategoryResponse(ResponseBase):
     id: int
     name: str
     parent_id: Optional[int]
-    archive: bool
+    is_archived: bool
 
 
 class TaskRequest(RequestBase):
@@ -83,4 +83,4 @@ class TaskResponse(ResponseBase):
     location: str
     link: str
     description: str
-    archive: bool
+    is_archived: bool
