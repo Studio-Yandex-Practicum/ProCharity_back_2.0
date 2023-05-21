@@ -9,10 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
 
-from .constants import DATE_FORMAT
-
-
-CURRENT_DATE = datetime.now().strftime(DATE_FORMAT)
 
 DatabaseModel = TypeVar("DatabaseModel")
 
@@ -79,7 +75,6 @@ class ContentRepository(AbstractRepository, abc.ABC):
             update(self._model)
             .where(self._model.is_archived == False)
             .where(self._model.id.not_in(ids))
-            .where(str(self._model.deadline) == CURRENT_DATE)
             .values({"is_archived": True})
         )
 

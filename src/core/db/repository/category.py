@@ -16,7 +16,10 @@ class CategoryRepository(ContentRepository):
 
     async def get_unarchived_parents(self) -> list[Category]:
         categories = await self._session.scalars(
-            select(Category).where(Category.is_archived == False).where(Category.parent_id.is_(None)))
+            select(Category)
+            .where(Category.is_archived == False)
+            .where(Category.parent_id == None) # noqa
+        )
         return categories
 
     async def get_unarchived_subcategories(self, parent_id: int) -> list[Category]:

@@ -50,7 +50,7 @@ class Task(Base):
     """Модель задач."""
 
     __tablename__ = "tasks"
-    title: Mapped[str] = mapped_column(nullable=True)
+    title: Mapped[str] = mapped_column()
     name_organization: Mapped[str] = mapped_column(nullable=True)
     deadline: Mapped[date] = mapped_column(Date, nullable=True)
 
@@ -58,9 +58,9 @@ class Task(Base):
     category: Mapped["Category"] = relationship(back_populates="tasks")
 
     bonus: Mapped[int]
-    location: Mapped[str] = mapped_column(nullable=True)
+    location: Mapped[str] = mapped_column()
     link: Mapped[str]
-    description: Mapped[str] = mapped_column(nullable=True)
+    description: Mapped[str] = mapped_column()
     is_archived: Mapped[bool] = mapped_column(default=False)
 
     def __repr__(self):
@@ -71,7 +71,6 @@ class Category(Base):
     """Модель категорий."""
 
     __tablename__ = "categories"
-    __allow_unmapped__ = True
     name: Mapped[str] = mapped_column(String(100))
     is_archived: Mapped[bool] = mapped_column(default=False)
 
@@ -80,7 +79,7 @@ class Category(Base):
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
     parent_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
-    children: relationship("Category", backref=backref("parent", remote_side="Category.id"))
+    children = relationship("Category", backref=backref("parent", remote_side="Category.id"))
 
     def __repr__(self):
         return f"<Category {self.name}>"
