@@ -8,6 +8,8 @@ COPY requirements.txt /app
 
 RUN pip3 install -r /app/requirements.txt --no-cache-dir
 
+RUN docker compose -f infra/docker-pg.yml down -v
+
 COPY . .
 
 CMD ["uvicorn", "src:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
