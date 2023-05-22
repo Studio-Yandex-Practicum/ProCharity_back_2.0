@@ -122,7 +122,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            docker compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
+            docker compose --env-file ../.env exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
       - name: Sleep for 30 seconds
         run: sleep 30s
         shell: bash
