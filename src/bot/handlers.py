@@ -71,7 +71,6 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     subcategory_match = context.match
-    print(context.match)
 
     if subcategory_match:
         subcategory_id = int(subcategory_match.group(1))
