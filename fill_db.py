@@ -154,7 +154,7 @@ async def filling_subcategory_in_db(
     """
     for category in CATEGORIES_TEST_DATA:
         category_obj = Category(
-            name='sub'+category['name'],
+            name='Подкатегория '+category['name'],
             is_archived=choice([True, False]),
             parent_id=int(category['id']),
             id=int(category['id']) + len(CATEGORIES_TEST_DATA)
