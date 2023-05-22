@@ -134,7 +134,7 @@ async def filling_category_in_db(
         session: async_sessionmaker[AsyncSession],
         ) -> None:
     """Filling the database with test data Categories.
-    The fields id, name, archive are filled in.
+    The fields id, name, is_archived are filled in.
     """
     for category in CATEGORIES_TEST_DATA:
         category_obj = Category(
@@ -146,12 +146,29 @@ async def filling_category_in_db(
     await session.commit()
 
 
+async def filling_subcategory_in_db(
+        session: async_sessionmaker[AsyncSession],
+        ) -> None:
+    """Filling the database with test data subcategories.
+    The fields id, name, is_archived, parent_id are filled in.
+    """
+    for category in CATEGORIES_TEST_DATA:
+        category_obj = Category(
+            name='sub'+category['name'],
+            is_archived=choice([True, False]),
+            parent_id=int(category['id']),
+            id=int(category['id']) + len(CATEGORIES_TEST_DATA)
+        )
+        session.add(category_obj)
+    await session.commit()
+
+
 async def filling_task_in_db(
         session: async_sessionmaker[AsyncSession],
         ) -> None:
     """Filling the database with test data: Tasks.
     The fields title, name_organization, deadline, category,
-    location, description, archive.
+    location, description, is_archived.
      """
     for category_id in range(1, len(CATEGORIES_TEST_DATA) + 1):
         async for title in get_task_name_by_id(category_id):
@@ -186,6 +203,8 @@ async def run():
         print("Deleted data from the Tasks, Categories table.")
         await filling_category_in_db(session)
         print("The table with the Categories is full.")
+        await filling_subcategory_in_db(session)
+        print("The table with the SubCategories is full.")
         await filling_task_in_db(session)
         print("The Tasks table is full.")
 
