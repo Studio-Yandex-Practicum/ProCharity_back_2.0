@@ -139,7 +139,7 @@ async def filling_category_in_db(
     for category in CATEGORIES_TEST_DATA:
         category_obj = Category(
             name=category['name'],
-            archive=choice([True, False]),
+            is_archived=choice([True, False]),
             id=int(category['id']),
         )
         session.add(category_obj)
@@ -165,7 +165,7 @@ async def filling_task_in_db(
                 link=f"http://example.com/task/"
                 f"{''.join(choices(CHARACTERS, k=6))}",
                 description=f"Description {title}",
-                archive=choice([True, False])
+                is_archived=choice([True, False])
             )
             session.add(task)
         await session.commit()

@@ -1,0 +1,62 @@
+version: "3.8"
+
+
+
+services:
+  backend:
+    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:latest
+    container_name: procharity_bot_backend
+    restart: always
+    depends_on:
+        postgres:
+          condition: service_healthy
+    ports:
+        - "8000:8000"
+    env_file:
+        - ../.env
+ 
+  postgres:
+    image: postgres:13.2
+    container_name: procharity_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ../.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  swag:
+    image: lscr.io/linuxserver/swag:2.4.0
+    container_name: procharity_swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=Europe/Moscow
+      - URL=${APPLICATION_URL}
+      - VALIDATION=http
+      - CERTPROVIDER=zerossl
+      - EMAIL=yandex-practicum@yandex.ru
+    env_file:
+      - ../.env
+    volumes:
+      - ../nginx_logs:/var/log/nginx
+      - ./swag_nginx.conf:/config/nginx/site-confs/default.conf
+      - keys:/config/keys
+    ports:
+      - "443:443"
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  keys:
+
+
