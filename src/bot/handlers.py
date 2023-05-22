@@ -88,7 +88,7 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=reply_markup,
-    )
+    ) 
 
 
 async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
