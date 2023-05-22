@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     @property
     def feedback_form_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
-        return urljoin(self.api_url, "telegram/feedback_form")
+        return urljoin(self.api_url, "telegram/feedback-form")
 
     @property
     def feedback_form_template(self) -> Path:

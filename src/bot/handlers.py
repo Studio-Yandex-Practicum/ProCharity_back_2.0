@@ -67,7 +67,8 @@ async def subcategories_callback(update: Update, context: CallbackContext):
 
 
 async def ask_your_question(update: Update, context: CallbackContext):
-    query = None
+    name = update.effective_chat['first_name']
+    surname = update.effective_chat['last_name']
     text = "Задать вопрос"
     if update.effective_message.web_app_data:
         query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data))
@@ -78,8 +79,8 @@ async def ask_your_question(update: Update, context: CallbackContext):
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
                 text=text,
-                # web_app=WebAppInfo(url=f"{settings.feedback_form_template_url}"),
-                web_app=WebAppInfo(url=f"https://python-telegram-bot.org/static/webappbot"),
+                web_app=WebAppInfo(
+                    url=f"{settings.feedback_form_template_url}?name={name}&surname={surname}"),
             )
         ),
     )
@@ -94,8 +95,7 @@ async def web_app_data(update: Update, context: CallbackContext):
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
         text=f"Спасибо, я передал информацию команде ProCharity!"
-             # Нужно поставить {} после добавления сертификата безопасности
-             f"Ответ придет на почту user_data.get['email']",
+             f"Ответ придет на почту {user_data['email']}",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
