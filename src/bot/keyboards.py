@@ -38,12 +38,15 @@ async def get_subcategories_keyboard(parent_id, context):
     category_service = CategoryService()
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
 
-    keyboard = [
-        [InlineKeyboardButton(category.name, callback_data=f"select_category_{category.id}")]
-        if category.id not in context.user_data.get("selected_categories", [])
-        else [InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")]
-        for category in subcategories
-    ]
+    keyboard = []
+    selected_categories = context.user_data.get("selected_categories", [])
+
+    for category in subcategories:
+        if category.id not in selected_categories:
+            button = InlineKeyboardButton(category.name, callback_data=f"select_category_{category.id}")
+        else:
+            button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")
+        keyboard.append([button])
 
     keyboard.append([InlineKeyboardButton("Назад ⬅️", callback_data=f"back_to_{parent_id}")])
     return InlineKeyboardMarkup(keyboard)
