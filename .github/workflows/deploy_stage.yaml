@@ -71,7 +71,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "infra/docker-compose.staging.yml,infra/nginx/nginx.local.conf"
+          source: "infra/docker-compose.swag.yml, infra/swag_nginx.conf"
           target: ${{ env.DEPLOY_PATH }}
 
       - name: Create .env file
@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv infra/docker-compose.staging.yml infra/docker-compose.yaml
+            mv infra/docker-compose.swag.yml infra/docker-compose.yaml
             rm -f .env
             cat > .env <<- EOM
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
@@ -111,11 +111,9 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            docker image prune -f
-            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
-            docker compose --file docker-compose.yaml stop
-            docker compose --file docker-compose.yaml rm backend
-            docker compose --file docker-compose.yaml up -d
+            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest 
+            docker compose --file docker-compose.yaml --env-file ../.env up -d
+            docker system prune -a -f
       - name: Making migrations
         uses: appleboy/ssh-action@master
         with:
@@ -124,7 +122,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            docker compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
+            docker compose --env-file ../.env exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
       - name: Sleep for 30 seconds
         run: sleep 30s
         shell: bash

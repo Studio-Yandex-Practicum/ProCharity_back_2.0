@@ -21,29 +21,9 @@
       <a href="#полезная-информация">Полезная информация</a>
       <ul>
         <li><a href="#регистрация-бота-telegram">Регистрация бота Telegram</a></li>
-        <li>
-          <a href="#режимы-работы-бота">Режимы работы бота</a>
-          <ul>
-            <li><a href="#запуск-без-api-приложения">Запуск без API приложения</a></li>
-            <li><a href="#polling">Polling</a></li>
-            <li><a href="#webhook">Webhook</a></li>
-          </ul>
-        </li>
-        <li>
-          <a href="#работа-с-базой-данных">Работа с базой данных</a>
-          <ul>
-            <li><a href="#создание-миграций">Создание миграций</a></li>
-            <li><a href="#откат-миграций">Откат миграций</a></li>
-          </ul>
-        </li>
-        <li>
-          <a href="#работа-с-poetry">Работа с Poetry</a>
-          <ul>
-            <li><a href="#активировать-виртуальное-окружение">Активировать виртуальное окружение</a></li>
-            <li><a href="#добавить-зависимость">Добавить зависимость</a></li>
-            <li><a href="#запустить-скрипт-без-активации-виртуального-окружения">Запустить скрипт без активации виртуального окружения</a></li>
-          </ul>
-        </li>
+        <li><a href="#режимы-работы-бота">Режимы работы бота</a></li>
+        <li><a href="#работа-с-базой-данных">Работа с базой данных</a></li>
+        <li><a href="#работа-с-poetry">Работа с Poetry</a></li>
         <li><a href="#использование-ngrok">Использование Ngrok</a></li>
         <li><a href="#переменные-окружения-env">Переменные окружения (.env)</a></li>
       </ul>
@@ -90,6 +70,7 @@ ProCharity (НКО Фонд Друзья).
 2. Установить зависимости и активировать виртуальное окружение.
 
     ```shell
+    poetry env use python3.11
     poetry install
     poetry shell
     ```
@@ -113,19 +94,24 @@ ProCharity (НКО Фонд Друзья).
 
 ### Запуск
 
-1. Применить миграции базы данных.
-
-    ```shell
-    alembic upgrade head
-    
-
-2. Запустить Docker с БД.
+1. Запустить Docker с БД.
 
     ```shell
     sudo docker compose -f infra/docker-pg.yml up -d
     ````
 
-3. Запустить сервер приложения.
+2. Применить миграции базы данных.
+
+    ```shell
+    alembic upgrade head
+
+3. Выполнить скрипт наполнения тестовой базы.
+
+    ```shell
+    python3 fill_db.py
+    ```
+
+4. Запустить сервер приложения.
 
     ```shell
     uvicorn src:app --reload
@@ -162,7 +148,8 @@ ProCharity (НКО Фонд Друзья).
     > **Note**
     > [Документация о боте BotFather](https://core.telegram.org/bots/features#botfather)
 
-### Режимы работы бота
+<details>
+  <summary><h3>Режимы работы бота</h3></summary>
 
 #### Запуск без API приложения
 
@@ -198,8 +185,10 @@ APPLICATION_URL=http://example.com  # Пример
 > **Note**
 > Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/) 
 > (см. раздел "[Использование Ngrok](#использование-ngrok)").
+</details>
 
-### Работа с базой данных
+<details>
+  <summary><h3>Работа с базой данных</h3></summary>
 
 #### Создание миграций
 
@@ -231,24 +220,33 @@ APPLICATION_URL=http://example.com  # Пример
 ```shell
 alembic downgrade -1
 ```
+</details>
 
-### Работа с Poetry
+<details>
+  <summary><h3>Работа с Poetry</h3></summary>
 
 В этом разделе представлены наиболее часто используемые команды.
 
 Подробнее: https://python-poetry.org/docs/cli/
 
+#### Настройка окружения проекта
+Установку необходимо выполнять через curl, как в документации.
+
+    ```shell
+    poetry env use python3.11; poetry install
+    ```
+
 #### Активировать виртуальное окружение
 
-```shell
-poetry shell
-```
+    ```shell
+    poetry shell
+    ```
 
 #### Добавить зависимость
 
-```shell
-poetry add <package_name>
-```
+    ```shell
+    poetry add <package_name>
+    ```
 
 > **Note**
 > Использование флага `--dev (-D)` позволяет установить зависимость,
@@ -259,9 +257,11 @@ poetry add <package_name>
 
 ```shell
 poetry run <script_name>.py
-```
+``` 
+</details>
 
-### Использование Ngrok
+<details>
+  <summary><h3>Использование Ngrok</h3></summary>
 
 Этот раздел будет полезен, если у вас нет доменного имени с установленным 
 SSL-сертификатом.
@@ -287,6 +287,7 @@ SSL-сертификатом.
     ```dotenv
     APPLICATION_URL=https://1234-56-78-9.eu.ngrok.io  # Пример
     ```
+</details>
 
 ### Переменные окружения (.env)
 
