@@ -76,8 +76,7 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    subcategory_match = select_category_pattern.match(query.data)
-    back_to_match = back_to_category_pattern.match(query.data)
+    subcategory_match = context.match
 
     if subcategory_match:
         subcategory_id = int(subcategory_match.group(1))
@@ -91,8 +90,13 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         parent_id = context.user_data["parent_id"]
         reply_markup = await get_subcategories_keyboard(parent_id, context)
 
-    elif back_to_match:
-        parent_id = int(back_to_match.group(1))
+    await query.message.edit_text(text=TEXT, reply_markup=reply_markup)
+
+
+async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    back_to_match = context.match
+    if back_to_match:
         reply_markup = await get_categories_keyboard()
 
     await query.message.edit_text(text=TEXT, reply_markup=reply_markup)
