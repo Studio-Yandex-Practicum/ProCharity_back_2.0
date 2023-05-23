@@ -58,10 +58,16 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    parent_id = int(query.data.split("_")[1])
+    parent_id_match = context.match
+
+    if not parent_id_match:
+        return
+
+    parent_id = int(parent_id_match.group(1))
     context.user_data["parent_id"] = parent_id
 
     reply_markup = await get_subcategories_keyboard(parent_id, context)
+
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
@@ -78,13 +84,15 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         return
 
     subcategory_id = int(subcategory_match.group(1))
-    selected_categories = context.user_data.get("selected_categories", {})
-    if subcategory_id in selected_categories:
+
+    selected_categories = context.user_data.setdefault("selected_categories", {})
+    selected_categories_keys = selected_categories.keys()
+
+    if subcategory_id in selected_categories_keys:
         del selected_categories[subcategory_id]
     else:
-        selected_categories[subcategory_id] = "this is a subcategory"
+        selected_categories[subcategory_id] = None
 
-    context.user_data["selected_categories"] = selected_categories
     parent_id = context.user_data["parent_id"]
     reply_markup = await get_subcategories_keyboard(parent_id, context)
 
