@@ -21,7 +21,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
         except Exception as error:
-            structlog.stdlib.get_logger("api.error").exception("Непойманное исключение")
+            structlog.stdlib.get_logger("api.error").exception(
+                "Непойманное исключение"
+            )
             raise error
         finally:
             process_time = time.perf_counter_ns() - start_time
@@ -32,7 +34,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             http_method = request.method
             http_version = request.scope["http_version"]
             access_logger.info(
-                f'{client_host}:{client_port} - "{http_method} {url} ' f'HTTP/{http_version}" {status_code}',
+                f'{client_host}:{client_port} - "{http_method} {url} '
+                f'HTTP/{http_version}" {status_code}',
                 http={
                     "url": str(request.url),
                     "status_code": status_code,
