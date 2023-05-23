@@ -55,7 +55,7 @@ async def get_all_tasks(task_service: TaskService = Depends()) -> list[TaskRespo
 
 
 @api_router.get(
-    f"/telegram/feedback-form",
+    "/telegram/feedback-form",
     status_code=status.HTTP_200_OK,
     summary="Вернуть шаблон формы обратной связи в телеграм",
     response_description="Предоставить пользователю форму для заполнения",
