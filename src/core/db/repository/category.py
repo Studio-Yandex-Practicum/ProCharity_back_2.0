@@ -1,4 +1,3 @@
-
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import not_, and_, select
@@ -15,14 +14,13 @@ class CategoryRepository(ContentRepository):
         super().__init__(session, Category)
 
     async def get_unarchived_parents(self) -> list[Category]:
-        categories = await self._session.scalars(
-            select(Category)
-            .where(Category.is_archived == False)
-            .where(Category.parent_id == None) # noqa
+        categories = await self._session.execute(
+            select(Category).where(and_(not_(Category.archive)), Category.parent_id.is_(None))
         )
-        return categories
+        return categories.scalars().all()
 
     async def get_unarchived_subcategories(self, parent_id: int) -> list[Category]:
-        categories = await self._session.scalars(
-            select(Category).where(Category.is_archived == False).where(Category.parent_id == parent_id))
-        return categories
+        categories = await self._session.execute(
+            select(Category).where(and_(not_(Category.archive)), Category.parent_id == parent_id)
+        )
+        return categories.scalars().all()
