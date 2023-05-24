@@ -86,9 +86,8 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
     subcategory_id = int(subcategory_match.group(1))
 
     selected_categories = context.user_data.setdefault("selected_categories", {})
-    selected_categories_keys = selected_categories.keys()
 
-    if subcategory_id in selected_categories_keys:
+    if subcategory_id in selected_categories.keys():
         del selected_categories[subcategory_id]
     else:
         selected_categories[subcategory_id] = None
