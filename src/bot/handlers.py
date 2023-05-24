@@ -58,12 +58,11 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    parent_id_match = context.match
 
-    if not parent_id_match:
+    if not context.match:
         return
 
-    parent_id = int(parent_id_match.group(1))
+    parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
 
     reply_markup = await get_subcategories_keyboard(parent_id, context)
@@ -78,21 +77,21 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    subcategory_match = context.match
 
-    if not subcategory_match:
+    if not context.match:
         return
 
-    subcategory_id = int(subcategory_match.group(1))
+    subcategory_id = int(context.match.group(1))
 
     selected_categories = context.user_data.setdefault("selected_categories", {})
 
-    if subcategory_id in selected_categories.keys():
-        del selected_categories[subcategory_id]
-    else:
+    if subcategory_id not in selected_categories:
         selected_categories[subcategory_id] = None
+    else:
+        del selected_categories[subcategory_id]
 
     parent_id = context.user_data["parent_id"]
+
     reply_markup = await get_subcategories_keyboard(parent_id, context)
 
     await query.message.edit_text(
@@ -105,8 +104,8 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
 
 async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    back_to_match = context.match
-    if back_to_match:
+
+    if context.match:
         reply_markup = await get_categories_keyboard()
 
     await query.message.edit_text(
