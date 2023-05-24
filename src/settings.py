@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib.parse import urljoin
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, validator
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +36,13 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_FILE_SIZE: int = 10 * 2**20
     LOG_FILES_TO_KEEP: int = 5
+
+    @validator("APPLICATION_URL")
+    def check_domain_startswith_https_or_add_https(cls, v) -> str:
+        """Добавить 'https://' к домену."""
+        if "https://" in v:
+            return v
+        return urljoin("https://", f"//{v}")
 
     @property
     def database_url(self) -> str:

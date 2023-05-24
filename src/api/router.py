@@ -77,7 +77,7 @@ async def user_register_form_webhook(request: Request) -> StreamingResponse:
     name = request.query_params.get('name')
     surname = request.query_params.get('surname')
 
-    def get_feedback_form(name, surname) -> Iterator[bytes]:
+    def get_feedback_form() -> Iterator[bytes]:
         """
         Открывает для чтения html-шаблон формы регистрации пользователя.
         Возвращает генератор для последующего рендеринга шаблона StreamingResponse-ом.
@@ -85,4 +85,4 @@ async def user_register_form_webhook(request: Request) -> StreamingResponse:
         with open(settings.feedback_form_template, 'rb') as html_form:
             yield from html_form
 
-    return StreamingResponse(get_feedback_form(name, surname), media_type="text/html", headers=headers)
+    return StreamingResponse(get_feedback_form(), media_type="text/html", headers=headers)

@@ -67,11 +67,11 @@ async def subcategories_callback(update: Update, context: CallbackContext):
 
 
 async def ask_your_question(update: Update, context: CallbackContext):
-    name = update.effective_chat['first_name']
-    surname = update.effective_chat['last_name']
+    name = update.effective_chat["first_name"]
+    surname = update.effective_chat["last_name"]
     text = "Задать вопрос"
     if update.effective_message.web_app_data:
-        query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data))
+        query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data)),
         text = "Исправить неверно внесенные данные"
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
