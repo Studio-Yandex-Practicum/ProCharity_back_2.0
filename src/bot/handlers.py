@@ -3,12 +3,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from src.bot.constants import commands, states
-from src.bot.keyboards import (
-    get_categories_keyboard,
-    get_subcategories_keyboard,
-    MENU_KEYBOARD,
-    get_subcategories_keyboard_select,
-)
+from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
 from src.core.services.user import UserService
 
 
@@ -51,25 +46,19 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reply_markup = await get_categories_keyboard()
     context.user_data["parent_id"] = None
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=reply_markup,
+        reply_markup=await get_categories_keyboard(),
     )
 
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
-    if not context.match:
-        return
-
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
-
     reply_markup = await get_subcategories_keyboard(parent_id, context)
 
     await query.message.edit_text(
@@ -82,10 +71,6 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-
-    if not context.match:
-        return
-
     subcategory_id = int(context.match.group(1))
     selected_categories = context.user_data.setdefault("selected_categories", {})
 
@@ -95,25 +80,21 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         del selected_categories[subcategory_id]
 
     parent_id = context.user_data["parent_id"]
-    reply_markup = await get_subcategories_keyboard_select(parent_id, selected_categories)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=reply_markup,
+        reply_markup=await get_subcategories_keyboard(parent_id, context),
     )
 
 
 async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
-    if context.match:
-        reply_markup = await get_categories_keyboard()
-
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=reply_markup,
+        reply_markup=await get_categories_keyboard(),
     )
