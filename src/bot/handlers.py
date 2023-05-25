@@ -3,7 +3,12 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from src.bot.constants import commands, states
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
+from src.bot.keyboards import (
+    get_categories_keyboard,
+    get_subcategories_keyboard,
+    MENU_KEYBOARD,
+    get_subcategories_keyboard_select,
+)
 from src.core.services.user import UserService
 
 
@@ -82,7 +87,6 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         return
 
     subcategory_id = int(context.match.group(1))
-
     selected_categories = context.user_data.setdefault("selected_categories", {})
 
     if subcategory_id not in selected_categories:
@@ -91,9 +95,7 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         del selected_categories[subcategory_id]
 
     parent_id = context.user_data["parent_id"]
-    selected_categories = context.user_data["selected_categories"]
-
-    reply_markup = await get_subcategories_keyboard(parent_id, *selected_categories)
+    reply_markup = await get_subcategories_keyboard_select(parent_id, selected_categories)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "

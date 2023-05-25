@@ -33,22 +33,29 @@ async def get_categories_keyboard():
 
     return InlineKeyboardMarkup(keyboard)
 
-# Галочки по началу ставятся, но не сохраняются. потом выходит ошибка 
-# BadRequest: Message is not modified: specified new message content 
-# and reply markup are exactly the same as a current content and reply
-# markup of the message.
-# это видимо из-за кортежа..
-## Если передавать только parent_id, selected_categories (бе звездочек), то ошибка 
-# про то, что CallBack не итерируетсяTypeError: argument of type 'CallbackContext' is not iterable
 
-async def get_subcategories_keyboard(parent_id, *selected_categories):
+async def get_subcategories_keyboard(parent_id, context):
     category_service = CategoryService()
-
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
 
     keyboard = []
+    selected_categories = context.user_data.get("selected_categories", {})
 
-    selected_categories = selected_categories
+    for category in subcategories:
+        if category.id not in selected_categories:
+            button = InlineKeyboardButton(category.name, callback_data=f"select_category_{category.id}")
+        else:
+            button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")
+        keyboard.append([button])
+
+    keyboard.append([InlineKeyboardButton("Назад ⬅️", callback_data=f"back_to_{parent_id}")])
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_subcategories_keyboard_select(parent_id, selected_categories):
+    category_service = CategoryService()
+    subcategories = await category_service.get_unarchived_subcategories(parent_id)
+    keyboard = []
 
     for category in subcategories:
         if category.id not in selected_categories:
