@@ -2,12 +2,12 @@ import asyncio
 import string
 
 from datetime import datetime, timedelta
-from random import randint, choice, random, choices
+from random import randint, choice, choices
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     create_async_engine,
-    async_sessionmaker
+    async_sessionmaker,
 )
 from contextlib import asynccontextmanager
 
@@ -28,6 +28,14 @@ CATEGORIES_TEST_DATA = [
     {"id": "8", "name": "Обучение и тренинги"},
     {"id": "9", "name": "Финансы и фандрайзинг"},
     {"id": "10", "name": "Менеджмент"}
+    ]
+SUBCATEGORIES_TEST_DATA = [
+    {"id": "11", "name": "Новичок"},
+    {"id": "12", "name": "Архивный новичок"},
+    {"id": "13", "name": "Опытный"},
+    {"id": "14", "name": "Архивный опытный"},
+    {"id": "15", "name": "Профессионал"},
+    {"id": "16", "name": "Архивный профессионал"}
     ]
 TEST_LOCATION = [
     "Москва",
@@ -152,14 +160,14 @@ async def filling_subcategory_in_db(
     """Filling the database with test data subcategories.
     The fields id, name, is_archived, parent_id are filled in.
     """
-    for category in CATEGORIES_TEST_DATA:
-        category_obj = Category(
-            name='Подкатегория '+category['name'],
-            is_archived=choice([True, False]),
-            parent_id=int(category['id']),
-            id=int(category['id']) + len(CATEGORIES_TEST_DATA)
+    for subcategory in SUBCATEGORIES_TEST_DATA:
+        subcategory_obj = Category(
+            name=f"{subcategory['name']}",
+            is_archived=True if "Архивный" in subcategory['name'] else False,
+            parent_id=int(choice([category['id'] for category in CATEGORIES_TEST_DATA])),
+            id=int(subcategory['id'])
         )
-        session.add(category_obj)
+        session.add(subcategory_obj)
     await session.commit()
 
 
@@ -170,7 +178,7 @@ async def filling_task_in_db(
     The fields title, name_organization, deadline, category,
     location, description, is_archived.
      """
-    for category_id in range(1, len(CATEGORIES_TEST_DATA) + 1):
+    for category_id in range(100, len(CATEGORIES_TEST_DATA) + 1):
         async for title in get_task_name_by_id(category_id):
             task = Task(
                 name_organization=f'{choice(TEST_ORGANIZATION)}',
@@ -181,7 +189,7 @@ async def filling_task_in_db(
                 location=f'{choice(TEST_LOCATION)}',
                 link=f"http://example.com/task/"
                 f"{''.join(choices(CHARACTERS, k=6))}",
-                description=f"Description {title}",
+                description=f"Описание {title}",
                 is_archived=choice([True, False])
             )
             session.add(task)
@@ -200,13 +208,10 @@ async def run():
     session_manager = asynccontextmanager(get_session)
     async with session_manager() as session:
         await delete_all_data(session)
-        print("Deleted data from the Tasks, Categories table.")
         await filling_category_in_db(session)
-        print("The table with the Categories is full.")
         await filling_subcategory_in_db(session)
-        print("The table with the SubCategories is full.")
         await filling_task_in_db(session)
-        print("The Tasks table is full.")
+        print("Тестовые данные загружены в БД.")
 
 if __name__ == "__main__":
     asyncio.run(run())
