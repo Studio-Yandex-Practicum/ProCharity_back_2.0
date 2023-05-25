@@ -59,13 +59,12 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
     query = update.callback_query
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
-    reply_markup = await get_subcategories_keyboard(parent_id, context)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=reply_markup,
+        reply_markup=await get_subcategories_keyboard(parent_id, context),
     )
 
 
