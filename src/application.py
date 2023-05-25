@@ -12,7 +12,7 @@ from src.settings import settings
 def create_app() -> FastAPI:
     app = FastAPI(
         debug=settings.DEBUG,
-        openapi_prefix="/api")
+        root_path=settings.ROOT_PATH)
     origins = ["*"]
 
     app.add_middleware(

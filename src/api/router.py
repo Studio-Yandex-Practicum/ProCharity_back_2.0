@@ -5,7 +5,7 @@ from src.api.services.category import CategoryService
 from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
 
-api_router = APIRouter(prefix="/api", tags=["API"])
+api_router = APIRouter(tags=["API"])
 
 
 @api_router.get(
