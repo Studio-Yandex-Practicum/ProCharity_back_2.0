@@ -91,8 +91,9 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         del selected_categories[subcategory_id]
 
     parent_id = context.user_data["parent_id"]
+    selected_categories = context.user_data["selected_categories"]
 
-    reply_markup = await get_subcategories_keyboard(parent_id, context)
+    reply_markup = await get_subcategories_keyboard(parent_id, *selected_categories)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
