@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     APPLICATION_URL: str = "localhost"
     SECRET_KEY: str 
-    ROOT_PATH: str = "/api"
+    ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
     # Параметры подключения к БД
