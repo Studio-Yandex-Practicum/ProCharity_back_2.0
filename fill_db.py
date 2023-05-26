@@ -30,12 +30,12 @@ CATEGORIES_TEST_DATA = [
     {"id": "10", "name": "Менеджмент"}
     ]
 SUBCATEGORIES_TEST_DATA = [
-    {"id": "11", "name": "Новичок"},
-    {"id": "12", "name": "Архивный новичок"},
-    {"id": "13", "name": "Опытный"},
-    {"id": "14", "name": "Архивный опытный"},
-    {"id": "15", "name": "Профессионал"},
-    {"id": "16", "name": "Архивный профессионал"}
+    {"id": "1", "name": "Новичок"},
+    {"id": "2", "name": "Архивный новичок"},
+    {"id": "3", "name": "Опытный"},
+    {"id": "4", "name": "Архивный опытный"},
+    {"id": "5", "name": "Профессионал"},
+    {"id": "6", "name": "Архивный профессионал"}
     ]
 TEST_LOCATION = [
     "Москва",
@@ -160,14 +160,17 @@ async def filling_subcategory_in_db(
     """Filling the database with test data subcategories.
     The fields id, name, is_archived, parent_id are filled in.
     """
-    for subcategory in SUBCATEGORIES_TEST_DATA:
-        subcategory_obj = Category(
-            name=f"{subcategory['name']}",
-            is_archived=True if "Архивный" in subcategory['name'] else False,
-            parent_id=int(subcategory['id'][1]),
-            id=int(subcategory['id'])
-        )
-        session.add(subcategory_obj)
+    for category in CATEGORIES_TEST_DATA:
+        parent_id = int(category['id'])
+        category_name = str(category['name'])
+        for subcategory in SUBCATEGORIES_TEST_DATA:
+            subcategory_obj = Category(
+                name=f"{subcategory['name']} для {category_name}",
+                is_archived=True if "Архивный" in subcategory['name'] else False,
+                parent_id=parent_id,
+                id=int(str(subcategory['id']) + str(parent_id))
+            )
+            session.add(subcategory_obj)
     await session.commit()
 
 
