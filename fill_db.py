@@ -164,7 +164,7 @@ async def filling_subcategory_in_db(
         subcategory_obj = Category(
             name=f"{subcategory['name']}",
             is_archived=True if "Архивный" in subcategory['name'] else False,
-            parent_id=int(choice([category['id'] for category in CATEGORIES_TEST_DATA])),
+            parent_id=int(subcategory['id'][1]),
             id=int(subcategory['id'])
         )
         session.add(subcategory_obj)
