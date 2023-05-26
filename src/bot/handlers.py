@@ -64,6 +64,8 @@ async def ask_your_question(update: Update, context: CallbackContext):
     name = update.effective_chat["first_name"]
     surname = update.effective_chat["last_name"]
     text = "Задать вопрос"
+    url = f"{settings.feedback_form_template_url}?"
+    params = {'name': name, 'surname': surname}
     if update.effective_message.web_app_data:
         query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data)),
         text = "Исправить неверно внесенные данные"
@@ -74,7 +76,8 @@ async def ask_your_question(update: Update, context: CallbackContext):
             KeyboardButton(
                 text=text,
                 web_app=WebAppInfo(
-                    url=f"{settings.feedback_form_template_url}?name={name}&surname={surname}"),
+                    url=url + urllib.parse.urlencode(params)
+                )
             )
         ),
     )
@@ -96,6 +99,7 @@ async def web_app_data(update: Update, context: CallbackContext):
         text=f"Вы можете вернуться в меню или посмотреть открытые "
              f"задания. Нажмите на нужную кнопку.",
         reply_markup=keyboard,
+    )
 
 
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
