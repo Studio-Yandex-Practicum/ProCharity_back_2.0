@@ -1,4 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CallbackContext
 
 from src.bot.services.category import CategoryService
 from src.bot.constants import callback_data
@@ -18,7 +19,7 @@ MENU_KEYBOARD = [
 ]
 
 
-async def get_categories_keyboard():
+async def get_categories_keyboard() -> InlineKeyboardMarkup:
     category_service = CategoryService()
     categories = await category_service.get_unarchived_parents()
     keyboard = [
@@ -34,7 +35,7 @@ async def get_categories_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_subcategories_keyboard(parent_id, context):
+async def get_subcategories_keyboard(parent_id: int, context: CallbackContext) -> InlineKeyboardMarkup:
     category_service = CategoryService()
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
 
