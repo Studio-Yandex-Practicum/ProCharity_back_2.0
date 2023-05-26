@@ -51,19 +51,13 @@ async def menu_callback(update: Update, context: CallbackContext):
 
 
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reply_markup = await get_categories_keyboard()
+    context.user_data["parent_id"] = None
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=reply_markup,
+        reply_markup=await get_categories_keyboard(),
     )
-
-
-async def subcategories_callback(update: Update, context: CallbackContext):
-    parent_id = int(update.callback_query.data.split("_")[1])
-    reply_markup = await get_subcategories_keyboard(parent_id)
-    await update.callback_query.message.edit_text("Выберите категории", reply_markup=reply_markup)
 
 
 async def ask_your_question(update: Update, context: CallbackContext):
@@ -102,4 +96,47 @@ async def web_app_data(update: Update, context: CallbackContext):
         text=f"Вы можете вернуться в меню или посмотреть открытые "
              f"задания. Нажмите на нужную кнопку.",
         reply_markup=keyboard,
+
+
+async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    parent_id = int(context.match.group(1))
+    context.user_data["parent_id"] = parent_id
+
+    await query.message.edit_text(
+        "Чтобы я знал, с какими задачами ты готов помогать, "
+        "выбери свои профессиональные компетенции (можно выбрать "
+        'несколько). После этого, нажми на пункт "Готово 👌"',
+        reply_markup=await get_subcategories_keyboard(parent_id, context),
+    )
+
+
+async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    subcategory_id = int(context.match.group(1))
+    selected_categories = context.user_data.setdefault("selected_categories", {})
+
+    if subcategory_id not in selected_categories:
+        selected_categories[subcategory_id] = None
+    else:
+        del selected_categories[subcategory_id]
+
+    parent_id = context.user_data["parent_id"]
+
+    await query.message.edit_text(
+        "Чтобы я знал, с какими задачами ты готов помогать, "
+        "выбери свои профессиональные компетенции (можно выбрать "
+        'несколько). После этого, нажми на пункт "Готово 👌"',
+        reply_markup=await get_subcategories_keyboard(parent_id, context),
+    )
+
+
+async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+
+    await query.message.edit_text(
+        "Чтобы я знал, с какими задачами ты готов помогать, "
+        "выбери свои профессиональные компетенции (можно выбрать "
+        'несколько). После этого, нажми на пункт "Готово 👌"',
+        reply_markup=await get_categories_keyboard(),
     )
