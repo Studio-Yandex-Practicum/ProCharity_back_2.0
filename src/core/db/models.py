@@ -3,6 +3,7 @@ from datetime import date
 from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
+from sqlalchemy.ext.declarative import AbstractConcreteBase
 
 
 class Base(DeclarativeBase):
@@ -10,9 +11,8 @@ class Base(DeclarativeBase):
     __name__: Mapped[str]
 
 
-class EntityBase(Base):
+class ContentBase(AbstractConcreteBase, Base):
     """Базовый класс для сущностей."""
-    __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
@@ -21,6 +21,7 @@ class EntityBase(Base):
         nullable=False,
         onupdate=func.current_timestamp(),
     )
+    is_archived: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
 
 
 class UsersCategories(Base):
@@ -35,7 +36,7 @@ class UsersCategories(Base):
         return f"<User {self.user_id} - Category {self.category_id}>"
 
 
-class User(EntityBase):
+class User(ContentBase):
     """Модель пользователя."""
 
     __tablename__ = "users"
@@ -57,7 +58,7 @@ class User(EntityBase):
         return f"<User {self.telegram_id}>"
 
 
-class Task(EntityBase):
+class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
@@ -72,18 +73,16 @@ class Task(EntityBase):
     location: Mapped[str] = mapped_column()
     link: Mapped[str]
     description: Mapped[str] = mapped_column()
-    is_archived: Mapped[bool]
 
     def __repr__(self):
         return f"<Task {self.title}>"
 
 
-class Category(EntityBase):
+class Category(ContentBase):
     """Модель категорий."""
 
     __tablename__ = "categories"
     name: Mapped[str] = mapped_column(String(100))
-    is_archived: Mapped[bool]
 
     users: Mapped[list["User"]] = relationship(
         "User", secondary="users_categories", back_populates="categories"
