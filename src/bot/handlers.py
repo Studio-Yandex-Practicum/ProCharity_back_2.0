@@ -46,6 +46,9 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_service = UserService()
+    categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in categories}
     context.user_data["parent_id"] = None
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
@@ -100,15 +103,17 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 
 
 async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Записывает выбранные категории в базу данных и
+    отправляет пользователю отчет о выбранных категориях.
+    """
     query = update.callback_query
     telegram_id = update.effective_chat.id
     user_service = UserService()
 
-    users_categories = context.user_data.get("selected_categories")
-    users_categories_ids = list(users_categories.keys()) if users_categories else None
+    users_categories_ids = context.user_data.get("selected_categories", {}).keys()
 
     await user_service.set_categories_to_user(
-        telegram_id=update.effective_chat.id,
+        telegram_id=telegram_id,
         categories_ids=users_categories_ids,
     )
 
@@ -118,6 +123,6 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
     else:
         await query.message.edit_text(
             text="Отлично! Теперь я буду присылать тебе уведомления о новых "
-                 f"заданиях в категориях: *{', '.join(categories)}*.\n\n",
+                 f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN
         )
