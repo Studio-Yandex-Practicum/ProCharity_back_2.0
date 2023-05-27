@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends
+from typing import Iterator
+
+from fastapi import APIRouter, Depends, status, Request
+from fastapi.responses import StreamingResponse
 
 from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse
 from src.api.services.category import CategoryService
 from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
+from src.settings import settings
 
-api_router = APIRouter(prefix="/api", tags=["API"])
+api_router = APIRouter(tags=["API"])
 
 
 @api_router.get(
@@ -48,3 +52,37 @@ async def get_tasks_for_user(user_id: int, task_service: TaskService = Depends()
 )
 async def get_all_tasks(task_service: TaskService = Depends()) -> list[TaskResponse]:
     return await task_service.get_all()
+
+
+@api_router.get(
+    "/telegram/feedback-form",
+    status_code=status.HTTP_200_OK,
+    summary="Вернуть шаблон формы обратной связи в телеграм",
+    response_description="Предоставить пользователю форму для заполнения",
+)
+async def user_register_form_webhook(request: Request) -> StreamingResponse:
+    """
+    Вернуть пользователю в телеграм форму для заполнения персональных данных.
+
+    - **surname**: фамилия пользователя
+    - **name**: имя пользователя
+    - **email**: Email
+    - **question**: вопрос или предложение
+    """
+    headers: dict[str, str] = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+    }
+    name = request.query_params.get('name')
+    surname = request.query_params.get('surname')
+
+    def get_feedback_form() -> Iterator[bytes]:
+        """
+        Открывает для чтения html-шаблон формы регистрации пользователя.
+        Возвращает генератор для последующего рендеринга шаблона StreamingResponse-ом.
+        """
+        with open(settings.feedback_form_template, 'rb') as html_form:
+            yield from html_form
+
+    return StreamingResponse(get_feedback_form(), media_type="text/html", headers=headers)

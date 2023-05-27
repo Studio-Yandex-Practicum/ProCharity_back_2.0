@@ -1,12 +1,10 @@
-version: "3.8"
-
-
-
 services:
   backend:
     image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:staging
     container_name: procharity_bot_backend
     restart: always
+    volumes:
+      - ./logs/:/app/logs/
     depends_on:
         postgres:
           condition: service_healthy
