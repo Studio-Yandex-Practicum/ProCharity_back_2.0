@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table
+from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
 
@@ -21,8 +21,9 @@ class Base(DeclarativeBase):
 users_categories = Table(
     "users_categories",
     Base.metadata,
-    Column("category_id", ForeignKey("categories.id"), primary_key=True, unique=True),
-    Column("user_id", ForeignKey("users.id"), primary_key=True, unique=True),
+    Column("category_id", ForeignKey("categories.id"), primary_key=True),
+    Column("user_id", ForeignKey("users.id"), primary_key=True),
+    UniqueConstraint('category_id', 'user_id', name='unique_user_category')
 )
 
 
