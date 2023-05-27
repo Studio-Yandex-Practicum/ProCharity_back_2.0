@@ -1,6 +1,5 @@
 import abc
 
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.repository import ContentRepository
