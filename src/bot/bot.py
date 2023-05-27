@@ -5,6 +5,7 @@ from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, Comm
 from src.bot.handlers import (
     back_subcategory_callback,
     categories_callback,
+    confirm_categories_callback,
     menu_callback,
     select_subcategory_callback,
     start_command,
@@ -22,6 +23,7 @@ def create_bot() -> Application:
     bot.add_handler(CallbackQueryHandler(subcategories_callback, pattern=r"category_(\d+)"))
     bot.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=r"select_category_(\d+)"))
     bot.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=r"back_to_(\d+)"))
+    bot.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern="confirm_categories"))
 
     return bot
 

@@ -4,7 +4,7 @@ from typing import Generator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.db import get_session
-from src.core.db.models import User
+from src.core.db.models import Category, User
 from src.core.db.repository.user import UserRepository
 
 
@@ -26,3 +26,17 @@ class UserService:
             user.telegram_id = telegram_id
             user.username = username
             return await user_repository.create(user)
+
+    async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
+        """Присваивает пользователю список категорий."""
+        async with self._sessionmaker() as session:
+            repository = UserRepository(session)
+            await repository.set_categories_to_user(telegram_id, categories_ids)
+
+    async def get_user_categories(self, telegram_id: int) -> list[str]:
+        """Возвращает список названий категорий пользователя по его telegram_id."""
+        async with self._sessionmaker() as session:
+            repository = UserRepository(session)
+            user = await repository.get_by_telegram_id(telegram_id)
+            categories = await repository.get_user_categories(user)
+            return [category.name for category in categories]

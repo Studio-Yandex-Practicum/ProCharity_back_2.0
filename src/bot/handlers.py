@@ -97,3 +97,27 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=await get_categories_keyboard(),
     )
+
+
+async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    telegram_id = update.effective_chat.id
+    user_service = UserService()
+
+    users_categories = context.user_data.get("selected_categories")
+    users_categories_ids = list(users_categories.keys()) if users_categories else None
+
+    await user_service.set_categories_to_user(
+        telegram_id=update.effective_chat.id,
+        categories_ids=users_categories_ids,
+    )
+
+    categories = await user_service.get_user_categories(telegram_id)
+    if not categories:
+        await query.message.edit_text(text="Категории не выбраны.")
+    else:
+        await query.message.edit_text(
+            text="Отлично! Теперь я буду присылать тебе уведомления о новых "
+                 f"заданиях в категориях: *{', '.join(categories)}*.\n\n",
+            parse_mode=ParseMode.MARKDOWN
+        )
