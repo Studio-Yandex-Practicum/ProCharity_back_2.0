@@ -75,7 +75,7 @@ async def ask_your_question(update: Update, context: CallbackContext):
             KeyboardButton(
                 text=text,
                 web_app=WebAppInfo(
-                    url=urllib.parse.urljoin(settings.feedback_form_template_url, "?", urllib.parse.urlencode(params))
+                    url=f"{settings.feedback_form_template_url}?{urllib.parse.urlencode(params)}"
                 )
             )
         ),
