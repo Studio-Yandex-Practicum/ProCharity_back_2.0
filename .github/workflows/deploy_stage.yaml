@@ -71,7 +71,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "infra/docker-compose.swag.yml, infra/swag_nginx.conf"
+          source: "infra/docker-compose.swag.yml, infra/nginx/swag.conf"
           target: ${{ env.DEPLOY_PATH }}
 
       - name: Create .env file
