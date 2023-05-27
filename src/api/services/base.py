@@ -9,8 +9,8 @@ class ContentService(abc.ABC):
     """Абстрактный класс для контента."""
 
     def __init__(self, repository: ContentRepository, session: AsyncSession):
-        self._repository = repository
-        self._session = session
+        self._repository: ContentRepository = repository
+        self._session: AsyncSession = session
 
     async def actualize_objects(self, objects: list[any], model_class: any) -> None:
         to_create, to_update = [], []
