@@ -128,4 +128,4 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend alembic upgrade head
+            docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend alembic upgrade head & python fill_db.py
