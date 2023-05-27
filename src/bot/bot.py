@@ -25,7 +25,7 @@ def create_bot() -> Application:
     bot.add_handler(CommandHandler("menu", menu_callback))
     bot.add_handler(CommandHandler("categories", categories_callback))
     bot.add_handler(CallbackQueryHandler(categories_callback, pattern="change_category"))
-    bot.add_handler(CallbackQueryHandler(subcategories_callback, pattern=r"category_\d+"))
+    bot.add_handler(CallbackQueryHandler(subcategories_callback, pattern=r"category_(\d+)"))
     bot.add_handler(CallbackQueryHandler(ask_your_question, pattern=ASK_YOUR_QUESTION))
     bot.add_handler(CallbackQueryHandler(ask_your_question, pattern=SEND_ERROR_OR_PROPOSAL))
     bot.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))

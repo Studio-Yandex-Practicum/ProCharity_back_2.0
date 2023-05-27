@@ -8,11 +8,12 @@ from sqlalchemy.ext.declarative import AbstractConcreteBase
 
 class Base(DeclarativeBase):
     """Основа для базового класса."""
+
     __name__: Mapped[str]
 
 
-class ContentBase(AbstractConcreteBase, Base):
-    """Базовый класс для сущностей."""
+class EntityBase(AbstractConcreteBase, Base):
+    """Базовый класс для всех сущностей."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
@@ -21,6 +22,13 @@ class ContentBase(AbstractConcreteBase, Base):
         nullable=False,
         onupdate=func.current_timestamp(),
     )
+
+
+class ContentBase(EntityBase):
+    """Базовый класс для контента (категорий и задач)."""
+
+    __abstract__ = True
+
     is_archived: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
 
 
@@ -36,7 +44,7 @@ class UsersCategories(Base):
         return f"<User {self.user_id} - Category {self.category_id}>"
 
 
-class User(ContentBase):
+class User(EntityBase):
     """Модель пользователя."""
 
     __tablename__ = "users"
