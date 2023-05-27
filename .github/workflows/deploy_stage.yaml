@@ -120,12 +120,4 @@ jobs:
             docker compose --file docker-compose.yaml --env-file ../.env up -dV --quit-pull
             docker system prune -af
 
-      - name: Making migrations
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: |
-            cd ${{ env.DEPLOY_PATH }}/infra
-            docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend alembic upgrade head & python fill_db.py
+            docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend bash -c "alembic upgrade head & python fill_db.py"
