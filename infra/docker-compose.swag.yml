@@ -4,7 +4,7 @@ version: "3.8"
 
 services:
   backend:
-    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:latest
+    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:staging
     container_name: procharity_bot_backend
     restart: always
     depends_on:
@@ -14,7 +14,7 @@ services:
         - "8000:8000"
     env_file:
         - ../.env
- 
+
   postgres:
     image: postgres:13.2
     container_name: procharity_postgres
@@ -58,5 +58,3 @@ services:
 volumes:
   postgres_data:
   keys:
-
-
