@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str 
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
+    BASE_URL: str
+    USE_NGROK: str
 
     # Параметры подключения к БД
     POSTGRES_DB: str
@@ -82,3 +84,7 @@ def get_settings():
 
 
 settings = get_settings()
+
+
+def init_webhooks(base_url):
+    pass
