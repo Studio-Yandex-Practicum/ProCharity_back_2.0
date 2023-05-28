@@ -1,8 +1,8 @@
 """add users_categories model
 
-Revision ID: dc92b818969c
+Revision ID: f23ba9c68210
 Revises: edf9d4b6cdea
-Create Date: 2023-05-28 00:04:23.403075
+Create Date: 2023-05-28 16:53:13.659785
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'dc92b818969c'
+revision = 'f23ba9c68210'
 down_revision = 'edf9d4b6cdea'
 branch_labels = None
 depends_on = None

@@ -1,9 +1,8 @@
 from datetime import date
 
 from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship, declarative_mixin
 from sqlalchemy.sql import expression, func
-from sqlalchemy.ext.declarative import AbstractConcreteBase
 
 
 class Base(DeclarativeBase):
@@ -12,7 +11,8 @@ class Base(DeclarativeBase):
     __name__: Mapped[str]
 
 
-class EntityBase(AbstractConcreteBase, Base):
+@declarative_mixin
+class EntityBase:
     """Базовый класс для всех сущностей."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -24,10 +24,9 @@ class EntityBase(AbstractConcreteBase, Base):
     )
 
 
+@declarative_mixin
 class ContentBase(EntityBase):
     """Базовый класс для контента (категорий и задач)."""
-
-    __abstract__ = True
 
     is_archived: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
 
@@ -44,7 +43,7 @@ class UsersCategories(Base):
         return f"<User {self.user_id} - Category {self.category_id}>"
 
 
-class User(EntityBase):
+class User(EntityBase, Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
@@ -66,7 +65,7 @@ class User(EntityBase):
         return f"<User {self.telegram_id}>"
 
 
-class Task(ContentBase):
+class Task(ContentBase, Base):
     """Модель задач."""
 
     __tablename__ = "tasks"
@@ -86,7 +85,7 @@ class Task(ContentBase):
         return f"<Task {self.title}>"
 
 
-class Category(ContentBase):
+class Category(ContentBase, Base):
     """Модель категорий."""
 
     __tablename__ = "categories"
