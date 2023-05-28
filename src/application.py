@@ -1,12 +1,16 @@
+import sys
+
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
+from fastapi.logger import logger
 from fastapi.middleware.cors import CORSMiddleware
+from pyngrok import ngrok
 
 from src.api.router import api_router
 from src.bot.bot import start_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
-from src.settings import settings
+from src.settings import init_webhooks, settings
 
 
 def create_app() -> FastAPI:
@@ -49,3 +53,12 @@ def create_app() -> FastAPI:
         await bot_instance.shutdown()
 
     return app
+
+
+if settings.USE_NGROK:
+    port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 8000
+
+    public_url = ngrok.connect(port).public_url
+    logger.info("ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}\"".format(public_url, port))
+    settings.BASE_URL = public_url
+    init_webhooks(public_url)
