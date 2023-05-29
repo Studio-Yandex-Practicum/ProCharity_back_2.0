@@ -10,9 +10,11 @@ from telegram.ext import ContextTypes, CallbackContext
 from src.bot.constants import commands, states, callback_data
 from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
 from src.core.services.user import UserService
+from src.core.logging.setup import logger_decor
 from src.settings import settings
 
 
+@logger_decor
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     await user_service.register_user(
@@ -42,6 +44,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+@logger_decor
 async def menu_callback(update: Update, context: CallbackContext):
     """Create button menu."""
     keyboard = MENU_KEYBOARD
@@ -50,6 +53,7 @@ async def menu_callback(update: Update, context: CallbackContext):
     await update.message.reply_text("Выбери, что тебя интересует:", reply_markup=reply_markup)
 
 
+@logger_decor
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["parent_id"] = None
     await update.message.reply_text(
@@ -60,6 +64,7 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
+@logger_decor
 async def ask_your_question(update: Update, context: CallbackContext):
     name = update.effective_chat["first_name"]
     surname = update.effective_chat["last_name"]
@@ -82,6 +87,7 @@ async def ask_your_question(update: Update, context: CallbackContext):
     )
 
 
+@logger_decor
 async def web_app_data(update: Update, context: CallbackContext):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
@@ -101,6 +107,7 @@ async def web_app_data(update: Update, context: CallbackContext):
     )
 
 
+@logger_decor
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     parent_id = int(context.match.group(1))
@@ -114,6 +121,7 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
     )
 
 
+@logger_decor
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
@@ -134,6 +142,7 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
     )
 
 
+@logger_decor
 async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 

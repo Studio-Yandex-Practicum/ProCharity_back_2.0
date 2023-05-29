@@ -136,3 +136,16 @@ def setup_logging():
         )
 
     sys.excepthook = handle_exception
+
+
+def logger_decor(func):
+    def wrapper(*args, **kwargs):
+        try:
+            logging.config.dictConfig(LOGGING_DICTCONFIG)
+            update = args[0]
+            logging.info(f'Получено обновление: {update}')
+            return func(*args, **kwargs)
+        except Exception as error:
+            logging.warning(f'Необработанное обновление: {update}')
+            logging.error(f'Error: {error}')
+    return wrapper
