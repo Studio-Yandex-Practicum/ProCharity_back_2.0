@@ -11,7 +11,6 @@ repos:
     - id: mixed-line-ending
     - id: no-commit-to-branch
       args: [--branch, master, --branch, develop]
-    - id: mixed-line-ending
 
 - repo: https://github.com/pycqa/isort
   rev: 5.12.0
