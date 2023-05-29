@@ -1,6 +1,5 @@
 import abc
 from typing import TypeVar
-from datetime import datetime
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
-
 
 DatabaseModel = TypeVar("DatabaseModel")
 
@@ -73,7 +71,7 @@ class ContentRepository(AbstractRepository, abc.ABC):
         """Изменяет is_archived с False на True у не указанных ids."""
         await self._session.execute(
             update(self._model)
-            .where(self._model.is_archived == False)
+            .where(self._model.is_archived == False)  # noqa
             .where(self._model.id.not_in(ids))
             .values({"is_archived": True})
         )
@@ -81,10 +79,6 @@ class ContentRepository(AbstractRepository, abc.ABC):
     async def get_all_non_archived_and_by_ids(self, ids: list[int]) -> list[int]:
         """Возвращает id всех объектов модели из базы данных, которые не в архиве и по указанным ids"""
         filtred_ids = await self._session.scalars(
-            select(self._model.id)
-            .where(
-                self._model.id.in_(ids)
-                | (self._model.is_archived == False)
-            )
+            select(self._model.id).where(self._model.id.in_(ids) | (self._model.is_archived == False))  # noqa
         )
         return filtred_ids

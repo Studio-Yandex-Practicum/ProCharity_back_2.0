@@ -1,4 +1,3 @@
-
 from functools import wraps
 
 
@@ -9,4 +8,5 @@ def auto_commit(func):
         if commit:
             await self._session.commit()
         return result
+
     return auto_commit_wraps

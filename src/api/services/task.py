@@ -11,7 +11,7 @@ class TaskService(ContentService):
     """Сервис для работы с моделью Task."""
 
     def __init__(
-            self, task_repository: TaskRepository = Depends(), session: AsyncSession = Depends(get_session)
+        self, task_repository: TaskRepository = Depends(), session: AsyncSession = Depends(get_session)
     ) -> None:
         super().__init__(task_repository, session)
 
