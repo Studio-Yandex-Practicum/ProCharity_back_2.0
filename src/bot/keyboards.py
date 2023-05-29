@@ -2,18 +2,44 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
 from src.bot.services.category import CategoryService
-from src.bot.constants import callback_data
+from src.bot.constants import callback_data, keyboards_const
 
 
 MENU_KEYBOARD = [
-    [InlineKeyboardButton("Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
-    [InlineKeyboardButton("Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)],
-    [InlineKeyboardButton("Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
-    [InlineKeyboardButton("Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
-    [InlineKeyboardButton("О платформе", callback_data=callback_data.ABOUT_PROJECT)],
     [
         InlineKeyboardButton(
-            "⏹️ Остановить / ▶️ включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION
+            keyboards_const.VIEW_OPEN_TASKS_TEXT,
+            callback_data=callback_data.VIEW_TASKS
+        )
+    ],
+    [
+        InlineKeyboardButton(
+            keyboards_const.EDIT_COMPETENTIONS_TEXT,
+            callback_data=callback_data.CHANGE_CATEGORY
+        )
+    ],
+    [
+        InlineKeyboardButton(
+            keyboards_const.SEND_OFFER_TEXT,
+            callback_data=callback_data.SEND_ERROR_OR_PROPOSAL
+        )
+    ],
+    [
+        InlineKeyboardButton(
+            keyboards_const.ASK_QUESTION_TEXT,
+            callback_data=callback_data.ASK_YOUR_QUESTION
+        )
+    ],
+    [
+        InlineKeyboardButton(
+            keyboards_const.ABOUT_TEXT,
+            callback_data=callback_data.ABOUT_PROJECT
+        )
+    ],
+    [
+        InlineKeyboardButton(
+            keyboards_const.STOP_RUN_SUBSCRIPTION_TEXT,
+            callback_data=callback_data.JOB_SUBSCRIPTION
         )
     ],
 ]
@@ -27,8 +53,16 @@ async def get_categories_keyboard() -> InlineKeyboardMarkup:
     ]
     keyboard.extend(
         [
-            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data="add_categories")],
-            [InlineKeyboardButton("Готово 👌", callback_data="confirm_categories")],
+            [
+                InlineKeyboardButton(
+                    keyboards_const.NO_COMPETENTIONS_TEXT,
+                    callback_data=callback_data.ADD_CATEGORIES
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    keyboards_const.DONE_TEXT,
+                    callback_data=callback_data.CONFIRM_CATEGORIES)],
         ]
     )
 
@@ -40,7 +74,7 @@ async def get_subcategories_keyboard(parent_id: int, context: CallbackContext) -
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
 
     keyboard = []
-    selected_categories = context.user_data.get("selected_categories", {})
+    selected_categories = context.user_data.get(callback_data.SELECTED_CATEGORIES, {})
 
     for category in subcategories:
         if category.id not in selected_categories:
@@ -49,5 +83,5 @@ async def get_subcategories_keyboard(parent_id: int, context: CallbackContext) -
             button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")
         keyboard.append([button])
 
-    keyboard.append([InlineKeyboardButton("Назад ⬅️", callback_data=f"back_to_{parent_id}")])
+    keyboard.append([InlineKeyboardButton(keyboards_const.BACK_TEXT, callback_data=f"back_to_{parent_id}")])
     return InlineKeyboardMarkup(keyboard)
