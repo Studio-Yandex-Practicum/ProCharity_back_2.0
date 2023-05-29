@@ -10,6 +10,6 @@ class CategoryService(ContentService):
     """Сервис для работы с моделью Category."""
 
     def __init__(
-        self, category_repository: CategoryRepository = Depends(), session: AsyncSession = Depends(get_session)
+            self, category_repository: CategoryRepository = Depends(), session: AsyncSession = Depends(get_session)
     ) -> None:
         super().__init__(category_repository, session)

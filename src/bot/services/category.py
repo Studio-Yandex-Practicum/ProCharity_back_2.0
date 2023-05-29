@@ -1,10 +1,9 @@
 import contextlib
 from typing import Generator
-
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.core.db.db import get_session
 from src.core.db.models import Category
+
 from src.core.db.repository.category import CategoryRepository
 
 

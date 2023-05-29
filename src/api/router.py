@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, status, Request
 from fastapi.responses import StreamingResponse
 
 from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse
@@ -74,13 +74,15 @@ async def user_register_form_webhook(request: Request) -> StreamingResponse:
         "Pragma": "no-cache",
         "Expires": "0",
     }
+    name = request.query_params.get('name')
+    surname = request.query_params.get('surname')
 
     def get_feedback_form() -> Iterator[bytes]:
         """
         Открывает для чтения html-шаблон формы регистрации пользователя.
         Возвращает генератор для последующего рендеринга шаблона StreamingResponse-ом.
         """
-        with open(settings.feedback_form_template, "rb") as html_form:
+        with open(settings.feedback_form_template, 'rb') as html_form:
             yield from html_form
 
     return StreamingResponse(get_feedback_form(), media_type="text/html", headers=headers)
