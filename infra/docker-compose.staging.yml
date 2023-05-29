@@ -1,18 +1,23 @@
+version: "3.8"
+
+volumes:
+  postgres_data:
+
 services:
   backend:
-    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:staging
-    container_name: procharity_bot_backend
+    build:
+      context: ../../ProCharity_back_2.0
+      dockerfile: Dockerfile
+    container_name: dev_procharity_bot_backend
     restart: always
-    volumes:
-      - ./logs/:/app/logs/
     depends_on:
-        postgres:
-          condition: service_healthy
+      postgres:
+        condition: service_healthy
     ports:
-        - "8000:8000"
+      - "8000:8000"
     env_file:
-        - ../.env
-
+      - ../.env
+ 
   postgres:
     image: postgres:13.2
     container_name: procharity_postgres
@@ -22,7 +27,7 @@ services:
     env_file:
       - ../.env
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-U", "{{ POSTGRES_USER | 'postgres' }}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,5 +43,16 @@ services:
     env_file:
       - ../.env
 
-volumes:
-  postgres_data:
+  procharity_bot_local:
+    build:
+      context: ../../ProCharity_back_2.0
+      dockerfile: Dockerfile
+    container_name: procharity_bot_local
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../.env
