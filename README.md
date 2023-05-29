@@ -10,10 +10,11 @@
       </ul>
     </li>
     <li>
-      <a href="#установка-и-запуск">Установка и запуск</a>
+      <a href="#установка-и-запуск">Для разработки</a>
       <ul>
         <li><a href="#установка-приложения">Установка приложения</a></li>
         <li><a href="#запуск">Запуск</a></li>
+        <li><a href="#запуск-бота-локально">Запуск бота локально</a></li>
       </ul>
     </li>
     <li><a href="#использование">Использование</a></li>
@@ -56,7 +57,7 @@ ProCharity (НКО Фонд Друзья).
 [![Postgres][Postgres-badge]][Postgres-url]
 [![Nginx][Nginx-badge]][Nginx-url]
 
-## Установка и запуск
+## Для разработки
 
 ### Установка приложения
 
@@ -115,6 +116,31 @@ ProCharity (НКО Фонд Друзья).
 
     ```shell
     uvicorn src:app --reload
+    ```
+
+### Запуск бота локально
+
+1. Собрать и запустить контейнеры из файла infra/docker-compose.staging.yml.
+
+    ```shell
+    docker-compose -f infra/docker-compose.staging.yml up procharity_bot_local
+    ```
+
+2. Войти в контейнер.
+
+    ```shell
+    docker exec -it procharity_bot_local sh
+    ```
+
+3. Применить миграции базы данных.
+
+    ```shell
+    alembic upgrade head
+
+4. Выполнить скрипт наполнения тестовой базы.
+
+    ```shell
+    python3 fill_db.py
     ```
 
 ## Использование
