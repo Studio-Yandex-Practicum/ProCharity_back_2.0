@@ -10,11 +10,13 @@
       </ul>
     </li>
     <li>
+    <a href="#запуск-бота-локально">Запуск бота локально</a>
+    </li> 
+    <li>
       <a href="#для-разработки">Для разработки</a>
       <ul>
         <li><a href="#установка-приложения">Установка приложения</a></li>
         <li><a href="#запуск">Запуск</a></li>
-        <li><a href="#запуск-бота-локально">Запуск бота локально</a></li>
       </ul>
     </li>
     <li><a href="#использование">Использование</a></li>
@@ -56,6 +58,21 @@ ProCharity (НКО Фонд Друзья).
 [![Python-telegram-bot][Python-telegram-bot-badge]][Python-telegram-bot-url]
 [![Postgres][Postgres-badge]][Postgres-url]
 [![Nginx][Nginx-badge]][Nginx-url]
+
+## Запуск бота локально
+
+1. Собрать и запустить контейнеры из файла infra/docker-compose.local.yml.
+
+    ```shell
+    docker-compose -f infra/docker-compose.local.yml up
+    ```
+    Эта команда создаст и запустит все необходимые контейнеры, включая базу данных и бэкенд.
+
+2. После успешного запуска контейнеров, выполните следующую команду, которая войдет в контейнер, выполнит миграции и наполнит тестовую базу данных:
+
+    ```shell
+    docker exec -it procharity_bot_backend sh -c "alembic upgrade head && python3 fill_db.py"
+    ```
 
 ## Для разработки
 
@@ -116,24 +133,6 @@ ProCharity (НКО Фонд Друзья).
 
     ```shell
     uvicorn src:app --reload
-    ```
-
-### Запуск бота локально
-
-1. Собрать и запустить контейнеры из файла infra/docker-compose.staging.yml.
-    ```shell
-    docker-compose -f infra/docker-compose.staging.yml up procharity_bot_local
-    ```
-2. Войти в контейнер.
-    ```shell
-    docker exec -it procharity_bot_local sh
-    ```
-3. Применить миграции базы данных.
-    ```shell
-    alembic upgrade head
-4. Выполнить скрипт наполнения тестовой базы.
-    ```shell
-    python3 fill_db.py
     ```
 
 ## Использование
