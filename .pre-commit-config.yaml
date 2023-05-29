@@ -9,11 +9,9 @@ repos:
       args: [--markdown-linebreak-ext=md]
     - id: check-merge-conflict
     - id: mixed-line-ending
-      args: [--fix=crlf]
     - id: no-commit-to-branch
       args: [--branch, master, --branch, develop]
     - id: mixed-line-ending
-      args: [--fix=auto]
 
 - repo: https://github.com/pycqa/isort
   rev: 5.12.0
