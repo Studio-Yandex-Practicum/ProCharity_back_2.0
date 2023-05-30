@@ -87,16 +87,11 @@ class TaskResponse(ResponseBase):
     is_archived: bool
 
 
-class QueryParams(BaseModel):
+class FeedbackFormQueryParams(BaseModel):
     """Класс формирования параметров запроса для формы обратной связи."""
 
-    name: Optional[str] = "Имя"
-    surname: Optional[str] = "Фамилия"
+    name: str | None = "Имя"
+    surname: str | None = "Фамилия"
 
-    @classmethod
-    def as_dict(cls, name, surname):
-        return {"name": name, "surname": surname}
-
-    @classmethod
-    def as_url_query(cls, name, surname):
-        return f"?{urllib.parse.urlencode(cls.as_dict(name, surname))}"
+    def as_url_query(cls):
+        return f"?{urllib.parse.urlencode(cls.dict())}"
