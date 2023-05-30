@@ -1,15 +1,21 @@
 import json
 import urllib
 
-from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
-                      Update, WebAppInfo, ReplyKeyboardMarkup,
-                      ReplyKeyboardRemove, KeyboardButton)
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    Update,
+    WebAppInfo,
+)
 from telegram.constants import ParseMode
-from telegram.ext import ContextTypes, CallbackContext
+from telegram.ext import CallbackContext, ContextTypes
 
 from src.api.schemas import QueryParams
-from src.bot.constants import commands, states, callback_data
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
+from src.bot.constants import callback_data, commands
+from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
 from src.core.services.user import UserService
 from src.settings import settings
 
@@ -66,10 +72,7 @@ async def ask_your_question(update: Update, context: CallbackContext):
     name = update.effective_chat["first_name"]
     surname = update.effective_chat["last_name"]
     query_params = QueryParams.as_url_query(name, surname)
-    print(urllib.parse.urljoin(settings.feedback_form_template_url, query_params))
-    print(settings.feedback_form_template_url)
     if update.effective_message.web_app_data:
-        query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data)),
         text = "Исправить неверно внесенные данные"
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -77,15 +80,13 @@ async def ask_your_question(update: Update, context: CallbackContext):
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
                 text=text,
-                web_app=WebAppInfo(
-                    url=urllib.parse.urljoin(settings.feedback_form_template_url, query_params)
-                )
+                web_app=WebAppInfo(url=urllib.parse.urljoin(settings.feedback_form_template_url, query_params)),
             )
         ),
     )
 
 
-async def web_app_data(update: Update, context: CallbackContext):
+async def web_app_data(update: Update):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
         [InlineKeyboardButton(text="Открыть в меню", callback_data=callback_data.MENU)],
@@ -93,13 +94,11 @@ async def web_app_data(update: Update, context: CallbackContext):
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity!"
-             f"Ответ придет на почту {user_data['email']}",
+        text=f"Спасибо, я передал информацию команде ProCharity!\nОтвет придет на почту {user_data['email']}",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
-        text=f"Вы можете вернуться в меню или посмотреть открытые "
-             f"задания. Нажмите на нужную кнопку.",
+        text="Вы можете вернуться в меню или посмотреть открытые задания. Нажмите на нужную кнопку.",
         reply_markup=keyboard,
     )
 
