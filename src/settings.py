@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
-    SECRET_KEY: str 
+    SECRET_KEY: str
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
