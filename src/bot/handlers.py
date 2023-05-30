@@ -88,7 +88,7 @@ async def ask_your_question(update: Update, context: CallbackContext):
     )
 
 
-async def web_app_data(update: Update, context: CallbackContext):
+async def web_app_data(update: Update):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
         [InlineKeyboardButton(text="Открыть в меню", callback_data=callback_data.MENU)],
