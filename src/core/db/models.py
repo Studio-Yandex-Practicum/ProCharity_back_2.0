@@ -1,19 +1,13 @@
 from datetime import date
 
 from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship, declarative_mixin
+from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
+from sqlalchemy.ext.declarative import AbstractConcreteBase
 
 
 class Base(DeclarativeBase):
     """Основа для базового класса."""
-
-    __name__: Mapped[str]
-
-
-@declarative_mixin
-class EntityBase:
-    """Базовый класс для всех сущностей."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
     created_at: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
@@ -22,10 +16,10 @@ class EntityBase:
         nullable=False,
         onupdate=func.current_timestamp(),
     )
+    __name__: Mapped[str]
 
 
-@declarative_mixin
-class ContentBase(EntityBase):
+class ContentBase(AbstractConcreteBase, Base):
     """Базовый класс для контента (категорий и задач)."""
 
     is_archived: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
@@ -36,6 +30,7 @@ class UsersCategories(Base):
 
     __tablename__ = "users_categories"
 
+    id = None
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), primary_key=True)
 
@@ -43,7 +38,7 @@ class UsersCategories(Base):
         return f"<User {self.user_id} - Category {self.category_id}>"
 
 
-class User(EntityBase, Base):
+class User(Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
@@ -65,7 +60,7 @@ class User(EntityBase, Base):
         return f"<User {self.telegram_id}>"
 
 
-class Task(ContentBase, Base):
+class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
@@ -85,7 +80,7 @@ class Task(ContentBase, Base):
         return f"<Task {self.title}>"
 
 
-class Category(ContentBase, Base):
+class Category(ContentBase):
     """Модель категорий."""
 
     __tablename__ = "categories"
