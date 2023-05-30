@@ -1,6 +1,6 @@
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.core.db.models import Category, User
 from src.core.db.repository.base import AbstractRepository
@@ -31,15 +31,14 @@ class UserRepository(AbstractRepository):
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
         user = await self._session.scalar(
-            select(User)
-            .options(selectinload(User.categories))
-            .where(User.telegram_id == telegram_id)
+            select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
         )
 
-        categories = (await self._session.scalars(
-            select(Category)
-            .where(Category.id.in_(categories_ids))
-        )).all() if categories_ids else []
+        categories = (
+            (await self._session.scalars(select(Category).where(Category.id.in_(categories_ids)))).all()
+            if categories_ids
+            else []
+        )
 
         user.categories = categories
         if user:
@@ -47,8 +46,4 @@ class UserRepository(AbstractRepository):
 
     async def get_user_categories(self, user: User) -> list[Category]:
         """Возвращает список категорий пользователя."""
-        return await self._session.scalars(
-            select(Category)
-            .join(User.categories)
-            .where(User.id == user.id)
-        )
+        return await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))

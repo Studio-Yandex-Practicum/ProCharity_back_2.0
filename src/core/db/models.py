@@ -86,9 +86,7 @@ class Category(ContentBase):
     __tablename__ = "categories"
     name: Mapped[str] = mapped_column(String(100))
 
-    users: Mapped[list["User"]] = relationship(
-        "User", secondary="users_categories", back_populates="categories"
-    )
+    users: Mapped[list["User"]] = relationship("User", secondary="users_categories", back_populates="categories")
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
