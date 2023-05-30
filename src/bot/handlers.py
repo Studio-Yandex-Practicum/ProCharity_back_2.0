@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes, CallbackContext
 from src.bot.constants import commands, states, callback_data
 from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
 from src.core.services.user import UserService
-from src.core.logging.setup import logger_decor
+from src.core.logging.utils import logger_decor
 from src.settings import settings
 
 
