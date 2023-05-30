@@ -1,4 +1,3 @@
-
 import argparse
 from application import create_app
 import uvicorn
