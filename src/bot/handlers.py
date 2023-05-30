@@ -73,6 +73,7 @@ async def ask_your_question(update: Update, context: CallbackContext):
     surname = update.effective_chat["last_name"]
     query_params = QueryParams.as_url_query(name, surname)
     if update.effective_message.web_app_data:
+        # query = ((urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data))),)
         text = "Исправить неверно внесенные данные"
     await context.bot.send_message(
         chat_id=update.effective_chat.id,

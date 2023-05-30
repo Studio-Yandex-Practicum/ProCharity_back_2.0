@@ -88,6 +88,8 @@ class TaskResponse(ResponseBase):
 
 
 class QueryParams(BaseModel):
+    """Класс формирования параметров запроса для формы обратной связи."""
+
     name: Optional[str] = "Имя"
     surname: Optional[str] = "Фамилия"
 
