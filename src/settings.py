@@ -5,16 +5,25 @@ from pydantic import BaseSettings, validator
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_FILE = None
-if Path.exists(BASE_DIR / ".env"):
-    ENV_FILE = BASE_DIR / ".env"
+
+
+@lru_cache
+def get_env_path() -> Path | None:
+    import importlib
+
+    try:
+        importlib.import_module("dotenv")
+    except ImportError:
+        return
+    if Path.exists(BASE_DIR / ".env"):
+        return BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
-    SECRET_KEY: str 
+    SECRET_KEY: str
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
@@ -73,7 +82,7 @@ class Settings(BaseSettings):
         return BASE_DIR / "src" / "bot" / "templates" / "feedback_form.html"
 
     class Config:
-        env_file = ENV_FILE
+        env_file = get_env_path()
 
 
 @lru_cache()
