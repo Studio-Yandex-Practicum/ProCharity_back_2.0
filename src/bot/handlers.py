@@ -7,6 +7,7 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes, CallbackContext
 
+from src.api.schemas import QueryParams
 from src.bot.constants import commands, states, callback_data
 from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
 from src.core.services.user import UserService
@@ -61,10 +62,12 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def ask_your_question(update: Update, context: CallbackContext):
+    text = "Задать вопрос"
     name = update.effective_chat["first_name"]
     surname = update.effective_chat["last_name"]
-    text = "Задать вопрос"
-    params = {'name': name, 'surname': surname}
+    query_params = QueryParams.as_url_query(name, surname)
+    print(urllib.parse.urljoin(settings.feedback_form_template_url, query_params))
+    print(settings.feedback_form_template_url)
     if update.effective_message.web_app_data:
         query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data)),
         text = "Исправить неверно внесенные данные"
@@ -75,7 +78,7 @@ async def ask_your_question(update: Update, context: CallbackContext):
             KeyboardButton(
                 text=text,
                 web_app=WebAppInfo(
-                    url=f"{settings.feedback_form_template_url}?{urllib.parse.urlencode(params)}"
+                    url=urllib.parse.urljoin(settings.feedback_form_template_url, query_params)
                 )
             )
         ),

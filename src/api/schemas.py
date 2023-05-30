@@ -1,5 +1,6 @@
 from datetime import date
 from typing import Optional
+import urllib
 
 from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
@@ -84,3 +85,17 @@ class TaskResponse(ResponseBase):
     link: str
     description: str
     is_archived: bool
+
+
+class QueryParams(BaseModel):
+    name: Optional[str] = "Имя"
+    surname: Optional[str] = "Фамилия"
+
+    @classmethod
+    def as_dict(cls, name, surname):
+        return {"name": name, "surname": surname}
+
+    @classmethod
+    def as_url_query(cls, name, surname):
+        return f"?{urllib.parse.urlencode(cls.as_dict(name, surname))}"
+

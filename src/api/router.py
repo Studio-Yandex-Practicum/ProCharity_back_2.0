@@ -1,9 +1,9 @@
-from typing import Iterator
+from typing import Iterator, Optional
 
 from fastapi import APIRouter, Depends, status, Request
 from fastapi.responses import StreamingResponse
 
-from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse
+from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse, QueryParams
 from src.api.services.category import CategoryService
 from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
@@ -60,7 +60,10 @@ async def get_all_tasks(task_service: TaskService = Depends()) -> list[TaskRespo
     summary="Вернуть шаблон формы обратной связи в телеграм",
     response_description="Предоставить пользователю форму для заполнения",
 )
-async def user_register_form_webhook(request: Request) -> StreamingResponse:
+async def user_register_form_webhook(
+        request: Request,
+        parameters: QueryParams = Depends(QueryParams),
+) -> StreamingResponse:
     """
     Вернуть пользователю в телеграм форму для заполнения персональных данных.
 
