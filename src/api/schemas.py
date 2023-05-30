@@ -1,6 +1,6 @@
+import urllib
 from datetime import date
 from typing import Optional
-import urllib
 
 from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
@@ -98,4 +98,3 @@ class QueryParams(BaseModel):
     @classmethod
     def as_url_query(cls, name, surname):
         return f"?{urllib.parse.urlencode(cls.as_dict(name, surname))}"
-
