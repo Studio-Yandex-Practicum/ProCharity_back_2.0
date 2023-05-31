@@ -93,5 +93,5 @@ class FeedbackFormQueryParams(BaseModel):
     name: str | None = "Имя"
     surname: str | None = "Фамилия"
 
-    def as_url_query(cls):
-        return f"?{urllib.parse.urlencode(cls.dict())}"
+    def as_url_query(self):
+        return f"?{urllib.parse.urlencode(self.dict())}"
