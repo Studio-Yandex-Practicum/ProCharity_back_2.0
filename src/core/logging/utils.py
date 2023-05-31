@@ -15,4 +15,5 @@ def logger_decor(func):
         await log.ainfo(f"Получено обновление: args = {args}, kwargs = {kwargs}")
         await not_handled_updates_func(func, *args)
         return await func(*args, **kwargs)
+
     return wrapper
