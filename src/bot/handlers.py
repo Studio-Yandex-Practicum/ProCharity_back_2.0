@@ -96,7 +96,7 @@ async def web_app_data(update: Update):
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity!" f"Ответ придет на почту {user_data['email']}",
+        text=f"Спасибо, я передал информацию команде ProCharity! Ответ придет на почту {user_data['email']}",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
