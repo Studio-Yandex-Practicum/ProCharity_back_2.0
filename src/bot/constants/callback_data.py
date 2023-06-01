@@ -5,6 +5,5 @@ ASK_YOUR_QUESTION = "ask_your_question"
 ABOUT_PROJECT = "about_project"
 JOB_SUBSCRIPTION = "job_subscription"
 MENU = "menu_callback"
+GET_CATEGORIES = 'categories_callback'
 ADD_CATEGORIES = "add_categories"
-CONFIRM_CATEGORIES = "confirm_categories"
-SELECTED_CATEGORIES = "selected_categories"
