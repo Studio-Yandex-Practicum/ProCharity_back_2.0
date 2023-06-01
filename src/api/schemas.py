@@ -1,3 +1,4 @@
+import urllib
 from datetime import date
 from typing import Optional
 
@@ -84,3 +85,13 @@ class TaskResponse(ResponseBase):
     link: str
     description: str
     is_archived: bool
+
+
+class FeedbackFormQueryParams(BaseModel):
+    """Класс формирования параметров запроса для формы обратной связи."""
+
+    name: str | None = "Имя"
+    surname: str | None = "Фамилия"
+
+    def as_url_query(self):
+        return f"?{urllib.parse.urlencode(self.dict())}"

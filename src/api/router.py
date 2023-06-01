@@ -3,7 +3,7 @@ from typing import Iterator
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import StreamingResponse
 
-from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse
+from src.api.schemas import CategoryRequest, CategoryResponse, FeedbackFormQueryParams, TaskRequest, TaskResponse
 from src.api.services.category import CategoryService
 from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
@@ -60,7 +60,10 @@ async def get_all_tasks(task_service: TaskService = Depends()) -> list[TaskRespo
     summary="Вернуть шаблон формы обратной связи в телеграм",
     response_description="Предоставить пользователю форму для заполнения",
 )
-async def user_register_form_webhook(request: Request) -> StreamingResponse:
+async def user_register_form_webhook(
+    request: Request,
+    parameters: FeedbackFormQueryParams = Depends(FeedbackFormQueryParams),
+) -> StreamingResponse:
     """
     Вернуть пользователю в телеграм форму для заполнения персональных данных.
 
