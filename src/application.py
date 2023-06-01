@@ -2,19 +2,16 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
 from src.api.router import api_router
 from src.bot.bot import start_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
-from src.core.services.set_ngrok import set_ngrok
+from src.core.utils import set_ngrok
 from src.settings import settings
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(
-        debug=settings.DEBUG,
-        root_path="/api")
+    app = FastAPI(debug=settings.DEBUG, root_path="/api")
     origins = ["*"]
 
     app.add_middleware(
@@ -40,7 +37,6 @@ def create_app() -> FastAPI:
         app.state.bot_instance = bot_instance
         if settings.USE_NGROK:
             set_ngrok()
-
 
     @app.on_event("shutdown")
     async def on_shutdown():

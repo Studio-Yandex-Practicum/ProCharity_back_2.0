@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
-    SECRET_KEY: str 
+    SECRET_KEY: str
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
     USE_NGROK: str
@@ -83,7 +83,3 @@ def get_settings():
 
 
 settings = get_settings()
-
-
-# def init_webhooks(base_url):
-#     pass
