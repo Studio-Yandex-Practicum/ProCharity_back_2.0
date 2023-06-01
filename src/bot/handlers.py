@@ -58,6 +58,9 @@ async def menu_callback(update: Update, context: CallbackContext):
 
 
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_service = UserService()
+    categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in categories}
     context.user_data["parent_id"] = None
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
@@ -96,7 +99,7 @@ async def web_app_data(update: Update):
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity!\nОтвет придет на почту {user_data['email']}",
+        text=f"Спасибо, я передал информацию команде ProCharity! Ответ придет на почту {user_data['email']}",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
@@ -147,3 +150,27 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=await get_categories_keyboard(),
     )
+
+
+async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
+    query = update.callback_query
+    telegram_id = update.effective_user.id
+    user_service = UserService()
+
+    users_categories_ids = context.user_data.get("selected_categories", {}).keys()
+
+    await user_service.set_categories_to_user(
+        telegram_id=telegram_id,
+        categories_ids=users_categories_ids,
+    )
+
+    categories = await user_service.get_user_categories(telegram_id)
+    if not categories:
+        await query.message.edit_text(text="Категории не выбраны.")
+    else:
+        await query.message.edit_text(
+            text="Отлично! Теперь я буду присылать тебе уведомления о новых "
+            f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
+            parse_mode=ParseMode.MARKDOWN,
+        )
