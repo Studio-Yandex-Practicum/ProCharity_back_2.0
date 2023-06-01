@@ -20,6 +20,5 @@ def auto_commit(func):
 
 def set_ngrok():
     port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 8000
-    public_url = ngrok.connect(port).public_url
+    settings.APPLICATION_URL = ngrok.connect(port).public_url
     setup_logging()
-    settings.APPLICATION_URL = public_url
