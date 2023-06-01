@@ -3,13 +3,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.router import api_router
+from src.bot.bot import startup_bot, shutdown_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
 from src.settings import settings
-from src.run_bot import startup_bot, shutdown_bot
 
 
-def create_app(run_bot: bool) -> FastAPI:
+def create_app(run_bot: bool = True) -> FastAPI:
     app = FastAPI(
         debug=settings.DEBUG,
         root_path="/api")

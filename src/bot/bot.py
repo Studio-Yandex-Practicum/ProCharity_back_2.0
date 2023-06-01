@@ -46,3 +46,15 @@ async def start_bot() -> Application:
     await bot.start()
     logging.info("Bot started")
     return bot
+
+
+async def startup_bot():
+    bot_instance = await start_bot()
+    return bot_instance
+
+
+async def shutdown_bot(bot_instance):
+    if not settings.BOT_WEBHOOK_MODE:
+        await bot_instance.updater.stop()
+    await bot_instance.stop()
+    await bot_instance.shutdown()
