@@ -1,5 +1,6 @@
-from application import create_app
 import uvicorn
+
+from application import create_app
 
 
 def start_api():
