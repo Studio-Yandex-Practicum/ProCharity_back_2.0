@@ -4,7 +4,7 @@ from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, Comm
 from telegram.ext.filters import StatusUpdate
 
 from src.bot import handlers
-from src.bot.constants import callback_data, commands
+from src.bot.constants import callback_data, commands, patterns
 from src.settings import settings
 
 
@@ -13,13 +13,13 @@ def create_bot() -> Application:
     bot.add_handler(CommandHandler(commands.START, handlers.start_command))
     bot.add_handler(CommandHandler(commands.MENU, handlers.menu_callback))
     bot.add_handler(CallbackQueryHandler(handlers.categories_callback, pattern=callback_data.CHANGE_CATEGORY))
-    bot.add_handler(CallbackQueryHandler(handlers.categories_callback, pattern=callback_data.CHANGE_CATEGORY))
-    bot.add_handler(CallbackQueryHandler(handlers.subcategories_callback, pattern=r"category_\d+"))
+    bot.add_handler(CallbackQueryHandler(handlers.categories_callback, pattern=callback_data.GET_CATEGORIES))
+    bot.add_handler(CallbackQueryHandler(handlers.subcategories_callback, pattern=patterns.SUBCATEGORIES))
     bot.add_handler(CallbackQueryHandler(handlers.ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
     bot.add_handler(CallbackQueryHandler(handlers.ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
     bot.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, handlers.web_app_data))
-    bot.add_handler(CallbackQueryHandler(handlers.select_subcategory_callback, pattern=r"select_category_(\d+)"))
-    bot.add_handler(CallbackQueryHandler(handlers.back_subcategory_callback, pattern=r"back_to_(\d+)"))
+    bot.add_handler(CallbackQueryHandler(handlers.select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
+    bot.add_handler(CallbackQueryHandler(handlers.back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
     return bot
 
 
