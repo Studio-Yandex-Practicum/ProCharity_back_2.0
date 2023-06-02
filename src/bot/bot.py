@@ -4,14 +4,14 @@ from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, Comm
 from telegram.ext.filters import StatusUpdate
 
 from src.bot import handlers
-from src.bot.constants import callback_data
+from src.bot.constants import callback_data, commands
 from src.settings import settings
 
 
 def create_bot() -> Application:
     bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
-    bot.add_handler(CommandHandler('start', handlers.start_command))
-    bot.add_handler(CommandHandler('menu', handlers.menu_callback))
+    bot.add_handler(CommandHandler(commands.START, handlers.start_command))
+    bot.add_handler(CommandHandler(commands.MENU, handlers.menu_callback))
     bot.add_handler(CallbackQueryHandler(handlers.categories_callback, pattern=callback_data.CHANGE_CATEGORY))
     bot.add_handler(CallbackQueryHandler(handlers.categories_callback, pattern=callback_data.CHANGE_CATEGORY))
     bot.add_handler(CallbackQueryHandler(handlers.subcategories_callback, pattern=r"category_\d+"))
