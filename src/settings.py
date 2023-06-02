@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     BOT_WEBHOOK_MODE: bool = False
 
     # Настройки логирования
-    LOG_LEVEL: str | int = "INFO"
+    LOG_LEVEL: str = "INFO"
     LOG_DIR: str | Path = BASE_DIR / "logs"
     LOG_FILE: str = "app.log"
     LOG_FILE_SIZE: int = 10 * 2**20
