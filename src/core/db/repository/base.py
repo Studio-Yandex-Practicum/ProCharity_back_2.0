@@ -82,3 +82,8 @@ class ContentRepository(AbstractRepository, abc.ABC):
             select(self._model.id).where(self._model.id.in_(ids) | (self._model.is_archived == False))  # noqa
         )
         return filtred_ids
+
+    async def get_by_ids(self, ids: list[int]) -> list[int]:
+        """Возвращает список id объектов модели из базы данных по указанным ids"""
+        filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
+        return [obj_id for obj_id in filtered_ids]
