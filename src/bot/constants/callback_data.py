@@ -7,3 +7,4 @@ JOB_SUBSCRIPTION = "job_subscription"
 MENU = "menu_callback"
 GET_CATEGORIES = 'categories_callback'
 ADD_CATEGORIES = "add_categories"
+CONFIRM_CATEGORIES = 'menu'

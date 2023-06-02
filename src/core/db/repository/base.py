@@ -1,6 +1,6 @@
 import abc
-from typing import TypeVar
 from datetime import datetime
+from typing import TypeVar
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
-
 
 DatabaseModel = TypeVar("DatabaseModel")
 

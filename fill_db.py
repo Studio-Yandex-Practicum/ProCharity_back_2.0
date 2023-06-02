@@ -1,19 +1,14 @@
 import asyncio
 import string
-
-from datetime import datetime, timedelta
-from random import randint, choice, choices
-from sqlalchemy import select, text
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    create_async_engine,
-    async_sessionmaker,
-)
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
+from random import choice, choices, randint
 
-from src.core.db.models import Category, Task
+from sqlalchemy import select, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from src.core.db import get_session
-
+from src.core.db.models import Category, Task
 
 CHARACTERS = string.ascii_uppercase + string.digits
 

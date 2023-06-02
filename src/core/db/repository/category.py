@@ -1,7 +1,7 @@
 
 from fastapi import Depends
+from sqlalchemy import and_, not_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import not_, and_, select
 
 from src.core.db.db import get_session
 from src.core.db.models import Category

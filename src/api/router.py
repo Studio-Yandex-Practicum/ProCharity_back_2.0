@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from fastapi import APIRouter, Depends, status, Request
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import StreamingResponse
 
 from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse
