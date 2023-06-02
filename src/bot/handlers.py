@@ -1,14 +1,21 @@
 import json
 import urllib
 
-from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
-                      Update, WebAppInfo, ReplyKeyboardMarkup,
-                      ReplyKeyboardRemove, KeyboardButton)
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    Update,
+    WebAppInfo,
+)
 from telegram.constants import ParseMode
-from telegram.ext import ContextTypes, CallbackContext
+from telegram.ext import CallbackContext, ContextTypes
 
-from src.bot.constants import commands, states, callback_data
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard, MENU_KEYBOARD
+from src.api.schemas import FeedbackFormQueryParams
+from src.bot.constants import callback_data, commands
+from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
 from src.core.services.user import UserService
 from src.settings import settings
 
@@ -51,6 +58,9 @@ async def menu_callback(update: Update, context: CallbackContext):
 
 
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_service = UserService()
+    categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in categories}
     context.user_data["parent_id"] = None
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
@@ -61,12 +71,11 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def ask_your_question(update: Update, context: CallbackContext):
-    name = update.effective_chat["first_name"]
-    surname = update.effective_chat["last_name"]
     text = "Задать вопрос"
-    params = {'name': name, 'surname': surname}
+    name = update.effective_user["first_name"]
+    surname = update.effective_user["last_name"]
+    query_params = FeedbackFormQueryParams(name=name, surname=surname)
     if update.effective_message.web_app_data:
-        query = urllib.parse.urlencode(json.loads(update.effective_message.web_app_data.data)),
         text = "Исправить неверно внесенные данные"
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -75,14 +84,14 @@ async def ask_your_question(update: Update, context: CallbackContext):
             KeyboardButton(
                 text=text,
                 web_app=WebAppInfo(
-                    url=f"{settings.feedback_form_template_url}?{urllib.parse.urlencode(params)}"
-                )
+                    url=urllib.parse.urljoin(settings.feedback_form_template_url, query_params.as_url_query())
+                ),
             )
         ),
     )
 
 
-async def web_app_data(update: Update, context: CallbackContext):
+async def web_app_data(update: Update):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
         [InlineKeyboardButton(text="Открыть в меню", callback_data=callback_data.MENU)],
@@ -90,13 +99,11 @@ async def web_app_data(update: Update, context: CallbackContext):
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity!"
-             f"Ответ придет на почту {user_data['email']}",
+        text=f"Спасибо, я передал информацию команде ProCharity! Ответ придет на почту {user_data['email']}",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
-        text=f"Вы можете вернуться в меню или посмотреть открытые "
-             f"задания. Нажмите на нужную кнопку.",
+        text="Вы можете вернуться в меню или посмотреть открытые задания. Нажмите на нужную кнопку.",
         reply_markup=keyboard,
     )
 
@@ -143,3 +150,27 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=await get_categories_keyboard(),
     )
+
+
+async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
+    query = update.callback_query
+    telegram_id = update.effective_user.id
+    user_service = UserService()
+
+    users_categories_ids = context.user_data.get("selected_categories", {}).keys()
+
+    await user_service.set_categories_to_user(
+        telegram_id=telegram_id,
+        categories_ids=users_categories_ids,
+    )
+
+    categories = await user_service.get_user_categories(telegram_id)
+    if not categories:
+        await query.message.edit_text(text="Категории не выбраны.")
+    else:
+        await query.message.edit_text(
+            text="Отлично! Теперь я буду присылать тебе уведомления о новых "
+            f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
+            parse_mode=ParseMode.MARKDOWN,
+        )
