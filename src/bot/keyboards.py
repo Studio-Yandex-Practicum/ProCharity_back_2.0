@@ -18,9 +18,7 @@ MENU_KEYBOARD = [
 ]
 
 
-async def get_categories_keyboard() -> InlineKeyboardMarkup:
-    category_service = CategoryService()
-    categories = await category_service.get_unarchived_parents()
+async def get_categories_keyboard(categories) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
     ]

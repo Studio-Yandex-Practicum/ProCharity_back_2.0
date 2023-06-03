@@ -16,6 +16,7 @@ from telegram.ext import CallbackContext, ContextTypes
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
+from src.bot.services.category import CategoryService
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 from src.settings import settings
@@ -63,14 +64,17 @@ async def menu_callback(update: Update, context: CallbackContext):
 @logger_decor
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
-    categories = await user_service.get_user_categories(update.effective_user.id)
-    context.user_data["selected_categories"] = {category: None for category in categories}
+    category_service = CategoryService()
+    user_categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in user_categories}
     context.user_data["parent_id"] = None
+    categories = await category_service.get_unarchived_parents()
+
     await update.message.reply_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_categories_keyboard(),
+        reply_markup=await get_categories_keyboard(categories),
     )
 
 
@@ -152,12 +156,14 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
 @logger_decor
 async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    category_service = CategoryService()
+    categories = await category_service.get_unarchived_parents()
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_categories_keyboard(),
+        reply_markup=await get_categories_keyboard(categories),
     )
 
 
