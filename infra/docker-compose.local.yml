@@ -2,7 +2,7 @@ version: "3.8"
 services:
   backend:
     build:
-      context: ../../ProCharity_back_2.0
+      context: ../
       dockerfile: Dockerfile
     container_name: procharity_bot_backend
     restart: always
