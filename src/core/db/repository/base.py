@@ -1,7 +1,7 @@
 import abc
 from typing import TypeVar
 
-from sqlalchemy import select, update
+from sqlalchemy import ScalarResult, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -76,14 +76,7 @@ class ContentRepository(AbstractRepository, abc.ABC):
             .values({"is_archived": True})
         )
 
-    async def get_all_non_archived_and_by_ids(self, ids: list[int]) -> list[int]:
-        """Возвращает id всех объектов модели из базы данных, которые не в архиве и по указанным ids"""
-        filtred_ids = await self._session.scalars(
-            select(self._model.id).where(self._model.id.in_(ids) | (self._model.is_archived == False))  # noqa
-        )
-        return filtred_ids
-
-    async def get_by_ids(self, ids: list[int]) -> list[int]:
-        """Возвращает список id объектов модели из базы данных по указанным ids"""
+    async def get_by_ids(self, ids: list[int]) -> ScalarResult:
+        """Возвращает id объектов модели из базы данных по указанным ids"""
         filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
-        return [obj_id for obj_id in filtered_ids]
+        return filtered_ids
