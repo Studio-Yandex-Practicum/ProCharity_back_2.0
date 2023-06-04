@@ -16,6 +16,7 @@ from src.bot.handlers import (
     web_app_data,
 )
 from src.settings import settings
+from src.core.logging.utils import logging_updates
 
 
 def create_bot() -> Application:
@@ -31,6 +32,7 @@ def create_bot() -> Application:
     bot.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=r"select_category_(\d+)"))
     bot.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=r"back_to_(\d+)"))
     bot.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=CONFIRM_CATEGORIES))
+    bot.add_handler(CallbackQueryHandler(logging_updates))
 
     return bot
 

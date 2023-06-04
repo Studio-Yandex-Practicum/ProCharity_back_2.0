@@ -1,5 +1,10 @@
 import structlog
 
+
+async def logging_updates(*args, **kwargs):
+    await log.awarning(f"Не пойманны update", args=args, kwargs=kwargs)
+
+
 log = structlog.get_logger()
 
 
