@@ -15,8 +15,8 @@ from src.bot.handlers import (
     subcategories_callback,
     web_app_data,
 )
-from src.settings import settings
 from src.core.logging.utils import logging_updates
+from src.settings import settings
 
 
 def create_bot() -> Application:
