@@ -15,10 +15,15 @@ from telegram.ext import CallbackContext, ContextTypes
 
 from src.bot.constants import callback_data
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
+from src.api.schemas import FeedbackFormQueryParams
+from src.bot.constants import callback_data, commands
+from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
+from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 from src.settings import settings
 
 
+@logger_decor
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     await user_service.register_user(
@@ -48,6 +53,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+@logger_decor
 async def menu_callback(update: Update, context: CallbackContext):
     """Create button menu."""
     keyboard = MENU_KEYBOARD
@@ -56,7 +62,11 @@ async def menu_callback(update: Update, context: CallbackContext):
     await update.message.reply_text("Выбери, что тебя интересует:", reply_markup=reply_markup)
 
 
+@logger_decor
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_service = UserService()
+    categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in categories}
     context.user_data["parent_id"] = None
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -67,11 +77,12 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
+@logger_decor
 async def ask_your_question(update: Update, context: CallbackContext):
-    name = update.effective_chat["first_name"]
-    surname = update.effective_chat["last_name"]
     text = "Задать вопрос"
-    params = {"name": name, "surname": surname}
+    name = update.effective_user["first_name"]
+    surname = update.effective_user["last_name"]
+    query_params = FeedbackFormQueryParams(name=name, surname=surname)
     if update.effective_message.web_app_data:
         text = "Исправить неверно внесенные данные"
     await context.bot.send_message(
@@ -80,12 +91,15 @@ async def ask_your_question(update: Update, context: CallbackContext):
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
                 text=text,
-                web_app=WebAppInfo(url=f"{settings.feedback_form_template_url}?{urllib.parse.urlencode(params)}"),
+                web_app=WebAppInfo(
+                    url=urllib.parse.urljoin(settings.feedback_form_template_url, query_params.as_url_query())
+                ),
             )
         ),
     )
 
 
+@logger_decor
 async def web_app_data(update: Update):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
@@ -94,7 +108,7 @@ async def web_app_data(update: Update):
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity!\nОтвет придет на почту {user_data['email']}",
+        text=f"Спасибо, я передал информацию команде ProCharity! Ответ придет на почту {user_data['email']}",
         reply_markup=ReplyKeyboardRemove(),
     )
     await update.message.reply_text(
@@ -103,6 +117,7 @@ async def web_app_data(update: Update):
     )
 
 
+@logger_decor
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     parent_id = int(context.match.group(1))
@@ -116,6 +131,7 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
     )
 
 
+@logger_decor
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
@@ -136,6 +152,7 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
     )
 
 
+@logger_decor
 async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
@@ -145,3 +162,27 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=await get_categories_keyboard(),
     )
+
+
+async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
+    query = update.callback_query
+    telegram_id = update.effective_user.id
+    user_service = UserService()
+
+    users_categories_ids = context.user_data.get("selected_categories", {}).keys()
+
+    await user_service.set_categories_to_user(
+        telegram_id=telegram_id,
+        categories_ids=users_categories_ids,
+    )
+
+    categories = await user_service.get_user_categories(telegram_id)
+    if not categories:
+        await query.message.edit_text(text="Категории не выбраны.")
+    else:
+        await query.message.edit_text(
+            text="Отлично! Теперь я буду присылать тебе уведомления о новых "
+            f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
+            parse_mode=ParseMode.MARKDOWN,
+        )

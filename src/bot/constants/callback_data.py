@@ -8,3 +8,4 @@ MENU = "menu_callback"
 GET_CATEGORIES = 'categories_callback'
 ADD_CATEGORIES = "add_categories"
 CONFIRM_CATEGORIES = 'menu'
+CONFIRM_CATEGORIES = "confirm_categories"

@@ -5,6 +5,7 @@ from telegram.ext.filters import StatusUpdate
 
 from src.bot import handlers
 from src.bot.constants import callback_data, commands, patterns
+
 from src.settings import settings
 
 
@@ -20,6 +21,7 @@ def create_bot() -> Application:
     bot.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, handlers.web_app_data))
     bot.add_handler(CallbackQueryHandler(handlers.select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     bot.add_handler(CallbackQueryHandler(handlers.back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
+
     return bot
 
 

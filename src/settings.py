@@ -5,16 +5,25 @@ from pydantic import BaseSettings, validator
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_FILE = None
-if Path.exists(BASE_DIR / ".env"):
-    ENV_FILE = BASE_DIR / ".env"
+
+
+@lru_cache
+def get_env_path() -> Path | None:
+    import importlib
+
+    try:
+        importlib.import_module("dotenv")
+    except ImportError:
+        return
+    if Path.exists(BASE_DIR / ".env"):
+        return BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
-    SECRET_KEY: str 
+    SECRET_KEY: str = "secret_key"
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
@@ -22,8 +31,8 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    DB_HOST: str
-    DB_PORT: str
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5432
 
     # Настройки бота
     BOT_TOKEN: str
@@ -33,7 +42,6 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_DIR: str | Path = BASE_DIR / "logs"
     LOG_FILE: str = "app.log"
-    LOG_LEVEL: str = "INFO"
     LOG_FILE_SIZE: int = 10 * 2**20
     LOG_FILES_TO_KEEP: int = 5
 
@@ -73,7 +81,7 @@ class Settings(BaseSettings):
         return BASE_DIR / "src" / "bot" / "templates" / "feedback_form.html"
 
     class Config:
-        env_file = ENV_FILE
+        env_file = get_env_path()
 
 
 @lru_cache()

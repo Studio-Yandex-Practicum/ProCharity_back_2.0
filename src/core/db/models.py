@@ -1,6 +1,7 @@
 from datetime import date
 
-from sqlalchemy import BigInteger, Column, Date, ForeignKey, Integer, String, Table
+from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
 
@@ -18,12 +19,23 @@ class Base(DeclarativeBase):
     __name__: Mapped[str]
 
 
-users_categories = Table(
-    "users_categories",
-    Base.metadata,
-    Column("category_id", ForeignKey("categories.id"), primary_key=True, unique=True),
-    Column("user_id", ForeignKey("users.id"), primary_key=True, unique=True),
-)
+class ContentBase(AbstractConcreteBase, Base):
+    """Базовый класс для контента (категорий и задач)."""
+
+    is_archived: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
+
+
+class UsersCategories(Base):
+    """Модель отношений пользователь-категория."""
+
+    __tablename__ = "users_categories"
+
+    id = None
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), primary_key=True)
+
+    def __repr__(self):
+        return f"<User {self.user_id} - Category {self.category_id}>"
 
 
 class User(Base):
@@ -40,13 +52,15 @@ class User(Base):
     external_signup_date: Mapped[date] = mapped_column(nullable=True)
     banned: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
 
-    categories: Mapped[list["Category"]] = relationship(secondary="users_categories", back_populates="users")
+    categories: Mapped[list["Category"]] = relationship(
+        "Category", secondary="users_categories", back_populates="users"
+    )
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
 
 
-class Task(Base):
+class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
@@ -61,20 +75,18 @@ class Task(Base):
     location: Mapped[str] = mapped_column()
     link: Mapped[str]
     description: Mapped[str] = mapped_column()
-    is_archived: Mapped[bool]
 
     def __repr__(self):
         return f"<Task {self.title}>"
 
 
-class Category(Base):
+class Category(ContentBase):
     """Модель категорий."""
 
     __tablename__ = "categories"
     name: Mapped[str] = mapped_column(String(100))
-    is_archived: Mapped[bool]
 
-    users: Mapped[list["User"]] = relationship(secondary="users_categories", back_populates="categories")
+    users: Mapped[list["User"]] = relationship("User", secondary="users_categories", back_populates="categories")
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
