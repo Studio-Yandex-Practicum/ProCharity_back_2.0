@@ -26,8 +26,8 @@ async def get_categories_keyboard() -> InlineKeyboardMarkup:
     ]
     keyboard.extend(
         [
-            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data="add_categories")],
-            [InlineKeyboardButton("Готово 👌", callback_data="confirm_categories")],
+            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
+            [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
         ]
     )
 
