@@ -14,7 +14,7 @@ from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes
 
 from src.api.schemas import FeedbackFormQueryParams
-from src.bot.constants import callback_data, commands
+from src.bot.constants import callback_data
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
