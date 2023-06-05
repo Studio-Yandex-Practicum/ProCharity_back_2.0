@@ -6,8 +6,8 @@ from telegram.ext.filters import StatusUpdate
 
 from src.bot import handlers
 from src.bot.constants import callback_data, commands, patterns
-from src.core.logging.utils import logging_updates
 from src.settings import settings
+from src.core.logging.utils import logging_updates
 
 
 def create_bot() -> Application:
