@@ -181,6 +181,7 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 async def view_task_callback(update: Update, context: CallbackContext):
     task_service = TaskService()
     tasks = await task_service.get_user_tasks()
+
     for task in tasks:
         message = formatter.display_tasks(task)
         await context.bot.send_message(
