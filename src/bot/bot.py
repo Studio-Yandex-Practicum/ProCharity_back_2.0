@@ -3,6 +3,7 @@ import logging
 from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler, MessageHandler
 from telegram.ext.filters import StatusUpdate
 
+from src.bot.constants import callback_data
 from src.bot.constants.callback_data import ASK_YOUR_QUESTION, CONFIRM_CATEGORIES, SEND_ERROR_OR_PROPOSAL
 from src.bot.handlers import (
     ask_your_question,
@@ -13,6 +14,7 @@ from src.bot.handlers import (
     select_subcategory_callback,
     start_command,
     subcategories_callback,
+    view_task_callback,
     web_app_data,
 )
 from src.settings import settings
@@ -31,7 +33,7 @@ def create_bot() -> Application:
     bot.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=r"select_category_(\d+)"))
     bot.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=r"back_to_(\d+)"))
     bot.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=CONFIRM_CATEGORIES))
-
+    bot.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
     return bot
 
 

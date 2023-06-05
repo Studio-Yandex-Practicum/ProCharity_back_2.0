@@ -16,6 +16,7 @@ from telegram.ext import CallbackContext, ContextTypes
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
+from src.bot.services.task import TaskService
 from src.core.services.user import UserService
 from src.settings import settings
 
@@ -173,4 +174,24 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
             text="Отлично! Теперь я буду присылать тебе уведомления о новых "
             f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
+        )
+
+
+async def view_task_callback(update: Update, context: CallbackContext):
+    task_service = TaskService()
+    tasks = await task_service.get_user_tasks()
+    bot_name = "ProCharity Bot"
+    for task in tasks[:3]:
+        deadline = task.deadline.strftime("%d.%m.%y")
+        bonus_link = "https://help.procharity.ru/article/10053"
+        message = (
+            f"{bot_name}\n\n"
+            f"От фонда: {task.name_organization}\n\n"
+            f"Категория: {task.category.name}\n\n"
+            f"Срок: {deadline}\n"
+            f"Бонусы: <a href='{bonus_link}'>{task.bonus * '💎'}</a>"
+        )
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
