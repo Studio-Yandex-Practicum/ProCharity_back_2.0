@@ -180,7 +180,7 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
     if not categories:
         await query.message.edit_text(text="Категории не выбраны.")
     else:
-        await query.message.reply_text(
+        await query.message.edit_text(
             text="Отлично! Теперь я буду присылать тебе уведомления о новых "
             f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
