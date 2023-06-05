@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     """Настройки проекта."""
 
     APPLICATION_URL: str = "localhost"
-    SECRET_KEY: str
+    SECRET_KEY: str = "secret_key"
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
 
@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    DB_HOST: str
-    DB_PORT: str
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5432
 
     # Настройки бота
     BOT_TOKEN: str
@@ -42,7 +42,6 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_DIR: str | Path = BASE_DIR / "logs"
     LOG_FILE: str = "app.log"
-    LOG_LEVEL: str = "INFO"
     LOG_FILE_SIZE: int = 10 * 2**20
     LOG_FILES_TO_KEEP: int = 5
 
