@@ -2,7 +2,7 @@ import structlog
 
 
 async def logging_updates(*args, **kwargs):
-    await log.awarning("Не пойманны update", args=args, kwargs=kwargs)
+    await log.awarning("Следующие Updates не были пойманы ни одним из обработчиков", args=args, kwargs=kwargs)
 
 
 log = structlog.get_logger()
