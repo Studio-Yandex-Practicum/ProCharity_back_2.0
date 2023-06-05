@@ -3,7 +3,8 @@ import logging
 from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler, MessageHandler
 from telegram.ext.filters import StatusUpdate
 
-from src.bot.constants import callback_data
+from src.bot import handlers
+from src.bot.constants import callback_data, commands, patterns
 from src.bot.constants.callback_data import ASK_YOUR_QUESTION, CONFIRM_CATEGORIES, SEND_ERROR_OR_PROPOSAL
 from src.bot.handlers import (
     ask_your_question,
@@ -17,8 +18,6 @@ from src.bot.handlers import (
     view_task_callback,
     web_app_data,
 )
-from src.bot import handlers
-from src.bot.constants import callback_data, commands, patterns
 from src.settings import settings
 
 
