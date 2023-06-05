@@ -5,7 +5,6 @@ from telegram.ext.filters import StatusUpdate
 
 from src.bot import handlers
 from src.bot.constants import callback_data, commands, patterns
-
 from src.settings import settings
 
 

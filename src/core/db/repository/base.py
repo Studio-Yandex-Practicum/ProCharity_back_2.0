@@ -1,5 +1,4 @@
 import abc
-
 from typing import TypeVar
 
 from sqlalchemy import ScalarResult, select, update
