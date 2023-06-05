@@ -17,7 +17,7 @@ class ContentService(abc.ABC):
         ids = [obj.id for obj in objects]
         async with self._session.begin() as session:
             await self._repository.archive_by_ids(ids, commit=False)
-            already_have = await self._repository.get_all_non_archived_and_by_ids(ids)
+            already_have = await self._repository.get_by_ids(ids)
             for obj in objects:
                 if obj.id not in already_have:
                     to_create.append(model_class(**obj.dict(), is_archived=False))
