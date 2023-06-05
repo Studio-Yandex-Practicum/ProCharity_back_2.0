@@ -23,6 +23,7 @@ def create_bot() -> Application:
     bot.add_handler(CallbackQueryHandler(handlers.select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     bot.add_handler(CallbackQueryHandler(handlers.back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
     bot.add_handler(TypeHandler(Update, logging_updates))
+
     return bot
 
 
