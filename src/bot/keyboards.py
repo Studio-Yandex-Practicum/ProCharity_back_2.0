@@ -2,6 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
 from src.bot.constants import callback_data
+from src.core.services.user import UserService
 from src.bot.services.category import CategoryService
 
 MENU_KEYBOARD = [
@@ -10,11 +11,16 @@ MENU_KEYBOARD = [
     [InlineKeyboardButton("Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
     [InlineKeyboardButton("Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
     [InlineKeyboardButton("О платформе", callback_data=callback_data.ABOUT_PROJECT)],
-    [
-        InlineKeyboardButton(
-            "⏹️ Остановить / ▶️ включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION
-        )
-    ],
+]
+UNSUBSCRIBE_BUTTON = [
+    InlineKeyboardButton(
+        "⏹️ Остановить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION
+    )
+]
+SUBSCRIBE_BUTTON = [
+    InlineKeyboardButton(
+        "▶️ Включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION
+    )
 ]
 
 
@@ -49,4 +55,16 @@ async def get_subcategories_keyboard(parent_id: int, context: CallbackContext) -
         keyboard.append([button])
 
     keyboard.append([InlineKeyboardButton("Назад ⬅️", callback_data=f"back_to_{parent_id}")])
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
+    keyboard = []
+    keyboard.extend(MENU_KEYBOARD)
+    user_service = UserService()
+    has_mailing = await user_service.get_tasks_mailing(telegram_id=telegram_id)
+    if has_mailing:
+        keyboard.extend([UNSUBSCRIBE_BUTTON])
+    else:
+        keyboard.extend([SUBSCRIBE_BUTTON])
     return InlineKeyboardMarkup(keyboard)

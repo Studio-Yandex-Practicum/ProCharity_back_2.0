@@ -40,3 +40,25 @@ class UserService:
             user = await repository.get_by_telegram_id(telegram_id)
             categories = await repository.get_user_categories(user)
             return {category.id: category.name for category in categories}
+
+    async def get_tasks_mailing(self, telegram_id: int) -> bool:
+        """Возвращает статус подписки пользователя на почтовую рассылку."""
+        async with self._sessionmaker() as session:
+            repository = UserRepository(session)
+            user = await repository.get_by_telegram_id(telegram_id)
+            return user.has_mailing
+
+    async def set_tasks_mailing(self, telegram_id: int) -> bool:
+        """
+           Присваивает пользователю получение почтовой рассылки.
+           Возвращает статус подписки пользователя на почтовую рассылку.
+        """
+        async with self._sessionmaker() as session:
+            repository = UserRepository(session)
+            user = await repository.get_by_telegram_id(telegram_id)
+            if user.has_mailing:
+                user.has_mailing = False
+            else:
+                user.has_mailing = True
+            await repository.update(user.id, user)
+            return user.has_mailing
