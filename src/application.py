@@ -12,7 +12,6 @@ from src.settings import settings
 def create_app() -> FastAPI:
     app = FastAPI(
         debug=settings.DEBUG,
-        docs_url="/api/docs",
     )
     origins = ["*"]
 

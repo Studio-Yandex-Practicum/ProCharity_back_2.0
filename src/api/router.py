@@ -9,7 +9,7 @@ from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
 from src.settings import settings
 
-api_router = APIRouter(prefix="/api", tags=["API"])
+api_router = APIRouter(prefix=settings.ROOT_PATH, tags=["API"])
 
 
 @api_router.get(
