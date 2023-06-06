@@ -783,7 +783,19 @@ files = [
 plugins = ["importlib-metadata"]
 
 [[package]]
+name = "pyngrok"
+version = "6.0.0"
+description = "A Python wrapper for ngrok."
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pyngrok-6.0.0.tar.gz", hash = "sha256:dd8a87944b8e28572e3d126bfb2c81a2948594575f5237eefd3651ae0b487155"},
+]
 
+[package.dependencies]
+PyYAML = "*"
+
+[[package]]
 name = "python-dotenv"
 version = "1.0.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
