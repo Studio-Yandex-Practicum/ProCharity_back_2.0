@@ -1,4 +1,10 @@
+import sys
 from functools import wraps
+
+from pyngrok import ngrok
+
+from src.core.logging.setup import setup_logging
+from src.settings import settings
 
 
 def auto_commit(func):
@@ -10,3 +16,9 @@ def auto_commit(func):
         return result
 
     return auto_commit_wraps
+
+
+def set_ngrok():
+    port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 8000
+    settings.APPLICATION_URL = ngrok.connect(port).public_url
+    setup_logging()

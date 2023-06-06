@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "secret_key"
     ROOT_PATH: str = "/api/"
     DEBUG: bool = False
+    USE_NGROK: str
 
     # Параметры подключения к БД
     POSTGRES_DB: str

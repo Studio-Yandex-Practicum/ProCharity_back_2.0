@@ -18,7 +18,7 @@ repos:
     - id: isort
       args: [--profile, black]
 
-- repo: https://github.com/ambv/black
+- repo: https://github.com/psf/black
   rev: 23.3.0
   hooks:
     - id: black
