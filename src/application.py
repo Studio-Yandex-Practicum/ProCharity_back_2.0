@@ -6,6 +6,7 @@ from src.api.router import api_router
 from src.bot.bot import start_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
+from src.core.utils import set_ngrok
 from src.settings import settings
 
 
@@ -36,6 +37,8 @@ def create_app() -> FastAPI:
         # storing bot_instance to extra state of FastAPI app instance
         # refer to https://www.starlette.io/applications/#storing-state-on-the-app-instance
         app.state.bot_instance = bot_instance
+        if settings.USE_NGROK:
+            set_ngrok()
 
     @app.on_event("shutdown")
     async def on_shutdown():
