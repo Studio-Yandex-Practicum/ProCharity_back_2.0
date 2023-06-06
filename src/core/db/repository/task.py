@@ -1,6 +1,7 @@
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from src.core.db.db import get_session
 from src.core.db.models import Category, Task
@@ -16,4 +17,9 @@ class TaskRepository(ContentRepository):
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         """Получить список задач из категорий на которые подписан пользователь."""
         tasks = await self._session.execute(select(Task).join(Category).where(Category.users.any(id=user_id)))
+        return tasks.scalars().all()
+
+    async def get_user_tasks(self, limit: int = 3) -> list[Task]:
+        """Получить список задач для пользователя."""
+        tasks = await self._session.execute(select(Task).options(joinedload(Task.category)).limit(limit))
         return tasks.scalars().all()

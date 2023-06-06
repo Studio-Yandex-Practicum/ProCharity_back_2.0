@@ -18,6 +18,7 @@ from src.bot.constants import callback_data
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
 from src.bot.services import formatter
 from src.bot.services.task import TaskService
+from src.core.db.repository.task import TaskRepository
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 from src.settings import settings
@@ -189,7 +190,9 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
 
 async def view_task_callback(update: Update, context: CallbackContext):
-    task_service = TaskService()
+    task_repo = TaskRepository()
+    task_service = TaskService(task_repo)
+
     tasks = await task_service.get_user_tasks()
 
     for task in tasks:
