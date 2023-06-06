@@ -188,12 +188,12 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
 
 @logger_decor
-async def set_tasks_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     query = update.callback_query
     telegram_id = update.effective_user.id
     user_service = UserService()
-    has_mailing = await user_service.set_tasks_mailing(telegram_id)
+    has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
         text = "Отлично! Теперь я буду присылать тебе уведомления о новых "
         "заданиях на почту."

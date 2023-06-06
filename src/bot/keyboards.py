@@ -62,7 +62,7 @@ async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
     keyboard = []
     keyboard.extend(MENU_KEYBOARD)
     user_service = UserService()
-    has_mailing = await user_service.get_tasks_mailing(telegram_id=telegram_id)
+    has_mailing = await user_service.get_mailing(telegram_id=telegram_id)
     if has_mailing:
         keyboard.extend([UNSUBSCRIBE_BUTTON])
     else:
