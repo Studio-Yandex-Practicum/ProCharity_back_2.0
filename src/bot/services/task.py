@@ -17,4 +17,5 @@ class TaskService:
     async def get_user_tasks(self, limit: int) -> list[Task]:
         async with self._sessionmaker() as session:
             repository = TaskRepository(session)
+
             return await repository.get_user_tasks(limit)
