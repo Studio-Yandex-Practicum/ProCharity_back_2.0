@@ -19,7 +19,6 @@ class TaskRepository(ContentRepository):
         tasks = await self._session.execute(select(Task).join(Category).where(Category.users.any(id=user_id)))
         return tasks.scalars().all()
 
-    async def get_user_tasks(self, limit: int = 3) -> list[Task]:
-        """Получить список задач для пользователя."""
-        tasks = await self._session.execute(select(Task).options(joinedload(Task.category)).limit(limit))
-        return tasks.scalars().all()
+    async def get_user_tasks(self, limit: int) -> list[Task]:
+        """Получить список задач из категорий."""
+        return await self._session.scalars(select(Task).options(joinedload(Task.category)).limit(limit))
