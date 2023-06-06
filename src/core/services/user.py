@@ -50,8 +50,8 @@ class UserService:
 
     async def set_mailing(self, telegram_id: int) -> bool:
         """
-           Присваивает пользователю получение почтовой рассылки на задания.
-           Возвращает статус подписки пользователя на почтовую рассылку.
+        Присваивает пользователю получение почтовой рассылки на задания.
+        Возвращает статус подписки пользователя на почтовую рассылку.
         """
         async with self._sessionmaker() as session:
             repository = UserRepository(session)
