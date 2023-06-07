@@ -16,10 +16,10 @@ from telegram.ext import CallbackContext, ContextTypes
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
-from src.bot.services import formatter
 from src.bot.services.task import TaskService
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
+from src.core.utils import display_tasks
 from src.settings import settings
 
 
@@ -191,7 +191,7 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
     tasks = await task_service.get_user_tasks(limit)
 
     for task in tasks:
-        message = formatter.display_tasks(task)
+        message = display_tasks(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
