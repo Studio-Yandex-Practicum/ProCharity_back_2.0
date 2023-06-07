@@ -168,7 +168,6 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
     query = update.callback_query
     telegram_id = update.effective_user.id
     user_service = UserService()
-
     users_categories_ids = context.user_data.get("selected_categories", {}).keys()
 
     await user_service.set_categories_to_user(
