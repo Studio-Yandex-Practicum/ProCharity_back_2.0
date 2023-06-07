@@ -120,21 +120,24 @@ async def web_app_data(update: Update):
 
 @logger_decor
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    category_service = CategoryService()
     query = update.callback_query
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
+    subcategories = await category_service.get_unarchived_subcategories(parent_id)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_subcategories_keyboard(parent_id, context),
+        reply_markup=await get_subcategories_keyboard(parent_id, subcategories, context),
     )
 
 
 @logger_decor
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    category_service = CategoryService()
     subcategory_id = int(context.match.group(1))
     selected_categories = context.user_data.setdefault("selected_categories", {})
 
@@ -144,12 +147,13 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         del selected_categories[subcategory_id]
 
     parent_id = context.user_data["parent_id"]
+    subcategories = await category_service.get_unarchived_subcategories(parent_id)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_subcategories_keyboard(parent_id, context),
+        reply_markup=await get_subcategories_keyboard(parent_id, subcategories, context),
     )
 
 
