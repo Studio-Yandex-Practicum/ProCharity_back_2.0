@@ -28,7 +28,6 @@ def create_bot() -> Application:
     bot.add_handler(CallbackQueryHandler(handlers.view_task_callback, pattern=callback_data.VIEW_TASKS))
     bot.add_handler(TypeHandler(Update, logging_updates))
 
-
     return bot
 
 
