@@ -77,7 +77,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "infra/docker-compose.swag.yml, infra/nginx/*.conf"
+          source: "infra/docker-compose.swag.yml, infra/nginx/*.conf, infra/entrypoints/*.sh"
           target: ${{ env.DEPLOY_PATH }}
 
       - name: Create .env file
@@ -120,5 +120,3 @@ jobs:
             docker compose --file docker-compose.yaml --env-file ../.env pull backend
             docker compose --file docker-compose.yaml --env-file ../.env up -dV
             docker system prune -af
-
-            docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend bash -c "alembic upgrade head & python fill_db.py"
