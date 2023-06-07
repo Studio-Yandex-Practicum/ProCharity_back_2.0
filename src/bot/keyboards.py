@@ -1,5 +1,4 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackContext
 
 from src.bot.constants import callback_data
 from src.core.db.models import Category
@@ -33,10 +32,9 @@ async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardM
 
 
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], context: CallbackContext
+    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = {}
 ) -> InlineKeyboardMarkup:
     keyboard = []
-    selected_categories = context.user_data.get("selected_categories", {})
 
     for category in subcategories:
         if category.id not in selected_categories:
