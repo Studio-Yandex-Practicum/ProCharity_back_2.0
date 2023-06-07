@@ -1,10 +1,7 @@
-import locale
 import sys
 from functools import wraps
 
 from src.settings import settings
-
-locale.setlocale(locale.LC_ALL, "ru_RU.65001")
 
 
 def display_tasks(task):
