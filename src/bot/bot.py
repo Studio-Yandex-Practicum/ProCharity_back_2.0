@@ -20,9 +20,6 @@ def create_bot() -> Application:
     bot.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, handlers.web_app_data))
     bot.add_handler(CallbackQueryHandler(handlers.select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     bot.add_handler(CallbackQueryHandler(handlers.back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
-    bot.add_handler(
-        CallbackQueryHandler(handlers.confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES)
-    )
     bot.add_handler(CallbackQueryHandler(handlers.view_task_callback, pattern=callback_data.VIEW_TASKS))
 
     return bot
