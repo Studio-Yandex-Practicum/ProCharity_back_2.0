@@ -10,6 +10,7 @@ from src.settings import settings
 
 def create_bot() -> Application:
     bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
+
     registration.init_app(bot)
     categories.init_app(bot)
     tasks.init_app(bot)
