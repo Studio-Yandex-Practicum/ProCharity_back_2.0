@@ -14,7 +14,7 @@ from telegram.constants import ParseMode
 from telegram.ext import CallbackContext, ContextTypes
 
 from src.api.schemas import FeedbackFormQueryParams
-from src.bot.constants import callback_data, commands
+from src.bot.constants import callback_data
 from src.bot.keyboards import MENU_KEYBOARD, get_categories_keyboard, get_subcategories_keyboard
 from src.bot.services.category import CategoryService
 from src.core.logging.utils import logger_decor
@@ -34,7 +34,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [
                 InlineKeyboardButton(
                     text="Начнём",
-                    callback_data=commands.GREETING,
+                    callback_data=callback_data.CHANGE_CATEGORY,
                 )
             ]
         ]
@@ -70,8 +70,9 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     context.user_data["parent_id"] = None
     categories = await category_service.get_unarchived_parents()
 
-    await update.message.reply_text(
-        "Чтобы я знал, с какими задачами ты готов помогать, "
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=await get_categories_keyboard(categories),
