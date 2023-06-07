@@ -1,10 +1,12 @@
 import logging
 
-from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler, MessageHandler
+from telegram import Update
+from telegram.ext import AIORateLimiter, Application, CallbackQueryHandler, CommandHandler, MessageHandler, TypeHandler
 from telegram.ext.filters import StatusUpdate
 
 from src.bot import handlers
 from src.bot.constants import callback_data, commands, patterns
+from src.core.logging.utils import logging_updates
 from src.settings import settings
 
 
@@ -24,6 +26,9 @@ def create_bot() -> Application:
         CallbackQueryHandler(handlers.confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES)
     )
     bot.add_handler(CallbackQueryHandler(handlers.view_task_callback, pattern=callback_data.VIEW_TASKS))
+    bot.add_handler(TypeHandler(Update, logging_updates))
+
+
     return bot
 
 
