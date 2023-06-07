@@ -8,11 +8,6 @@ from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 
 
-def init_app(app: Application):
-    app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.CHANGE_CATEGORY))
-    app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.GET_CATEGORIES))
-
-
 @logger_decor
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
@@ -50,3 +45,9 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
             f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
         )
+
+
+def init_app(app: Application):
+    app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.CHANGE_CATEGORY))
+    app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.GET_CATEGORIES))
+    app.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES))

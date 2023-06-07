@@ -20,13 +20,6 @@ from src.core.logging.utils import logger_decor
 from src.settings import settings
 
 
-def init_app(app: Application):
-    app.add_handler(CommandHandler(commands.MENU, menu_callback))
-    app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
-    app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
-    app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
-
-
 @logger_decor
 async def menu_callback(update: Update, context: CallbackContext):
     """Create button menu."""
@@ -74,3 +67,10 @@ async def web_app_data(update: Update):
         text="Вы можете вернуться в меню или посмотреть открытые задания. Нажмите на нужную кнопку.",
         reply_markup=keyboard,
     )
+
+
+def init_app(app: Application):
+    app.add_handler(CommandHandler(commands.MENU, menu_callback))
+    app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
+    app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
+    app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))

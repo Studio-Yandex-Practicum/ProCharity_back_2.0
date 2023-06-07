@@ -7,10 +7,6 @@ from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 
 
-def init_app(app: Application):
-    app.add_handler(CommandHandler(commands.START, start_command))
-
-
 @logger_decor
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
@@ -39,3 +35,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
+
+
+def init_app(app: Application):
+    app.add_handler(CommandHandler(commands.START, start_command))
