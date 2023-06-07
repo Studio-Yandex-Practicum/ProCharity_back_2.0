@@ -141,7 +141,6 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
         selected_categories[subcategory_id] = None
     else:
         del selected_categories[subcategory_id]
-
     parent_id = context.user_data["parent_id"]
 
     await query.message.edit_text(
