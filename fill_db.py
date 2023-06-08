@@ -213,7 +213,7 @@ async def filling_task_in_db(
                 deadline=datetime.now() + timedelta(days=10),
                 category_id=category_id,
                 title=title,
-                bonus=randint(1, 4) + randint(1, 4),
+                bonus=(randint(2, 3) + randint(2, 3)) - 1,
                 location=f"{choice(TEST_LOCATION)}",
                 link=f"http://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
                 description=f"Описание {title}",
