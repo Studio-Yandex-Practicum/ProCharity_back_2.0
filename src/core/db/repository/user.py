@@ -47,3 +47,11 @@ class UserRepository(AbstractRepository):
     async def get_user_categories(self, user: User) -> list[Category]:
         """Возвращает список категорий пользователя."""
         return await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))
+
+    async def set_mailing(self, user: User, has_mailing: bool) -> None:
+        """
+        Присваивает пользователю статус получения
+        почтовой рассылки на задания.
+        """
+        user.has_mailing = has_mailing
+        await self.update(user.id, user)

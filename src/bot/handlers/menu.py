@@ -10,23 +10,45 @@ from telegram import (
     Update,
     WebAppInfo,
 )
-from telegram.ext import Application, CallbackContext, CallbackQueryHandler, CommandHandler, MessageHandler
+from telegram.ext import (
+    Application,
+    CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+)
 from telegram.ext.filters import StatusUpdate
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
-from src.bot.keyboards import MENU_KEYBOARD
+from src.bot.keyboards import get_menu_keyboard
 from src.core.logging.utils import logger_decor
+from src.core.services.user import UserService
 from src.settings import settings
 
 
 @logger_decor
 async def menu_callback(update: Update, context: CallbackContext):
     """Create button menu."""
-    keyboard = MENU_KEYBOARD
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = await get_menu_keyboard(update.effective_user.id)
 
     await update.message.reply_text("Выбери, что тебя интересует:", reply_markup=reply_markup)
+
+
+@logger_decor
+async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Включение/выключение подписки пользователя на почтовую рассылку."""
+    query = update.callback_query
+    telegram_id = update.effective_user.id
+    user_service = UserService()
+    has_mailing = await user_service.set_mailing(telegram_id)
+    if has_mailing:
+        text = "Отлично! Теперь я буду присылать тебе уведомления о новых "
+        "заданиях на почту."
+    else:
+        text = "Я больше не буду присылать сообщения на почту."
+    await query.message.edit_text(text=text)
 
 
 @logger_decor
@@ -74,3 +96,4 @@ def init_app(app: Application):
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
     app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
+    app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
