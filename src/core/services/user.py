@@ -26,3 +26,17 @@ class UserService:
             user.telegram_id = telegram_id
             user.username = username
             return await user_repository.create(user)
+
+    async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
+        """Присваивает пользователю список категорий."""
+        async with self._sessionmaker() as session:
+            repository = UserRepository(session)
+            await repository.set_categories_to_user(telegram_id, categories_ids)
+
+    async def get_user_categories(self, telegram_id: int) -> dict[int, str]:
+        """Возвращает словарь с id и name категорий пользователя по его telegram_id."""
+        async with self._sessionmaker() as session:
+            repository = UserRepository(session)
+            user = await repository.get_by_telegram_id(telegram_id)
+            categories = await repository.get_user_categories(user)
+            return {category.id: category.name for category in categories}

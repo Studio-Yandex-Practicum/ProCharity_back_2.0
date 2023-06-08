@@ -1,15 +1,15 @@
 from typing import Iterator
 
-from fastapi import APIRouter, Depends, status, Request
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import StreamingResponse
 
-from src.api.schemas import CategoryRequest, CategoryResponse, TaskRequest, TaskResponse
+from src.api.schemas import CategoryRequest, CategoryResponse, FeedbackFormQueryParams, TaskRequest, TaskResponse
 from src.api.services.category import CategoryService
 from src.api.services.task import TaskService
 from src.core.db.models import Category, Task
 from src.settings import settings
 
-api_router = APIRouter(tags=["API"])
+api_router = APIRouter(prefix=settings.ROOT_PATH, tags=["API"])
 
 
 @api_router.get(
@@ -60,7 +60,10 @@ async def get_all_tasks(task_service: TaskService = Depends()) -> list[TaskRespo
     summary="Вернуть шаблон формы обратной связи в телеграм",
     response_description="Предоставить пользователю форму для заполнения",
 )
-async def user_register_form_webhook(request: Request) -> StreamingResponse:
+async def user_register_form_webhook(
+    request: Request,
+    parameters: FeedbackFormQueryParams = Depends(FeedbackFormQueryParams),
+) -> StreamingResponse:
     """
     Вернуть пользователю в телеграм форму для заполнения персональных данных.
 
@@ -74,15 +77,13 @@ async def user_register_form_webhook(request: Request) -> StreamingResponse:
         "Pragma": "no-cache",
         "Expires": "0",
     }
-    name = request.query_params.get('name')
-    surname = request.query_params.get('surname')
 
     def get_feedback_form() -> Iterator[bytes]:
         """
         Открывает для чтения html-шаблон формы регистрации пользователя.
         Возвращает генератор для последующего рендеринга шаблона StreamingResponse-ом.
         """
-        with open(settings.feedback_form_template, 'rb') as html_form:
+        with open(settings.feedback_form_template, "rb") as html_form:
             yield from html_form
 
     return StreamingResponse(get_feedback_form(), media_type="text/html", headers=headers)

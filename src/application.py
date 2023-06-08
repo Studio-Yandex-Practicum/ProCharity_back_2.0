@@ -6,13 +6,14 @@ from src.api.router import api_router
 from src.bot.bot import shutdown_bot, startup_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
+from src.core.utils import set_ngrok
 from src.settings import settings
 
 
 def create_app(run_bot: bool = True) -> FastAPI:
     app = FastAPI(
         debug=settings.DEBUG,
-        root_path="/api")
+    )
     origins = ["*"]
 
     app.add_middleware(
@@ -34,6 +35,8 @@ def create_app(run_bot: bool = True) -> FastAPI:
         """Действия при запуске сервера."""
         if run_bot:
             app.state.bot_instance = await startup_bot()
+        if settings.USE_NGROK:
+            set_ngrok()
 
     @app.on_event("shutdown")
     async def on_shutdown():

@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0_backend:staging
+    image: ghcr.io/studio-yandex-practicum/procharity_back_2.0:stage
     container_name: procharity_bot_backend
     restart: always
     volumes:
@@ -17,8 +17,6 @@ services:
     image: postgres:13.2
     container_name: procharity_postgres
     restart: always
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -44,7 +42,7 @@ services:
       - ../.env
     volumes:
       - ../nginx_logs:/var/log/nginx
-      - ./swag_nginx.conf:/config/nginx/site-confs/default.conf
+      - ./nginx/swag.conf:/config/nginx/site-confs/default.conf
       - keys:/config/keys
     ports:
       - "443:443"
