@@ -1,3 +1,3 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
 alembic upgrade head

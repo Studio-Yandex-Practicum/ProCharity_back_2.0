@@ -1,4 +1,4 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
 bash infra/entrypoints/prod.sh
 python3 fill_db.py
