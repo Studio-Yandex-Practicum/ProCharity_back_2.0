@@ -49,6 +49,7 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
             f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
         )
+        await user_service.check_and_set_has_mailing_atribute(telegram_id)
 
 
 def init_app(app: Application):
