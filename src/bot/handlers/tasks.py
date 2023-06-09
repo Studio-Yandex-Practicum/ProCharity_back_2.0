@@ -4,8 +4,8 @@ from telegram.ext import Application, CallbackContext, CallbackQueryHandler, Con
 
 from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
-from src.bot.services.task import TaskService
 from src.bot.services.category import CategoryService
+from src.bot.services.task import TaskService
 from src.core.logging.utils import logger_decor
 from src.core.utils import display_tasks
 

@@ -27,7 +27,6 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-
 async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
     query = update.callback_query

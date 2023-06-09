@@ -1,8 +1,8 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from src.bot.constants import callback_data
-from src.core.services.user import UserService
 from src.core.db.models import Category
+from src.core.services.user import UserService
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
