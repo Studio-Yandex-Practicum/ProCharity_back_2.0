@@ -59,9 +59,7 @@ class UserService:
             await repository.set_mailing(user, not user.has_mailing)
             return user.has_mailing
 
-    async def check_and_set_has_mailing_atribute(
-            self, telegram_id: int
-    ) -> None:
+    async def check_and_set_has_mailing_atribute(self, telegram_id: int) -> None:
         """
         Присваивает пользователю атрибут has_mailing, для получения почтовой
         рассылки на задания после выбора категорий. Предварительно
@@ -74,5 +72,3 @@ class UserService:
             has_mailing = user.has_mailing
             if not has_mailing:
                 await repository.set_mailing(user, True)
-
-
