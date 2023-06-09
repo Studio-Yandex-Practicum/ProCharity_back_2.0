@@ -4,6 +4,7 @@ from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data
 from src.bot.keyboards import get_categories_keyboard
+from src.bot.services.category import CategoryService
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 
@@ -11,15 +12,18 @@ from src.core.services.user import UserService
 @logger_decor
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
-    categories = await user_service.get_user_categories(update.effective_user.id)
-    context.user_data["selected_categories"] = {category: None for category in categories}
+    category_service = CategoryService()
+    user_categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in user_categories}
     context.user_data["parent_id"] = None
+    categories = await category_service.get_unarchived_parents()
+
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_categories_keyboard(),
+        reply_markup=await get_categories_keyboard(categories),
     )
 
 

@@ -1,8 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackContext
 
 from src.bot.constants import callback_data
-from src.bot.services.category import CategoryService
+from src.core.db.models import Category
 from src.core.services.user import UserService
 
 MENU_KEYBOARD = [
@@ -20,9 +19,7 @@ SUBSCRIBE_BUTTON = [
 ]
 
 
-async def get_categories_keyboard() -> InlineKeyboardMarkup:
-    category_service = CategoryService()
-    categories = await category_service.get_unarchived_parents()
+async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
     ]
@@ -36,12 +33,10 @@ async def get_categories_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_subcategories_keyboard(parent_id: int, context: CallbackContext) -> InlineKeyboardMarkup:
-    category_service = CategoryService()
-    subcategories = await category_service.get_unarchived_subcategories(parent_id)
-
+async def get_subcategories_keyboard(
+    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = {}
+) -> InlineKeyboardMarkup:
     keyboard = []
-    selected_categories = context.user_data.get("selected_categories", {})
 
     for category in subcategories:
         if category.id not in selected_categories:
