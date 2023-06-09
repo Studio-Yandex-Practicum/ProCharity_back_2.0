@@ -1,108 +1,108 @@
- body {
-      background: var(--tg-theme-bg-color) !important;
-      -moz-osx-font-smoothing: grayscale;
-      -webkit-font-smoothing: antialiased;
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-      -moz-text-size-adjust: 100%;
-      text-rendering: optimizeLegibility;
-    }
+body {
+  background: var(--tg-theme-bg-color) !important;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
 
-    .form {
-      max-width: 450px;
-      padding: 20px;
-      margin: 0 auto;
-    }
+.form {
+  max-width: 450px;
+  padding: 20px;
+  margin: 0 auto;
+}
 
-    .input-field input[type="text"]:focus+label {
-      color: var(--tg-theme-button-color) !important;
-    }
+.input-field input[type='text']:focus + label {
+  color: var(--tg-theme-button-color) !important;
+}
 
-    .input-field input[type="text"]:focus {
-      border-bottom: 1px solid var(--tg-theme-button-color) !important;
-      box-shadow: 0 1px 0 0 var(--tg-theme-button-color) !important;
-    }
+.input-field input[type='text']:focus {
+  border-bottom: 1px solid var(--tg-theme-button-color) !important;
+  box-shadow: 0 1px 0 0 var(--tg-theme-button-color) !important;
+}
 
-    .input-field input[type="text"].invalid+label {
-      color: #e53935 !important;
-    }
+.input-field input[type='text'].invalid + label {
+  color: #e53935 !important;
+}
 
-    .input-field input[type="text"].invalid {
-      border-bottom: 1px solid #e53935 !important;
-      box-shadow: 0 1px 0 0 #e53935 !important;
-    }
+.input-field input[type='text'].invalid {
+  border-bottom: 1px solid #e53935 !important;
+  box-shadow: 0 1px 0 0 #e53935 !important;
+}
 
-    .helper-text {
-      color: #e53935 !important;
-    }
+.helper-text {
+  color: #e53935 !important;
+}
 
-    .input-field input[type="text"].valid {
-      border-bottom: 1px solid #9e9e9e;
-      box-shadow: none;
-    }
+.input-field input[type='text'].valid {
+  border-bottom: 1px solid #9e9e9e;
+  box-shadow: none;
+}
 
-    .input-field input[type="text"] {
-      color: var(--tg-theme-text-color) !important;
-    }
+.input-field input[type='text'] {
+  color: var(--tg-theme-text-color) !important;
+}
 
-    .datepicker-modal {
-      top: 5% !important;
-    }
+.datepicker-modal {
+  top: 5% !important;
+}
 
-    .datepicker-date-display {
-      background-color: var(--tg-theme-button-color) !important;
-    }
+.datepicker-date-display {
+  background-color: var(--tg-theme-button-color) !important;
+}
 
-    .datepicker-calendar-container {
-      background: var(--tg-theme-bg-color) !important;
-    }
+.datepicker-calendar-container {
+  background: var(--tg-theme-bg-color) !important;
+}
 
-    .datepicker-table td {
-      color: var(--tg-theme-text-color) !important;
-    }
+.datepicker-table td {
+  color: var(--tg-theme-text-color) !important;
+}
 
-    .datepicker-table td.is-disabled {
-      color: #9e9e9e !important;
-    }
+.datepicker-table td.is-disabled {
+  color: #9e9e9e !important;
+}
 
-    .datepicker-table td.is-selected {
-      background-color: var(--tg-theme-button-color) !important;
-      color: var(--tg-theme-button-text-color) !important;
-    }
+.datepicker-table td.is-selected {
+  background-color: var(--tg-theme-button-color) !important;
+  color: var(--tg-theme-button-text-color) !important;
+}
 
-    .datepicker-table td.is-today,
-    .datepicker-cancel,
-    .datepicker-done {
-      color: var(--tg-theme-button-color) !important;
-    }
+.datepicker-table td.is-today,
+.datepicker-cancel,
+.datepicker-done {
+  color: var(--tg-theme-button-color) !important;
+}
 
-    .datepicker-table td.is-today.is-selected {
-      color: var(--tg-theme-button-text-color) !important;
-    }
+.datepicker-table td.is-today.is-selected {
+  color: var(--tg-theme-button-text-color) !important;
+}
 
-    .dropdown-content li>a,
-    .dropdown-content li>span {
-      color: var(--tg-theme-text-color) !important;
-    }
+.dropdown-content li > a,
+.dropdown-content li > span {
+  color: var(--tg-theme-text-color) !important;
+}
 
-    .datepicker-controls button>svg {
-      fill: var(--tg-theme-text-color) !important;
-    }
+.datepicker-controls button > svg {
+  fill: var(--tg-theme-text-color) !important;
+}
 
-    .datepicker-controls button:focus {
-      background-color: transparent;
-    }
+.datepicker-controls button:focus {
+  background-color: transparent;
+}
 
-    .browser-default {
-      outline: none !important;
-      background: var(--tg-theme-bg-color) !important;
-      border: none !important;
-      max-height: 50px !important;
-      color: var(--tg-theme-text-color) !important;
-      cursor: pointer;
-      box-shadow: none !important;
-    }
-    .form-title {
-      text-align: center;
-      color: var(--tg-theme-text-color) !important;
-    }
+.browser-default {
+  outline: none !important;
+  background: var(--tg-theme-bg-color) !important;
+  border: none !important;
+  max-height: 50px !important;
+  color: var(--tg-theme-text-color) !important;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+.form-title {
+  text-align: center;
+  color: var(--tg-theme-text-color) !important;
+}
