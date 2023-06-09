@@ -71,7 +71,7 @@ class UserService:
         async with self._sessionmaker() as session:
             repository = UserRepository(session)
             user = await repository.get_by_telegram_id(telegram_id)
-            has_mailing = await self.get_mailing(telegram_id)
+            has_mailing = user.has_mailing
             if not has_mailing:
                 await repository.set_mailing(user, True)
 
