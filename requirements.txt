@@ -27,3 +27,4 @@ starlette==0.26.1 ; python_version >= "3.11" and python_version < "4.0"
 structlog==23.1.0 ; python_version >= "3.11" and python_version < "4.0"
 typing-extensions==4.5.0 ; python_version >= "3.11" and python_version < "4.0"
 uvicorn==0.21.1 ; python_version >= "3.11" and python_version < "4.0"
+pyngrok==6.0.0
