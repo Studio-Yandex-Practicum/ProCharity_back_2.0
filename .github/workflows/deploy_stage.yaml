@@ -117,7 +117,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}/infra
-            docker compose --file docker-compose.yaml --env-file ../.env pull backend
+            docker compose --file docker-compose.yaml --env-file ../.env pull backend -q
             docker compose --file docker-compose.yaml --env-file ../.env up -dV --wait
             docker system prune -af
 
