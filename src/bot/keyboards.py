@@ -65,15 +65,13 @@ async def get_start_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
     user_service = UserService()
     categories = await user_service.get_user_categories(telegram_id)
     callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
-    keyboard = [
-        [InlineKeyboardButton("Начнём", callback_data=callback_const)]
-    ]
+    keyboard = [[InlineKeyboardButton("Начнём", callback_data=callback_const)]]
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_confirm_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Да", callback_data=callback_data.CONFIRM_CATEGORIES)],
-        [InlineKeyboardButton("Нет, хочу изменить", callback_data=callback_data.CHANGE_CATEGORY)]
+        [InlineKeyboardButton("Нет, хочу изменить", callback_data=callback_data.CHANGE_CATEGORY)],
     ]
     return InlineKeyboardMarkup(keyboard)

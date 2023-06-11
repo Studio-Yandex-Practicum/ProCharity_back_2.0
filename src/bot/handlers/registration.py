@@ -3,7 +3,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import commands
-from src.bot.keyboards import get_start_keyboard, get_confirm_keyboard
+from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 
