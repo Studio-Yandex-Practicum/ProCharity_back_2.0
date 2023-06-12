@@ -10,16 +10,15 @@ from src.core.services.user import UserService
 
 @logger_decor
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    telegram_id = update.effective_chat.id
     user_service = UserService()
     await user_service.register_user(
-        telegram_id=telegram_id,
+        telegram_id=update.effective_user.id,
         username=update.effective_chat.username,
     )
-    keyboard = await get_start_keyboard(telegram_id=telegram_id)
+    keyboard = await get_start_keyboard(telegram_id=update.effective_user.id)
 
     await context.bot.send_message(
-        chat_id=telegram_id,
+        chat_id=update.effective_user.id,
         text="Привет! 👋 \n\n"
         'Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
@@ -35,12 +34,11 @@ async def confirm_chosen_categories(update: Update, context: ContextTypes.DEFAUL
     keyboard = get_confirm_keyboard()
 
     user_service = UserService()
-    telegram_id = update.effective_chat.id
-    categories = await user_service.get_user_categories(telegram_id)
+    categories = await user_service.get_user_categories(update.effective_user.id)
     text = ", ".join(categories.values())
 
     await context.bot.send_message(
-        chat_id=telegram_id,
+        chat_id=update.effective_user.id,
         text=f"Вот список твоих профессиональных компетенций: *{text}* Все верно?",
         reply_markup=keyboard,
         parse_mode=ParseMode.MARKDOWN,
