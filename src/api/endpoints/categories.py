@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.api.schemas import CategoryResponse, CategoryRequest
+from src.api.schemas import CategoryRequest, CategoryResponse
 from src.api.services import CategoryService
 from src.core.db.models import Category
 
