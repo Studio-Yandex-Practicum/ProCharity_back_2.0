@@ -1,3 +1,5 @@
-from .categories import api_router as category_router # noqa
-from .tasks import api_router as task_router # noqa
-from .form import api_router as form_router # noqa
+from .categories import category_router
+from .tasks import task_router
+from .form import form_router
+
+__all__ = ("category_router", "task_router", "form_router")

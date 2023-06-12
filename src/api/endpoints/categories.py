@@ -4,10 +4,10 @@ from src.api.schemas import CategoryResponse, CategoryRequest
 from src.api.services import CategoryService
 from src.core.db.models import Category
 
-api_router = APIRouter()
+category_router = APIRouter()
 
 
-@api_router.get(
+@category_router.get(
     "/",
     response_model=list[CategoryResponse],
     response_model_exclude_none=True,
@@ -17,7 +17,7 @@ async def get_categories(category_service: CategoryService = Depends()) -> list[
     return await category_service.get_all()
 
 
-@api_router.post("/", description="Актуализирует список категорий.")
+@category_router.post("/", description="Актуализирует список категорий.")
 async def actualize_categories(
     categories: list[CategoryRequest], category_service: CategoryService = Depends()
 ) -> None:

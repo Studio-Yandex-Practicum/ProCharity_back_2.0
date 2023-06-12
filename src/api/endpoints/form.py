@@ -6,10 +6,10 @@ from fastapi.responses import StreamingResponse
 from src.api.schemas import FeedbackFormQueryParams
 from src.settings import settings
 
-api_router = APIRouter()
+form_router = APIRouter()
 
 
-@api_router.get(
+@form_router.get(
     "/feedback-form",
     status_code=status.HTTP_200_OK,
     summary="Вернуть шаблон формы обратной связи в телеграм",
