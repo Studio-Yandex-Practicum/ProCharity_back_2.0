@@ -18,6 +18,7 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
 )
+from telegram.constants import ParseMode
 from telegram.ext.filters import StatusUpdate
 
 from src.api.schemas import FeedbackFormQueryParams
@@ -29,11 +30,22 @@ from src.settings import settings
 
 
 @logger_decor
-async def menu_callback(update: Update, context: CallbackContext):
-    """Create button menu."""
-    reply_markup = await get_menu_keyboard(update.effective_user.id)
+async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Create button menu by command /menu."""
+    await update.message.reply_text(
+        "Выбери, что тебя интересует:",
+        reply_markup=await get_menu_keyboard(update.effective_user.id)
+    )
 
-    await update.message.reply_text("Выбери, что тебя интересует:", reply_markup=reply_markup)
+
+@logger_decor
+async def button_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Возвращает в меню при нажатии кнопки "Вернуться в меню"."""
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Выбери, что тебя интересует:",
+        reply_markup=await get_menu_keyboard(update.effective_user.id),
+    )
 
 
 @logger_decor
@@ -91,9 +103,38 @@ async def web_app_data(update: Update):
     )
 
 
+@logger_decor
+async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Информация о платформе."""
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    text="Вернуться в меню",
+                    callback_data=callback_data.MENU_BUTTON,
+                )
+            ]
+        ]
+    )
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="С ProCharity профессионалы могут помочь некоммерческим "
+             "организациям в вопросах, которые требуют специальных знаний и "
+             "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
+             "время и профессиональные навыки, позволяя решать задачи, "
+             "которые трудно закрыть силами штатных сотрудников.\n\n"
+             "Сделано студентами <a href=\"https://praktikum.yandex.ru/\">Яндекс.Практикума.</a>",
+        reply_markup=keyboard,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+
+
 def init_app(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
+    app.add_handler(CallbackQueryHandler(button_menu_callback, pattern=callback_data.MENU_BUTTON))
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
+    app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
     app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
