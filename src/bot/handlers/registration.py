@@ -45,6 +45,6 @@ async def confirm_chosen_categories(update: Update, context: ContextTypes.DEFAUL
     )
 
 
-def init_app(app: Application):
+def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.START, start_command))
     app.add_handler(CallbackQueryHandler(confirm_chosen_categories, pattern=commands.GREETING_REGISTERED_USER))

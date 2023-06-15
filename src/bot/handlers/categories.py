@@ -52,7 +52,7 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
         await user_service.check_and_set_has_mailing_atribute(telegram_id)
 
 
-def init_app(app: Application):
+def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.CHANGE_CATEGORY))
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.GET_CATEGORIES))
     app.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES))
