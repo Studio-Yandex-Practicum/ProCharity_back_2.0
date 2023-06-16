@@ -91,7 +91,7 @@ async def web_app_data(update: Update):
     )
 
 
-def init_app(app: Application):
+def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
