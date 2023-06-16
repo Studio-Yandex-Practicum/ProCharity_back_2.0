@@ -5,11 +5,11 @@ from src.core.db.models import Category
 from src.core.services.user import UserService
 
 MENU_KEYBOARD = [
-    [InlineKeyboardButton("Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
-    [InlineKeyboardButton("Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)],
-    [InlineKeyboardButton("Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
-    [InlineKeyboardButton("Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
-    [InlineKeyboardButton("О платформе", callback_data=callback_data.ABOUT_PROJECT)],
+    [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
+    [InlineKeyboardButton("✏️ Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)],
+    [InlineKeyboardButton("✉️ Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
+    [InlineKeyboardButton("❓ Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
+    [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)],
 ]
 UNSUBSCRIBE_BUTTON = [
     InlineKeyboardButton("⏹️ Остановить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
@@ -58,6 +58,13 @@ async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
         keyboard.extend([UNSUBSCRIBE_BUTTON])
     else:
         keyboard.extend([SUBSCRIBE_BUTTON])
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_menu_about_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
