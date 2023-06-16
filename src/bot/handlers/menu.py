@@ -10,6 +10,7 @@ from telegram import (
     Update,
     WebAppInfo,
 )
+from telegram.constants import ParseMode
 from telegram.ext import (
     Application,
     CallbackContext,
@@ -18,15 +19,11 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
 )
-from telegram.constants import ParseMode
 from telegram.ext.filters import StatusUpdate
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
-from src.bot.keyboards import (
-    get_menu_keyboard,
-    get_menu_about_keyboard,
-)
+from src.bot.keyboards import get_menu_about_keyboard, get_menu_keyboard
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 from src.settings import settings
@@ -43,10 +40,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=get_menu,
         )
     else:
-        await update.message.reply_text(
-            text="Выбери, что тебя интересует:",
-            reply_markup=get_menu
-        )
+        await update.message.reply_text(text="Выбери, что тебя интересует:", reply_markup=get_menu)
 
 
 @logger_decor
@@ -109,11 +103,11 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="С ProCharity профессионалы могут помочь некоммерческим "
-             "организациям в вопросах, которые требуют специальных знаний и "
-             "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
-             "время и профессиональные навыки, позволяя решать задачи, "
-             "которые трудно закрыть силами штатных сотрудников.\n\n"
-             "Сделано студентами <a href=\"https://praktikum.yandex.ru/\">Яндекс.Практикума.</a>",
+        "организациям в вопросах, которые требуют специальных знаний и "
+        "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
+        "время и профессиональные навыки, позволяя решать задачи, "
+        "которые трудно закрыть силами штатных сотрудников.\n\n"
+        'Сделано студентами <a href="https://praktikum.yandex.ru/">Яндекс.Практикума.</a>',
         reply_markup=await get_menu_about_keyboard(),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,

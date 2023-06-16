@@ -62,9 +62,7 @@ async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
 
 
 async def get_menu_about_keyboard() -> InlineKeyboardMarkup:
-    keyboard = [
-        [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]
-    ]
+    keyboard = [[InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]]
     return InlineKeyboardMarkup(keyboard)
 
 
