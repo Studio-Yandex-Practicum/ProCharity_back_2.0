@@ -11,9 +11,8 @@ from telegram import (
     WebAppInfo,
 )
 from telegram.constants import ParseMode
-from telegram.ext import (
+from telegram.ext import (  # CallbackContext,
     Application,
-    #CallbackContext,
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
