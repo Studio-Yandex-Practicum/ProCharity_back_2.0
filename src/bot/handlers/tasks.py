@@ -76,7 +76,7 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
         )
 
 
-def init_app(app: Application):
+def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(subcategories_callback, pattern=patterns.SUBCATEGORIES))
     app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     app.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))

@@ -120,7 +120,7 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def init_app(app: Application):
+def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
