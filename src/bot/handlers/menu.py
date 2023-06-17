@@ -13,7 +13,6 @@ from telegram import (
 from telegram.constants import ParseMode
 from telegram.ext import (
     Application,
-    #CallbackContext,
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
@@ -32,15 +31,11 @@ from src.settings import settings
 @logger_decor
 async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Возвращает в меню."""
-    get_menu = await get_menu_keyboard(update.effective_user.id)
-    query = update.callback_query
-    if query:
-        await query.message.edit_text(
-            text="Выбери, что тебя интересует:",
-            reply_markup=get_menu,
-        )
-    else:
-        await update.message.reply_text(text="Выбери, что тебя интересует:", reply_markup=get_menu)
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Выбери, что тебя интересует:",
+        reply_markup=await get_menu_keyboard(update.effective_user.id),
+    )
 
 
 @logger_decor
