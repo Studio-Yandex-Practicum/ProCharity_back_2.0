@@ -68,11 +68,20 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
     tasks = await task_service.get_user_tasks(limit)
-
+    if not tasks:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text='Нет доступных заданий',
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True
+        )
     for task in tasks:
         message = display_tasks(task)
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
+            chat_id=update.effective_chat.id,
+            text=message,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True
         )
 
 
