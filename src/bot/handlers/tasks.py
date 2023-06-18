@@ -3,7 +3,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
+from src.bot.keyboards import get_categories_keyboard, get_back_menu, get_subcategories_keyboard
 from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
 from src.core.logging.utils import logger_decor
@@ -74,6 +74,12 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="### Здесь текст о наличии заданий, или возврата в меню:\n"
+             "Есть ещё задания, показать?:",
+        reply_markup=await get_back_menu(),
+    )
 
 
 def registration_handlers(app: Application):

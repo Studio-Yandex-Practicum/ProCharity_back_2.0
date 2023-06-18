@@ -11,7 +11,7 @@ from telegram import (
     WebAppInfo,
 )
 from telegram.constants import ParseMode
-from telegram.ext import (  # CallbackContext,
+from telegram.ext import (
     Application,
     CallbackQueryHandler,
     CommandHandler,
@@ -22,7 +22,7 @@ from telegram.ext.filters import StatusUpdate
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
-from src.bot.keyboards import get_menu_about_keyboard, get_menu_keyboard
+from src.bot.keyboards import get_back_menu, get_menu_keyboard
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 from src.settings import settings
@@ -103,7 +103,7 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "время и профессиональные навыки, позволяя решать задачи, "
         "которые трудно закрыть силами штатных сотрудников.\n\n"
         'Сделано студентами <a href="https://praktikum.yandex.ru/">Яндекс.Практикума.</a>',
-        reply_markup=await get_menu_about_keyboard(),
+        reply_markup=await get_back_menu(),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
     )
