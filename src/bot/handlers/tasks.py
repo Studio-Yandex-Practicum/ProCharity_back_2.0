@@ -71,17 +71,14 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
     if not tasks:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text='Нет доступных заданий',
+            text="Нет доступных заданий",
             parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True
+            disable_web_page_preview=True,
         )
     for task in tasks:
         message = display_tasks(task)
         await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=message,
-            parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True
+            chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
 
 
