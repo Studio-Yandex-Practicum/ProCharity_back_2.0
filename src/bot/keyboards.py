@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from src.bot.constants import callback_data, commands
+from src.bot.constants import callback_data, commands, urls
 from src.core.db.models import Category
 from src.core.services.user import UserService
 
@@ -70,7 +70,10 @@ async def get_start_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
     user_service = UserService()
     categories = await user_service.get_user_categories(telegram_id)
     callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
-    keyboard = [[InlineKeyboardButton("Начнём", callback_data=callback_const)]]
+    keyboard = [
+        [InlineKeyboardButton("Начнём", callback_data=callback_const)],
+        [InlineKeyboardButton("Перейти на сайт ProCharity", url=urls.PROCHARITY_URL)]
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
