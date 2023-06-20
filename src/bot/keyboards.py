@@ -72,7 +72,7 @@ async def get_start_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
     callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
     keyboard = [
         [InlineKeyboardButton("Начнём", callback_data=callback_const)],
-        [InlineKeyboardButton("Перейти на сайт ProCharity", url=urls.PROCHARITY_URL)]
+        [InlineKeyboardButton("Перейти на сайт ProCharity", url=urls.PROCHARITY_URL)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
