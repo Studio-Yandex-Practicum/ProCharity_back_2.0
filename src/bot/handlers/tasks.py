@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler, ContextTypes
 
@@ -65,15 +65,43 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 
 
 @logger_decor
-async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
+async def view_task_callback(update: Update, context: CallbackContext):
     task_service = TaskService()
-    tasks = await task_service.get_user_tasks(limit)
+    tasks = await task_service.get_all_user_tasks()
+    tasks = tasks.all()
 
-    for task in tasks:
+    page_number = context.user_data.get("page_number", 1)
+    start = (page_number - 1) * 3
+    finish = page_number * 3
+    tasks_to_show = tasks[start:finish]
+
+    for task in tasks_to_show:
         message = display_tasks(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
+
+    await show_next_tasks(update, context, tasks, page_number)
+
+
+async def show_next_tasks(update: Update, context: CallbackContext, tasks, page_number: int):
+    if len(tasks) > page_number * 3:
+        text = "Есть ещё задания, показать?"
+        context.user_data["page_number"] = page_number + 1
+        buttons = [
+            [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
+            [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
+        ]
+    else:
+        text = "Заданий больше нет."
+        buttons = [[InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]]
+
+    keyboard = InlineKeyboardMarkup(buttons)
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=text,
+        reply_markup=keyboard,
+    )
 
 
 def init_app(app: Application):
