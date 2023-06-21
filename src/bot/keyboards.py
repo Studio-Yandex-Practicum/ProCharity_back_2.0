@@ -66,10 +66,7 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
-    user_service = UserService()
-    categories = await user_service.get_user_categories(telegram_id)
-    callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
+async def get_start_keyboard(callback_const: str) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Начнём", callback_data=callback_const)],
         [InlineKeyboardButton("Перейти на сайт ProCharity", url=urls.PROCHARITY_URL)],

@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
-from src.bot.constants import commands
+from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
@@ -15,7 +15,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         telegram_id=update.effective_user.id,
         username=update.effective_chat.username,
     )
-    keyboard = await get_start_keyboard(telegram_id=update.effective_user.id)
+    categories = await user_service.get_user_categories(update.effective_user.id)
+    callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
+    keyboard = await get_start_keyboard(callback_const=callback_const)
 
     await context.bot.send_message(
         chat_id=update.effective_user.id,
