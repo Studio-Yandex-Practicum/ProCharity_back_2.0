@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from src.bot.constants import callback_data, commands, urls
+from src.bot.constants import callback_data, urls
 from src.core.db.models import Category
 from src.core.services.user import UserService
 
