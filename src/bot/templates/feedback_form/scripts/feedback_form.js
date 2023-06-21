@@ -1,50 +1,3 @@
-dayjs.extend(dayjs_plugin_customParseFormat);
-
-// datepicker options
-const i18nOptions = {
-  cancel: 'Отменить',
-  done: 'Ок',
-  months: [
-    'Январь',
-    'Февраль',
-    'Март',
-    'Апрель',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Август',
-    'Сентябрь',
-    'Октябрь',
-    'Ноябрь',
-    'Декабрь',
-  ],
-  monthsShort: [
-    'Янв',
-    'Фев',
-    'Мар',
-    'Апр',
-    'Май',
-    'Июн',
-    'Июл',
-    'Авг',
-    'Сен',
-    'Окт',
-    'Ноя',
-    'Дек',
-  ],
-  weekdays: [
-    'Воскресенье',
-    'Понедельник',
-    'Вторник',
-    'Среда',
-    'Четверг',
-    'Пятница',
-    'Суббота',
-  ],
-  weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-  weekdaysAbbrev: ['Вc', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-};
-
 // validation settings and check actions
 const validationConfig = {
   name: {
@@ -55,16 +8,12 @@ const validationConfig = {
     pattern: /[^ЁА-Яёа-я-]/g,
     isCapitalize: true,
   },
-  date_of_birth: {
-    pattern: /[^\d.]/g,
+  email: {
+    pattern: /[А-ЯЁа-яё]/g,
     isCapitalize: false,
   },
-  city: {
-    pattern: /[^ЁА-Яёа-я- ]/g,
-    isCapitalize: true,
-  },
-  phone_number: {
-    pattern: /[^\d]/g,
+  feedback: {
+    // pattern: /[|/\_!@-]/g,
     isCapitalize: false,
   },
 };
@@ -86,28 +35,22 @@ const errMsg = {
     dashPattern: 'Убедитесь, что дефис находится в нужном месте',
     nameSurnamePattern: 'Доступно использование только кириллицы и "-"',
   },
-  date_of_birth: {
-    required: 'Пожалуйста, укажите дату рождения',
-    invalidDate: 'Введите дату в формате дд.мм.гггг',
-  },
-  city: {
-    required: 'Пожалуйста, укажите название города',
-    min: 'Введите не менее 2 символов',
-    max: 'Допускается ввод не более 50 символов',
+  email: {
+    required: 'Пожалуйста, укажите ваш email',
     capsPattern: 'Убедитесь, что у Вас выключен CAPS LOCK',
-    dashPattern: 'Убедитесь, что дефис находится в нужном месте',
-    cityPattern: 'Доступно использование только кириллицы, пробела и "-"',
+    emailPattern:
+      'Неверный формат адреса email. Используйте только латиницу, "-", "@" и "_"',
   },
-  phone_number: {
-    required: 'Пожалуйста, укажите номер телефона',
-    min: 'Введите номер телефона',
-    max: 'Номер телефона не должен содержать более 11 цифр',
-    phonePattern: `Допускаются номера только мобильных
-          операторов РФ: \"+7\u00A03.........\" или \"+7\u00A04.........\" или \"+7\u00A09.........\"`,
+  feedback: {
+    required: 'Пожалуйста, напишите ваш отзыв',
+    min: 'Введите не менее 10 символов',
+    max: 'Допускается ввод не более 500 символов',
+    capsPattern: 'Убедитесь, что у Вас выключен CAPS LOCK',
+    feedbackPattern:
+      'Доступно использование только кириллицы, латиницы и символов: "-", "_", ".", "," и "!"',
   },
 };
 
-const dateFormatDayjs = 'DD.MM.YYYY';
 const disabledTgButtonColor = '#9e9e9e';
 const disabledTgButtonTextColor = '#eceff1';
 
@@ -124,13 +67,13 @@ const setInvalid = (element, errElement, errName) => {
 const checkInputValidity = (element, errElement, pattern, isCapitalize) => {
   let newValue = element.value;
   const minlength = element.getAttribute('minlength');
-  const maximumlength = element.getAttribute('maximumlength');
+  const maxlength = element.getAttribute('maxlength');
   const capsPattern = /[А-ЯЁ]{2,}/g;
   const dashPattern = /( -)|(- )|(^-)|(-$)/g;
   const phonePattern = /^\+7 [3489]\d{2} \d{3}-\d{2}-\d{2}$/;
   const nameSurnamePattern = /^[А-ЯЁ][а-яё]*([-][А-ЯЁ][а-яё]+)*$/g;
-  const cityPattern =
-    /^[А-ЯЁ][а-яё]*(([-][А-ЯЁ][а-яё]+)|[-](на)+)*([\s][А-ЯЁ][а-яё]+)*$/g;
+  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+  const feedbackPattern = /[А-ЯЁа-яёa-zA-Z0-9._!@/-]/g;
 
   if (pattern) {
     newValue = newValue.trimStart().replace(pattern, '');
@@ -162,14 +105,9 @@ const checkInputValidity = (element, errElement, pattern, isCapitalize) => {
 
   if (!newValue) {
     setInvalid(element, errElement, 'required');
-  } else if (
-    element.name === 'date_of_birth' &&
-    !dayjs(newValue, dateFormatDayjs, true).isValid()
-  ) {
-    setInvalid(element, errElement, 'invalidDate');
   } else if (minlength && newValue.length < minlength) {
     setInvalid(element, errElement, 'min');
-  } else if (maximumlength && newValue.length > maximumlength) {
+  } else if (maxlength && newValue.length > maxlength) {
     setInvalid(element, errElement, 'max');
   } else if (newValue.match(capsPattern)) {
     setInvalid(element, errElement, 'capsPattern');
@@ -182,8 +120,10 @@ const checkInputValidity = (element, errElement, pattern, isCapitalize) => {
     !newValue.match(nameSurnamePattern)
   ) {
     setInvalid(element, errElement, 'nameSurnamePattern');
-  } else if (element.name === 'city' && !newValue.match(cityPattern)) {
-    setInvalid(element, errElement, 'cityPattern');
+  } else if (element.name === 'email' && !newValue.match(emailPattern)) {
+    setInvalid(element, errElement, 'emailPattern');
+  } else if (element.name === 'feedback' && !newValue.match(feedbackPattern)) {
+    setInvalid(element, errElement, 'feedbackPattern');
   } else {
     setValid(element, errElement);
   }
@@ -258,9 +198,8 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
 if (params.surname) {
   document.getElementById('name').value = params.name;
   document.getElementById('surname').value = params.surname;
-  document.getElementById('date_of_birth').value = params.date_of_birth;
-  document.getElementById('city').value = params.city;
-  document.getElementById('phone_number').value = params.phone_number;
+  document.getElementById('email').value = params.email;
+  document.getElementById('feedback').value = params.feedback;
 }
 
 if (params.update) {
@@ -268,7 +207,7 @@ if (params.update) {
         Пожалуйста, проверьте свои данные.`;
   var buttonText = 'Подать заявку на участие в смене';
 } else {
-  var formText = 'Пожалуйста, заполните данную форму.';
+  var formText = '* необходимо заполнить поля';
   var buttonText = 'Зарегистрироваться в проекте';
 }
 
@@ -303,29 +242,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const defaultButtonTextColor = tg.themeParams.button_text_color;
 
   const inputElements = document.querySelectorAll('.validate');
-  const datePickerElement = document.querySelector('.datepicker');
-
-  const today = new Date();
-  const currentYear = today.getFullYear();
-
-  const datePickerInstance = M.Datepicker.init(datePickerElement, {
-    format: 'dd.mm.yyyy',
-    maxDate: today,
-    yearRange: [1945, currentYear],
-    firstDay: 1,
-    i18n: { ...i18nOptions },
-    onDraw() {
-      const selects = document.querySelectorAll('.datepicker-select');
-      selects.forEach((select) => {
-        select.classList.add('browser-default');
-      });
-
-      const selectInputs = document.querySelectorAll('.select-dropdown');
-      selectInputs.forEach((input) => {
-        input.remove();
-      });
-    },
-  });
 
   setValidation(
     inputElements,

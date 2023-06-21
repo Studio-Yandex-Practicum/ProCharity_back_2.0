@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ломая барьеры</title>
+    <title>ProCharity Bot</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
@@ -13,22 +13,9 @@
   </head>
   <body>
     <main>
-      <form class="form row" name="registration">
+      <form class="form row" name="feedback">
         <div class="form-title">
           <p id="formtitle"></p>
-        </div>
-        <div class="input-field col s12">
-          <input
-            id="name"
-            name="name"
-            type="text"
-            class="validate"
-            minlength="2"
-            maximumlength="100"
-            required
-          />
-          <label for="name">Имя</label>
-          <span class="helper-text name"></span>
         </div>
         <div class="input-field col s12">
           <input
@@ -37,57 +24,54 @@
             type="text"
             class="validate"
             minlength="2"
-            maximumlength="100"
+            maxlength="100"
             required
           />
-          <label for="surname">Фамилия</label>
+          <label for="surname">Ваша фамилия *</label>
           <span class="helper-text surname"></span>
         </div>
         <div class="input-field col s12">
           <input
-            id="date_of_birth"
-            name="date_of_birth"
-            type="text"
-            class="datepicker validate"
-            autocomplete="off"
-            minlength="10"
-            maxlength="10"
-            required
-          />
-          <label for="date_of_birth">Дата рождения</label>
-          <span class="helper-text date_of_birth"></span>
-        </div>
-        <div class="input-field col s12">
-          <input
-            id="city"
-            name="city"
+            id="name"
+            name="name"
             type="text"
             class="validate"
             minlength="2"
-            maximumlength="50"
+            maxlength="100"
             required
           />
-          <label for="city">Город</label>
-          <span class="helper-text city"></span>
+          <label for="name">Ваше имя *</label>
+          <span class="helper-text name"></span>
         </div>
         <div class="input-field col s12">
           <input
-            id="phone_number"
-            name="phone_number"
+            id="email"
+            name="email"
             type="text"
             class="validate"
-            minlength="16"
-            maximumlength="16"
             required
           />
-          <label for="phone_number">Телефон</label>
-          <span class="helper-text phone_number"></span>
+          <label for="email">email *</label>
+          <span class="helper-text email"></span>
+        </div>
+        <div class="input-field col s12">
+          <input
+            id="feedback"
+            name="feedback"
+            type="text"
+            class="validate"
+            minlength="10"
+            maxlength="500"
+            required
+          />
+          <label for="feedback">Будем рады ответить, напишите свой вопрос*</label>
+          <span class="helper-text feedback"></span>
         </div>
       </form>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script> -->
     <script src="./scripts/feedback_form.js"></script>
   </body>
 </html>
