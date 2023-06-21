@@ -11,9 +11,8 @@ from src.core.services.user import UserService
 @logger_decor
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
-    telegram_id = update.effective_user.id
     await user_service.register_user(
-        telegram_id=telegram_id,
+        telegram_id=update.effective_user.id,
         username=update.effective_chat.username,
     )
     keyboard = await get_start_keyboard(telegram_id=update.effective_user.id)
@@ -24,7 +23,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         'Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n"
-        "Ваш телеграм id - {}".format(telegram_id),
+        f"Ваш телеграм id - {update.effective_user.id}",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
