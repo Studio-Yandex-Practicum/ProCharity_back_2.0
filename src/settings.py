@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     APPLICATION_URL: str = "localhost"
     SECRET_KEY: str = "secret_key"
-    ROOT_PATH: str = "/api/"
+    ROOT_PATH: str = "/api"
     DEBUG: bool = False
     USE_NGROK: bool = False
 
@@ -64,7 +64,7 @@ class Settings(BaseSettings):
 
     @property
     def api_url(self) -> str:
-        return urljoin(self.APPLICATION_URL, self.ROOT_PATH)
+        return urljoin(self.APPLICATION_URL, self.ROOT_PATH + "/")
 
     @property
     def telegram_webhook_url(self) -> str:
