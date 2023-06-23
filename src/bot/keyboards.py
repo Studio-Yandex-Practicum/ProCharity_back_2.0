@@ -74,6 +74,14 @@ async def get_start_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
+async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
+        [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def get_confirm_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Да", callback_data=callback_data.CONFIRM_CATEGORIES)],

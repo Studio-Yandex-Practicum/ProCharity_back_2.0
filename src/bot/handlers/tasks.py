@@ -1,9 +1,14 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_categories_keyboard, get_subcategories_keyboard
+from src.bot.keyboards import (
+    get_back_menu,
+    get_categories_keyboard,
+    get_subcategories_keyboard,
+    view_more_tasks_keyboard,
+)
 from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
 from src.core.logging.utils import logger_decor
@@ -65,15 +70,10 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 
 
 @logger_decor
-async def view_task_callback(update: Update, context: CallbackContext):
+async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
     tasks = await task_service.get_all_user_tasks()
-    tasks = tasks.all()
-
-    page_number = context.user_data.get("page_number", 1)
-    start = (page_number - 1) * 3
-    finish = page_number * 3
-    tasks_to_show = tasks[start:finish]
+    tasks_to_show, page_number = await task_service.get_user_tasks_by_page(tasks, context, limit)
 
     for task in tasks_to_show:
         message = display_tasks(task)
@@ -88,15 +88,11 @@ async def show_next_tasks(update: Update, context: CallbackContext, tasks, page_
     if len(tasks) > page_number * 3:
         text = "Есть ещё задания, показать?"
         context.user_data["page_number"] = page_number + 1
-        buttons = [
-            [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
-            [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
-        ]
+        keyboard = await view_more_tasks_keyboard()
     else:
         text = "Заданий больше нет."
-        buttons = [[InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]]
+        keyboard = await get_back_menu()
 
-    keyboard = InlineKeyboardMarkup(buttons)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=text,
@@ -104,7 +100,7 @@ async def show_next_tasks(update: Update, context: CallbackContext, tasks, page_
     )
 
 
-def init_app(app: Application):
+def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(subcategories_callback, pattern=patterns.SUBCATEGORIES))
     app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     app.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
