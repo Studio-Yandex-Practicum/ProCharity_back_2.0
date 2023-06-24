@@ -95,3 +95,16 @@ class FeedbackFormQueryParams(BaseModel):
 
     def as_url_query(self):
         return f"?{urllib.parse.urlencode(self.dict())}"
+
+
+class TelegramMessageRequest(RequestBase):
+    """Класс формирования параметров запроса для отправки сообщения определенному пользователю."""
+
+    message: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Some message to user",
+            }
+        }
