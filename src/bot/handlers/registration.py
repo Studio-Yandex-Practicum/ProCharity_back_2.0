@@ -16,8 +16,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username=update.effective_chat.username,
     )
     categories = await user_service.get_user_categories(update.effective_user.id)
-    callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
-    keyboard = await get_start_keyboard(callback_const=callback_const)
+    keyboard_markup_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
+    keyboard = await get_start_keyboard(keyboard_markup_on_start=keyboard_markup_on_start)
 
     await context.bot.send_message(
         chat_id=update.effective_user.id,
