@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
+
 from src.api.services.messages import TelegramNotificationService
 from src.api.services.schemas import TelegramNotificationRequest
-
 
 users_group_notification_router = APIRouter()
 

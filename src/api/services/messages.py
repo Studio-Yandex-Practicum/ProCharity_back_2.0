@@ -11,7 +11,7 @@ from src.core.services.notification import TelegramNotification
 
 class TelegramNotificationService(ContentService):
     """Класс описывающий функционал передачи сообщения
-      определенному пользователю """
+    определенному пользователю"""
 
     def __init__(
         self,
@@ -20,13 +20,13 @@ class TelegramNotificationService(ContentService):
         self._session = session
 
     async def send_messages_to_group_of_users(self, notifications):
-        """ Отправляет сообщение указанной группе пользователей"""
+        """Отправляет сообщение указанной группе пользователей"""
         if notifications.mode == "all":
             users = await self._session.execute(select(User))
         if notifications.mode == "subscribed":
-            users = await self._session.execute(select(User).where(User.has_mailing == True)) # noqa
+            users = await self._session.execute(select(User).where(User.has_mailing == True))  # noqa
         if notifications.mode == "unsubscribed":
-            users = await self._session.execute(select(User).where(User.has_mailing == False)) # noqa
+            users = await self._session.execute(select(User).where(User.has_mailing == False))  # noqa
 
         users = users.scalars().all()
         telegram_notification = TelegramNotification(create_bot())
