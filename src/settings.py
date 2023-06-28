@@ -79,7 +79,7 @@ class Settings(BaseSettings):
     @property
     def feedback_form_template(self) -> Path:
         """Получить HTML-шаблон формы обратной связи."""
-        return BASE_DIR / "src" / "bot" / "templates" / "feedback_form.html"
+        return BASE_DIR / "src" / "bot" / "templates" / "feedback_form" / "feedback_form.html"
 
     class Config:
         env_file = get_env_path()
