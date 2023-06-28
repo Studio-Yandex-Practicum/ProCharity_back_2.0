@@ -16,16 +16,15 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username=update.effective_chat.username,
     )
     categories = await user_service.get_user_categories(update.effective_user.id)
-    keyboard_markup_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
-    keyboard = await get_start_keyboard(keyboard_markup_on_start=keyboard_markup_on_start)
+    callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
+    keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start)
 
     await context.bot.send_message(
         chat_id=update.effective_user.id,
         text="Привет! 👋 \n\n"
         'Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
-        "оперативно связаться с командой поддержки.\n\n"
-        f"Ваш телеграм id - {update.effective_user.id}",
+        "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
