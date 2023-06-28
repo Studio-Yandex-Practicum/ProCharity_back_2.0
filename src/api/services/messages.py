@@ -11,7 +11,7 @@ from src.core.services.notification import TelegramNotification
 
 class TelegramNotificationService:
     """Класс описывающий функционал передачи сообщения
-      определенному пользователю """
+    определенному пользователю"""
 
     def __init__(
         self,
