@@ -5,6 +5,7 @@ from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application
 
 from src.core.db.models import User
+from src.core.db.repository.base import AbstractRepository
 
 logger = logging.getLogger(__name__)
 
@@ -37,3 +38,13 @@ class TelegramNotification:
         send_message_tasks = (self.__send_message(user.telegram_id, message) for user in users)
         self.__bot_application.create_task(asyncio.gather(*send_message_tasks))
         return True
+
+    async def send_notification(
+        self,
+        message: str,
+    ):
+        """Делает массовую рассылку уведомления о новых задачах пользователям users."""
+
+        users = AbstractRepository.get_all(User)
+        for user in users:
+            self.__send_message(user.telegram_id, message)
