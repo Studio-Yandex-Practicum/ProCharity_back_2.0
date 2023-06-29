@@ -29,7 +29,7 @@ async def send_question_feedback(telegram_id: int, message: str, email: list[Ema
         subject=f"Сообщение от пользователя c telegram_id = {telegram_id}",
         recipients=email,
         body=message,
-        subtype=MessageType.html
+        subtype=MessageType.html,
     )
     fastmail = FastMail(conf)
     try:
