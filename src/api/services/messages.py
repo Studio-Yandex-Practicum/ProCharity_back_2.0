@@ -20,7 +20,7 @@ class TelegramNotificationService:
         session: AsyncSession = Depends(get_session),
     ) -> None:
         self._session = session
-        self.telegram_bot = telegram_bot
+        self.telegram_notification = TelegramNotification(telegram_bot)
 
     async def send_messages_to_group_of_users(self, notifications):
         """Отправляет сообщение указанной группе пользователей"""
@@ -31,5 +31,4 @@ class TelegramNotificationService:
                 users = await self._session.scalars(select(User).where(User.has_mailing == True))  # noqa
             case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
-        telegram_notification = TelegramNotification(self.telegram_bot)
-        await telegram_notification.send_messages(message=notifications.message, users=users)
+        await self.telegram_notification.send_messages(message=notifications.message, users=users)
