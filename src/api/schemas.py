@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
+from src.core.enums import TelegramNotificationUsersGroups
+
 from .constants import DATE_FORMAT
 
 
@@ -95,3 +97,19 @@ class FeedbackFormQueryParams(BaseModel):
 
     def as_url_query(self):
         return f"?{urllib.parse.urlencode(self.dict())}"
+
+
+class TelegramNotificationRequest(RequestBase):
+    """Класс формирования параметров запроса для отправки
+    сообщения определенной группе пользователей."""
+
+    message: str = Field(..., min_length=2, max_length=500)
+    mode: TelegramNotificationUsersGroups
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Type here your message for user",
+                "mode": "all",
+            }
+        }
