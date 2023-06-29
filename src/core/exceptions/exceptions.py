@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Any
-from pydantic import EmailStr
 
+from pydantic import EmailStr
 from starlette.exceptions import HTTPException
 
 from src.core.db.models import Base as DatabaseModel
