@@ -72,21 +72,25 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
-    tasks = await task_service.get_all_user_tasks()
-    tasks_to_show, page_number = await task_service.get_user_tasks_by_page(tasks, context, limit)
+    page_number = context.user_data.get("page_number", 1)
+    offset = (page_number - 1) * limit
+    tasks_to_show = await task_service.get_user_tasks_by_page(limit, offset)
 
     for task in tasks_to_show:
         message = display_tasks(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
+    await show_next_tasks(update, context, limit, offset, page_number)
 
-    await show_next_tasks(update, context, tasks, page_number)
 
+async def show_next_tasks(update: Update, context: CallbackContext, limit: int, offset: int, page_number: int):
+    task_service = TaskService()
+    total_tasks = await task_service.get_user_tasks_count()
+    remaining_tasks = total_tasks - (offset + limit)
 
-async def show_next_tasks(update: Update, context: CallbackContext, tasks, page_number: int):
-    if len(tasks) > page_number * 3:
-        text = "Есть ещё задания, показать?"
+    if remaining_tasks > 0:
+        text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
         context.user_data["page_number"] = page_number + 1
         keyboard = await view_more_tasks_keyboard()
     else:

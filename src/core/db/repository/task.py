@@ -14,15 +14,22 @@ class TaskRepository(ContentRepository):
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, Task)
 
-    async def get_tasks_for_user(self, user_id: int) -> list[Task]:
+    async def get_tasks_for_user(self, user_id: int, limit: int, offset: int) -> list[Task]:
         """Получить список задач из категорий на которые подписан пользователь."""
-        tasks = await self._session.execute(select(Task).join(Category).where(Category.users.any(id=user_id)))
+        tasks = await self._session.execute(
+            select(Task).join(Category).where(Category.users.any(id=user_id)).limit(limit).offset(offset)
+        )
         return tasks.scalars().all()
 
-    async def get_user_tasks(self, limit: int) -> list[Task]:
-        """Получить список задач из категорий."""
-        return await self._session.scalars(select(Task).options(joinedload(Task.category)).limit(limit))
-
     async def get_all_user_tasks(self) -> list[Task]:
-        """Получить список задач из категорий."""
+        """Получить список задач из категорий на которые подписан пользователь."""
         return await self._session.scalars(select(Task).options(joinedload(Task.category)))
+
+    async def get_tasks_limit_for_user(self, limit: int, offset: int) -> list[Task]:
+        """Получить limit-выборку из списка всех задач пользователя."""
+        return await self._session.scalars(select(Task).options(joinedload(Task.category)).limit(limit).offset(offset))
+
+    async def get_user_tasks_count(self) -> int:
+        """Получить общее количество задач для пользователя."""
+        tasks = await self._session.scalars(select(Task).options(joinedload(Task.category)))
+        return len(tasks.all())
