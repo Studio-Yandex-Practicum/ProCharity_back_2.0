@@ -20,6 +20,7 @@ from src.bot.keyboards import get_back_menu, get_menu_keyboard
 from src.core.logging.utils import logger_decor
 from src.core.services.user import UserService
 from src.settings import settings
+from src.core.services.email import send_question_feedback
 
 
 @logger_decor
@@ -45,6 +46,7 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = "Я больше не буду присылать сообщения на почту."
     await query.message.edit_text(text=text)
+    await send_question_feedback(telegram_id, text, settings.EMAIL_ADMIN)
 
 
 @logger_decor
