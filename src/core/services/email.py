@@ -24,7 +24,7 @@ conf = ConnectionConfig(
 
 
 async def send_question_feedback(telegram_id: int, message: str, email: list[EmailStr]) -> None:
-    """Отправляет email на почтовый ящик администратора с отзывом/паролем."""
+    """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
     message = MessageSchema(
         subject=f"Сообщение от пользователя c telegram_id = {telegram_id}",
         recipients=email,
