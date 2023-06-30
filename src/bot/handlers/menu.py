@@ -18,9 +18,9 @@ from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_back_menu, get_menu_keyboard
 from src.core.logging.utils import logger_decor
-from src.core.services.email import send_question_feedback
 from src.core.services.user import UserService
 from src.settings import settings
+from src.core.services.email import EmailProvider
 
 
 @logger_decor
@@ -41,12 +41,14 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
-        text = "Отлично! Теперь я буду присылать тебе уведомления о новых "
-        "заданиях на почту."
+        text = (
+            "Отлично! Теперь я буду присылать тебе уведомления о новых "
+            "заданиях на почту."
+        )
     else:
         text = "Я больше не буду присылать сообщения на почту."
     await query.message.edit_text(text=text)
-    await send_question_feedback(telegram_id, text, settings.EMAIL_ADMIN)
+    await EmailProvider.send_question_feedback(EmailProvider, telegram_id, text, settings.EMAIL_ADMIN)
 
 
 @logger_decor
