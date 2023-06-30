@@ -3,4 +3,9 @@ from .form import form_router
 from .notification import notification_router
 from .tasks import task_router
 
-__all__ = ("category_router", "task_router", "form_router", "notification_router")
+__all__ = (
+    "category_router",
+    "task_router",
+    "form_router",
+    "notification_router",
+)

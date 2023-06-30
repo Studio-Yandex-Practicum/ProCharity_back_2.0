@@ -1,10 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from src.api.schemas import TelegramMessageRequest
-from src.bot import create_bot
-from src.core.services.notification import TelegramNotification
+from src.api.schemas import TelegramNotificationRequest, TelegramNotificationUsersRequest
+from src.api.services.messages import TelegramNotificationService
 
 notification_router = APIRouter()
+
+
+@notification_router.post(
+    "/",
+    description="Сообщение для группы пользователей",
+)
+async def send_telegram_notification(
+    notifications: TelegramNotificationUsersRequest,
+    telegram_notification_service: TelegramNotificationService = Depends(),
+) -> None:
+    """Отправляет сообщение указаной группе пользователей"""
+    await telegram_notification_service.send_messages_to_group_of_users(notifications)
 
 
 @notification_router.post(
@@ -14,7 +25,8 @@ notification_router = APIRouter()
 )
 async def send_user_message(
     telegram_id: int,
-    message: TelegramMessageRequest,
+    notifications: TelegramNotificationRequest,
+    telegram_notification_service: TelegramNotificationService = Depends(),
 ) -> str:
-    notifications_services = TelegramNotification(create_bot())
-    return await notifications_services.send_user_message(telegram_id, dict(message).get("message"))
+    await telegram_notification_service.send_message_to_user(telegram_id, notifications)
+    return notifications.message
