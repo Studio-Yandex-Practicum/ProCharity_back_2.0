@@ -77,7 +77,7 @@ async def get_start_keyboard(callback_data_on_start: str) -> InlineKeyboardMarku
 async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Посмотреть открытые задачи", callback_data=callback_data.VIEW_TASKS)],
-        [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
+        [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
