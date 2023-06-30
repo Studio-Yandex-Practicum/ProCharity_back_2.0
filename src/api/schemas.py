@@ -92,8 +92,8 @@ class TaskResponse(ResponseBase):
 class FeedbackFormQueryParams(BaseModel):
     """Класс формирования параметров запроса для формы обратной связи."""
 
-    name: str | None = "Имя"
-    surname: str | None = "Фамилия"
+    name: str | None
+    surname: str | None
 
     def as_url_query(self):
         return f"?{urllib.parse.urlencode(self.dict())}"
