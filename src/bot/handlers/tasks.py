@@ -72,9 +72,8 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
-    page_number = context.user_data.get("page_number", 1)
-    offset = (page_number - 1) * limit
-    tasks_to_show = await task_service.get_user_tasks_by_page(limit, offset)
+    user_data = context.user_data
+    tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(user_data, limit)
 
     for task in tasks_to_show:
         message = display_tasks(task)
@@ -86,8 +85,7 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
 
 async def show_next_tasks(update: Update, context: CallbackContext, limit: int, offset: int, page_number: int):
     task_service = TaskService()
-    total_tasks = await task_service.get_user_tasks_count()
-    remaining_tasks = total_tasks - (offset + limit)
+    remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset)
 
     if remaining_tasks > 0:
         text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
