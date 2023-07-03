@@ -14,8 +14,7 @@ class TaskService:
     def __init__(self, sessionmaker: Generator[AsyncSession, None, None] = get_session):
         self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
 
-    async def get_user_tasks_by_page(self, user_data: dict, limit: int) -> list[Task]:
-        page_number = user_data.get("page_number", 1)
+    async def get_user_tasks_by_page(self, page_number, limit: int) -> list[Task]:
         offset = (page_number - 1) * limit
         async with self._sessionmaker() as session:
             repository = TaskRepository(session)

@@ -72,8 +72,9 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
-    user_data = context.user_data
-    tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(user_data, limit)
+    tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
+        context.user_data.get("page_number", 1), limit
+    )
 
     for task in tasks_to_show:
         message = display_tasks(task)
