@@ -74,6 +74,7 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
             text="Нет доступных заданий",
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
+            reply_markup=await get_back_menu(),
         )
     for task in tasks:
         message = display_tasks(task)
