@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from src.api.schemas import TaskRequest, TaskResponse
 from src.api.services import TaskService
+from src.bot.bot import create_bot
 from src.core.db.models import Task
 from src.core.services.notification import TelegramNotification
 from src.core.utils import display_tasks
@@ -13,15 +14,10 @@ task_router = APIRouter()
 async def actualize_tasks(
     tasks: list[TaskRequest],
     task_service: TaskService = Depends(),
+    notifications_services: TelegramNotification = Depends(create_bot),
 ) -> None:
     await task_service.actualize_objects(tasks, Task)
-
-
-@task_router.post("/", description="Уведомление о новых задачах")
-async def send_notifications(
-    notifications_services: TelegramNotification = Depends(),
-) -> None:
-    await notifications_services.send_notification(display_tasks)
+    await notifications_services.send_notification(message=display_tasks)
 
 
 @task_router.get(

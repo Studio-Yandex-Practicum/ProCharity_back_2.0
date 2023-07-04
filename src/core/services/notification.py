@@ -39,12 +39,20 @@ class TelegramNotification:
         self.__bot_application.create_task(asyncio.gather(*send_message_tasks))
         return True
 
+    async def send_notifications(
+        self,
+        message: str,
+    ):
+        """Делает массовую рассылку уведомления о новых задачах пользователям users."""
+        users = AbstractRepository.get_all(User)
+        for user in users:
+            self.__send_message(user.telegram_id, message)
+
     async def send_notification(
         self,
         message: str,
     ):
         """Делает массовую рассылку уведомления о новых задачах пользователям users."""
-
         users = AbstractRepository.get_all(User)
         for user in users:
             self.__send_message(user.telegram_id, message)
