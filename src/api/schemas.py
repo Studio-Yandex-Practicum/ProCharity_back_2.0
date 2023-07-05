@@ -113,3 +113,14 @@ class TelegramNotificationRequest(RequestBase):
                 "mode": "all",
             }
         }
+
+
+class ExternalSiteUserRequest(RequestBase):
+    """Класс модели запроса для ExternalSiteUser."""
+
+    external_id: int = Field(..., alias="id")
+    external_id_hash: str = Field(..., alias="id_hash", max_length=256)
+    first_name: Optional[str] = Field(None, max_length=64)
+    last_name: Optional[str] = Field(None, max_length=64)
+    email: str = Field(..., max_length=48)
+    specializations: Optional[str] = Field(...)
