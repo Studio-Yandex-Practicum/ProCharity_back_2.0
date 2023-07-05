@@ -63,7 +63,7 @@ class User(Base):
 class ExternalSiteUser(Base):
     """Модель пользователя с сайта ProCharity."""
 
-    __tablename__ = 'external_site_users'
+    __tablename__ = "external_site_users"
 
     id = None
     external_id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -75,7 +75,7 @@ class ExternalSiteUser(Base):
     source: Mapped[str] = mapped_column(String(), nullable=True)
 
     def __repr__(self):
-        return f'<SiteUser {self.external_id}>'
+        return f"<SiteUser {self.external_id}>"
 
 
 class Task(ContentBase):

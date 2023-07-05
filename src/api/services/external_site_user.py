@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.services.base import ContentService
 from src.api.schemas import ExternalSiteUserRequest
+from src.api.services.base import ContentService
 from src.core.db import get_session
 from src.core.db.models import ExternalSiteUser
 from src.core.db.repository.external_site_user import ExternalSiteUserRepository
