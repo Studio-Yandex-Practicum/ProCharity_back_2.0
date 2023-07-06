@@ -16,7 +16,7 @@ class ExternalSiteUserService(ContentService):
     ) -> None:
         super().__init__(site_user_repository, session)
 
-    async def registrate(self, site_user_schema: ExternalSiteUserRequest) -> None:
+    async def register(self, site_user_schema: ExternalSiteUserRequest) -> None:
         site_user = await self._repository.get_by_external_id(site_user_schema.external_id)
         if site_user:
             await self._repository.update(None, ExternalSiteUser(**site_user_schema.dict()))
