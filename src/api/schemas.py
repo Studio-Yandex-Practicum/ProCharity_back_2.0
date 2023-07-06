@@ -4,8 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
-from src.core.enums import TelegramNotificationUsersGroups
 from src.core.db.models import ExternalSiteUser
+from src.core.enums import TelegramNotificationUsersGroups
 
 from .constants import DATE_FORMAT
 
