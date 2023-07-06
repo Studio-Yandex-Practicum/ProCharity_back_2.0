@@ -5,6 +5,10 @@ async def logging_updates(*args, **kwargs):
     await log.ainfo("Следующие Updates не были пойманы ни одним из обработчиков", args=args, kwargs=kwargs)
 
 
+async def logging_info(info, *args, **kwargs):
+    await log.ainfo(info, args=args, kwargs=kwargs)
+
+
 log = structlog.get_logger()
 
 

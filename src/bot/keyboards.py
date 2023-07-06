@@ -17,6 +17,14 @@ UNSUBSCRIBE_BUTTON = [
 SUBSCRIBE_BUTTON = [
     InlineKeyboardButton("▶️ Включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
 ]
+REASONS = [
+    "Слишком много уведомлений",
+    "Нет времени на волонтёрство",
+    "Нет подходящих заданий",
+    "Бот мне неудобен",
+    "Фонды меня не выбирают",
+    "Другое",
+]
 
 
 async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
@@ -94,5 +102,12 @@ def get_confirm_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Да", callback_data=callback_data.CONFIRM_CATEGORIES)],
         [InlineKeyboardButton("Нет, хочу изменить", callback_data=callback_data.CHANGE_CATEGORY)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(REASONS[i], callback_data=f"reason_{i}")] for i in range(len(REASONS))
     ]
     return InlineKeyboardMarkup(keyboard)
