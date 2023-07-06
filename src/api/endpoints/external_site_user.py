@@ -10,4 +10,4 @@ site_user_router = APIRouter()
 async def external_user_registration(
     site_user: ExternalSiteUserRequest, site_user_service: ExternalSiteUserService = Depends()
 ) -> None:
-    await site_user_service.registrate(site_user)
+    await site_user_service.register(site_user)
