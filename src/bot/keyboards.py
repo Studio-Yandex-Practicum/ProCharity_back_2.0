@@ -108,7 +108,5 @@ def get_confirm_keyboard() -> InlineKeyboardMarkup:
 
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
-    keyboard = [
-        [InlineKeyboardButton(REASONS[i], callback_data=f"reason_{i}")] for i in range(len(REASONS))
-    ]
+    keyboard = [[InlineKeyboardButton(REASONS[i], callback_data=f"reason_{i}")] for i in range(len(REASONS))]
     return InlineKeyboardMarkup(keyboard)

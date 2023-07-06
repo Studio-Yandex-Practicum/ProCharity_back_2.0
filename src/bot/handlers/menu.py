@@ -16,7 +16,7 @@ from telegram.ext.filters import StatusUpdate
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands, patterns
-from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard, REASONS
+from src.bot.keyboards import REASONS, get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
 from src.core.logging.utils import logger_decor, logging_info
 from src.core.services.user import UserService
 from src.settings import settings
@@ -43,9 +43,11 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = await get_back_menu()
         parse_mode = ParseMode.MARKDOWN
     else:
-        text = ("Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-                '<a href="https://procharity.ru">ProCharity</a>.\n\n'
-                "Поделись, пожалуйста, почему ты решил отписаться?")
+        text = (
+            "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
+            '<a href="https://procharity.ru">ProCharity</a>.\n\n'
+            "Поделись, пожалуйста, почему ты решил отписаться?"
+        )
         keyboard = get_no_mailing_keyboard()
         parse_mode = ParseMode.HTML
     await context.bot.send_message(
@@ -60,8 +62,10 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @logger_decor
 async def reason(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = REASONS[int(context.match.group(1))]
-    await logging_info(f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
-                       f"рассылки по причине: {reason}")
+    await logging_info(
+        f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
+        f"рассылки по причине: {reason}"
+    )
     await context.bot.send_message(
         chat_id=update.effective_user.id,
         text="Спасибо, я передал информацию команде ProCharity!",
