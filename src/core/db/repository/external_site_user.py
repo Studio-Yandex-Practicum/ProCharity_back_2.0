@@ -15,7 +15,6 @@ class ExternalSiteUserRepository(AbstractRepository):
 
     async def get_by_external_id(self, external_id: int) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по external_id."""
-        site_user = await self._session.execute(
+        return await self._session.scalar(
             select(ExternalSiteUser).where(ExternalSiteUser.external_id == external_id)  # noqa
         )
-        return site_user.scalars().first()
