@@ -41,14 +41,19 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if has_mailing:
         text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
         keyboard = await get_back_menu()
+        parse_mode = ParseMode.MARKDOWN
     else:
-        text = "Я больше не буду присылать сообщения на почту."
+        text = ("Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
+                '<a href="https://procharity.ru">ProCharity</a>.\n\n'
+                "Поделись, пожалуйста, почему ты решил отписаться?")
         keyboard = get_no_mailing_keyboard()
+        parse_mode = ParseMode.HTML
     await context.bot.send_message(
         chat_id=update.effective_user.id,
         text=text,
         reply_markup=keyboard,
-        parse_mode=ParseMode.MARKDOWN,
+        parse_mode=parse_mode,
+        disable_web_page_preview=True,
     )
 
 
