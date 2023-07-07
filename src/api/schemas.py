@@ -130,10 +130,7 @@ class ExternalSiteUserRequest(RequestBase):
         site_user.external_id = self.external_id
         site_user.external_id_hash = self.external_id_hash
         site_user.email = self.email
-        if self.first_name:
-            site_user.first_name = self.first_name
-        if self.last_name:
-            site_user.last_name = self.last_name
-        if self.specializations:
-            site_user.specializations = self.specializations
+        site_user.first_name = self.first_name
+        site_user.last_name = self.last_name
+        site_user.specializations = self.specializations
         return site_user
