@@ -3,7 +3,12 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_back_menu, get_categories_keyboard, get_subcategories_keyboard
+from src.bot.keyboards import (
+    get_back_menu,
+    get_categories_keyboard,
+    get_subcategories_keyboard,
+    view_more_tasks_keyboard,
+)
 from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
 from src.core.logging.utils import logger_decor
@@ -67,23 +72,34 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
-    tasks = await task_service.get_user_tasks(limit)
-    if not tasks:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Нет доступных заданий",
-            parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True,
-        )
-    for task in tasks:
+    tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
+        context.user_data.get("page_number", 1), limit
+    )
+
+    for task in tasks_to_show:
         message = display_tasks(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
         )
+    await show_next_tasks(update, context, limit, offset, page_number)
+
+
+async def show_next_tasks(update: Update, context: CallbackContext, limit: int, offset: int, page_number: int):
+    task_service = TaskService()
+    remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset)
+
+    if remaining_tasks > 0:
+        text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
+        context.user_data["page_number"] = page_number + 1
+        keyboard = await view_more_tasks_keyboard()
+    else:
+        text = "Заданий больше нет."
+        keyboard = await get_back_menu()
+
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="### Здесь текст о наличии заданий, или возврата в меню:\n" "Есть ещё задания, показать?:",
-        reply_markup=await get_back_menu(),
+        text=text,
+        reply_markup=keyboard,
     )
 
 
