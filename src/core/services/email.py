@@ -15,22 +15,7 @@ class EmailSchema(BaseModel):
 class EmailProvider:
     """Класс для отправки электронных писем."""
 
-    @staticmethod
-    async def __send_mail(
-        email_obj: EmailSchema,
-        subject: str,
-        template_name: str | None,
-        body: str | None,
-    ) -> None:
-        """Базовый метод отправки сообщения на электронную почту.
-
-        Аргументы:
-            recipients (list[EmailStr]): список email получателей
-            subject (str): тема сообщения
-            template_body (dict[str, Any]): значения переменных для шаблона сообщения
-            template_name (str): название шаблона для сообщения
-            body (str): тело электронного письма
-        """
+    def __init__(self):
         conf = ConnectionConfig(
             MAIL_USERNAME=settings.MAIL_LOGIN,
             MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -43,6 +28,23 @@ class EmailProvider:
             USE_CREDENTIALS=settings.USE_CREDENTIALS,
             VALIDATE_CERTS=settings.VALIDATE_CERTS,
         )
+        self.fastmail = FastMail(conf)
+
+    async def __send_mail(
+        self,
+        email_obj: EmailSchema,
+        subject: str,
+        template_name: str | None,
+        body: str | None,
+    ) -> None:
+        """Базовый метод отправки сообщения на электронную почту.
+        Аргументы:
+            recipients (list[EmailStr]): список email получателей
+            subject (str): тема сообщения
+            template_body (dict[str, Any]): значения переменных для шаблона сообщения
+            template_name (str): название шаблона для сообщения
+            body (str): тело электронного письма
+        """
         message = MessageSchema(
             subject=subject,
             recipients=email_obj.recipients,
@@ -51,15 +53,13 @@ class EmailProvider:
             subtype=MessageType.html,
         )
 
-        fastmail = FastMail(conf)
         try:
-            await fastmail.send_message(message, template_name)
+            await self.fastmail.send_message(message, template_name)
         except Exception as exc:
             raise exceptions.EmailSendError(email_obj.recipients, exc)
 
     async def send_question_feedback(self, telegram_id: int, message: str, email: list[EmailStr]) -> None:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
-
         recipients = email
         email_obj = EmailSchema(recipients=recipients, template_body=None)
         await self.__send_mail(

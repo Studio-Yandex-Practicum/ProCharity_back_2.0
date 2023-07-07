@@ -41,11 +41,12 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
-        text = "Отлично! Теперь я буду присылать тебе уведомления о новых " "заданиях на почту."
+        text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
     else:
         text = "Я больше не буду присылать сообщения на почту."
     await query.message.edit_text(text=text)
-    await EmailProvider.send_question_feedback(EmailProvider, telegram_id, text, settings.EMAIL_ADMIN)
+    email_provider = EmailProvider()
+    await email_provider.send_question_feedback(telegram_id, text, settings.EMAIL_ADMIN)
 
 
 @logger_decor

@@ -47,20 +47,20 @@ class Settings(BaseSettings):
     LOG_FILES_TO_KEEP: int = 5
 
     # Organization data
-    ORGANIZATIONS_EMAIL: str = "procharity@yandex.ru"
+    ORGANIZATIONS_EMAIL: str = ""
 
     # Настройки отправки сообщений через электронную почту
-    MAIL_SERVER: str = "smtp.yandex.ru"  # адрес почтового сервиса
-    MAIL_PORT: int = 465  # порт для подключения к почтовому сервису
-    MAIL_LOGIN: str = ""  # логин для подключения к почтовому сервису
-    MAIL_PASSWORD: str = ""  # пароль для подключения к почтовому сервису
-    MAIL_STARTTLS: bool = False  # использовать STARTTLS или нет
-    MAIL_SSL_TLS: bool = True  # использовать SSL/TLS или нет
-    USE_CREDENTIALS: bool = True  # использовать логин/пароль для подключения к почтовому серверу или нет
-    VALIDATE_CERTS: bool = True  # проверять SSL сертификат почтового сервера или нет
+    MAIL_SERVER: str = ""
+    MAIL_PORT: int
+    MAIL_LOGIN: str = ""
+    MAIL_PASSWORD: str = ""
+    MAIL_STARTTLS: bool = False
+    MAIL_SSL_TLS: bool = True
+    USE_CREDENTIALS: bool = True
+    VALIDATE_CERTS: bool = True
 
     # Адреса электронной почты администраторов
-    EMAIL_ADMIN = ["procharity.admin_1@yandex.ru"]
+    EMAIL_ADMIN = [""]
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
