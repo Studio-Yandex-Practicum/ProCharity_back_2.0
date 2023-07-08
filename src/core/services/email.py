@@ -60,7 +60,6 @@ class EmailProvider:
 
     async def send_question_feedback(self, telegram_id: int, message: str, email: list[EmailStr]) -> None:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
-
         recipients = email
         email_obj = EmailSchema(recipients=recipients, template_body=None)
         await self.__send_mail(
