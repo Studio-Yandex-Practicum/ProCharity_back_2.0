@@ -46,6 +46,22 @@ class Settings(BaseSettings):
     LOG_FILE_SIZE: int = 10 * 2**20
     LOG_FILES_TO_KEEP: int = 5
 
+    # Organization data
+    ORGANIZATIONS_EMAIL: str = ""
+
+    # Настройки отправки сообщений через электронную почту
+    MAIL_SERVER: str = ""
+    MAIL_PORT: int = 465
+    MAIL_LOGIN: str = ""
+    MAIL_PASSWORD: str = ""
+    MAIL_STARTTLS: bool = False
+    MAIL_SSL_TLS: bool = True
+    USE_CREDENTIALS: bool = True
+    VALIDATE_CERTS: bool = True
+
+    # Адреса электронной почты администраторов
+    EMAIL_ADMIN = [""]
+
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
         """Добавить 'https://' к домену."""
