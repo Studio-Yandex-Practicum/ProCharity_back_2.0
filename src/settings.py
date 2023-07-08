@@ -51,7 +51,7 @@ class Settings(BaseSettings):
 
     # Настройки отправки сообщений через электронную почту
     MAIL_SERVER: str = ""
-    MAIL_PORT: int
+    MAIL_PORT: int = 465
     MAIL_LOGIN: str = ""
     MAIL_PASSWORD: str = ""
     MAIL_STARTTLS: bool = False
