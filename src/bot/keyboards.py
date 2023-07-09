@@ -1,3 +1,5 @@
+import enum
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from src.bot.constants import callback_data, urls
@@ -17,14 +19,15 @@ UNSUBSCRIBE_BUTTON = [
 SUBSCRIBE_BUTTON = [
     InlineKeyboardButton("▶️ Включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
 ]
-REASONS = [
-    "Слишком много уведомлений",
-    "Нет времени на волонтёрство",
-    "Нет подходящих заданий",
-    "Бот мне неудобен",
-    "Фонды меня не выбирают",
-    "Другое",
-]
+
+
+class REASONS(enum.StrEnum):
+    to_much_messages = "Слишком много уведомлений"
+    no_time = "Нет времени на волонтёрство"
+    no_match = "Нет подходящих заданий"
+    uncomfortable = "Бот мне неудобен"
+    funds_dont_choose = "Фонды меня не выбирают"
+    other = "Другое"
 
 
 async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
@@ -108,5 +111,5 @@ def get_confirm_keyboard() -> InlineKeyboardMarkup:
 
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
-    keyboard = [[InlineKeyboardButton(REASONS[i], callback_data=f"reason_{i}")] for i in range(len(REASONS))]
+    keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in REASONS]
     return InlineKeyboardMarkup(keyboard)
