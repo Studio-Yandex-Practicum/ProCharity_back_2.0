@@ -4,6 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
+from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
 
 from .constants import DATE_FORMAT
@@ -113,3 +114,23 @@ class TelegramNotificationRequest(RequestBase):
                 "mode": "all",
             }
         }
+
+
+class ExternalSiteUserRequest(RequestBase):
+    """Класс модели запроса для ExternalSiteUser."""
+
+    id: int = Field(...)
+    id_hash: str = Field(..., max_length=256)
+    first_name: Optional[str] = Field(None, max_length=64)
+    last_name: Optional[str] = Field(None, max_length=64)
+    email: str = Field(..., max_length=48)
+    specializations: Optional[str] = Field(...)
+
+    def to_orm(self, site_user: ExternalSiteUser = ExternalSiteUser()):
+        site_user.id = self.id
+        site_user.id_hash = self.id_hash
+        site_user.email = self.email
+        site_user.first_name = self.first_name
+        site_user.last_name = self.last_name
+        site_user.specializations = self.specializations
+        return site_user
