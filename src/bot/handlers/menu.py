@@ -1,7 +1,7 @@
 import json
-import structlog
 import urllib
 
+import structlog
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
