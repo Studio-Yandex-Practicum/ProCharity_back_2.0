@@ -119,16 +119,16 @@ class TelegramNotificationRequest(RequestBase):
 class ExternalSiteUserRequest(RequestBase):
     """Класс модели запроса для ExternalSiteUser."""
 
-    external_id: int = Field(..., alias="id")
-    external_id_hash: str = Field(..., alias="id_hash", max_length=256)
+    id: int = Field(...)
+    id_hash: str = Field(..., max_length=256)
     first_name: Optional[str] = Field(None, max_length=64)
     last_name: Optional[str] = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
     specializations: Optional[str] = Field(...)
 
     def to_orm(self, site_user: ExternalSiteUser = ExternalSiteUser()):
-        site_user.external_id = self.external_id
-        site_user.external_id_hash = self.external_id_hash
+        site_user.id = self.id
+        site_user.id_hash = self.id_hash
         site_user.email = self.email
         site_user.first_name = self.first_name
         site_user.last_name = self.last_name

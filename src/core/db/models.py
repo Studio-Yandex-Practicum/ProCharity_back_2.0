@@ -65,9 +65,7 @@ class ExternalSiteUser(Base):
 
     __tablename__ = "external_site_users"
 
-    id = None
-    external_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    external_id_hash: Mapped[str] = mapped_column(String(256), nullable=False)
+    id_hash: Mapped[str] = mapped_column(String(256), nullable=False)
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
@@ -75,7 +73,7 @@ class ExternalSiteUser(Base):
     source: Mapped[str] = mapped_column(String(), nullable=True)
 
     def __repr__(self):
-        return f"<SiteUser {self.external_id}>"
+        return f"<SiteUser {self.id}>"
 
 
 class Task(ContentBase):
