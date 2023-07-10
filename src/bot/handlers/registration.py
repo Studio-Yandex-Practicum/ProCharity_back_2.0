@@ -4,8 +4,8 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
-from src.core.logging.utils import logger_decor
 from src.bot.services.user import UserService
+from src.core.logging.utils import logger_decor
 
 
 @logger_decor
