@@ -133,5 +133,5 @@ class ExternalSiteUserRequest(RequestBase):
             email=self.email,
             first_name=self.first_name,
             last_name=self.last_name,
-            specializations=self.specializations
+            specializations=self.specializations,
         )
