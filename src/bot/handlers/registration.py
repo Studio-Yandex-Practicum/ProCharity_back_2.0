@@ -13,9 +13,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     await user_service.register_user(
         telegram_id=update.effective_user.id,
-        username=update.effective_chat.username,
-        first_name=update.effective_chat.first_name,
-        last_name=update.effective_chat.last_name,
+        username=update.effective_user.username,
+        first_name=update.effective_user.first_name,
+        last_name=update.effective_user.last_name,
     )
     categories = await user_service.get_user_categories(update.effective_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
