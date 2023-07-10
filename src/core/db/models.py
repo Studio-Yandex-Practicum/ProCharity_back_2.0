@@ -70,7 +70,7 @@ class ExternalSiteUser(Base):
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     specializations: Mapped[str]
-    source: Mapped[str] = mapped_column(String(), nullable=True)
+    source: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
