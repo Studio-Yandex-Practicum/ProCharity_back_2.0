@@ -5,7 +5,7 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
 from src.core.logging.utils import logger_decor
-from src.core.services.user import UserService
+from src.bot.services.user import UserService
 
 
 @logger_decor
@@ -14,6 +14,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await user_service.register_user(
         telegram_id=update.effective_user.id,
         username=update.effective_chat.username,
+        first_name=update.effective_chat.first_name,
+        last_name=update.effective_chat.last_name,
     )
     categories = await user_service.get_user_categories(update.effective_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
