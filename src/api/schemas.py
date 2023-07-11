@@ -126,11 +126,12 @@ class ExternalSiteUserRequest(RequestBase):
     email: str = Field(..., max_length=48)
     specializations: Optional[str] = Field(...)
 
-    def to_orm(self, site_user: ExternalSiteUser = ExternalSiteUser()):
-        site_user.id = self.id
-        site_user.id_hash = self.id_hash
-        site_user.email = self.email
-        site_user.first_name = self.first_name
-        site_user.last_name = self.last_name
-        site_user.specializations = self.specializations
-        return site_user
+    def to_orm(self) -> ExternalSiteUser:
+        return ExternalSiteUser(
+            id=self.id,
+            id_hash=self.id_hash,
+            email=self.email,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            specializations=self.specializations,
+        )

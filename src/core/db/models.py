@@ -69,8 +69,8 @@ class ExternalSiteUser(Base):
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    specializations: Mapped[str] = mapped_column(String(), nullable=False)
-    source: Mapped[str] = mapped_column(String(), nullable=True)
+    specializations: Mapped[str]
+    source: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
