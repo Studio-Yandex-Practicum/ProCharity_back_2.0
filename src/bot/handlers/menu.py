@@ -17,8 +17,8 @@ from telegram.ext.filters import StatusUpdate
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_back_menu, get_menu_keyboard
+from src.bot.services.user import UserService
 from src.core.logging.utils import logger_decor
-from src.core.services.user import UserService
 from src.settings import settings
 
 
