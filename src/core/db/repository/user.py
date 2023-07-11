@@ -17,14 +17,14 @@ class UserRepository(AbstractRepository):
         user = await self._session.execute(select(User).where(User.telegram_id == telegram_id))
         return user.scalars().first()
 
-    async def restore_existing_user(self, user: User, username: str) -> User:
+    async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.
 
-        Если ранее существовавший юзер делает /start в боте, то проверяется/обновляется username
-        и сбрасывается флаг "banned" - признак, что бот у него был заблокирован.
+        Если ранее существовавший юзер делает /start в боте, то проверяются/обновляются его username, first_name,
+        last_name и сбрасывается флаг "banned" - признак, что бот у него был заблокирован.
         """
-        if user.username != username or user.banned:
-            user.username, user.banned = username, False
+        if user.username != username or user.first_name != first_name or user.last_name != last_name or user.banned:
+            user.username, user.first_name, user.last_name, user.banned = username, first_name, last_name, False
             await self.update(user.id, user)
         return user
 
