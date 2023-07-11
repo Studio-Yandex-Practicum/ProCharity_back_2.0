@@ -18,8 +18,8 @@ from telegram.ext.filters import StatusUpdate
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands, enum, patterns
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
+from src.bot.services.user import UserService
 from src.core.logging.utils import logger_decor
-from src.core.services.user import UserService
 from src.settings import settings
 
 log = structlog.get_logger()
