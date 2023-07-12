@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
       - ./logs/:/app/logs/
+      - static:/app/src/bot/templates
     depends_on:
         postgres:
           condition: service_healthy
@@ -44,6 +45,7 @@ services:
       - ../nginx_logs:/var/log/nginx
       - ./nginx/swag.conf:/config/nginx/site-confs/default.conf
       - keys:/config/keys
+      - static:/var/html/static/
     ports:
       - "443:443"
       - "80:80"
@@ -54,3 +56,4 @@ services:
 volumes:
   postgres_data:
   keys:
+  static:
