@@ -11,15 +11,10 @@ log = structlog.get_logger()
 
 
 async def logging_updates(*args, **kwargs):
-    await log.ainfo(
-        "Следующие Updates не были пойманы ни одним из обработчиков",
-        args=args,
-        kwargs=kwargs
-    )
+    await log.ainfo("Следующие Updates не были пойманы ни одним из обработчиков", args=args, kwargs=kwargs)
 
 
 def logger_decor(coroutine: Callable[P, Awaitable[T]]) -> Callable[P, Awaitable[T]]:
-    
     @wraps(coroutine)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         await log.ainfo(
