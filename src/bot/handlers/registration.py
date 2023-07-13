@@ -5,6 +5,7 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
 from src.bot.services.user import UserService
+from src.bot.utils import delete_previous
 from src.core.logging.utils import logger_decor
 
 
@@ -34,6 +35,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger_decor
+@delete_previous
 async def confirm_chosen_categories(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = get_confirm_keyboard()
 

@@ -19,6 +19,7 @@ from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands, enum, patterns
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
 from src.bot.services.user import UserService
+from src.bot.utils import delete_previous
 from src.core.logging.utils import logger_decor
 from src.settings import settings
 
@@ -26,6 +27,7 @@ log = structlog.get_logger()
 
 
 @logger_decor
+@delete_previous
 async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Возвращает в меню."""
     await context.bot.send_message(
@@ -36,6 +38,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger_decor
+@delete_previous
 async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
@@ -118,6 +121,7 @@ async def web_app_data(update: Update):
 
 
 @logger_decor
+@delete_previous
 async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
