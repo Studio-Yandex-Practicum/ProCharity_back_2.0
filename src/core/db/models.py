@@ -10,10 +10,9 @@ class Base(DeclarativeBase):
     """Основа для базового класса."""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    created_at: Mapped[date] = mapped_column(server_default=func.current_timestamp(), nullable=False)
+    created_at: Mapped[date] = mapped_column(server_default=func.current_timestamp())
     updated_at: Mapped[date] = mapped_column(
         server_default=func.current_timestamp(),
-        nullable=False,
         onupdate=func.current_timestamp(),
     )
     __name__: Mapped[str]
@@ -22,7 +21,7 @@ class Base(DeclarativeBase):
 class ContentBase(AbstractConcreteBase, Base):
     """Базовый класс для контента (категорий и задач)."""
 
-    is_archived: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
+    is_archived: Mapped[bool] = mapped_column(server_default=expression.false())
 
 
 class UsersCategories(Base):
@@ -50,7 +49,7 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
     external_signup_date: Mapped[date] = mapped_column(nullable=True)
-    banned: Mapped[bool] = mapped_column(server_default=expression.false(), nullable=False)
+    banned: Mapped[bool] = mapped_column(server_default=expression.false())
 
     categories: Mapped[list["Category"]] = relationship(
         "Category", secondary="users_categories", back_populates="users"
@@ -65,8 +64,8 @@ class ExternalSiteUser(Base):
 
     __tablename__ = "external_site_users"
 
-    id_hash: Mapped[str] = mapped_column(String(256), nullable=False)
-    email: Mapped[str] = mapped_column(String(48), unique=True, nullable=False)
+    id_hash: Mapped[str] = mapped_column(String(256))
+    email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     specializations: Mapped[str]
