@@ -18,4 +18,3 @@ api_router.include_router(users_group_notification_router, prefix="/messages", t
 api_router.include_router(site_user_router, prefix="/external_user_registration", tags=["ExternalSiteUser"])
 if settings.DEBUG:
     api_router.mount("/static", StaticFiles(directory=settings.STATIC_URL), name="static")
-
