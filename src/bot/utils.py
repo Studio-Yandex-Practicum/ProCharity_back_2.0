@@ -6,7 +6,7 @@ def delete_previous(coroutine):
     Удаляет сообщение с кнопками, приведшее к вызову функции."""
 
     async def wrapper(*args, **kwargs):
-        result = await coroutine(*args, **kwargs)
+        result = await coroutine(update: Update, *args, **kwargs)
         if "update" in kwargs and isinstance(kwargs["update"], Update):
             update = kwargs["update"]
         else:
