@@ -7,8 +7,8 @@ def delete_previous(coroutine):
 
     async def wrapper(*args, **kwargs):
         result = await coroutine(*args, **kwargs)
-        if 'update' in kwargs and isinstance(kwargs['update'], Update):
-            update = kwargs['update']
+        if "update" in kwargs and isinstance(kwargs["update"], Update):
+            update = kwargs["update"]
         else:
             for arg in args:
                 if isinstance(arg, Update):
@@ -18,4 +18,5 @@ def delete_previous(coroutine):
                 return result  # если нет update, просто возвращаем результат работы
         await update.callback_query.message.delete()
         return result
+
     return wrapper
