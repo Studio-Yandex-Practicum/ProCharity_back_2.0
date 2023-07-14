@@ -101,10 +101,22 @@ class FeedbackFormQueryParams(BaseModel):
 
 
 class TelegramNotificationRequest(RequestBase):
+    """Класс формирования параметров запроса для отправки сообщения определенному пользователю."""
+
+    message: str = Field(..., min_length=2, max_length=500)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Type here your message for user",
+            }
+        }
+
+
+class TelegramNotificationUsersRequest(TelegramNotificationRequest):
     """Класс формирования параметров запроса для отправки
     сообщения определенной группе пользователей."""
 
-    message: str = Field(..., min_length=2, max_length=500)
     mode: TelegramNotificationUsersGroups
 
     class Config:
