@@ -18,6 +18,6 @@ class ExternalSiteUserService:
     async def register(self, site_user_schema: ExternalSiteUserRequest) -> None:
         site_user = await self._repository.get_or_none(site_user_schema.id)
         if site_user:
-            await self._repository.update(site_user.id, site_user_schema.to_orm(site_user))
+            await self._repository.update(site_user.id, site_user_schema.to_orm())
         else:
             await self._repository.create(site_user_schema.to_orm())

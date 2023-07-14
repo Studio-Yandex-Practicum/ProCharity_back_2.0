@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from src.bot.constants import callback_data, urls
+from src.bot.constants import callback_data, enum, urls
 from src.bot.services.user import UserService
 from src.core.db.models import Category
 
@@ -95,4 +95,10 @@ def get_confirm_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("Да", callback_data=callback_data.CONFIRM_CATEGORIES)],
         [InlineKeyboardButton("Нет, хочу изменить", callback_data=callback_data.CHANGE_CATEGORY)],
     ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
+    """Клавиатура с причинами отписки от рассылки на почту"""
+    keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
     return InlineKeyboardMarkup(keyboard)
