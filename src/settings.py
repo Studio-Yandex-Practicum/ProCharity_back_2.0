@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
     USE_NGROK: bool = False
-    STATIC_URL: str = "../templates"
+    STATIC_URL: str = "/static/"
 
     # Параметры подключения к БД
     POSTGRES_DB: str
