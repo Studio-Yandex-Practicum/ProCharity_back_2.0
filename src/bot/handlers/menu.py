@@ -146,9 +146,9 @@ async def test_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     email_provider = EmailProvider()
     await email_provider.send_question_feedback(
-        telegram_id=update.effective_user.id, 
+        telegram_id=update.effective_user.id,
         message="Тест - тут будет вопрос/отзыв от пользователя",
-        email=settings.EMAIL_ADMIN
+        email=settings.EMAIL_ADMIN,
     )
 
 
