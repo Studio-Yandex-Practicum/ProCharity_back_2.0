@@ -11,11 +11,7 @@ log = structlog.get_logger()
 
 
 async def logging_updates(*args, **kwargs):
-    await log.ainfo(
-        "Следующие Updates не были пойманы ни одним из обработчиков",
-        args=args,
-        kwargs=kwargs
-    )
+    await log.ainfo("Следующие Updates не были пойманы ни одним из обработчиков", args=args, kwargs=kwargs)
 
 
 def logger_decor(
