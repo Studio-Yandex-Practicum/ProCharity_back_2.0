@@ -16,11 +16,7 @@ def delete_previous(
     нажатие на которую повлекло вызов оборачиваемой функции."""
 
     @wraps(coroutine)
-    async def wrapper(
-        update: Update,
-        *args: ParameterTypes.args,
-        **kwargs: ParameterTypes.kwargs
-    ) -> ReturnType:
+    async def wrapper(update: Update, *args: ParameterTypes.args, **kwargs: ParameterTypes.kwargs) -> ReturnType:
         result = await coroutine(update, *args, **kwargs)
         await update.callback_query.message.delete()
         return result
