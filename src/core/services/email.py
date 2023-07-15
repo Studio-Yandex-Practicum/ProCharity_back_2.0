@@ -1,8 +1,12 @@
-from typing import Any
+import contextlib
+from typing import Any, Generator
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.db.db import get_session
+from src.core.db.repository.user import UserRepository
 from src.core.exceptions import exceptions
 from src.settings import settings
 
@@ -15,7 +19,7 @@ class EmailSchema(BaseModel):
 class EmailProvider:
     """Класс для отправки электронных писем."""
 
-    def __init__(self):
+    def __init__(self, sessionmaker: Generator[AsyncSession, None, None] = get_session):
         conf = ConnectionConfig(
             MAIL_USERNAME=settings.MAIL_LOGIN,
             MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -29,6 +33,7 @@ class EmailProvider:
             VALIDATE_CERTS=settings.VALIDATE_CERTS,
         )
         self.fastmail = FastMail(conf)
+        self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
 
     async def __send_mail(
         self,
@@ -62,9 +67,17 @@ class EmailProvider:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
         recipients = email
         email_obj = EmailSchema(recipients=recipients, template_body=None)
+        try:
+            async with self._sessionmaker() as session:
+                user_repository = UserRepository(session)
+                user = await user_repository.get_by_telegram_id(telegram_id)
+        except ValueError:
+            user = None
+        if user.email is None:
+            user.email = "пользователь не указал свой email"
         await self.__send_mail(
             email_obj,
-            subject=f"Сообщение от пользователя c telegram_id = {telegram_id}",
+            subject=f"Сообщение от пользователя {user.username}(email: {user.email})",
             body=message,
             template_name=None,
         )
