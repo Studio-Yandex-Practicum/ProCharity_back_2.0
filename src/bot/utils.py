@@ -4,16 +4,23 @@ from typing import ParamSpec, TypeVar
 
 from telegram import Update
 
-T = TypeVar("T")
-P = ParamSpec("P")
+ReturnType = TypeVar("ReturnType")
+ParameterTypes = ParamSpec("ParameterTypes")
 
 
-def delete_previous(coroutine: Callable[P, Awaitable[T]]) -> Callable[P, Awaitable[T]]:
-    """Для функций, отправляющих сообщения с inline-кнопками.
-    Удаляет сообщение с кнопками, приведшее к вызову функции."""
+def delete_previous(
+    coroutine: Callable[ParameterTypes, Awaitable[ReturnType]]
+) -> Callable[ParameterTypes, Awaitable[ReturnType]]:
+    """Декоратор для функций, отправляющих новые сообщения с inline-кнопками.
+    После выполнения оборачиваемой функции удаляет сообщение с inline-кнопкой,
+    нажатие на которую повлекло вызов оборачиваемой функции."""
 
     @wraps(coroutine)
-    async def wrapper(update: Update, *args: P.args, **kwargs: P.kwargs) -> T:
+    async def wrapper(
+        update: Update,
+        *args: ParameterTypes.args,
+        **kwargs: ParameterTypes.kwargs
+    ) -> ReturnType:
         result = await coroutine(update, *args, **kwargs)
         await update.callback_query.message.delete()
         return result

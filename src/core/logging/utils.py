@@ -4,8 +4,8 @@ from typing import ParamSpec, TypeVar
 
 import structlog
 
-T = TypeVar("T")
-P = ParamSpec("P")
+ReturnType = TypeVar("ReturnType")
+ParameterTypes = ParamSpec("ParameterTypes")
 
 log = structlog.get_logger()
 
@@ -18,10 +18,15 @@ async def logging_updates(*args, **kwargs):
     )
 
 
-def logger_decor(coroutine: Callable[P, Awaitable[T]]) -> Callable[P, Awaitable[T]]:
+def logger_decor(
+    coroutine: Callable[ParameterTypes, Awaitable[ReturnType]]
+) -> Callable[ParameterTypes, Awaitable[ReturnType]]:
     
     @wraps(coroutine)
-    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+    async def wrapper(
+        *args: ParameterTypes.args,
+        **kwargs: ParameterTypes.kwargs
+    ) -> ReturnType:
         await log.ainfo(
             f"Запущенна функция {coroutine.__name__}",
             args=args,
