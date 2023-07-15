@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
+from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
@@ -30,8 +30,8 @@ class UsersCategories(Base):
     __tablename__ = "users_categories"
 
     id = None
-    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), primary_key=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
 
     def __repr__(self):
         return f"<User {self.user_id} - Category {self.category_id}>"
@@ -79,17 +79,17 @@ class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
-    title: Mapped[str] = mapped_column()
+    title: Mapped[str]
     name_organization: Mapped[str] = mapped_column(nullable=True)
-    deadline: Mapped[date] = mapped_column(Date, nullable=True)
+    deadline: Mapped[date] = mapped_column(nullable=True)
 
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category"] = relationship(back_populates="tasks")
 
     bonus: Mapped[int]
-    location: Mapped[str] = mapped_column()
+    location: Mapped[str]
     link: Mapped[str]
-    description: Mapped[str] = mapped_column()
+    description: Mapped[str]
 
     def __repr__(self):
         return f"<Task {self.title}>"
@@ -105,7 +105,7 @@ class Category(ContentBase):
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
-    parent_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
+    parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     children = relationship("Category", backref=backref("parent", remote_side="Category.id"))
 
     def __repr__(self):
