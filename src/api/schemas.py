@@ -4,6 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
 
+from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
 
 from .constants import DATE_FORMAT
@@ -100,10 +101,22 @@ class FeedbackFormQueryParams(BaseModel):
 
 
 class TelegramNotificationRequest(RequestBase):
+    """Класс формирования параметров запроса для отправки сообщения определенному пользователю."""
+
+    message: str = Field(..., min_length=2, max_length=500)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Type here your message for user",
+            }
+        }
+
+
+class TelegramNotificationUsersRequest(TelegramNotificationRequest):
     """Класс формирования параметров запроса для отправки
     сообщения определенной группе пользователей."""
 
-    message: str = Field(..., min_length=2, max_length=500)
     mode: TelegramNotificationUsersGroups
 
     class Config:
@@ -113,3 +126,24 @@ class TelegramNotificationRequest(RequestBase):
                 "mode": "all",
             }
         }
+
+
+class ExternalSiteUserRequest(RequestBase):
+    """Класс модели запроса для ExternalSiteUser."""
+
+    id: int = Field(...)
+    id_hash: str = Field(..., max_length=256)
+    first_name: Optional[str] = Field(None, max_length=64)
+    last_name: Optional[str] = Field(None, max_length=64)
+    email: str = Field(..., max_length=48)
+    specializations: Optional[str] = Field(...)
+
+    def to_orm(self) -> ExternalSiteUser:
+        return ExternalSiteUser(
+            id=self.id,
+            id_hash=self.id_hash,
+            email=self.email,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            specializations=self.specializations,
+        )
