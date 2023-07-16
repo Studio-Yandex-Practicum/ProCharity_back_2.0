@@ -1,6 +1,7 @@
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.api.router import api_router
 from src.bot.bot import shutdown_bot, startup_bot
@@ -29,6 +30,12 @@ def create_app(run_bot: bool = True) -> FastAPI:
     app.add_middleware(CorrelationIdMiddleware)
 
     app.include_router(api_router)
+    if settings.DEBUG:
+        app.mount(
+            "/static",
+            StaticFiles(directory=settings.STATIC_DIR, html=True),
+            name="static",
+        )
 
     @app.on_event("startup")
     async def on_startup():
