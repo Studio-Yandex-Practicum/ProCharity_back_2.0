@@ -64,7 +64,7 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger_decor
-async def eason_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def reason_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
     await log.ainfo(
