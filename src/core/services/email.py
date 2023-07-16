@@ -72,7 +72,9 @@ class EmailProvider:
             user = await user_repository.get_by_telegram_id(telegram_id)
         await self.__send_mail(
             email_obj,
-            subject=f"Сообщение от пользователя {user.first_name} ({user.email or 'пользователь не указал свой email'})",
+            subject=(
+                f"Сообщение от пользователя {user.first_name} ({user.email or 'пользователь не указал свой email'})"
+            ),
             body=message,
             template_name=None,
         )
