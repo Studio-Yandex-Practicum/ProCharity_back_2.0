@@ -45,7 +45,7 @@ services:
       - ../nginx_logs:/var/log/nginx
       - ./nginx/swag.conf:/config/nginx/site-confs/default.conf
       - keys:/config/keys
-      - static:/var/html/static/
+      - static:/var/html/static/:ro
     ports:
       - "443:443"
       - "80:80"
