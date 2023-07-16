@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     @property
     def feedback_form_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
-        return urljoin(self.api_url, f"{settings.STATIC_URL}feedback_form/feedback_form.html")
+        return urljoin(urljoin(self.api_url, settings.STATIC_URL), "/feedback_form/feedback_form.html")
 
     @property
     def feedback_form_template(self) -> Path:
