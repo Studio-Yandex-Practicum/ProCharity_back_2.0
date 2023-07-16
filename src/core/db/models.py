@@ -106,7 +106,7 @@ class Category(ContentBase):
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
     parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
-    children = relationship("Category", backref=backref("parent", remote_side="Category.id"))
+    children: Mapped["Category"] = relationship("Category", backref=backref("parent", remote_side="Category.id"))
 
     def __repr__(self):
         return f"<Category {self.name}>"
