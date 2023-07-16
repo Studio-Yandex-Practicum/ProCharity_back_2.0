@@ -67,17 +67,12 @@ class EmailProvider:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
         recipients = email
         email_obj = EmailSchema(recipients=recipients, template_body=None)
-        try:
-            async with self._sessionmaker() as session:
-                user_repository = UserRepository(session)
-                user = await user_repository.get_by_telegram_id(telegram_id)
-        except ValueError:
-            user = None
-        if user.email is None:
-            user.email = "пользователь не указал свой email"
+        async with self._sessionmaker() as session:
+            user_repository = UserRepository(session)
+            user = await user_repository.get_by_telegram_id(telegram_id)
         await self.__send_mail(
             email_obj,
-            subject=f"Сообщение от пользователя {user.username}(email: {user.email})",
+            subject=f"Сообщение от пользователя {user.first_name} ({user.email or 'пользователь не указал свой email'})",
             body=message,
             template_name=None,
         )
