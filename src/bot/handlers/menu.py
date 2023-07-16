@@ -64,7 +64,7 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger_decor
-async def reason(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def eason_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
     await log.ainfo(
@@ -160,5 +160,5 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
     app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
+    app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
     app.add_handler(CallbackQueryHandler(test_mailing, pattern=callback_data.TEST_EMAIL))
-    app.add_handler(CallbackQueryHandler(reason, pattern=patterns.NO_MAILING_REASON))
