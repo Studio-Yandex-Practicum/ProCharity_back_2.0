@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
     USE_NGROK: bool = False
+    STATIC_URL: str = "/static/"
 
     # Параметры подключения к БД
     POSTGRES_DB: str
@@ -74,7 +75,7 @@ class Settings(BaseSettings):
     @property
     def feedback_form_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
-        return urljoin(self.api_url, "telegram/feedback-form")
+        return urljoin(urljoin(self.api_url, settings.STATIC_URL), "/feedback_form/feedback_form.html")
 
     @property
     def feedback_form_template(self) -> Path:
