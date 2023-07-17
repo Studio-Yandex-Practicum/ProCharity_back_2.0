@@ -109,10 +109,6 @@ jobs:
             MAIL_PORT=${{ secrets.MAIL_PORT }}
             MAIL_LOGIN=${{ secrets.MAIL_LOGIN }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-            MAIL_STARTTLS=${{ secrets.MAIL_STARTTLS }}
-            MAIL_SSL_TLS=${{ secrets.MAIL_SSL_TLS }}
-            USE_CREDENTIALS=${{ secrets.USE_CREDENTIALS }}
-            VALIDATE_CERTS=${{ secrets.VALIDATE_CERTS }}
             EOM
   start_application:
     name: Start application
