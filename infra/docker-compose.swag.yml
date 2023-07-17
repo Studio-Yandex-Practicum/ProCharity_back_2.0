@@ -5,7 +5,7 @@ services:
     restart: always
     volumes:
       - ./logs/:/app/logs/
-      - static:/app/src/bot/templates
+      - static:/app/templates
     depends_on:
         postgres:
           condition: service_healthy
