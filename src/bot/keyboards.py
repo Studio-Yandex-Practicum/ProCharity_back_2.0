@@ -10,6 +10,7 @@ MENU_KEYBOARD = [
     [InlineKeyboardButton("✉️ Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
     [InlineKeyboardButton("❓ Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
     [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)],
+    [InlineKeyboardButton("⁉ Проверка отправки email админам", callback_data=callback_data.TEST_EMAIL)],
 ]
 UNSUBSCRIBE_BUTTON = [
     InlineKeyboardButton("⏹️ Остановить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
