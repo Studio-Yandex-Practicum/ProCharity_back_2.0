@@ -6,12 +6,12 @@ from src.bot.constants import callback_data
 from src.bot.keyboards import get_categories_keyboard, get_open_tasks_and_menu_keyboard
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
-from src.bot.utils import delete_previous
+from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
 
 
 @logger_decor
-@delete_previous
+@delete_previous_message
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     category_service = CategoryService()

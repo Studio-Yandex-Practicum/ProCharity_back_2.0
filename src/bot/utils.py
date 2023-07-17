@@ -8,7 +8,7 @@ ReturnType = TypeVar("ReturnType")
 ParameterTypes = ParamSpec("ParameterTypes")
 
 
-def delete_previous(
+def delete_previous_message(
     coroutine: Callable[ParameterTypes, Awaitable[ReturnType]]
 ) -> Callable[ParameterTypes, Awaitable[ReturnType]]:
     """Декоратор для функций, отправляющих новые сообщения с inline-кнопками.

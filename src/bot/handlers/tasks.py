@@ -11,7 +11,7 @@ from src.bot.keyboards import (
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
-from src.bot.utils import delete_previous
+from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
 from src.core.utils import display_tasks
 
@@ -71,7 +71,7 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 
 
 @logger_decor
-@delete_previous
+@delete_previous_message
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
@@ -86,7 +86,7 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
     await show_next_tasks(update, context, limit, offset, page_number)
 
 
-@delete_previous
+@delete_previous_message
 async def show_next_tasks(update: Update, context: CallbackContext, limit: int, offset: int, page_number: int):
     task_service = TaskService()
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset)
