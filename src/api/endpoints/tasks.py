@@ -17,7 +17,8 @@ async def actualize_tasks(
     notifications_services: TelegramNotification = Depends(create_bot),
 ) -> None:
     await task_service.actualize_objects(tasks, Task)
-    await notifications_services.send_notification(message=display_tasks)
+    for task in tasks:
+        await notifications_services.send_notifications(message=display_tasks(task))
 
 
 @task_router.get(

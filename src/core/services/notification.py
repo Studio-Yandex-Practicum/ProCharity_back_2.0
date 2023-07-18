@@ -47,12 +47,3 @@ class TelegramNotification:
         users = AbstractRepository.get_all(User)
         for user in users:
             self.__send_message(user.telegram_id, message)
-
-    async def send_notification(
-        self,
-        message: str,
-    ):
-        """Делает массовую рассылку уведомления о новых задачах пользователям users."""
-        users = AbstractRepository.get_all(User)
-        for user in users:
-            self.__send_message(user.telegram_id, message)
