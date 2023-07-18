@@ -33,7 +33,7 @@ class TelegramNotification:
         self,
         message: str,
         users: list[User],
-    ) -> bool:
+    ) -> None:
         """Делает массовую рассылку сообщения message пользователям users."""
         send_message_tasks = (self.__send_message(user.telegram_id, message) for user in users)
         self.__bot_application.create_task(asyncio.gather(*send_message_tasks))
@@ -43,7 +43,18 @@ class TelegramNotification:
         self,
         message: str,
     ):
-        """Делает массовую рассылку уведомления о новых задачах пользователям users."""
+        """
+        Делает массовую рассылку уведомления
+        о новых задачах пользователям users.
+        """
         users = AbstractRepository.get_all(User)
         for user in users:
             self.__send_message(user.telegram_id, message)
+
+    async def send_message(
+        self,
+        message: str,
+        user_id: int,
+    ) -> None:
+        """Отправляет сообщение message конкретному пользователю user."""
+        await self.__send_message(user_id, message)

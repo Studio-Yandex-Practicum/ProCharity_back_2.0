@@ -3,13 +3,15 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data
-from src.bot.keyboards import get_categories_keyboard
+from src.bot.keyboards import get_categories_keyboard, get_open_tasks_and_menu_keyboard
 from src.bot.services.category import CategoryService
+from src.bot.services.user import UserService
+from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
-from src.core.services.user import UserService
 
 
 @logger_decor
+@delete_previous_message
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService()
     category_service = CategoryService()
@@ -42,12 +44,16 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
     categories = await user_service.get_user_categories(telegram_id)
     if not categories:
-        await query.message.edit_text(text="Категории не выбраны.")
+        await query.message.edit_text(
+            text="Категории не выбраны.",
+            reply_markup=await get_open_tasks_and_menu_keyboard(),
+        )
     else:
         await query.message.edit_text(
             text="Отлично! Теперь я буду присылать тебе уведомления о новых "
             f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
+            reply_markup=await get_open_tasks_and_menu_keyboard(),
         )
         await user_service.check_and_set_has_mailing_atribute(telegram_id)
 

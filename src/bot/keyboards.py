@@ -1,8 +1,8 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from src.bot.constants import callback_data, commands
+from src.bot.constants import callback_data, enum, urls
+from src.bot.services.user import UserService
 from src.core.db.models import Category
-from src.core.services.user import UserService
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
@@ -10,6 +10,7 @@ MENU_KEYBOARD = [
     [InlineKeyboardButton("✉️ Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
     [InlineKeyboardButton("❓ Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
     [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)],
+    [InlineKeyboardButton("⁉ Проверка отправки email админам", callback_data=callback_data.TEST_EMAIL)],
 ]
 UNSUBSCRIBE_BUTTON = [
     InlineKeyboardButton("⏹️ Остановить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
@@ -66,11 +67,27 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
-    user_service = UserService()
-    categories = await user_service.get_user_categories(telegram_id)
-    callback_const = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
-    keyboard = [[InlineKeyboardButton("Начнём", callback_data=callback_const)]]
+async def get_start_keyboard(callback_data_on_start: str) -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Начнём", callback_data=callback_data_on_start)],
+        [InlineKeyboardButton("Перейти на сайт ProCharity", url=urls.PROCHARITY_URL)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton("Посмотреть открытые задачи", callback_data=callback_data.VIEW_TASKS)],
+        [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
+        [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -79,4 +96,10 @@ def get_confirm_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton("Да", callback_data=callback_data.CONFIRM_CATEGORIES)],
         [InlineKeyboardButton("Нет, хочу изменить", callback_data=callback_data.CHANGE_CATEGORY)],
     ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
+    """Клавиатура с причинами отписки от рассылки на почту"""
+    keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
     return InlineKeyboardMarkup(keyboard)

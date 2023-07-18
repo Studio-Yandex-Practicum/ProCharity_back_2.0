@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import Any
 
+from pydantic import EmailStr
 from starlette.exceptions import HTTPException
 
 from src.core.db.models import Base as DatabaseModel
@@ -25,3 +26,10 @@ class AlreadyExistsException(ApplicationException):
     def __init__(self, obj: DatabaseModel):
         self.status_code = HTTPStatus.BAD_REQUEST
         self.detail = f"Объект {obj} уже существует"
+
+
+class EmailSendError(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+
+    def __init__(self, recipients: list[EmailStr], exc: Exception):
+        self.detail = f"Возникла ошибка {exc} при отправке email на адрес {recipients}."

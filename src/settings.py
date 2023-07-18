@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib.parse import urljoin
 
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings, EmailStr, validator
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,11 +22,13 @@ def get_env_path() -> Path | None:
 class Settings(BaseSettings):
     """Настройки проекта."""
 
-    APPLICATION_URL: str = "localhost"
+    APPLICATION_URL: str = "http://localhost:8000"
     SECRET_KEY: str = "secret_key"
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
     USE_NGROK: bool = False
+    STATIC_DIR: str | Path = BASE_DIR / "templates/"
+    STATIC_URL: str = "static/"
 
     # Параметры подключения к БД
     POSTGRES_DB: str
@@ -46,10 +48,26 @@ class Settings(BaseSettings):
     LOG_FILE_SIZE: int = 10 * 2**20
     LOG_FILES_TO_KEEP: int = 5
 
+    # Organization data
+    ORGANIZATIONS_EMAIL: str = ""
+
+    # Настройки отправки сообщений через электронную почту
+    MAIL_SERVER: str = ""
+    MAIL_PORT: int = 465
+    MAIL_LOGIN: str = ""
+    MAIL_PASSWORD: str = ""
+    MAIL_STARTTLS: bool = False
+    MAIL_SSL_TLS: bool = True
+    USE_CREDENTIALS: bool = True
+    VALIDATE_CERTS: bool = True
+
+    # Адреса электронной почты администраторов
+    EMAIL_ADMIN: list[EmailStr] = []
+
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
         """Добавить 'https://' к домену."""
-        if "https://" in v:
+        if "https://" in v or "http://" in v:
             return v
         return urljoin("https://", f"//{v}")
 
@@ -67,6 +85,10 @@ class Settings(BaseSettings):
         return urljoin(self.APPLICATION_URL, self.ROOT_PATH + "/")
 
     @property
+    def static_url(self) -> str:
+        return urljoin(self.APPLICATION_URL, settings.STATIC_URL)
+
+    @property
     def telegram_webhook_url(self) -> str:
         """Получить url-ссылку на эндпоинт для работы telegram в режиме webhook."""
         return urljoin(self.api_url, "telegram/webhook")
@@ -74,12 +96,7 @@ class Settings(BaseSettings):
     @property
     def feedback_form_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
-        return urljoin(self.api_url, "telegram/feedback-form")
-
-    @property
-    def feedback_form_template(self) -> Path:
-        """Получить HTML-шаблон формы обратной связи."""
-        return BASE_DIR / "src" / "bot" / "templates" / "feedback_form.html"
+        return urljoin(self.static_url, "feedback_form/feedback_form.html")
 
     class Config:
         env_file = get_env_path()

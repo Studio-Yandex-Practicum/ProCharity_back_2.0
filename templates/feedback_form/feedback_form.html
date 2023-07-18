@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProCharity Bot</title>
+    <link rel="stylesheet" href="./pages/feedback_form.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body>
+    <main>
+      <form class="form row" name="feedback">
+        <div class="form-title">
+          <p id="formtitle"></p>
+        </div>
+        <div class="input-field col s12">
+          <input
+            id="surname"
+            name="surname"
+            type="text"
+            class="validate"
+            minlength="2"
+            maxlength="100"
+            required
+          />
+          <label for="surname">Ваша фамилия *</label>
+          <span class="helper-text surname"></span>
+        </div>
+        <div class="input-field col s12">
+          <input
+            id="name"
+            name="name"
+            type="text"
+            class="validate"
+            minlength="2"
+            maxlength="100"
+            required
+          />
+          <label for="name">Ваше имя *</label>
+          <span class="helper-text name"></span>
+        </div>
+        <div class="input-field col s12">
+          <input
+            id="email"
+            name="email"
+            type="text"
+            class="validate"
+            required
+          />
+          <label for="email">email</label>
+          <span class="helper-text email"></span>
+        </div>
+        <div class="input-field col s12">
+          <input
+            id="feedback"
+            name="feedback"
+            type="text"
+            class="validate"
+            minlength="10"
+            maxlength="500"
+          />
+          <label for="feedback">Будем рады ответить, напишите свой вопрос*</label>
+          <span class="helper-text feedback"></span>
+        </div>
+      </form>
+    </main>
+    <script src="./scripts/feedback_form.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  </body>
+</html>
