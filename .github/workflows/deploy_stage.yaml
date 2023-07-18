@@ -108,7 +108,6 @@ jobs:
             MAIL_SERVER=${{ secrets.MAIL_SERVER }}
             MAIL_LOGIN=${{ secrets.MAIL_LOGIN }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-            ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             EOM
   start_application:
