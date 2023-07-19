@@ -1,5 +1,5 @@
 from fastapi import Depends
-from sqlalchemy import select, and_
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import false
@@ -35,7 +35,8 @@ class TaskRepository(ContentRepository):
             .options(joinedload(Task.category))
             .where(and_(Category.users.any(id=user_id)), Task.is_archived == false())
             .limit(limit)
-            .offset(offset))
+            .offset(offset)
+        )
 
     async def get_user_tasks_count(self, user_telegram_id: int) -> int:
         """Получить общее количество задач для пользователя."""

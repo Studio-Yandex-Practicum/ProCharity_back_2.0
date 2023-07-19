@@ -75,7 +75,9 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
-        context.user_data.get("page_number", 1), limit, user_telegram_id=context._user_id,
+        context.user_data.get("page_number", 1),
+        limit,
+        user_telegram_id=context._user_id,
     )
 
     for task in tasks_to_show:
