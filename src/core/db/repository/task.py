@@ -2,6 +2,7 @@ from fastapi import Depends
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import false
 
 from src.core.db.db import get_session
 from src.core.db.models import Category, Task, User
@@ -32,7 +33,7 @@ class TaskRepository(ContentRepository):
             select(Task)
             .join(Category)
             .options(joinedload(Task.category))
-            .where(and_(Category.users.any(id=user_id)), Task.is_archived == False) # noqa
+            .where(and_(Category.users.any(id=user_id)), Task.is_archived == false())
             .limit(limit)
             .offset(offset))
 
@@ -43,5 +44,5 @@ class TaskRepository(ContentRepository):
             select(Task)
             .join(Category)
             .options(joinedload(Task.category))
-            .where(and_(Category.users.any(id=user_id)), Task.is_archived == False)) # noqa
+            .where(and_(Category.users.any(id=user_id)), Task.is_archived == false()))
         return len(tasks.all())
