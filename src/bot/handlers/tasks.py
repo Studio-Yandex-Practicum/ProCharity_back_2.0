@@ -67,7 +67,7 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
-    tasks = await task_service.get_user_tasks(limit)
+    tasks = await task_service.get_user_tasks(user_telegram_id=context._user_id, limit=limit)
     if not tasks:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
