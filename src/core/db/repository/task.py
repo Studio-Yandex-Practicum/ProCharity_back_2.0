@@ -45,5 +45,6 @@ class TaskRepository(ContentRepository):
             select(Task)
             .join(Category)
             .options(joinedload(Task.category))
-            .where(and_(Category.users.any(id=user_id)), Task.is_archived == false()))
+            .where(and_(Category.users.any(id=user_id)), Task.is_archived == false())
+        )
         return len(tasks.all())
