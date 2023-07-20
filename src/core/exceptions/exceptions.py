@@ -1,9 +1,5 @@
 from http import HTTPStatus
-<<<<<<< HEAD
 from typing import Any
-=======
-from typing import Any, List, Union
->>>>>>> 39a8045f1772281dc66faa61a062e728ba4c2ef9
 
 from pydantic import EmailStr
 from starlette.exceptions import HTTPException
