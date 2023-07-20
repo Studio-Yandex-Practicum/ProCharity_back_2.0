@@ -19,7 +19,9 @@ UNSUBSCRIBE_BUTTON = [
 SUBSCRIBE_BUTTON = [
     InlineKeyboardButton("▶️ Включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
 ]
-FEEDBACK_BUTTON_TITLE = "✉️ Задать вопрос/отправить предложение"
+SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ошибку"
+QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
+
 
 async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
     keyboard = [
@@ -61,15 +63,16 @@ async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
         keyboard.extend([UNSUBSCRIBE_BUTTON])
     else:
         keyboard.extend([SUBSCRIBE_BUTTON])
-    # Кнопка обратной связи
+    # Кнопки обратной связи
     params = await user_service.get_feedback_query_params(telegram_id)
-    keyboard.extend([[InlineKeyboardButton(
-        FEEDBACK_BUTTON_TITLE,
-        web_app=WebAppInfo(url=urljoin(
-            settings.feedback_form_template_url,
-            params.as_url_query(),
-        ))
-    )]])
+    web_app = WebAppInfo(url=urljoin(
+        settings.feedback_form_template_url,
+        params.as_url_query(),
+    ))
+    keyboard.extend([
+        [InlineKeyboardButton(QUESTION_BUTTON_TITLE, web_app=web_app)],
+        [InlineKeyboardButton(SUGGESTION_BUTTON_TITLE, web_app=web_app)],
+    ])
     return InlineKeyboardMarkup(keyboard)
 
 
