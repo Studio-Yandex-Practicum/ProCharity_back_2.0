@@ -33,3 +33,8 @@ class TaskRepository(ContentRepository):
         """Получить общее количество задач для пользователя."""
         tasks = await self._session.scalars(select(Task).options(joinedload(Task.category)))
         return len(tasks.all())
+
+    async def get_task_category_by_id(self, _id: int) -> Task | None:
+        """Получить категорию из задачи."""
+        task = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id == _id))
+        return task.first()

@@ -2,14 +2,24 @@ from fastapi import APIRouter, Depends
 
 from src.api.schemas import TaskRequest, TaskResponse
 from src.api.services import TaskService
+from src.api.services.messages import TelegramNotificationService
 from src.core.db.models import Task
+from src.core.utils import display_tasks
 
 task_router = APIRouter()
 
 
 @task_router.post("/", description="Актуализирует список задач.")
-async def actualize_tasks(tasks: list[TaskRequest], task_service: TaskService = Depends()) -> None:
+async def actualize_tasks(
+        tasks: list[TaskRequest],
+        task_service: TaskService = Depends(),
+        telegram_notification_service: TelegramNotificationService = Depends(),
+) -> None:
     await task_service.actualize_objects(tasks, Task)
+    for task in tasks:
+        added_task = await task_service.get_task_category_by_id(task.id)
+        message = display_tasks(added_task)
+        await telegram_notification_service.send_messages_to_all_users(message)
 
 
 @task_router.get(

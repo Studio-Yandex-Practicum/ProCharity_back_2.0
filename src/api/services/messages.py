@@ -36,3 +36,8 @@ class TelegramNotificationService:
     async def send_message_to_user(self, telegram_id, notifications):
         """Отправляет сообщение указанному по telegram_id пользователю"""
         await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
+
+    async def send_messages_to_all_users(self, notifications):
+        """Отправляет сообщение всем пользователям"""
+        users = await self._session.scalars(select(User))
+        await self.telegram_notification.send_messages(message=notifications, users=users)

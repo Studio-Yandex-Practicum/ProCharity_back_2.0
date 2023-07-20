@@ -17,3 +17,6 @@ class TaskService(ContentService):
 
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         return await self._repository.get_tasks_for_user(user_id)
+
+    async def get_task_category_by_id(self, _id: int) -> Task:
+        return await self._repository.get_task_category_by_id(_id)
