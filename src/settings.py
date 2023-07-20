@@ -1,6 +1,6 @@
 from pathlib import Path
+from typing import List, Union
 from urllib.parse import urljoin
-from typing import Union, List
 
 from pydantic import BaseSettings, EmailStr, validator
 from pydantic.tools import lru_cache
