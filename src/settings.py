@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List, Union
 from urllib.parse import urljoin
 
 from pydantic import BaseSettings, EmailStr, validator
