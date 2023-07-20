@@ -16,7 +16,7 @@ class EmailSchema(BaseModel):
     template_body: dict[str, Any] | None
 
 
-class EmailProvider:
+class EmailProvider(EmailSchema):
     """Класс для отправки электронных писем."""
 
     def __init__(self, sessionmaker: Generator[AsyncSession, None, None] = get_session):
