@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List, Union
 from urllib.parse import urljoin
 
 from pydantic import BaseSettings, EmailStr, validator
@@ -63,7 +62,7 @@ class Settings(BaseSettings):
     VALIDATE_CERTS: bool = True
 
     # Адреса электронной почты администраторов
-    EMAIL_ADMIN: EmailStr | list[EmailStr] = []
+    EMAIL_ADMIN: EmailStr = "" | list[EmailStr] = []
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
