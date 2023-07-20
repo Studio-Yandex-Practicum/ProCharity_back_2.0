@@ -1,11 +1,11 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from urllib.parse import urljoin
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.bot.constants import callback_data, enum, urls
 from src.bot.services.user import UserService
 from src.core.db.models import Category
 from src.settings import settings
-
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
@@ -21,6 +21,7 @@ SUBSCRIBE_BUTTON = [
 ]
 SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ошибку"
 QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
+
 
 
 async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:

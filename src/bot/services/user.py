@@ -79,10 +79,7 @@ class UserService:
             if not user.has_mailing:
                 await repository.set_mailing(user, True)
 
-    async def get_feedback_query_params(
-        self,
-        telegram_id: int
-    ) -> FeedbackFormQueryParams:
+    async def get_feedback_query_params(self, telegram_id: int) -> FeedbackFormQueryParams:
         """Возвращает объект FeedbackFormQueryParams на основе имени пользователя.
         Используется для автоподстановки личных данных в форме обратной связи."""
         async with self._sessionmaker() as session:
