@@ -117,6 +117,7 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
         reply_markup=await get_categories_keyboard(categories),
     )
 
+
 def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(subcategories_callback, pattern=patterns.SUBCATEGORIES))
     app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
