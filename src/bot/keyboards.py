@@ -1,11 +1,11 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from urllib.parse import urljoin
+
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.bot.constants import callback_data, enum, urls
 from src.bot.services.user import UserService
 from src.core.db.models import Category
 from src.settings import settings
-
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
@@ -20,6 +20,7 @@ SUBSCRIBE_BUTTON = [
     InlineKeyboardButton("▶️ Включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
 ]
 FEEDBACK_BUTTON_TITLE = "✉️ Задать вопрос/отправить предложение"
+
 
 async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
     keyboard = [
@@ -63,13 +64,21 @@ async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
         keyboard.extend([SUBSCRIBE_BUTTON])
     # Кнопка обратной связи
     params = await user_service.get_feedback_query_params(telegram_id)
-    keyboard.extend([[InlineKeyboardButton(
-        FEEDBACK_BUTTON_TITLE,
-        web_app=WebAppInfo(url=urljoin(
-            settings.feedback_form_template_url,
-            params.as_url_query(),
-        ))
-    )]])
+    keyboard.extend(
+        [
+            [
+                InlineKeyboardButton(
+                    FEEDBACK_BUTTON_TITLE,
+                    web_app=WebAppInfo(
+                        url=urljoin(
+                            settings.feedback_form_template_url,
+                            params.as_url_query(),
+                        )
+                    ),
+                )
+            ]
+        ]
+    )
     return InlineKeyboardMarkup(keyboard)
 
 
