@@ -3,7 +3,6 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
 from src.bot.constants import callback_data, patterns
-from src.bot.handlers.categories import subcategories_callback, select_subcategory_callback, back_subcategory_callback
 from src.bot.keyboards import (
     get_back_menu,
     view_more_tasks_keyboard,
@@ -51,7 +50,4 @@ async def show_next_tasks(update: Update, context: CallbackContext, limit: int, 
 
 
 def registration_handlers(app: Application):
-    app.add_handler(CallbackQueryHandler(subcategories_callback, pattern=patterns.SUBCATEGORIES))
-    app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
-    app.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
     app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
