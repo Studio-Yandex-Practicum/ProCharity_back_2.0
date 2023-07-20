@@ -1,14 +1,15 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from urllib.parse import urljoin
 
 from src.bot.constants import callback_data, enum, urls
 from src.bot.services.user import UserService
 from src.core.db.models import Category
+from src.settings import settings
+
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
     [InlineKeyboardButton("✏️ Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)],
-    [InlineKeyboardButton("✉️ Отправить предложение/ошибку", callback_data=callback_data.SEND_ERROR_OR_PROPOSAL)],
-    [InlineKeyboardButton("❓ Задать свой вопрос", callback_data=callback_data.ASK_YOUR_QUESTION)],
     [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)],
     [InlineKeyboardButton("⁉ Проверка отправки email админам", callback_data=callback_data.TEST_EMAIL)],
 ]
@@ -54,11 +55,21 @@ async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
     keyboard = []
     keyboard.extend(MENU_KEYBOARD)
     user_service = UserService()
+    # Кнопка включения/выключения подписки на новые заказы
     has_mailing = await user_service.get_mailing(telegram_id=telegram_id)
     if has_mailing:
         keyboard.extend([UNSUBSCRIBE_BUTTON])
     else:
         keyboard.extend([SUBSCRIBE_BUTTON])
+    # Кнопка обратной связи
+    params = await user_service.get_feedback_query_params(telegram_id)
+    keyboard.extend([[InlineKeyboardButton(
+        '✉️ Задать вопрос/отправить предложение',
+        web_app=WebAppInfo(url=urljoin(
+            settings.feedback_form_template_url,
+            params.as_url_query(),
+        ))
+    )]])
     return InlineKeyboardMarkup(keyboard)
 
 
