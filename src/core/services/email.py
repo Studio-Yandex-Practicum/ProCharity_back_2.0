@@ -12,7 +12,7 @@ from src.settings import settings
 
 
 class EmailSchema(BaseModel):
-    recipients: list[EmailStr]
+    recipients: EmailStr | list[EmailStr]
     template_body: dict[str, Any] | None
 
 
