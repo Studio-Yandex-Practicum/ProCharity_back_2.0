@@ -63,7 +63,7 @@ class EmailProvider:
         except Exception as exc:
             raise exceptions.EmailSendError(email_obj.recipients, exc)
 
-    async def send_question_feedback(self, telegram_id: int, message: str, email: list[EmailStr]) -> None:
+    async def send_question_feedback(self, telegram_id: int, message: str, email: EmailStr | list[EmailStr]) -> None:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
         recipients = email
         email_obj = EmailSchema(recipients=recipients, template_body=None)
