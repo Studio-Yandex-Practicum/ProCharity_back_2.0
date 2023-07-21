@@ -23,8 +23,8 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Чтобы я знал, с какими задачами ты готов помогать, "
-             "выбери свои профессиональные компетенции (можно выбрать "
-             'несколько). После этого, нажми на пункт "Готово 👌"',
+        "выбери свои профессиональные компетенции (можно выбрать "
+        'несколько). После этого, нажми на пункт "Готово 👌"',
         reply_markup=await get_categories_keyboard(categories),
     )
 
@@ -51,7 +51,7 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
     else:
         await query.message.edit_text(
             text="Отлично! Теперь я буду присылать тебе уведомления о новых "
-                 f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
+            f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=await get_open_tasks_and_menu_keyboard(),
         )
