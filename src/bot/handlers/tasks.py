@@ -89,8 +89,9 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
 
 
 @delete_previous_message
-async def show_next_tasks(update: Update, context: CallbackContext,
-                          limit: int, offset: int, page_number: int, telegram_id: int):
+async def show_next_tasks(
+    update: Update, context: CallbackContext, limit: int, offset: int, page_number: int, telegram_id: int
+):
     task_service = TaskService()
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
 
