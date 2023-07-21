@@ -50,4 +50,4 @@ class TaskRepository(ContentRepository):
             .join(Category)
             .where(Category.users.any(id=user.id))
             .where(Task.is_archived == false())
-        )
+            )
