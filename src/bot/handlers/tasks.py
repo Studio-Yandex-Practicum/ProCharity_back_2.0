@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler, ContextTypes
 
@@ -7,7 +7,7 @@ from src.bot.keyboards import (
     get_back_menu,
     get_categories_keyboard,
     get_subcategories_keyboard,
-    view_more_tasks_keyboard
+    view_more_tasks_keyboard,
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
