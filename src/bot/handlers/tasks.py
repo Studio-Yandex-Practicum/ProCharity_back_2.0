@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler, ContextTypes
 
@@ -7,7 +7,7 @@ from src.bot.keyboards import (
     get_back_menu,
     get_categories_keyboard,
     get_subcategories_keyboard,
-    view_more_tasks_keyboard,
+    view_more_tasks_keyboard
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
@@ -71,6 +71,24 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 
 
 @logger_decor
+async def task_details_callback(update: Update, context: CallbackContext):
+    query = update.callback_query
+    task_id = int(query.data.split("_")[2])
+    task_service = TaskService()
+    task = await task_service.get_task_by_id(task_id)
+    description = task.description
+    inline_keyboard = [[InlineKeyboardButton("Вернуться к списку заданий", callback_data=callback_data.VIEW_TASKS)]]
+    reply_markup = InlineKeyboardMarkup(inline_keyboard)
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=f"{description} для {task.name_organization}",
+        reply_markup=reply_markup,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
+
+
+@logger_decor
 @delete_previous_message
 async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
     task_service = TaskService()
@@ -80,8 +98,14 @@ async def view_task_callback(update: Update, context: CallbackContext, limit: in
 
     for task in tasks_to_show:
         message = display_tasks(task)
+        inline_keyboard = [[InlineKeyboardButton("ℹ️ Подробнее", callback_data=f"task_details_{task.id}")]]
+        reply_markup = InlineKeyboardMarkup(inline_keyboard)
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
+            chat_id=update.effective_chat.id,
+            text=message,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+            reply_markup=reply_markup,
         )
     await show_next_tasks(update, context, limit, offset, page_number)
 
@@ -111,3 +135,4 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     app.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
     app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
+    app.add_handler(CallbackQueryHandler(task_details_callback, pattern=patterns.TASK_DETAILS))
