@@ -73,19 +73,12 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def task_details_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    task_id = int(query.data.split("_")[2])
+    current_text = query.message.text
+    task_id = int(context.match.group(1))
     task_service = TaskService()
     task = await task_service.get_task_by_id(task_id)
-    description = task.description
-    inline_keyboard = [[InlineKeyboardButton("Вернуться к списку заданий", callback_data=callback_data.VIEW_TASKS)]]
-    reply_markup = InlineKeyboardMarkup(inline_keyboard)
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=f"{description} для {task.name_organization}",
-        reply_markup=reply_markup,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
+    detailed_text = f"{current_text}\n\n{task.description}"
+    await query.message.edit_text(detailed_text)
 
 
 @logger_decor
