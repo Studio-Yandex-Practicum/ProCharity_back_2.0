@@ -1,5 +1,5 @@
 from fastapi import Depends
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import false
@@ -45,9 +45,9 @@ class TaskRepository(ContentRepository):
 
     async def get_user_tasks_count(self, user: User) -> int:
         """Получить общее количество задач для пользователя."""
-        return await self._session.scalar(select(
-            func.count(Task.id))
+        return await self._session.scalar(
+            select(func.count(Task.id))
             .join(Category)
             .where(Category.users.any(id=user.id))
             .where(Task.is_archived == false())
-            )
+        )
