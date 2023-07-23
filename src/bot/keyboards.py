@@ -23,7 +23,6 @@ SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ош
 QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
 
 
-
 async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
