@@ -24,7 +24,9 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(update.effective_user.id),
+        reply_markup=await get_menu_keyboard(
+            await UserService().get_by_telegram_id(update.effective_user.id)
+        ),
     )
 
 

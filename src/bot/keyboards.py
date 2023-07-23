@@ -2,9 +2,9 @@ from urllib.parse import urljoin
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
+from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum, urls
-from src.bot.services.user import UserService
-from src.core.db.models import Category
+from src.core.db.models import Category, User
 from src.settings import settings
 
 MENU_KEYBOARD = [
@@ -54,21 +54,21 @@ async def get_subcategories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_menu_keyboard(telegram_id: int) -> InlineKeyboardMarkup:
+async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = []
     keyboard.extend(MENU_KEYBOARD)
-    user_service = UserService()
     # Кнопка включения/выключения подписки на новые заказы
-    has_mailing = await user_service.get_mailing(telegram_id=telegram_id)
-    if has_mailing:
+    if user.has_mailing:
         keyboard.extend([UNSUBSCRIBE_BUTTON])
     else:
         keyboard.extend([SUBSCRIBE_BUTTON])
     # Кнопки обратной связи
-    params = await user_service.get_feedback_query_params(telegram_id)
     web_app = WebAppInfo(url=urljoin(
         settings.feedback_form_template_url,
-        params.as_url_query(),
+        FeedbackFormQueryParams(
+            name=user.first_name,
+            surname=user.last_name
+        ).as_url_query(),
     ))
     keyboard.extend([
         [InlineKeyboardButton(QUESTION_BUTTON_TITLE, web_app=web_app)],

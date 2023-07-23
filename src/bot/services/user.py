@@ -3,7 +3,6 @@ from typing import Generator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.schemas import FeedbackFormQueryParams
 from src.core.db.db import get_session
 from src.core.db.models import User
 from src.core.db.repository.user import UserRepository
@@ -79,9 +78,8 @@ class UserService:
             if not user.has_mailing:
                 await repository.set_mailing(user, True)
 
-    async def get_feedback_query_params(self, telegram_id: int) -> FeedbackFormQueryParams:
-        """Возвращает объект FeedbackFormQueryParams на основе имени пользователя.
-        Используется для автоподстановки личных данных в форме обратной связи."""
+    async def get_by_telegram_id(self, telegram_id: int) -> User:
+        """Оборачивает одноименную функцию из UserRepository."""
         async with self._sessionmaker() as session:
             user = await UserRepository(session).get_by_telegram_id(telegram_id)
-        return FeedbackFormQueryParams(name=user.first_name, surname=user.last_name)
+            return user
