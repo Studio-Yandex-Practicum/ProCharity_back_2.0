@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib.parse import urljoin
 
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings, EmailStr, validator
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     LOG_FILES_TO_KEEP: int = 5
 
     # Organization data
-    ORGANIZATIONS_EMAIL: str = ""
+    ORGANIZATIONS_EMAIL: EmailStr = ""
 
     # Настройки отправки сообщений через электронную почту
     MAIL_SERVER: str = ""
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     VALIDATE_CERTS: bool = True
 
     # Адреса электронной почты администраторов
-    EMAIL_ADMIN: str | list[str]
+    EMAIL_ADMIN: EmailStr | list[EmailStr]
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
