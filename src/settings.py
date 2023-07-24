@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     LOG_FILES_TO_KEEP: int = 5
 
     # Organization data
-    ORGANIZATIONS_EMAIL: EmailStr = ""
+    ORGANIZATIONS_EMAIL: str = ""
 
     # Настройки отправки сообщений через электронную почту
     MAIL_SERVER: str = ""
