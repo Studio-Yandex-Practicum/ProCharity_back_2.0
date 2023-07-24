@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib.parse import urljoin
 
-from pydantic import BaseSettings, EmailStr, validator
+from pydantic import BaseSettings, validator
 from pydantic.tools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parent.parent
