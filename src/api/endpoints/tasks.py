@@ -19,7 +19,7 @@ async def actualize_tasks(
     for task in tasks:
         added_task = await task_service.get_task_category_by_id(task.id)
         message = display_tasks(added_task)
-        await telegram_notification_service.send_messages_to_all_users(message)
+        await telegram_notification_service.send_messages_to_subscribed_users(message, task.category_id)
 
 
 @task_router.get(
