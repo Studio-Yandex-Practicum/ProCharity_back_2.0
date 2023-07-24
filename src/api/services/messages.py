@@ -6,7 +6,7 @@ from telegram.ext import Application
 
 from src.bot.bot import create_bot
 from src.core.db import get_session
-from src.core.db.models import Category, Task, User
+from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
 
