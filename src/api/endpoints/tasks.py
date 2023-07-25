@@ -15,8 +15,8 @@ async def actualize_tasks(
     task_service: TaskService = Depends(),
     telegram_notification_service: TelegramNotificationService = Depends(),
 ) -> None:
-    await task_service.actualize_objects(tasks, Task)
-    for task in tasks:
+    new_tasks = await task_service.actualize_objects(tasks, Task)
+    for task in new_tasks:
         added_task = await task_service.get_task_category_by_id(task.id)
         message = display_tasks(added_task)
         await telegram_notification_service.send_messages_to_subscribed_users(message, task.category_id)

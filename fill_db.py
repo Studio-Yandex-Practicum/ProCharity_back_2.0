@@ -207,20 +207,21 @@ async def filling_task_in_db(
     location, description, is_archived.
     """
     for category_id in range(0, len(CATEGORIES_TEST_DATA) + 1):
-        async for title in get_task_name_by_id(category_id):
-            task = Task(
-                name_organization=f"{choice(TEST_ORGANIZATION)}",
-                deadline=datetime.now() + timedelta(days=10),
-                category_id=category_id,
-                title=title,
-                bonus=randint(1, 4) + randint(1, 4),
-                location=f"{choice(TEST_LOCATION)}",
-                link=f"http://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
-                description=f"Описание {title}",
-                is_archived=choice([True, False]),
-            )
-            session.add(task)
-        await session.commit()
+        for subcategory in SUBCATEGORIES_TEST_DATA:
+            async for title in get_task_name_by_id(category_id):
+                task = Task(
+                    name_organization=f"{choice(TEST_ORGANIZATION)}",
+                    deadline=datetime.now() + timedelta(days=10),
+                    category_id=int(str(subcategory["id"]) + str(category_id)),
+                    title=title,
+                    bonus=randint(1, 4) + randint(1, 4),
+                    location=f"{choice(TEST_LOCATION)}",
+                    link=f"http://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
+                    description=f"Описание {title}",
+                    is_archived=choice([True, False]),
+                )
+                session.add(task)
+            await session.commit()
 
 
 async def delete_all_data(

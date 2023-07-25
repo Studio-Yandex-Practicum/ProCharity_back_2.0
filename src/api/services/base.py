@@ -12,7 +12,7 @@ class ContentService(abc.ABC):
         self._repository: ContentRepository = repository
         self._session: AsyncSession = session
 
-    async def actualize_objects(self, objects: list[any], model_class: any) -> None:
+    async def actualize_objects(self, objects: list[any], model_class: any) -> list[any]:
         to_create, to_update = [], []
         ids = [obj.id for obj in objects]
         async with self._session.begin() as session:
@@ -28,6 +28,7 @@ class ContentService(abc.ABC):
             if to_update:
                 await self._repository.update_all(to_update, commit=False)
             await session.commit()
+            return to_create
 
     async def get_all(self) -> list[any]:
         return await self._repository.get_all()
