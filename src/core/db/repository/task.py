@@ -55,9 +55,6 @@ class TaskRepository(ContentRepository):
     async def get_task_category_by_id(self, _id: int) -> Task | None:
         """Получить категорию из задачи."""
         task = await self._session.scalars(
-            select(Task)
-            .options(joinedload(Task.category))
-            .where(Task.id == _id)
-            .where(Task.is_archived == false())
+            select(Task).options(joinedload(Task.category)).where(Task.id == _id).where(Task.is_archived == false())
         )
         return task.first()
