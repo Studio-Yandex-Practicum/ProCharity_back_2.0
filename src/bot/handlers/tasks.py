@@ -13,7 +13,7 @@ from src.bot.services.category import CategoryService
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
-from src.core.utils import display_tasks
+from src.core.utils import display_tasks, display_task_verbosely
 
 
 @logger_decor
@@ -73,11 +73,10 @@ async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAUL
 @logger_decor
 async def task_details_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    current_text = query.message.text
-    task_id = int(context.match.group(1))
     task_service = TaskService()
+    task_id = int(context.match.group(1))
     task = await task_service.get_task_by_id(task_id)
-    detailed_text = f"{current_text}\n\n{task.description}"
+    detailed_text = display_task_verbosely(task)
     await query.message.edit_text(detailed_text)
 
 
