@@ -7,8 +7,7 @@ from src.bot.keyboards import get_back_menu, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
-from src.core.utils import display_tasks, display_task_verbosely
-
+from src.core.utils import display_task_verbosely, display_tasks
 
 
 @logger_decor
