@@ -77,3 +77,9 @@ class UserService:
             user = await repository.get_by_telegram_id(telegram_id)
             if not user.has_mailing:
                 await repository.set_mailing(user, True)
+
+    async def get_by_telegram_id(self, telegram_id: int) -> User:
+        """Оборачивает одноименную функцию из UserRepository."""
+        async with self._sessionmaker() as session:
+            user = await UserRepository(session).get_by_telegram_id(telegram_id)
+            return user

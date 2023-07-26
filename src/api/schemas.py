@@ -14,7 +14,7 @@ class ResponseBase(BaseModel):
     """Базовый класс для модели ответа."""
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RequestBase(BaseModel):
@@ -61,7 +61,7 @@ class TaskRequest(RequestBase):
     description: Optional[StrictStr] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": 1,
                 "title": "Task Title",
@@ -106,7 +106,7 @@ class TelegramNotificationRequest(RequestBase):
     message: str = Field(..., min_length=2, max_length=500)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "message": "Type here your message for user",
             }
@@ -120,7 +120,7 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
     mode: TelegramNotificationUsersGroups
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "message": "Type here your message for user",
                 "mode": "all",
