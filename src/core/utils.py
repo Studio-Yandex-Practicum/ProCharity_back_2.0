@@ -18,6 +18,18 @@ def display_tasks(task):
     )
 
 
+def display_task_verbosely(task):
+    deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
+    bonus_link = "https://help.procharity.ru/article/10053"
+    return (
+        f"От фонда: {task.name_organization}\n\n"
+        f"Категория: {task.category.name}\n\n"
+        f"Срок: {deadline}\n"
+        f"Бонусы: {task.bonus * '💎'}{bonus_link}\n"
+        f"{task.description}"
+    )
+
+
 def auto_commit(func):
     @wraps(func)
     async def auto_commit_wraps(self, *args, commit=True):

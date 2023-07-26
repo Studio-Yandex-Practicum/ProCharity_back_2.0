@@ -1,21 +1,11 @@
 import json
-import urllib
 
 import structlog
-from telegram import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
-    Update,
-    WebAppInfo,
-)
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler
 from telegram.ext.filters import StatusUpdate
 
-from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, commands, enum, patterns
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
 from src.bot.services.user import UserService
@@ -34,7 +24,7 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(update.effective_user.id),
+        reply_markup=await get_menu_keyboard(await UserService().get_by_telegram_id(update.effective_user.id)),
     )
 
 
@@ -78,28 +68,6 @@ async def reason_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="Спасибо, я передал информацию команде ProCharity!",
         reply_markup=await get_back_menu(),
         parse_mode=ParseMode.MARKDOWN,
-    )
-
-
-@logger_decor
-async def ask_your_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = "Задать вопрос"
-    name = update.effective_user["first_name"]
-    surname = update.effective_user["last_name"]
-    query_params = FeedbackFormQueryParams(name=name, surname=surname)
-    if update.effective_message.web_app_data:
-        text = "Исправить неверно внесенные данные"
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="Нажмите на кнопку ниже, чтобы задать вопрос.",
-        reply_markup=ReplyKeyboardMarkup.from_button(
-            KeyboardButton(
-                text=text,
-                web_app=WebAppInfo(
-                    url=urllib.parse.urljoin(settings.feedback_form_template_url, query_params.as_url_query())
-                ),
-            )
-        ),
     )
 
 
@@ -159,9 +127,7 @@ async def test_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
-    app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.ASK_YOUR_QUESTION))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
-    app.add_handler(CallbackQueryHandler(ask_your_question, pattern=callback_data.SEND_ERROR_OR_PROPOSAL))
     app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
