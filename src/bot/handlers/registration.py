@@ -4,6 +4,7 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
+from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
@@ -11,13 +12,23 @@ from src.core.logging.utils import logger_decor
 
 @logger_decor
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ext_user_service = ExternalSiteUserService()
+    ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     user_service = UserService()
-    await user_service.register_user(
-        telegram_id=update.effective_user.id,
-        username=update.effective_user.username,
-        first_name=update.effective_user.first_name,
-        last_name=update.effective_user.last_name,
-    )
+    if ext_user is not None:
+        await user_service.register_user(
+            telegram_id=update.effective_user.id,
+            username=update.effective_user.username,
+            first_name=ext_user.first_name,
+            last_name=ext_user.last_name,
+        )
+    else:
+        await user_service.register_user(
+            telegram_id=update.effective_user.id,
+            username=update.effective_user.username,
+            first_name=update.effective_user.first_name,
+            last_name=update.effective_user.last_name,
+        )
     categories = await user_service.get_user_categories(update.effective_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
     keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start)
