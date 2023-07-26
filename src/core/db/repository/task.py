@@ -51,3 +51,8 @@ class TaskRepository(ContentRepository):
             .where(Category.users.any(id=user.id))
             .where(Task.is_archived == false())
         )
+
+    async def get_user_task_id(self, task_id) -> list[Task]:
+        """Получить задачу по id из категорий на которые подписан пользователь."""
+        task = await self._session.execute(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
+        return task.scalars().first()
