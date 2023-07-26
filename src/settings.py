@@ -1,8 +1,9 @@
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urljoin
 
-from pydantic import BaseSettings, EmailStr, validator
-from pydantic.tools import lru_cache
+from pydantic import EmailStr, validator
+from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -98,13 +99,10 @@ class Settings(BaseSettings):
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
         return urljoin(self.static_url, "feedback_form/feedback_form.html")
 
-    class Config:
-        env_file = get_env_path()
-
 
 @lru_cache()
 def get_settings():
-    return Settings()
+    return Settings(_env_file=get_env_path())  # type: ignore
 
 
 settings = get_settings()
