@@ -52,9 +52,15 @@ class TaskRepository(ContentRepository):
             .where(Task.is_archived == false())
         )
 
-    async def get_task_category_by_id(self, _id: int) -> Task | None:
-        """Получить категорию из задачи."""
-        task = await self._session.scalars(
-            select(Task).options(joinedload(Task.category)).where(Task.id == _id).where(Task.is_archived == false())
-        )
-        return task.first()
+# <<<<<<< HEAD
+#     async def get_task_category_by_id(self, _id: int) -> Task | None:
+#         """Получить категорию из задачи."""
+#         task = await self._session.scalars(
+#             select(Task).options(joinedload(Task.category)).where(Task.id == _id).where(Task.is_archived == false())
+#         )
+#         return task.first()
+# =======
+    async def get_user_task_id(self, task_id) -> list[Task]:
+        """Получить задачу по id из категорий на которые подписан пользователь."""
+        task = await self._session.execute(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
+        return task.scalars().first()
