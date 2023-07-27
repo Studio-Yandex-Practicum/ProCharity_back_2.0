@@ -2,7 +2,7 @@ import urllib
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
+from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, root_validator
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -57,7 +57,7 @@ class TaskRequest(RequestBase):
     category_id: NonNegativeInt = Field(...)
     bonus: NonNegativeInt = Field(...)
     location: StrictStr = Field(...)
-    link: HttpUrl = Field(...)
+    link: StrictStr = Field(...)
     description: Optional[StrictStr] = None
 
     class Config:
