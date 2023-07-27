@@ -31,5 +31,5 @@ class AlreadyExistsException(ApplicationException):
 class EmailSendError(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
 
-    def __init__(self, recipients: list[EmailStr], exc: Exception):
+    def __init__(self, recipients: EmailStr | list[EmailStr], exc: Exception):
         self.detail = f"Возникла ошибка {exc} при отправке email на адрес {recipients}."
