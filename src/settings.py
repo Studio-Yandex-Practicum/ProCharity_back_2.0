@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     LOG_FILES_TO_KEEP: int = 5
 
     # Organization data
-    ORGANIZATIONS_EMAIL: str = ""
+    ORGANIZATIONS_EMAIL: EmailStr
 
     # Настройки отправки сообщений через электронную почту
     MAIL_SERVER: str = ""
@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     VALIDATE_CERTS: bool = True
 
     # Адреса электронной почты администраторов
-    EMAIL_ADMIN: list[EmailStr] = []
+    EMAIL_ADMIN: EmailStr
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:

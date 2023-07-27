@@ -12,7 +12,7 @@ from src.settings import settings
 
 
 class EmailSchema(BaseModel):
-    recipients: list[EmailStr]
+    recipients: EmailStr | list[EmailStr]
     template_body: dict[str, Any] | None
 
 
@@ -63,9 +63,14 @@ class EmailProvider:
         except Exception as exc:
             raise exceptions.EmailSendError(email_obj.recipients, exc)
 
-    async def send_question_feedback(self, telegram_id: int, message: str, email: list[EmailStr]) -> None:
+    async def send_question_feedback(self, telegram_id: int, message: str, email: EmailStr | list[EmailStr]) -> None:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
-        recipients = email
+        if isinstance(email, str):
+            recipients = [email]
+        elif isinstance(email, list):
+            recipients = email
+        else:
+            raise ValueError("Invalid email format")
         email_obj = EmailSchema(recipients=recipients, template_body=None)
         async with self._sessionmaker() as session:
             user_repository = UserRepository(session)
