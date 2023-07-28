@@ -23,7 +23,7 @@ const errMsg = {
     required: 'Пожалуйста, укажите имя',
     min: 'Введите не менее 2 символов',
     max: 'Допускается ввод не более 100 символов',
-    capsPattern: 'Убедитесь, что у Вас выключен CAPS LOCK',
+    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
     dashPattern: 'Убедитесь, что дефис находится в нужном месте',
     nameSurnamePattern: 'Доступно использование только кириллицы и "-"',
   },
@@ -31,13 +31,13 @@ const errMsg = {
     required: 'Пожалуйста, укажите фамилию',
     min: 'Введите не менее 2 символов',
     max: 'Допускается ввод не более 100 символов',
-    capsPattern: 'Убедитесь, что у Вас выключен CAPS LOCK',
+    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
     dashPattern: 'Убедитесь, что дефис находится в нужном месте',
     nameSurnamePattern: 'Доступно использование только кириллицы и "-"',
   },
   email: {
     required: 'Пожалуйста, укажите ваш email',
-    capsPattern: 'Убедитесь, что у Вас выключен CAPS LOCK',
+    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
     emailPattern:
       'Неверный формат адреса email. Используйте только латиницу, "-", "@" и "_"',
   },
@@ -45,7 +45,7 @@ const errMsg = {
     required: 'Пожалуйста, напишите ваш отзыв',
     min: 'Введите не менее 10 символов',
     max: 'Допускается ввод не более 500 символов',
-    capsPattern: 'Убедитесь, что у Вас выключен CAPS LOCK',
+    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
     feedbackPattern:
       'Доступно использование только кириллицы, латиницы и символов: "-", "_", ".", "," и "!"',
   },
@@ -252,4 +252,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
   tgMainButton.onClick(() => handleSubmit(inputElements, tg));
   showTgButton(tgMainButton);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const checkbox = document.querySelector('#checkbox');
+  const emailSection = document.querySelector('#email_section');
+  const email = document.querySelector('#email');
+  checkbox.addEventListener('change', function (element) {
+    if (checkbox.checked) {
+      emailSection.style.display = 'block';
+    } else {
+      email.value = '';
+      const emailErr = document.querySelector('.helper-text.email');
+      setValid(email, emailErr);
+      email.classList.remove('valid');
+      emailSection.style.display = 'none';
+    }
+  });
 });
