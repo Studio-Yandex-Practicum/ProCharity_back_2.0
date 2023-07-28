@@ -65,7 +65,11 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     web_app = WebAppInfo(
         url=urljoin(
             settings.feedback_form_template_url,
-            FeedbackFormQueryParams(name=user.first_name, surname=user.last_name).as_url_query(),
+            FeedbackFormQueryParams(
+                name=user.first_name,
+                surname=user.last_name,
+                email=user.email
+            ).as_url_query(),
         )
     )
     keyboard.extend(
