@@ -28,7 +28,7 @@ class ContentService(abc.ABC):
             if to_update:
                 await self._repository.update_all(to_update, commit=False)
             await session.commit()
-            return to_create
+            return [obj.id for obj in to_create]
 
     async def get_all(self) -> list[any]:
         return await self._repository.get_all()

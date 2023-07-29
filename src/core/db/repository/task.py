@@ -56,3 +56,12 @@ class TaskRepository(ContentRepository):
         """Получить задачу по id из категорий на которые подписан пользователь."""
         task = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
         return task.first()
+
+    async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
+        """Получить список задач по ids из категорий на которые подписан пользователь."""
+        tasks = await self._session.execute(
+            select(Task)
+            .options(joinedload(Task.category))
+            .where(Task.id.in_(ids))
+        )
+        return tasks.scalars().all()
