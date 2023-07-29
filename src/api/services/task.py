@@ -23,4 +23,3 @@ class TaskService(ContentService):
 
     async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
         return await self._repository.get_user_tasks_ids(ids)
-
