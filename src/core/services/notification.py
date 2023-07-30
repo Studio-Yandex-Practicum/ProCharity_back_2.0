@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from telegram.constants import ParseMode
 from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application
 
@@ -16,7 +17,7 @@ class TelegramNotification:
 
     async def __send_message(self, user_id: int, message: str) -> None:
         try:
-            await self.__bot.send_message(chat_id=user_id, text=message)
+            await self.__bot.send_message(chat_id=user_id, text=message, parse_mode=ParseMode.HTML)
             logger.debug(f"Отправлено оповещение пользователю {user_id}")
         except TelegramError as exc:
             msg = f"Ошибка отправки сообщения пользователю {user_id}."
