@@ -163,4 +163,4 @@ class Users(BaseModel):
     banned = Column(Boolean, server_default=expression.false(), nullable=False)
 
     def __repr__(self):
-        return f'<User {self.telegram_id}>'
+        return f"<User {self.telegram_id}>"
