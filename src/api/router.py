@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.api.endpoints import category_router, notification_router, site_user_router, task_router, analytic_router
+from src.api.endpoints import analytic_router, category_router, notification_router, site_user_router, task_router
 from src.settings import settings
 
 api_router = APIRouter(prefix=settings.ROOT_PATH)

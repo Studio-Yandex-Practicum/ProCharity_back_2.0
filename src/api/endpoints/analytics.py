@@ -8,6 +8,5 @@ analytic_router = APIRouter()
 
 
 @analytic_router.get("/", description="Возращает количество пользователей.")
-async def get_users(
-) -> Users:
+async def get_users() -> Users:
     pass
