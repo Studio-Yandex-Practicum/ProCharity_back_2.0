@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from src.api.schemas import TaskRequest, TaskResponse
+from src.api.schemas import Users
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
-from src.core.db.models import Users
-from src.core.utils import display_tasks
 
 analytic_router = APIRouter()
 
