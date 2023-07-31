@@ -1,5 +1,5 @@
 import urllib
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, root_validator
@@ -148,3 +148,19 @@ class ExternalSiteUserRequest(RequestBase):
             last_name=self.last_name,
             specializations=self.specializations,
         )
+
+
+class Users(BaseModel):
+    telegram_id: int = Field(...)
+    username: Optional[str] = Field(..., max_length=32)
+    email: Optional[str] = Field(..., max_length=48)
+    external_id: Optional[int] = Field(...)
+    first_name: Optional[str] = Field(max_length=64)
+    last_name: Optional[str] = Field(max_length=64)
+    has_mailing: bool = False
+    date_registration: Optional[datetime] = Column(TIMESTAMP, server_default=func.current_timestamp(), nullable=False)
+    external_signup_date = Column(TIMESTAMP, nullable=True)
+    banned = Column(Boolean, server_default=expression.false(), nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.telegram_id}>'
