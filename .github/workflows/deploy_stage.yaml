@@ -128,6 +128,6 @@ jobs:
             cd ${{ env.DEPLOY_PATH }}/infra
             docker compose --file docker-compose.yaml --env-file ../.env pull backend -q
             docker compose --file docker-compose.yaml --env-file ../.env up -dV --wait
-            docker system prune -af
+            docker system prune -f || true
 
             docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend bash -c "alembic upgrade head & python fill_db.py"
