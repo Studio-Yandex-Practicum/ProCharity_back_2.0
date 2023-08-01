@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, String, Integer
 from sqlalchemy.ext.declarative import AbstractConcreteBase
