@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import ARRAY, BigInteger, ForeignKey, String, Integer
+from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
