@@ -137,7 +137,7 @@ class ExternalSiteUserRequest(RequestBase):
     first_name: Optional[str] = Field(None, max_length=64)
     last_name: Optional[str] = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
-    specializations: Optional[str] = Field(...)
+    specializations: Optional[list[int]] | None
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
