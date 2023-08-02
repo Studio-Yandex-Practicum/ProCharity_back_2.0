@@ -154,5 +154,3 @@ class Statistic(BaseModel):
     """Класс модели запроса для статистики."""
 
     users_number: int
-
-
