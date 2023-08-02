@@ -152,5 +152,3 @@ class ExternalSiteUserRequest(RequestBase):
 
 class Statistic(BaseModel):
     users_number: int
-
-
