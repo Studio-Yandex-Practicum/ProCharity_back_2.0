@@ -13,8 +13,13 @@ class UserService:
         self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
 
     async def register_user(
-        self, telegram_id: int, username: str = "", first_name: str = "",
-        last_name: str = "", email: str = "", external_id: int = None
+        self,
+        telegram_id: int,
+        username: str = "",
+        first_name: str = "",
+        last_name: str = "",
+        email: str = "",
+        external_id: int = None,
     ) -> User:
         """Регистрирует нового пользователя по telegram_id.
 
@@ -30,13 +35,15 @@ class UserService:
                     first_name=first_name,
                     last_name=last_name,
                 )
-            return await user_repository.create(User(
-                telegram_id=telegram_id,
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                external_id=external_id)
+            return await user_repository.create(
+                User(
+                    telegram_id=telegram_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    external_id=external_id,
+                )
             )
 
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:

@@ -3,7 +3,7 @@ import urllib
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, root_validator, field_validator
+from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -150,10 +150,10 @@ class ExternalSiteUserRequest(RequestBase):
             specializations=self.specializations,
         )
 
-    @field_validator('specializations')
+    @field_validator("specializations")
     def specializations_str_validation(cls, value: str):
         if isinstance(value, str):
-            if re.match(pattern=r'\d+(,\s\d+)*', string=value):
+            if re.match(pattern=r"\d+(,\s\d+)*", string=value):
                 new_value = [int(value) for value in value.split(", ")]
                 return new_value
             raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')

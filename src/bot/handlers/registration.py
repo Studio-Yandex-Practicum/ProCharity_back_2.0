@@ -22,7 +22,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             first_name=ext_user.first_name,
             last_name=ext_user.last_name,
             email=ext_user.email,
-            external_id=ext_user.id
+            external_id=ext_user.id,
         )
         await user_service.set_categories_to_user(update.effective_user.id, ext_user.specializations)
     else:
