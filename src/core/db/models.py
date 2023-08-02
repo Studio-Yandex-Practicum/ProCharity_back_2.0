@@ -68,7 +68,7 @@ class ExternalSiteUser(Base):
     email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer))
+    specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self):
