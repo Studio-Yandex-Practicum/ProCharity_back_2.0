@@ -150,17 +150,7 @@ class ExternalSiteUserRequest(RequestBase):
         )
 
 
-class Users(BaseModel):
-    telegram_id: int = Field(...)
-    username: Optional[str] = Field(..., max_length=32)
-    email: Optional[str] = Field(..., max_length=48)
-    external_id: Optional[int] = Field(...)
-    first_name: Optional[str] = Field(max_length=64)
-    last_name: Optional[str] = Field(max_length=64)
-    has_mailing: bool = False
-    date_registration: Optional[datetime] = Column(TIMESTAMP, server_default=func.current_timestamp(), nullable=False)
-    external_signup_date = Column(TIMESTAMP, nullable=True)
-    banned = Column(Boolean, server_default=expression.false(), nullable=False)
+class Statistic(BaseModel):
+    users_number: int
 
-    def __repr__(self):
-        return f"<User {self.telegram_id}>"
+
