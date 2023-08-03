@@ -30,9 +30,9 @@ class UserRepository(AbstractRepository):
 
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
-            user = await self._session.scalar(
-                select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
-            )
+        user = await self._session.scalar(
+            select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
+        )
 
         categories = (
             (await self._session.scalars(select(Category).where(Category.id.in_(categories_ids)))).all()
