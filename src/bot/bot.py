@@ -22,14 +22,15 @@ def create_bot() -> Application:
 async def start_bot() -> Application:
     """Запуск бота в `Background` режиме."""
     bot = create_bot()
+    await bot.initialize()
     if settings.BOT_WEBHOOK_MODE:
+        bot.updater = None
         await bot.bot.set_webhook(
             url=settings.telegram_webhook_url,
             secret_token=settings.SECRET_KEY,
         )
     else:
-        await bot.initialize()
-        await bot.updater.start_polling()
+        await bot.updater.start_polling()  # type: ignore
     await bot.start()
     logging.info("Bot started")
     return bot
