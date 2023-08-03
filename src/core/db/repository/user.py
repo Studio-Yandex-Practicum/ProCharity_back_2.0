@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -30,9 +30,9 @@ class UserRepository(AbstractRepository):
 
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
-        user = await self._session.scalar(
-            select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
-        )
+            user = await self._session.scalar(
+                select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
+            )
 
         categories = (
             (await self._session.scalars(select(Category).where(Category.id.in_(categories_ids)))).all()
@@ -55,3 +55,7 @@ class UserRepository(AbstractRepository):
         """
         user.has_mailing = has_mailing
         await self.update(user.id, user)
+
+    async def get_users_number(self) -> int:
+        """Возвращает список категорий пользователя."""
+        return await self._session.scalars(select(func.count()).select_from(User))
