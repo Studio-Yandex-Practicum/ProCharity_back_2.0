@@ -138,7 +138,7 @@ class ExternalSiteUserRequest(RequestBase):
     first_name: Optional[str] = Field(None, max_length=64)
     last_name: Optional[str] = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
-    specializations: list[int] | str = Field(None)
+    specializations: list[int] | None = None
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
@@ -150,11 +150,12 @@ class ExternalSiteUserRequest(RequestBase):
             specializations=self.specializations,
         )
 
-    @field_validator("specializations")
+    @field_validator("specializations", mode='before')
     def specializations_str_validation(cls, value: str):
-        if isinstance(value, str):
-            if re.match(pattern=r"\d+(,\s\d+)*", string=value):
-                new_value = [int(value) for value in value.split(", ")]
-                return new_value
+        if not isinstance(value, str):
+            return value
+        try:
+            new_value = [int(value) for value in value.split(", ")]
+            return new_value
+        except ValueError:
             raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
-        return value
