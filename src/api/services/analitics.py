@@ -1,16 +1,16 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.services.base import ContentService
 from src.core.db import get_session
-from src.core.db.repository.user import get_users_number
+from src.core.db.repository.base import AbstractRepository
+from src.api.schemas import Analytic
+from src.core.db.models import User
 
 
-class AnalyticsService(ContentService):
+class AnalyticsService:
     """Сервис для работы с моделью Analitics."""
 
-    def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
-        super().__init__(get_users_number, session)
-
-    async def get_users_number(self) -> int:
-        return await self._repository.get_users_number
+    def __init__(self, repository: AbstractRepository, session: AsyncSession) -> Analytic:
+        super().__init__(repository, session)
+        self.new_user_number = AbstractRepository.count_all(User)
+        return Analytic

@@ -1,4 +1,4 @@
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -55,7 +55,3 @@ class UserRepository(AbstractRepository):
         """
         user.has_mailing = has_mailing
         await self.update(user.id, user)
-
-    async def get_users_number(self) -> int:
-        """Возвращает список категорий пользователя."""
-        return await self._session.scalars(select(func.count()).select_from(User))
