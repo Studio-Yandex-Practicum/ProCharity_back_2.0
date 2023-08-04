@@ -21,7 +21,10 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             username=update.effective_user.username,
             first_name=ext_user.first_name,
             last_name=ext_user.last_name,
+            email=ext_user.email,
+            external_id=ext_user.id,
         )
+        await user_service.set_categories_to_user(update.effective_user.id, ext_user.specializations)
     else:
         await user_service.register_user(
             telegram_id=update.effective_user.id,
@@ -52,6 +55,7 @@ async def confirm_chosen_categories(update: Update, context: ContextTypes.DEFAUL
 
     user_service = UserService()
     categories = await user_service.get_user_categories(update.effective_user.id)
+    context.user_data["selected_categories"] = {category: None for category in categories}
     text = ", ".join(categories.values())
 
     await context.bot.send_message(

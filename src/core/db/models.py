@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import BigInteger, ForeignKey, String
+from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
@@ -68,7 +68,7 @@ class ExternalSiteUser(Base):
     email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    specializations: Mapped[str]
+    specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self):
