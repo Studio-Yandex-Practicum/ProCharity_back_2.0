@@ -1,4 +1,3 @@
-import re
 import urllib
 from datetime import date
 from typing import Optional
