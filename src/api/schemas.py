@@ -149,7 +149,7 @@ class ExternalSiteUserRequest(RequestBase):
             specializations=self.specializations,
         )
 
-    @field_validator("specializations", mode='before')
+    @field_validator("specializations", mode="before")
     def specializations_str_validation(cls, value: str):
         if not isinstance(value, str):
             return value
