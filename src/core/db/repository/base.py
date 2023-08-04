@@ -1,7 +1,7 @@
 import abc
 from typing import TypeVar
 
-from sqlalchemy import ScalarResult, select, update
+from sqlalchemy import ScalarResult, select, update, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -63,6 +63,10 @@ class AbstractRepository(abc.ABC):
     async def create_all(self, objects: list[DatabaseModel]) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
+
+    async def count_all(self, instance: DatabaseModel) -> int:
+        """Возвращает количество юнитов категории."""
+        return await self._session.scalars(select(func.count()).select_from(instance))
 
 
 class ContentRepository(AbstractRepository, abc.ABC):

@@ -150,7 +150,7 @@ class ExternalSiteUserRequest(RequestBase):
         )
 
 
-class Statistic(BaseModel):
+class Analytic(BaseModel):
     """Класс модели запроса для статистики."""
 
     command_stats: dict = {}
