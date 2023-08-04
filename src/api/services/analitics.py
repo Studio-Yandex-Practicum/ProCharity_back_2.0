@@ -10,7 +10,9 @@ from src.core.db.models import User
 class AnalyticsService:
     """Сервис для работы с моделью Analitics."""
 
-    def __init__(self, repository: AbstractRepository, session: AsyncSession) -> Analytic:
+    def __init__(self, repository: AbstractRepository, session: AsyncSession, analytic: Analytic) -> None:
         super().__init__(repository, session)
-        self.new_user_number = AbstractRepository.count_all(User)
-        return Analytic
+
+    async def get_analytic(self, analytic):
+        analytic.new_user_number = AbstractRepository.count_all(User)
+        return analytic
