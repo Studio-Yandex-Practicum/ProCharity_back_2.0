@@ -28,6 +28,19 @@ services:
       timeout: 3s
       retries: 5
 
+  front:
+    image: "ghcr.io/studio-yandex-practicum/procharity_bot_front:prod"
+    restart: always
+    depends_on:
+        - backend
+    env_file:
+        - ../.env
+    ports:
+        - "80:80"
+        - "443:443"
+    volumes:
+        - ./nginx/build:/frontend/build
+
   swag:
     image: lscr.io/linuxserver/swag:2.4.0
     container_name: procharity_swag
@@ -44,6 +57,7 @@ services:
     volumes:
       - ../nginx_logs:/var/log/nginx
       - ./nginx/swag.conf:/config/nginx/site-confs/default.conf
+      - ./nginx/build:/usr/share/nginx/html
       - keys:/config/keys
       - static:/var/html/static/:ro
     ports:

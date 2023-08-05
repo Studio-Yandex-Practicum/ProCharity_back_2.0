@@ -1,0 +1,8 @@
+FROM node:12.13.0-alpine as build
+
+COPY ../front/package.json ./
+COPY ../front/yarn.lock ./
+COPY ../front ./frontend
+WORKDIR /frontend
+RUN yarn install
+RUN yarn build
