@@ -14,7 +14,19 @@ def display_tasks(task):
         f"Категория: {task.category.name}\n\n"
         f"Срок: {deadline}\n"
         f"Бонусы: <a href='{bonus_link}'>{task.bonus * '💎'}</a>\n"
-        f"<a href='<Сделать ссылку на задание>'>{'Посмотреть задание'}</a>"
+        f"<a href='{task.link}'>{'Посмотреть задание'}</a>"
+    )
+
+
+def display_task_verbosely(task):
+    deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
+    bonus_link = "https://help.procharity.ru/article/10053"
+    return (
+        f"От фонда: {task.name_organization}\n\n"
+        f"Категория: {task.category.name}\n\n"
+        f"Срок: {deadline}\n"
+        f"Бонусы: {task.bonus * '💎'}{bonus_link}\n"
+        f"{task.description}"
     )
 
 

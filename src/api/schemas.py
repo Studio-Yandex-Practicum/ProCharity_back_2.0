@@ -2,7 +2,7 @@ import urllib
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Extra, Field, HttpUrl, NonNegativeInt, StrictStr, root_validator
+from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -57,7 +57,7 @@ class TaskRequest(RequestBase):
     category_id: NonNegativeInt = Field(...)
     bonus: NonNegativeInt = Field(...)
     location: StrictStr = Field(...)
-    link: HttpUrl = Field(...)
+    link: StrictStr = Field(...)
     description: Optional[StrictStr] = None
 
     class Config:
@@ -95,6 +95,7 @@ class FeedbackFormQueryParams(BaseModel):
 
     name: str | None
     surname: str | None
+    email: str | None
 
     def as_url_query(self):
         return f"?{urllib.parse.urlencode(self.dict())}"
@@ -136,7 +137,7 @@ class ExternalSiteUserRequest(RequestBase):
     first_name: Optional[str] = Field(None, max_length=64)
     last_name: Optional[str] = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
-    specializations: Optional[str] = Field(...)
+    specializations: list[int] | None = None
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
@@ -147,3 +148,13 @@ class ExternalSiteUserRequest(RequestBase):
             last_name=self.last_name,
             specializations=self.specializations,
         )
+
+    @field_validator("specializations", mode="before")
+    def specializations_str_validation(cls, value: str):
+        if not isinstance(value, str):
+            return value
+        try:
+            new_value = [int(value) for value in value.split(", ")]
+            return new_value
+        except ValueError:
+            raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')

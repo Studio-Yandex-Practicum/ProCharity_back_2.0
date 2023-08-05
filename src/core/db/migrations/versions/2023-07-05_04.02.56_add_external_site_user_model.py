@@ -24,7 +24,7 @@ def upgrade() -> None:
         sa.Column("email", sa.String(length=48), nullable=False),
         sa.Column("first_name", sa.String(length=64), nullable=True),
         sa.Column("last_name", sa.String(length=64), nullable=True),
-        sa.Column("specializations", sa.String(), nullable=False),
+        sa.Column("specializations", sa.ARRAY(sa.Integer), nullable=True),
         sa.Column("source", sa.String(), nullable=True),
         sa.Column("created_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
         sa.Column(

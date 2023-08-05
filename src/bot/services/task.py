@@ -1,5 +1,5 @@
 import contextlib
-from typing import Generator
+from typing import Generator, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,3 +31,8 @@ class TaskService:
             total_tasks = await repository.get_user_tasks_count(user)
             remaining_tasks = total_tasks - (offset + limit)
             return remaining_tasks
+
+    async def get_task_by_id(self, task_id: int) -> Optional[Task]:
+        async with self._sessionmaker() as session:
+            repository = TaskRepository(session)
+            return await repository.get_user_task_id(task_id)
