@@ -64,7 +64,7 @@ class AbstractRepository(abc.ABC):
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
 
-    async def count_all(self, instance: DatabaseModel) -> int:
+    async def count_all(self) -> int:
         """Возвращает количество юнитов категории."""
         return await self._session.scalars(select(func.count()).select_from(self._model))
 
