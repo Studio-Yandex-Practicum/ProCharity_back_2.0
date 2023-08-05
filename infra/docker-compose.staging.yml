@@ -35,8 +35,6 @@ services:
         - backend
     env_file:
         - ../.env
-    ports:
-        - "80:80"
     volumes:
         - ./nginx/build:/frontend/build
 
