@@ -13,7 +13,7 @@ class AnalyticsService:
     def __init__(self, repository: AbstractRepository) -> None:
         super().__init__(repository, session)
 
-    async def get_analytic(self):
+    async def get_user_number(self):
         analytic = Analytic
         analytic.new_user_number = repository.count_all(User)
         return analytic
