@@ -10,12 +10,6 @@ on:
       - develop
 
   workflow_dispatch:
-    workflow_run:
-      branches:
-        - develop
-        - 'feature/**'
-        - 'fix/**'
-        - 'refactoring/**'
 
 env:
   REGISTRY: ghcr.io
