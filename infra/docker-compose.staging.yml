@@ -30,9 +30,6 @@ services:
 
   front:
     image: "ghcr.io/studio-yandex-practicum/procharity_bot_front:prod"
-    restart: always
-    depends_on:
-        - backend
     env_file:
         - ../.env
     volumes:
