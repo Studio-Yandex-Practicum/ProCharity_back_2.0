@@ -5,11 +5,18 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  pull_request:
+  push:
     branches:
+      - master
       - develop
       - feature/deployment-of-admin-tools
-  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - master
+      - develop
+      - feature/deployment-of-admin-tools
+    # types: [ closed ]
 
 env:
   REGISTRY: ghcr.io

@@ -9,9 +9,11 @@ on:
     branches:
       - master
       - develop
+      - feature/deployment-of-admin-tools
 
   pull_request:
     branches:
+      - master
       - develop
       - feature/deployment-of-admin-tools
     # types: [ closed ]
