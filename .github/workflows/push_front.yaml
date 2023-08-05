@@ -51,6 +51,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./infra
-          file: Dockerfile_front
+          file: ./infra/Dockerfile_front
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.OWNER_LC }}/${{ env.IMAGE_NAME_FRONT }}:prod
