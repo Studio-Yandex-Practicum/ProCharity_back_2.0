@@ -158,3 +158,4 @@ class ExternalSiteUserRequest(RequestBase):
             return new_value
         except ValueError:
             raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
+
