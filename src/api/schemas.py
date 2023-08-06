@@ -1,6 +1,6 @@
 import urllib
 from datetime import date
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 
