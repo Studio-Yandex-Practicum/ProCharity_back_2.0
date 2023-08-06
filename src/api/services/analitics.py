@@ -1,9 +1,6 @@
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import Analytic
-from src.core.db import get_session
-from src.core.db.models import User
 from src.core.db.repository import UserRepository
 
 
@@ -16,5 +13,5 @@ class AnalyticsService:
 
     async def get_user_number(self) -> None:
         analytic = Analytic()
-        analytic.number_users = int(self._user_repository.count_all(User))
+        analytic.number_users = await self._user_repository.count_all()
         return analytic
