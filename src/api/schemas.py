@@ -158,3 +158,13 @@ class ExternalSiteUserRequest(RequestBase):
             return new_value
         except ValueError:
             raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
+
+class Statistic(BaseModel):
+    """Класс модели запроса для статистики."""
+
+    command_stats: dict
+    reasons_canceling: str
+    number_users: int
+    all_users_statistic: dict
+    active_users_statistic: dict
+    tasks: dict
