@@ -1,10 +1,10 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db import get_session
-from src.core.db.repository.base import AbstractRepository
 from src.api.schemas import Analytic
+from src.core.db import get_session
 from src.core.db.models import User
+from src.core.db.repository.base import AbstractRepository
 
 
 class AnalyticsService:
