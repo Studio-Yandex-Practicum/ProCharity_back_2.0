@@ -159,6 +159,7 @@ class ExternalSiteUserRequest(RequestBase):
         except ValueError:
             raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
 
+
 class Analytic(BaseModel):
     """Класс модели запроса для статистики."""
 
