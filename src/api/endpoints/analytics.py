@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.api.schemas import Analytic
-from src.api.services.analitics import AnalyticsService
+from src.api.services.analytics import AnalyticsService
 
 analytic_router = APIRouter()
 
