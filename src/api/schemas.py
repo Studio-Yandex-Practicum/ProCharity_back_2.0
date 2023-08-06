@@ -149,7 +149,6 @@ class ExternalSiteUserRequest(RequestBase):
             specializations=self.specializations,
         )
 
-
     @field_validator("specializations", mode="before")
     def specializations_str_validation(cls, value: str):
         if not isinstance(value, str):
@@ -159,5 +158,3 @@ class ExternalSiteUserRequest(RequestBase):
             return new_value
         except ValueError:
             raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
-
-
