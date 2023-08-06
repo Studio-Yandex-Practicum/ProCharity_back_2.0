@@ -1,6 +1,6 @@
 import urllib
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
+from typing import Optional, Dict
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 
@@ -163,9 +163,9 @@ class ExternalSiteUserRequest(RequestBase):
 class Analytic(BaseModel):
     """Класс модели запроса для статистики."""
 
-    command_stats: dict = {}
+    command_stats: Dict[str, str] = {}
     reasons_canceling: str = ""
     number_users: int = 0
-    all_users_statistic: dict = {}
-    active_users_statistic: dict = {}
-    tasks: dict = {}
+    all_users_statistic: Dict[str, str] = {}
+    active_users_statistic: Dict[str, str] = {}
+    tasks: Dict[str, str] = {}
