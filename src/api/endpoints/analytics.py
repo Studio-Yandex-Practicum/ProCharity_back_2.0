@@ -8,6 +8,4 @@ analytic_router = APIRouter()
 
 @analytic_router.get("/", description="Возращает статистику сервиса.")
 async def get_analytics(analytic_service: AnalyticsService = Depends()) -> Analytic:
-    return Analytic(
-        users_number=await analytic_service.get_user_number(),
-    )
+    return Analytic(number_users=await analytic_service.get_user_number())

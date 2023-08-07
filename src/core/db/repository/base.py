@@ -67,7 +67,7 @@ class AbstractRepository(abc.ABC):
     async def count_all(self) -> int:
         """Возвращает количество юнитов категории."""
         objects = await self._session.execute(select(func.count()).select_from(self._model))
-        return objects.scalars().one()
+        return objects.scalar()
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
