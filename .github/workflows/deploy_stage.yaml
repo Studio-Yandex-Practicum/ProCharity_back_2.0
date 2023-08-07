@@ -16,7 +16,6 @@ on:
       - master
       - develop
       - feature/deployment-of-admin-tools
-    # types: [ closed ]
 
   workflow_dispatch:
 
@@ -106,7 +105,6 @@ jobs:
             APPLICATION_URL=${{ secrets.APPLICATION_URL }}
             SECRET_KEY=${{ secrets.SECRET_KEY }}
             ROOT_PATH=${{ secrets.ROOT_PATH }}
-            REACT_APP_API_URL=https://procharity.duckdns.org/
             MAIL_SERVER=${{ secrets.MAIL_SERVER }}
             MAIL_LOGIN=${{ secrets.MAIL_LOGIN }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}

@@ -7,12 +7,7 @@ on:
       - develop
       - feature/deployment-of-admin-tools
 
-  pull_request:
-    branches:
-      - master
-      - develop
-      - feature/deployment-of-admin-tools
-    # types: [ closed ]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io

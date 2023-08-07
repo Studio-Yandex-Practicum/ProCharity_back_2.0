@@ -30,13 +30,10 @@ services:
 
   front:
     image: "ghcr.io/studio-yandex-practicum/procharity_bot_front:prod"
-    restart: always
-    depends_on:
-        - backend
     env_file:
         - ../.env
     volumes:
-        - ./nginx/build:/frontend/build
+        - frontend_build:/frontend/build
 
   swag:
     image: lscr.io/linuxserver/swag:2.4.0
@@ -54,7 +51,7 @@ services:
     volumes:
       - ../nginx_logs:/var/log/nginx
       - ./nginx/swag.conf:/config/nginx/site-confs/default.conf
-      - ./nginx/build:/usr/share/nginx/html
+      - frontend_build:/usr/share/nginx/html
       - keys:/config/keys
       - static:/var/html/static/:ro
     ports:
@@ -63,8 +60,10 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+      - front
 
 volumes:
   postgres_data:
   keys:
   static:
+  frontend_build:
