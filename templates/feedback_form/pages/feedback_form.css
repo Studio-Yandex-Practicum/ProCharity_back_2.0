@@ -102,7 +102,12 @@ body {
   cursor: pointer;
   box-shadow: none !important;
 }
+
 .form-title {
   text-align: center;
   color: var(--tg-theme-text-color) !important;
+}
+
+.hidden {
+  display: none;
 }

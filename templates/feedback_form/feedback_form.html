@@ -9,7 +9,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
     />
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
     <main>
@@ -45,17 +45,6 @@
         </div>
         <div class="input-field col s12">
           <input
-            id="email"
-            name="email"
-            type="text"
-            class="validate"
-            required
-          />
-          <label for="email">email</label>
-          <span class="helper-text email"></span>
-        </div>
-        <div class="input-field col s12">
-          <input
             id="feedback"
             name="feedback"
             type="text"
@@ -63,12 +52,23 @@
             minlength="10"
             maxlength="500"
           />
-          <label for="feedback">Будем рады ответить, напишите свой вопрос*</label>
+          <label for="feedback"
+            >Будем рады ответить, напишите свой вопрос*</label
+          >
           <span class="helper-text feedback"></span>
+        </div>
+        <label>
+          <input id="checkbox" type="checkbox" class="filled-in feedback_checkbox" />
+          <span>Хочу получить ответ на email</span>
+        </label>
+        <div id="email_section" class="input-field col s12 hidden">
+          <input id="email" name="email" type="text" class="validate" />
+          <label for="email">Ваш email</label>
+          <span class="helper-text email"></span>
         </div>
       </form>
     </main>
-    <script src="./scripts/feedback_form.js"></script>
+    <script defer src="./scripts/feedback_form.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   </body>
 </html>
