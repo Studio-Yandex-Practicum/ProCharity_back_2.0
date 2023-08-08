@@ -53,14 +53,14 @@ class UserService:
             await repository.set_categories_to_user(telegram_id, categories_ids)
 
     async def add_category_to_user(self, telegram_id: int, category_id: int) -> None:
-        """ Добавляет пользователю указанную категорию"""
+        """Добавляет пользователю указанную категорию"""
         async with self._sessionmaker() as session:
             repository = UserRepository(session)
             user = await repository.get_by_telegram_id(telegram_id)
             await repository.add_category_to_user(user, category_id)
 
     async def delete_category_from_user(self, telegram_id: int, category_id: int) -> None:
-        """ Удаляет у пользователя указанную категорию"""
+        """Удаляет у пользователя указанную категорию"""
         async with self._sessionmaker() as session:
             repository = UserRepository(session)
             user = await repository.get_by_telegram_id(telegram_id)
