@@ -41,6 +41,11 @@ class AbstractRepository(abc.ABC):
         await self._session.refresh(instance)
         return instance
 
+    async def remove(self, instance: DatabaseModel) -> None:
+        """Удаляет объект модели из базы данных."""
+        await self._session.delete(instance)
+        await self._session.commit()
+
     @auto_commit
     async def update(self, _id: int, instance: DatabaseModel) -> DatabaseModel:
         """Обновляет существующий объект модели в базе."""
