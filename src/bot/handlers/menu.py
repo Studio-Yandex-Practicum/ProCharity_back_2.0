@@ -7,6 +7,7 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 from telegram.ext.filters import StatusUpdate
 
 from src.bot.constants import callback_data, commands, enum, patterns
+from src.bot.handlers.form import FeedbackModel
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
@@ -72,7 +73,7 @@ async def reason_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @logger_decor
-async def web_app_data(update: Update):
+async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = json.loads(update.effective_message.web_app_data.data)
     buttons = [
         [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
@@ -86,6 +87,19 @@ async def web_app_data(update: Update):
     await update.message.reply_text(
         text="Вы можете вернуться в меню или посмотреть открытые задания. Нажмите на нужную кнопку.",
         reply_markup=keyboard,
+    )
+    email_provider = EmailProvider()
+    form = FeedbackModel(
+        telegram_id=update.effective_user.id,
+        surname=user_data['surname'],
+        name=user_data['name'],
+        email=user_data['email'],
+        feedback=user_data['feedback']
+    )
+    await email_provider.send_question_feedback(
+        telegram_id=update.effective_user.id,
+        message=form.to_message(),
+        email=settings.EMAIL_ADMIN,
     )
 
 
@@ -128,7 +142,7 @@ def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
-    app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
+    app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data_handler))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
     app.add_handler(CallbackQueryHandler(test_mailing, pattern=callback_data.TEST_EMAIL))
