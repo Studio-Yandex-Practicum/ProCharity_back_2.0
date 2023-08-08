@@ -47,7 +47,7 @@ class UserRepository(AbstractRepository):
     async def add_category_to_user(self, user: User, category_id: int) -> None:
         """Добавляет категорию для пользователя."""
         await self.create(UsersCategories(user_id=user.id, category_id=category_id))
-    
+
     async def delete_category_from_user(self, user: User, category_id: int) -> None:
         """Удаляет категорию у пользователя."""
         users_categories_obj = await self._session.scalar(
