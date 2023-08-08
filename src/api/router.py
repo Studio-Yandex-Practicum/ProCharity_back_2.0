@@ -1,7 +1,11 @@
 from fastapi import APIRouter
 
 from src.api.endpoints import (
-    category_router, notification_router, site_user_router, task_router, telegram_webhook_router
+    category_router,
+    notification_router,
+    site_user_router,
+    task_router,
+    telegram_webhook_router,
 )
 from src.settings import settings
 
