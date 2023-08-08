@@ -28,15 +28,10 @@ async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         reply_markup=keyboard,
     )
     email_provider = EmailProvider()
-    form = FeedbackModel(
-        surname=user_data['surname'],
-        name=user_data['name'],
-        email=user_data['email'],
-        feedback=user_data['feedback']
-    )
+    feedback = FeedbackModel(**user_data)
     await email_provider.send_question_feedback(
         telegram_id=update.effective_user.id,
-        message=form.to_message(),
+        message=feedback.to_message(),
         email=settings.EMAIL_ADMIN,
     )
 

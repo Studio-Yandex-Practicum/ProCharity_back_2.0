@@ -1,8 +1,7 @@
 import structlog
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler
-from telegram.ext.filters import StatusUpdate
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands, enum, patterns
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
