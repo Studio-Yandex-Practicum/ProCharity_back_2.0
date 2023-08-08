@@ -51,7 +51,7 @@ services:
     volumes:
       - ../nginx_logs:/var/log/nginx
       - ./nginx/swag.conf:/config/nginx/site-confs/default.conf
-      - frontend_build:/usr/share/nginx/html
+      - frontend_build:/usr/share/nginx/admin/
       - keys:/config/keys
       - static:/var/html/static/:ro
     ports:
