@@ -1,4 +1,5 @@
 import json
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, Update, WebAppInfo
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler
@@ -31,7 +32,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ext_user.first_name,
             ext_user.last_name,
             ext_user.email,
-            )
+        )
         await context.bot.send_message(
             chat_id=update.effective_user.id,
             text="Обратная связь - через кнопки под клавиатурой будут всегда под рукой!",
@@ -45,9 +46,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             last_name=update.effective_user.last_name,
         )
         keyboard_feedback = await feedback_buttons(
-            update.effective_user.first_name,
-            update.effective_user.last_name,
-            None)
+            update.effective_user.first_name, update.effective_user.last_name, None
+        )
         await context.bot.send_message(
             chat_id=update.effective_user.id,
             text="Обратная связь - через кнопки под клавиатурой будут всегда под рукой!",
