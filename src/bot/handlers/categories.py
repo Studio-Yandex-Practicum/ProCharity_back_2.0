@@ -13,10 +13,7 @@ from src.core.logging.utils import logger_decor
 @logger_decor
 @delete_previous_message
 async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_service = UserService()
     category_service = CategoryService()
-    user_categories = await user_service.get_user_categories(update.effective_user.id)
-    context.user_data["selected_categories"] = {category: None for category in user_categories}
     context.user_data["parent_id"] = None
     categories = await category_service.get_unarchived_parents()
 
@@ -34,13 +31,6 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
     query = update.callback_query
     telegram_id = update.effective_user.id
     user_service = UserService()
-
-    users_categories_ids = context.user_data.get("selected_categories", {}).keys()
-
-    await user_service.set_categories_to_user(
-        telegram_id=telegram_id,
-        categories_ids=users_categories_ids,
-    )
 
     categories = await user_service.get_user_categories(telegram_id)
     if not categories:
@@ -60,12 +50,13 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
 @logger_decor
 async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    category_service = CategoryService()
     query = update.callback_query
+    category_service = CategoryService()
+    user_service = UserService()
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
-    selected_categories = context.user_data.get("selected_categories", {})
+    selected_categories = await user_service.get_user_categories(update.effective_user.id)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
@@ -79,13 +70,16 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     category_service = CategoryService()
+    user_service = UserService()
     subcategory_id = int(context.match.group(1))
-    selected_categories = context.user_data.get("selected_categories", {})
+    selected_categories = await user_service.get_user_categories(update.effective_user.id)
 
     if subcategory_id not in selected_categories:
         selected_categories[subcategory_id] = None
+        await user_service.add_category_to_user(update.effective_user.id, subcategory_id)
     else:
         del selected_categories[subcategory_id]
+        await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
 
     parent_id = context.user_data["parent_id"]
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
