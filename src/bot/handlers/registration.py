@@ -51,8 +51,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard_feedback = await feedback_buttons(update.effective_user)
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text="Обратная связь - через кнопки под клавиатурой."
-        "Для Вашего удобства, будут всегда под рукой.",
+        text="Обратная связь - через кнопки под клавиатурой." "Для Вашего удобства, будут всегда под рукой.",
         reply_markup=keyboard_feedback,
     )
 
