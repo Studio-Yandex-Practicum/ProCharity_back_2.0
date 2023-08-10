@@ -1,9 +1,10 @@
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.core.db.models import Category, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
+from src.core.utils import auto_commit
 
 
 class UserRepository(AbstractRepository):
@@ -44,18 +45,14 @@ class UserRepository(AbstractRepository):
         if user:
             await self.update(user.id, user)
 
-    async def add_category_to_user(self, user: User, category_id: int) -> None:
-        """Добавляет категорию для пользователя."""
-        await self.create(UsersCategories(user_id=user.id, category_id=category_id))
-
+    @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:
         """Удаляет категорию у пользователя."""
-        users_categories_obj = await self._session.scalar(
-            select(UsersCategories)
+        await self._session.execute(
+            delete(UsersCategories)
             .where(UsersCategories.user_id == user.id)
             .where(UsersCategories.category_id == category_id)
         )
-        await self.remove(users_categories_obj)
 
     async def get_user_categories(self, user: User) -> list[Category]:
         """Возвращает список категорий пользователя."""
