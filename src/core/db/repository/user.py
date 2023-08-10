@@ -1,7 +1,9 @@
+from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.core.db.db import get_session
 from src.core.db.models import Category, User
 from src.core.db.repository.base import AbstractRepository
 
@@ -9,7 +11,7 @@ from src.core.db.repository.base import AbstractRepository
 class UserRepository(AbstractRepository):
     """Репозиторий для работы с моделью User."""
 
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, User)
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
