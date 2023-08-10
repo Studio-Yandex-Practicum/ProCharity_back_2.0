@@ -4,7 +4,7 @@ from typing import Generator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.db import get_session
-from src.core.db.models import User
+from src.core.db.models import User, UsersCategories
 from src.core.db.repository.user import UserRepository
 
 
@@ -57,7 +57,7 @@ class UserService:
         async with self._sessionmaker() as session:
             repository = UserRepository(session)
             user = await repository.get_by_telegram_id(telegram_id)
-            await repository.add_category_to_user(user, category_id)
+            await repository.create(UsersCategories(user_id=user.id, category_id=category_id))
 
     async def delete_category_from_user(self, telegram_id: int, category_id: int) -> None:
         """Удаляет у пользователя указанную категорию"""
