@@ -64,11 +64,11 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def feedback_buttons(name: User.first_name, surname: User.last_name, email: User.email) -> ReplyKeyboardMarkup:
+async def feedback_buttons(user: User) -> ReplyKeyboardMarkup:
     web_app = WebAppInfo(
         url=urljoin(
             settings.feedback_form_template_url,
-            FeedbackFormQueryParams(name=name, surname=surname, email=email).as_url_query(),
+            FeedbackFormQueryParams(name=user.first_name, surname=user.last_name).as_url_query(),
         )
     )
     keyboard = [

@@ -27,30 +27,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             external_id=ext_user.id,
         )
         await user_service.set_categories_to_user(update.effective_user.id, ext_user.specializations)
-        keyboard_feedback = await feedback_buttons(
-            ext_user.first_name,
-            ext_user.last_name,
-            ext_user.email,
-        )
-        await context.bot.send_message(
-            chat_id=update.effective_user.id,
-            text="Обратная связь - через кнопки под клавиатурой будут всегда под рукой!",
-            reply_markup=keyboard_feedback,
-        )
     else:
         await user_service.register_user(
             telegram_id=update.effective_user.id,
             username=update.effective_user.username,
             first_name=update.effective_user.first_name,
             last_name=update.effective_user.last_name,
-        )
-        keyboard_feedback = await feedback_buttons(
-            update.effective_user.first_name, update.effective_user.last_name, None
-        )
-        await context.bot.send_message(
-            chat_id=update.effective_user.id,
-            text="Обратная связь - через кнопки под клавиатурой будут всегда под рукой!",
-            reply_markup=keyboard_feedback,
         )
     categories = await user_service.get_user_categories(update.effective_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
@@ -64,6 +46,13 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
+    )
+    keyboard_feedback = await feedback_buttons(update.effective_user)
+    await context.bot.send_message(
+        chat_id=update.effective_user.id,
+        text="Обратная связь - через кнопки под клавиатурой."
+        "Для Вашего удобства, будут всегда под рукой.",
+        reply_markup=keyboard_feedback,
     )
 
 
