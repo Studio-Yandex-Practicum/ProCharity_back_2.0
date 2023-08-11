@@ -8,7 +8,6 @@ from src.api.endpoints import (
     task_router,
     telegram_webhook_router,
 )
-
 from src.settings import settings
 
 api_router = APIRouter(prefix=settings.ROOT_PATH)
