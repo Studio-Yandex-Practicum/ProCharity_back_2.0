@@ -11,7 +11,6 @@ MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
     [InlineKeyboardButton("✏️ Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)],
     [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)],
-    [InlineKeyboardButton("⁉ Проверка отправки email админам", callback_data=callback_data.TEST_EMAIL)],
 ]
 UNSUBSCRIBE_BUTTON = [
     InlineKeyboardButton("⏹️ Остановить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)

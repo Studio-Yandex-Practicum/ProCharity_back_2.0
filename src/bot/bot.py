@@ -3,7 +3,7 @@ import logging
 from telegram import Update
 from telegram.ext import AIORateLimiter, Application, TypeHandler
 
-from src.bot.handlers import categories, menu, registration, tasks
+from src.bot.handlers import categories, feedback_form, menu, registration, tasks
 from src.core.logging.utils import logging_updates
 from src.settings import settings
 
@@ -15,6 +15,7 @@ def create_bot() -> Application:
     categories.registration_handlers(bot)
     tasks.registration_handlers(bot)
     menu.registration_handlers(bot)
+    feedback_form.registration_handlers(bot)
     bot.add_handler(TypeHandler(Update, logging_updates))
     return bot
 
