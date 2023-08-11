@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Request
-# from telegram import Update
 
 from src.settings import settings
+
+# from telegram import Update
+
 
 telegram_webhook_router = APIRouter()
 
