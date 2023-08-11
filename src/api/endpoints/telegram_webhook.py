@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Request
-# from telegram import Update
 
 from src.settings import settings
+
+# from telegram import Update
+
 
 telegram_webhook_router = APIRouter()
 
@@ -15,7 +17,7 @@ if settings.BOT_WEBHOOK_MODE:
     )
     async def get_telegram_bot_updates(request: Request):
         """Получение обновлений telegram в режиме работы бота webhook."""
-        print(f'request_scope: {request.scope}')  # Печатает словарь
+        print(f"request_scope: {request.scope}")  # Печатает словарь
         # request_json_data = await request.json() # -> !!! JSONDecodeError
 
         # print(f'request_json_data: {request_json_data}')
