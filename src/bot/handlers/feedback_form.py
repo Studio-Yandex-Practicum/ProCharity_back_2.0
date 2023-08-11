@@ -28,7 +28,7 @@ async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         reply_markup=keyboard,
     )
     email_provider = EmailProvider()
-    feedback = FeedbackModel(**user_data)
+    feedback = FeedbackModel.model_validate(user_data)
     await email_provider.send_question_feedback(
         telegram_id=update.effective_user.id,
         message=feedback.to_message(),

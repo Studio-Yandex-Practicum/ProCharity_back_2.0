@@ -10,9 +10,9 @@ class FeedbackModel(BaseModel):
     feedback: str
 
     def to_message(self):
-        return f"""Recieved feedback from telegram bot user.
-                surname: {self.surname},
-                name: {self.name},
+        return f"""Получено сообщение от пользователя телеграмм бота.
+                Фамилия: {self.surname},
+                Имя: {self.name},
                 email: {self.email},
-                feedback: {self.feedback}
+                Отзыв: {self.feedback}
                 """
