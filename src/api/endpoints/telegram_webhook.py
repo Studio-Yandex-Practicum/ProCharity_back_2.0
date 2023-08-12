@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from src.settings import settings
+# from src.settings import settings
 
 # from telegram import Update
 
