@@ -4,9 +4,7 @@ from fastapi import APIRouter, Request
 
 # from telegram import Update
 
-
 telegram_webhook_router = APIRouter()
-
 
 # if settings.BOT_WEBHOOK_MODE:
 #     print(f"BOT_WEBHOOK_MODE: {settings.BOT_WEBHOOK_MODE}")
