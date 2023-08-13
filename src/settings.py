@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     # Настройки бота
     BOT_TOKEN: str
-    BOT_WEBHOOK_MODE: bool = True
+    BOT_WEBHOOK_MODE: bool = False
 
     # Настройки логирования
     LOG_LEVEL: str = "INFO"

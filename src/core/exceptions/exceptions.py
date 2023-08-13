@@ -38,3 +38,8 @@ class EmailSendError(ApplicationException):
 class UnauthorizedError(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
     detail = "У Вас нет прав для просмотра запрошенной страницы."
+
+
+class WebhookOnError(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.NO_CONTENT
+    detail = "Telegram Webhook выключен."
