@@ -4,6 +4,7 @@ from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class Base(DeclarativeBase):
@@ -110,3 +111,33 @@ class Category(ContentBase):
 
     def __repr__(self):
         return f"<Category {self.name}>"
+
+
+class AdminUser(Base):
+    __tablename__ = 'admin_users'
+
+    email: Mapped[str] = mapped_column(String(48), unique=True)
+    first_name: Mapped[str] = mapped_column(String(64), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(64), nullable=True)
+    password: Mapped[str] = mapped_column(String(128))
+    last_logon: Mapped[date]
+
+    def __repr__(self):
+        return f'<Admin User {self.first_name} {self.last_name}>'
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+
+class AdminTokenRequest(Base):
+    __tablename__ = 'admin_token_requests'
+
+    email: Mapped[str] = mapped_column(String(48), unique=True)
+    token: Mapped[str] = mapped_column(String(128))
+    token_expiration_date: Mapped[date]
+
+    def __repr__(self):
+        return f'<Register {self.email}>'
