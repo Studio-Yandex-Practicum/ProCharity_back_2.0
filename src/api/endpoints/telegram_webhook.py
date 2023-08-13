@@ -8,6 +8,7 @@ telegram_webhook_router = APIRouter()
 
 
 if settings.BOT_WEBHOOK_MODE:
+
     @telegram_webhook_router.post(
         "/webhook",
         description="Получить обновления telegram.",
