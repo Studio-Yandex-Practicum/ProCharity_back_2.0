@@ -114,7 +114,7 @@ class Category(ContentBase):
 
 
 class AdminUser(Base):
-    __tablename__ = 'admin_users'
+    __tablename__ = "admin_users"
 
     email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
@@ -123,7 +123,7 @@ class AdminUser(Base):
     last_logon: Mapped[date]
 
     def __repr__(self):
-        return f'<Admin User {self.first_name} {self.last_name}>'
+        return f"<Admin User {self.first_name} {self.last_name}>"
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -133,11 +133,11 @@ class AdminUser(Base):
 
 
 class AdminTokenRequest(Base):
-    __tablename__ = 'admin_token_requests'
+    __tablename__ = "admin_token_requests"
 
     email: Mapped[str] = mapped_column(String(48), unique=True)
     token: Mapped[str] = mapped_column(String(128))
     token_expiration_date: Mapped[date]
 
     def __repr__(self):
-        return f'<Register {self.email}>'
+        return f"<Register {self.email}>"
