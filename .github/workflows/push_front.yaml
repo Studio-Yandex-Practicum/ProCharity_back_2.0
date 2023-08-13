@@ -5,13 +5,11 @@ on:
     branches:
       - master
       - develop
-      - feature/deployment-of-admin-tools
 
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  DEPLOY_PATH: /code
   IMAGE_NAME_FRONT: procharity_bot_front
   OWNER_LC: studio-yandex-practicum
 
