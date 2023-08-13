@@ -1,0 +1,9 @@
+FROM node:12.13.0-alpine
+
+COPY ../front/package.json ./
+COPY ../front/yarn.lock ./
+COPY ../front ./frontend
+WORKDIR /frontend
+RUN yarn install
+RUN yarn build
+COPY ../front/public/robots.txt ./build/robots.txt
