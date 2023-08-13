@@ -120,7 +120,7 @@ class AdminUser(Base):
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     password: Mapped[str] = mapped_column(String(128))
-    last_logon: Mapped[date]
+    last_login: Mapped[date]
 
     def __repr__(self):
         return f"<Admin User {self.first_name} {self.last_name}>"
