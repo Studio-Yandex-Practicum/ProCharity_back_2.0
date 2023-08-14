@@ -1,15 +1,18 @@
-from sqlalchemy import select
+from fastapi import Depends
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.core.db.models import Category, User
+from src.core.db.db import get_session
+from src.core.db.models import Category, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
+from src.core.utils import auto_commit
 
 
 class UserRepository(AbstractRepository):
     """Репозиторий для работы с моделью User."""
 
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, User)
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
@@ -43,6 +46,15 @@ class UserRepository(AbstractRepository):
         user.categories = categories
         if user:
             await self.update(user.id, user)
+
+    @auto_commit
+    async def delete_category_from_user(self, user: User, category_id: int) -> None:
+        """Удаляет категорию у пользователя."""
+        await self._session.execute(
+            delete(UsersCategories)
+            .where(UsersCategories.user_id == user.id)
+            .where(UsersCategories.category_id == category_id)
+        )
 
     async def get_user_categories(self, user: User) -> list[Category]:
         """Возвращает список категорий пользователя."""

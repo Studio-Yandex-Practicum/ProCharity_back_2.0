@@ -8,8 +8,6 @@ from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_k
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
-from src.core.services.email import EmailProvider
-from src.settings import settings
 
 log = structlog.get_logger()
 
@@ -85,28 +83,9 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@logger_decor
-async def test_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Проверка, что админам приходит электронное письмо на почту."""
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="Админы, проверьте свою почту",
-        reply_markup=await get_back_menu(),
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-    email_provider = EmailProvider()
-    await email_provider.send_question_feedback(
-        telegram_id=update.effective_user.id,
-        message="Тест - тут будет вопрос/отзыв от пользователя",
-        email=settings.EMAIL_ADMIN,
-    )
-
-
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
-    app.add_handler(CallbackQueryHandler(test_mailing, pattern=callback_data.TEST_EMAIL))
