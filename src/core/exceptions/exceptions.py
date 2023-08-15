@@ -33,3 +33,13 @@ class EmailSendError(ApplicationException):
 
     def __init__(self, recipients: EmailStr | list[EmailStr], exc: Exception):
         self.detail = f"Возникла ошибка {exc} при отправке email на адрес {recipients}."
+
+
+class UnauthorizedError(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
+    detail = "У Вас нет прав для просмотра запрошенной страницы."
+
+
+class WebhookOnError(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.NO_CONTENT
+    detail = "Telegram Webhook выключен."
