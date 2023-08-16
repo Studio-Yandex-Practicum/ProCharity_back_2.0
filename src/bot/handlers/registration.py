@@ -38,21 +38,20 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     categories = await user_service.get_user_categories(update.effective_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
     keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start)
+    keyboard_feedback = await feedback_buttons(update.effective_user)
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text="Привет! 👋 \n\n"
-        'Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
+        text="Привет! 👋 \n\n",
+        reply_markup=keyboard_feedback,
+    )
+    await context.bot.send_message(
+        chat_id=update.effective_user.id,
+        text='Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
-    )
-    keyboard_feedback = await feedback_buttons(update.effective_user)
-    await context.bot.send_message(
-        chat_id=update.effective_user.id,
-        text="Обратная связь - через кнопки под клавиатурой." "Для Вашего удобства, будут всегда под рукой.",
-        reply_markup=keyboard_feedback,
     )
 
 
