@@ -64,7 +64,7 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
 
 
 async def feedback_buttons(user: User) -> ReplyKeyboardMarkup:
-    if hasattr(user, 'email'):
+    if hasattr(user, "email"):
         email = user.email
     else:
         email = None
