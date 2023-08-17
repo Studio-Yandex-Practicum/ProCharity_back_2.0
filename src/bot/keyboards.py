@@ -1,6 +1,6 @@
 from urllib.parse import urljoin
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum, urls
@@ -60,20 +60,25 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
         keyboard.extend([UNSUBSCRIBE_BUTTON])
     else:
         keyboard.extend([SUBSCRIBE_BUTTON])
-    # Кнопки обратной связи
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def feedback_buttons(user: User) -> ReplyKeyboardMarkup:
+    if hasattr(user, "email"):
+        email = user.email
+    else:
+        email = None
     web_app = WebAppInfo(
         url=urljoin(
             settings.feedback_form_template_url,
-            FeedbackFormQueryParams(name=user.first_name, surname=user.last_name, email=user.email).as_url_query(),
+            FeedbackFormQueryParams(name=user.first_name, surname=user.last_name, email=email).as_url_query(),
         )
     )
-    keyboard.extend(
-        [
-            [InlineKeyboardButton(QUESTION_BUTTON_TITLE, web_app=web_app)],
-            [InlineKeyboardButton(SUGGESTION_BUTTON_TITLE, web_app=web_app)],
-        ]
-    )
-    return InlineKeyboardMarkup(keyboard)
+    keyboard = [
+        [KeyboardButton(QUESTION_BUTTON_TITLE, web_app=web_app)],
+        [KeyboardButton(SUGGESTION_BUTTON_TITLE, web_app=web_app)],
+    ]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 
 async def get_back_menu() -> InlineKeyboardMarkup:
