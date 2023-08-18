@@ -18,8 +18,8 @@ class UserService:
         username: str = "",
         first_name: str = "",
         last_name: str = "",
-        email: str = "",
-        external_id: int = None,
+        email: str | None = None,
+        external_id: int | None = None,
     ) -> User:
         """Регистрирует нового пользователя по telegram_id.
 
