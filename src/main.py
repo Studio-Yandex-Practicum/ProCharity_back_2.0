@@ -1,23 +1,19 @@
-from fastapi import FastAPI
-from src.bot.bot import shutdown_bot, startup_bot
-from src.core.utils import set_ngrok
-from src.depends import Container
-from src.settings import settings
-
-
 from asgi_correlation_id import CorrelationIdMiddleware
-from src.core.logging.middleware import LoggingMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.router import api_router
-
+from fastapi.staticfiles import StaticFiles
 from telegram import Update
 from telegram.ext import AIORateLimiter, Application, TypeHandler
 
+from src.api.router import api_router
+from src.bot.bot import shutdown_bot, startup_bot
 from src.bot.handlers import categories, feedback_form, menu, registration, tasks
-from src.core.logging.utils import logging_updates
-
+from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
+from src.core.logging.utils import logging_updates
+from src.core.utils import set_ngrok
+from src.depends import Container
+from src.settings import settings
 
 
 def init_app(fastpi_app: FastAPI) -> FastAPI:
