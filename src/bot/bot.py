@@ -10,14 +10,20 @@ from src.settings import settings
 
 def create_bot() -> Application:
     bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
-
-    registration.registration_handlers(bot)
-    categories.registration_handlers(bot)
-    tasks.registration_handlers(bot)
-    menu.registration_handlers(bot)
-    feedback_form.registration_handlers(bot)
-    bot.add_handler(TypeHandler(Update, logging_updates))
     return bot
+
+
+# бекап
+# def create_bot() -> Application:
+#     bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
+
+#     registration.registration_handlers(bot)
+#     categories.registration_handlers(bot)
+#     tasks.registration_handlers(bot)
+#     menu.registration_handlers(bot)
+#     feedback_form.registration_handlers(bot)
+#     bot.add_handler(TypeHandler(Update, logging_updates))
+#     return bot
 
 
 async def start_bot() -> Application:
