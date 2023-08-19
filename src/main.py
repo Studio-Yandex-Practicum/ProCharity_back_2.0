@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.router import api_router
 
 from telegram import Update
-from telegram.ext import AIORateLimiter, Application, TypeHandler
+from telegram.ext import Application, TypeHandler
 
 from src.bot.handlers import categories, feedback_form, menu, registration, tasks
 from src.core.logging.utils import logging_updates
@@ -58,7 +58,7 @@ def main(run_bot: bool = True) -> FastAPI:
     container = Container()
     container.wire(packages=(__package__,))
     fastapi_app = init_app(container.fastapi_app())
-    telegram_bot = init_bot(container.telegram_bot())
+    init_bot(container.telegram_bot())
 
     @fastapi_app.on_event("startup")
     async def on_startup():

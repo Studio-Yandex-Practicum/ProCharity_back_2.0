@@ -1,10 +1,7 @@
 import logging
 
-from telegram import Update
-from telegram.ext import AIORateLimiter, Application, TypeHandler
+from telegram.ext import AIORateLimiter, Application
 
-from src.bot.handlers import categories, feedback_form, menu, registration, tasks
-from src.core.logging.utils import logging_updates
 from src.settings import settings
 
 
