@@ -169,3 +169,12 @@ class Analytic(BaseModel):
     all_users_statistic: Dict[str, str] = {}
     active_users_statistic: Dict[str, str] = {}
     tasks: Dict[str, str] = {}
+
+
+class HealthCheck(ResponseBase):
+    """Класс модели запроса для проверки работы бота."""
+
+    check_db_connection: Dict[str, str] = {}
+    check_bot: Dict[str, str] = {}
+    last_commit: Dict[str, str] = {}
+    simple_text_test: str = ""
