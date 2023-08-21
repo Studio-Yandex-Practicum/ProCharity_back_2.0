@@ -19,7 +19,7 @@ class HealthCheckService:
     async def check_bot(self,) -> dict[str, str]:
         try:
             webhook_info = await self._bot.bot.get_webhook_info()
-            logging.info(f"Health check: Bot connection succeeded")
+            logging.info("Health check: Bot connection succeeded")
             if settings.BOT_WEBHOOK_MODE:
                 return dict(status="True", method="webhooks", url=webhook_info.url)
             else:
