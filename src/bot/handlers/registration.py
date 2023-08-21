@@ -1,9 +1,6 @@
-import json
-
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler
-from telegram.ext.filters import StatusUpdate
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
