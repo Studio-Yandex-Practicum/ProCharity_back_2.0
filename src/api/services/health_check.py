@@ -16,7 +16,9 @@ class HealthCheckService:
     ) -> None:
         self._bot: Application = telegram_bot
 
-    async def check_bot(self,) -> dict[str, str]:
+    async def check_bot(
+        self,
+    ) -> dict[str, str]:
         try:
             webhook_info = await self._bot.bot.get_webhook_info()
             logging.info(f"Health check: Bot connection succeeded")

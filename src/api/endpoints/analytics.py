@@ -13,8 +13,7 @@ async def get_analytics(analytic_service: AnalyticsService = Depends()) -> Analy
 
 
 @analytic_router.get(
-    "/health_check",
-    description="Проверяет соединение с БД, ботом и выводит информацию о последнем коммите."
+    "/health_check", description="Проверяет соединение с БД, ботом и выводит информацию о последнем коммите."
 )
 async def get_health_check(health_check_service: HealthCheckService = Depends()) -> HealthCheck:
     return HealthCheck(
