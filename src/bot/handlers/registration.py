@@ -1,9 +1,6 @@
-import json
-
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler
-from telegram.ext.filters import StatusUpdate
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
@@ -73,25 +70,6 @@ async def confirm_chosen_categories(update: Update, context: ContextTypes.DEFAUL
     )
 
 
-@logger_decor
-async def web_app_data(update: Update):
-    user_data = json.loads(update.effective_message.web_app_data.data)
-    buttons = [
-        [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
-        [InlineKeyboardButton(text="Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
-    ]
-    keyboard = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity! Ответ придет на почту {user_data['email']}",
-        reply_markup=ReplyKeyboardRemove(),
-    )
-    await update.message.reply_text(
-        text="Вы можете вернуться в меню или посмотреть открытые задания. Нажмите на нужную кнопку.",
-        reply_markup=keyboard,
-    )
-
-
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.START, start_command))
     app.add_handler(CallbackQueryHandler(confirm_chosen_categories, pattern=commands.GREETING_REGISTERED_USER))
-    app.add_handler(MessageHandler(StatusUpdate.WEB_APP_DATA, web_app_data))
