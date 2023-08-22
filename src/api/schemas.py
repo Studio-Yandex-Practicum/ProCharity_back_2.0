@@ -177,4 +177,3 @@ class HealthCheck(ResponseBase):
     check_db_connection: Dict[str, str] = {}
     check_bot: Dict[str, str] = {}
     last_commit: Dict[str, Union[str, list[str]]] = {}
-
