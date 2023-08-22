@@ -1,6 +1,6 @@
 import urllib
 from datetime import date
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 
@@ -176,5 +176,5 @@ class HealthCheck(ResponseBase):
 
     check_db_connection: Dict[str, str] = {}
     check_bot: Dict[str, str] = {}
-    last_commit: Dict[str, str] = {}
-    simple_text_test: str = ""
+    last_commit: Dict[str, Union[str, list[str]]] = {}
+

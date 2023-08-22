@@ -1,8 +1,13 @@
+import datetime
 import logging
+import os
 
 from fastapi import Depends
+from git import Repo
 from telegram.ext import Application
+from typing import Union
 
+from src.api.constants import DATE_TIME_FORMAT
 from src.bot.bot import create_bot
 from src.settings import settings
 
@@ -27,3 +32,13 @@ class HealthCheckService:
         except Exception as ex:
             logging.critical(f"Health check: Bot error '{str(ex)}'")
             return dict(status="False", error=f"{ex}")
+
+
+    async def get_last_commit(self,) -> dict[str, Union[str, list[str]]]:
+        repo = Repo(os.getcwd())
+        master = repo.head.reference
+        commit_date = datetime.datetime.fromtimestamp(master.commit.committed_date)
+        last_commit = dict(last_commit=str(master.commit)[:7],
+                      commit_date=commit_date.strftime(DATE_TIME_FORMAT),
+                      tags=repo.tags)
+        return last_commit

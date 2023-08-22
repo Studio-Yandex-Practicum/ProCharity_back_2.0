@@ -18,6 +18,6 @@ async def get_analytics(analytic_service: AnalyticsService = Depends()) -> Analy
 )
 async def get_health_check(health_check_service: HealthCheckService = Depends()) -> HealthCheck:
     return HealthCheck(
-        test_test_test="HERE SOME TEXT",
         check_bot=await health_check_service.check_bot(),
+        last_commit=await health_check_service.get_last_commit(),
     )
