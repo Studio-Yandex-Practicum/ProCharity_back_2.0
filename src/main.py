@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 
+from src.api import init_app
+from src.bot import init_bot
 from src.bot.bot import shutdown_bot, startup_bot
 from src.core.utils import set_ngrok
 from src.depends import Container
-
-from src.api import init_app
-from src.bot import init_bot
 
 
 def main(run_bot: bool = True) -> FastAPI:
