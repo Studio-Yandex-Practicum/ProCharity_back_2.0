@@ -7,14 +7,8 @@ from src.settings import settings
 engine = create_async_engine(settings.database_url)
 
 
-async def get_session(sessionmaker) -> Generator[AsyncSession, None, None]:
-    async_session = sessionmaker()
-    async with async_session() as session:
+async def get_session(
+        sessionmaker=async_sessionmaker(engine, expire_on_commit=False)
+) -> Generator[AsyncSession, None, None]:
+    async with sessionmaker() as session:
         yield session
-
-
-# бэкап
-# async def get_session() -> Generator[AsyncSession, None, None]:
-#     async_session = async_sessionmaker(engine, expire_on_commit=False)
-#     async with async_session() as session:
-#         yield session
