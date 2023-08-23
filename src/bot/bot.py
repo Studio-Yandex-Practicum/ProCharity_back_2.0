@@ -9,10 +9,7 @@ def create_bot(bot_token) -> Application:
 
 
 async def start_bot(
-        bot: Application,
-        BOT_WEBHOOK_MODE: bool,
-        telegram_webhook_url: str,
-        SECRET_KEY: str
+    bot: Application, BOT_WEBHOOK_MODE: bool, telegram_webhook_url: str, SECRET_KEY: str
 ) -> Application:
     """Запуск бота в `Background` режиме."""
     await bot.initialize()
@@ -30,10 +27,7 @@ async def start_bot(
 
 
 async def startup_bot(
-        bot: Application,
-        BOT_WEBHOOK_MODE: bool,
-        telegram_webhook_url: str,
-        SECRET_KEY: str
+    bot: Application, BOT_WEBHOOK_MODE: bool, telegram_webhook_url: str, SECRET_KEY: str
 ) -> Application:
     bot_instance = await start_bot(bot, BOT_WEBHOOK_MODE, telegram_webhook_url, SECRET_KEY)
     return bot_instance

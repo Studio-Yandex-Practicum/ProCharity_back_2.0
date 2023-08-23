@@ -31,8 +31,7 @@ def main(run_bot: bool = True) -> FastAPI:
         """Действия после остановки сервера."""
         if run_bot:
             await shutdown_bot(
-                fastapi_app.state.bot_instance,
-                BOT_WEBHOOK_MODE=container.settings.provided.BOT_WEBHOOK_MODE
+                fastapi_app.state.bot_instance, BOT_WEBHOOK_MODE=container.settings.provided.BOT_WEBHOOK_MODE
             )
 
     return fastapi_app
