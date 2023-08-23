@@ -1,12 +1,11 @@
 from datetime import date
 
+# from werkzeug.security import check_password_hash, generate_password_hash
+from passlib.context import CryptContext
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
-# from werkzeug.security import check_password_hash, generate_password_hash
-from passlib.context import CryptContext
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
