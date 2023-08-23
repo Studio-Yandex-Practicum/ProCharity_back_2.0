@@ -1,9 +1,10 @@
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from src.core.logging.middleware import LoggingMiddleware
-from asgi_correlation_id import CorrelationIdMiddleware
+
 from src.api.router import api_router
+from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
 from src.settings import settings
 

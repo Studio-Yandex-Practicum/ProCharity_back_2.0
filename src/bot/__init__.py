@@ -1,9 +1,10 @@
+from telegram import Update
 from telegram.ext import Application, TypeHandler
 
-from .bot import create_bot, start_bot
 from src.bot.handlers import categories, feedback_form, menu, registration, tasks
-from telegram import Update
 from src.core.logging.utils import logging_updates
+
+from .bot import create_bot, start_bot
 
 __all__ = (
     "start_bot",
