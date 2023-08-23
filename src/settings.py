@@ -25,6 +25,7 @@ class Settings(BaseSettings):
 
     APPLICATION_URL: str = "http://localhost:8000"
     SECRET_KEY: str = "secret_key"
+    ALGORITHM: str = "HS256"
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
     USE_NGROK: bool = False
