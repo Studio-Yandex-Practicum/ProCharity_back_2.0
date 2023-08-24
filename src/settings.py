@@ -25,7 +25,6 @@ class Settings(BaseSettings):
 
     APPLICATION_URL: str = "http://localhost:8000"
     SECRET_KEY: str = "secret_key"
-    ALGORITHM: str = "HS256"
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
     USE_NGROK: bool = False
@@ -42,6 +41,10 @@ class Settings(BaseSettings):
     # Настройки бота
     BOT_TOKEN: str
     BOT_WEBHOOK_MODE: bool = False
+
+    # Настройки jwt
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Настройки логирования
     LOG_LEVEL: str = "INFO"
