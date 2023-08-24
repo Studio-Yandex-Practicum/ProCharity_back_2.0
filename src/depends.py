@@ -9,6 +9,7 @@ from src.settings import get_settings
 
 class Container(containers.DeclarativeContainer):
     """Контейнер dependency_injector."""
+
     # Settings
     settings = providers.Singleton(get_settings)
 
