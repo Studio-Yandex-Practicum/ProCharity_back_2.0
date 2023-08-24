@@ -21,9 +21,9 @@ def main(run_bot: bool = True) -> FastAPI:
         if run_bot:
             fastapi_app.state.bot_instance = await startup_bot(
                 bot=bot,
-                BOT_WEBHOOK_MODE=container.settings.provided.BOT_WEBHOOK_MODE,
+                bot_webhook_mode=container.settings.provided.BOT_WEBHOOK_MODE,
                 telegram_webhook_url=container.settings.provided.telegram_webhook_url,
-                SECRET_KEY=container.settings.provided.SECRET_KEY,
+                secret_key=container.settings.provided.SECRET_KEY,
             )
 
     @fastapi_app.on_event("shutdown")
@@ -31,7 +31,7 @@ def main(run_bot: bool = True) -> FastAPI:
         """Действия после остановки сервера."""
         if run_bot:
             await shutdown_bot(
-                fastapi_app.state.bot_instance, BOT_WEBHOOK_MODE=container.settings.provided.BOT_WEBHOOK_MODE
+                fastapi_app.state.bot_instance, bot_webhook_mode=container.settings.provided.BOT_WEBHOOK_MODE
             )
 
     return fastapi_app
