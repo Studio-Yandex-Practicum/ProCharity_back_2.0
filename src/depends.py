@@ -8,11 +8,15 @@ from src.settings import get_settings
 
 
 class Container(containers.DeclarativeContainer):
-    config = providers.Configuration()
-
+    """Контейнер dependency_injector."""
+    # Settings
     settings = providers.Singleton(get_settings)
+
+    # Database connection
     engine = providers.Singleton(create_async_engine, url=settings.provided.database_url)
     sessionmaker = providers.Singleton(async_sessionmaker, engine=engine, expire_on_commit=False)
     session = providers.Resource(get_session, sessionmaker=sessionmaker)
+
+    #  Applications
     fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG)
     telegram_bot = providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN)
