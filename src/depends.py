@@ -17,6 +17,6 @@ class Container(containers.DeclarativeContainer):
     sessionmaker = providers.Singleton(async_sessionmaker, engine=engine, expire_on_commit=False)
     session = providers.Resource(get_session, sessionmaker=sessionmaker)
 
-    #  Applications
+    # Applications
     fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG)
     telegram_bot = providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN)
