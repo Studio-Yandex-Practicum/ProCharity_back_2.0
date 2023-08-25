@@ -7,12 +7,7 @@ from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_v
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
 
-from .constants import (
-    DATE_FORMAT, TASK_ID_DESCRIPTION, TASK_CATEGORY_ID_DESCRIPTION,
-    BONUS_DESCRIPTION, NAME_ORGANIZATION_DESCRIPTION,
-    TITLE_DESCRIPTION, DEADLINE_DESCRIPTION, LINK_DESCRIPTION,
-    LOCATION_DESCRIPTION, CATEGORY_ID_DESCRIPTION,
-    CATEGORY_NAME_DESCRIPTION, PARENT_ID_DESCRIPTION)
+from .constants import DATE_FORMAT
 
 
 class ResponseBase(BaseModel):
@@ -33,11 +28,16 @@ class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
     id: int = Field(
-        ..., ge=1, lt=10**10, description=CATEGORY_ID_DESCRIPTION)
+        ..., ge=1, lt=10**10,
+        description="Уникальный идентификатор категории")
     name: str = Field(
-        ..., min_length=2, max_length=100, description=CATEGORY_NAME_DESCRIPTION)
+        ..., min_length=2, max_length=100,
+        description="Название категории.")
     parent_id: Optional[int] = Field(
-        None, ge=1, lt=10**10, description=PARENT_ID_DESCRIPTION)
+        None, ge=1, lt=10**10,
+        description=(
+            "Принадлежность к родительской категории."
+            "Если null, то это родительская категория."))
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
@@ -67,14 +67,23 @@ class CategoryResponse(ResponseBase):
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: NonNegativeInt = Field(..., description=TASK_ID_DESCRIPTION)
-    title: StrictStr = Field(..., description=TITLE_DESCRIPTION)
-    name_organization: StrictStr = Field(..., description=NAME_ORGANIZATION_DESCRIPTION)
-    deadline: date = Field(..., format=DATE_FORMAT, description=DEADLINE_DESCRIPTION)
-    category_id: NonNegativeInt = Field(..., description=TASK_CATEGORY_ID_DESCRIPTION)
-    bonus: NonNegativeInt = Field(..., description=BONUS_DESCRIPTION)
-    location: StrictStr = Field(..., description=LOCATION_DESCRIPTION)
-    link: StrictStr = Field(..., description=LINK_DESCRIPTION)
+    id: NonNegativeInt = Field(
+        ..., description="Уникальный идентификатор задачи.")
+    title: StrictStr = Field(
+        ..., description="Название задачи.")
+    name_organization: StrictStr = Field(
+        ..., description="Название организации, оставившей задачу.")
+    deadline: date = Field(
+        ..., format=DATE_FORMAT,
+        description="Время, до которого нужно выполнить задачу.")
+    category_id: NonNegativeInt = Field(
+        ..., description="Показывает, к какой дочерней категории относится задача.")
+    bonus: NonNegativeInt = Field(
+        ..., description="Величина бонуса за выполнение задачи.")
+    location: StrictStr = Field(
+        ..., description="Локация, в которой находится заказчик задачи.")
+    link: StrictStr = Field(
+        ..., description="Ссылка на сайт, где размещена задача.")
     description: Optional[StrictStr] = None
 
     class Config:

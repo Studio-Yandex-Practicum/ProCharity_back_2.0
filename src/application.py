@@ -14,7 +14,7 @@ from src.settings import settings
 def create_app(run_bot: bool = True) -> FastAPI:
     app = FastAPI(
         debug=settings.DEBUG,
-        openapi_tags=tags_metadata
+        openapi_tags=tags_metadata,
     )
     origins = ["*"]
 
