@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.api.router import api_router
+from src.api.router import api_router, tags_metadata
 from src.bot.bot import shutdown_bot, startup_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
@@ -14,6 +14,7 @@ from src.settings import settings
 def create_app(run_bot: bool = True) -> FastAPI:
     app = FastAPI(
         debug=settings.DEBUG,
+        openapi_tags=tags_metadata
     )
     origins = ["*"]
 
@@ -30,6 +31,7 @@ def create_app(run_bot: bool = True) -> FastAPI:
     app.add_middleware(CorrelationIdMiddleware)
 
     app.include_router(api_router)
+
     if settings.DEBUG:
         app.mount(
             "/static",

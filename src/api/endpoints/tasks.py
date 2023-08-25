@@ -5,11 +5,12 @@ from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.core.db.models import Task
 from src.core.utils import display_tasks
+from src.api.endpoints.constants import TASK_POST_DESCRIPTION
 
 task_router = APIRouter()
 
 
-@task_router.post("/", description="Актуализирует список задач.")
+@task_router.post("/", description=TASK_POST_DESCRIPTION)
 async def actualize_tasks(
     tasks: list[TaskRequest],
     task_service: TaskService = Depends(),

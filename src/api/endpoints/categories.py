@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends
 from src.api.schemas import CategoryRequest, CategoryResponse
 from src.api.services import CategoryService
 from src.core.db.models import Category
+from src.api.endpoints.constants import CATEGORY_POST_DESCRIPTION
 
 category_router = APIRouter()
 
@@ -17,7 +18,7 @@ async def get_categories(category_service: CategoryService = Depends()) -> list[
     return await category_service.get_all()
 
 
-@category_router.post("/", description="Актуализирует список категорий.")
+@category_router.post("/", description=CATEGORY_POST_DESCRIPTION)
 async def actualize_categories(
     categories: list[CategoryRequest], category_service: CategoryService = Depends()
 ) -> None:

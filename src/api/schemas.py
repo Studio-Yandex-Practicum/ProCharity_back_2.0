@@ -7,7 +7,12 @@ from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_v
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
 
-from .constants import DATE_FORMAT
+from .constants import (
+    DATE_FORMAT, TASK_ID_DESCRIPTION, TASK_CATEGORY_ID_DESCRIPTION,
+    BONUS_DESCRIPTION, NAME_ORGANIZATION_DESCRIPTION,
+    TITLE_DESCRIPTION, DEADLINE_DESCRIPTION, LINK_DESCRIPTION,
+    LOCATION_DESCRIPTION, CATEGORY_ID_DESCRIPTION,
+    CATEGORY_NAME_DESCRIPTION, PARENT_ID_DESCRIPTION)
 
 
 class ResponseBase(BaseModel):
@@ -27,15 +32,27 @@ class RequestBase(BaseModel):
 class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
-    id: int = Field(..., ge=1, lt=10**10)
-    name: str = Field(..., min_length=2, max_length=100)
-    parent_id: Optional[int] = Field(None, ge=1, lt=10**10)
+    id: int = Field(
+        ..., ge=1, lt=10**10, description=CATEGORY_ID_DESCRIPTION)
+    name: str = Field(
+        ..., min_length=2, max_length=100, description=CATEGORY_NAME_DESCRIPTION)
+    parent_id: Optional[int] = Field(
+        None, ge=1, lt=10**10, description=PARENT_ID_DESCRIPTION)
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
         if values["parent_id"] and values["parent_id"] == values["id"]:
             raise ValueError("Категория не может быть дочерней для самой себя.")
         return values
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 11,
+                "name": "Дизайн сайтов",
+                "parent_id": 1,
+            }
+        }
 
 
 class CategoryResponse(ResponseBase):
@@ -50,14 +67,14 @@ class CategoryResponse(ResponseBase):
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: NonNegativeInt = Field(...)
-    title: StrictStr = Field(...)
-    name_organization: StrictStr = Field(...)
-    deadline: date = Field(..., format=DATE_FORMAT)
-    category_id: NonNegativeInt = Field(...)
-    bonus: NonNegativeInt = Field(...)
-    location: StrictStr = Field(...)
-    link: StrictStr = Field(...)
+    id: NonNegativeInt = Field(..., description=TASK_ID_DESCRIPTION)
+    title: StrictStr = Field(..., description=TITLE_DESCRIPTION)
+    name_organization: StrictStr = Field(..., description=NAME_ORGANIZATION_DESCRIPTION)
+    deadline: date = Field(..., format=DATE_FORMAT, description=DEADLINE_DESCRIPTION)
+    category_id: NonNegativeInt = Field(..., description=TASK_CATEGORY_ID_DESCRIPTION)
+    bonus: NonNegativeInt = Field(..., description=BONUS_DESCRIPTION)
+    location: StrictStr = Field(..., description=LOCATION_DESCRIPTION)
+    link: StrictStr = Field(..., description=LINK_DESCRIPTION)
     description: Optional[StrictStr] = None
 
     class Config:
