@@ -1,34 +1,23 @@
 import logging
 
-from telegram import Update
-from telegram.ext import AIORateLimiter, Application, TypeHandler
-
-from src.bot.handlers import categories, feedback_form, menu, registration, tasks
-from src.core.logging.utils import logging_updates
-from src.settings import settings
+from telegram.ext import AIORateLimiter, Application
 
 
-def create_bot() -> Application:
-    bot = Application.builder().token(settings.BOT_TOKEN).rate_limiter(AIORateLimiter()).build()
-
-    registration.registration_handlers(bot)
-    categories.registration_handlers(bot)
-    tasks.registration_handlers(bot)
-    menu.registration_handlers(bot)
-    feedback_form.registration_handlers(bot)
-    bot.add_handler(TypeHandler(Update, logging_updates))
+def create_bot(bot_token) -> Application:
+    bot = Application.builder().token(bot_token).rate_limiter(AIORateLimiter()).build()
     return bot
 
 
-async def start_bot() -> Application:
+async def start_bot(
+    bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, secret_key: str
+) -> Application:
     """Запуск бота в `Background` режиме."""
-    bot = create_bot()
     await bot.initialize()
-    if settings.BOT_WEBHOOK_MODE:
+    if bot_webhook_mode is True:
         bot.updater = None
         await bot.bot.set_webhook(
-            url=settings.telegram_webhook_url,
-            secret_token=settings.SECRET_KEY,
+            url=telegram_webhook_url,
+            secret_token=secret_key,
         )
     else:
         await bot.updater.start_polling()  # type: ignore
@@ -37,13 +26,15 @@ async def start_bot() -> Application:
     return bot
 
 
-async def startup_bot():
-    bot_instance = await start_bot()
+async def startup_bot(
+    bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, secret_key: str
+) -> Application:
+    bot_instance = await start_bot(bot, bot_webhook_mode, telegram_webhook_url, secret_key)
     return bot_instance
 
 
-async def shutdown_bot(bot_instance):
-    if not settings.BOT_WEBHOOK_MODE:
+async def shutdown_bot(bot_instance, bot_webhook_mode: bool):
+    if bot_webhook_mode is True:
         await bot_instance.updater.stop()
     await bot_instance.stop()
     await bot_instance.shutdown()
