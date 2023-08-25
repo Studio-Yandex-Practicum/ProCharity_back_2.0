@@ -31,7 +31,6 @@ def create_app(run_bot: bool = True) -> FastAPI:
     app.add_middleware(CorrelationIdMiddleware)
 
     app.include_router(api_router)
-
     if settings.DEBUG:
         app.mount(
             "/static",
