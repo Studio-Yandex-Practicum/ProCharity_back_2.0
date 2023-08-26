@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 
+from src.api.endpoints.constants import TASK_POST_DESCRIPTION
 from src.api.schemas import TaskRequest, TaskResponse
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.core.db.models import Task
 from src.core.utils import display_tasks
-from src.api.endpoints.constants import TASK_POST_DESCRIPTION
 
 task_router = APIRouter()
 
