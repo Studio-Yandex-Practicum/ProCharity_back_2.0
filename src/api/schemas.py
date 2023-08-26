@@ -27,17 +27,14 @@ class RequestBase(BaseModel):
 class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
-    id: int = Field(
-        ..., ge=1, lt=10**10,
-        description="Уникальный идентификатор категории")
-    name: str = Field(
-        ..., min_length=2, max_length=100,
-        description="Название категории.")
+    id: int = Field(..., ge=1, lt=10**10, description="Уникальный идентификатор категории")
+    name: str = Field(..., min_length=2, max_length=100, description="Название категории.")
     parent_id: Optional[int] = Field(
-        None, ge=1, lt=10**10,
-        description=(
-            "Принадлежность к родительской категории."
-            "Если null, то это родительская категория."))
+        None,
+        ge=1,
+        lt=10**10,
+        description=("Принадлежность к родительской категории." "Если null, то это родительская категория."),
+    )
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
@@ -67,23 +64,14 @@ class CategoryResponse(ResponseBase):
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: NonNegativeInt = Field(
-        ..., description="Уникальный идентификатор задачи.")
-    title: StrictStr = Field(
-        ..., description="Название задачи.")
-    name_organization: StrictStr = Field(
-        ..., description="Название организации, оставившей задачу.")
-    deadline: date = Field(
-        ..., format=DATE_FORMAT,
-        description="Время, до которого нужно выполнить задачу.")
-    category_id: NonNegativeInt = Field(
-        ..., description="Показывает, к какой дочерней категории относится задача.")
-    bonus: NonNegativeInt = Field(
-        ..., description="Величина бонуса за выполнение задачи.")
-    location: StrictStr = Field(
-        ..., description="Локация, в которой находится заказчик задачи.")
-    link: StrictStr = Field(
-        ..., description="Ссылка на сайт, где размещена задача.")
+    id: NonNegativeInt = Field(..., description="Уникальный идентификатор задачи.")
+    title: StrictStr = Field(..., description="Название задачи.")
+    name_organization: StrictStr = Field(..., description="Название организации, оставившей задачу.")
+    deadline: date = Field(..., format=DATE_FORMAT, description="Время, до которого нужно выполнить задачу.")
+    category_id: NonNegativeInt = Field(..., description="Показывает, к какой дочерней категории относится задача.")
+    bonus: NonNegativeInt = Field(..., description="Величина бонуса за выполнение задачи.")
+    location: StrictStr = Field(..., description="Локация, в которой находится заказчик задачи.")
+    link: StrictStr = Field(..., description="Ссылка на сайт, где размещена задача.")
     description: Optional[StrictStr] = None
 
     class Config:
