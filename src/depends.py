@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from src.bot.bot import create_bot
 from src.core.db import get_session
 from src.settings import get_settings
+from src.api.router import tags_metadata
 
 
 class Container(containers.DeclarativeContainer):
@@ -19,5 +20,5 @@ class Container(containers.DeclarativeContainer):
     session = providers.Resource(get_session, sessionmaker=sessionmaker)
 
     # Applications
-    fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG)
+    fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG, openapi_tags=tags_metadata)
     telegram_bot = providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN)
