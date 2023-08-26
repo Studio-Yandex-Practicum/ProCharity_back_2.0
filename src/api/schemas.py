@@ -1,6 +1,7 @@
 import urllib
 from datetime import date
-from typing import Dict, Optional, Union
+from typing import Optional
+from typing_extensions import NotRequired, TypedDict
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 
@@ -163,17 +164,40 @@ class ExternalSiteUserRequest(RequestBase):
 class Analytic(BaseModel):
     """Класс модели запроса для статистики."""
 
-    command_stats: Dict[str, str] = {}
+    command_stats: dict[str, str] = {}
     reasons_canceling: str = ""
     number_users: int = 0
-    all_users_statistic: Dict[str, str] = {}
-    active_users_statistic: Dict[str, str] = {}
-    tasks: Dict[str, str] = {}
+    all_users_statistic: dict[str, str] = {}
+    active_users_statistic: dict[str, str] = {}
+    tasks: dict[str, str] = {}
+
+
+class DBStatus(TypedDict):
+    """Класс ответа для проверки работы базы данных."""
+    status: bool
+    last_update: NotRequired[str]
+    active_tasks: NotRequired[int]
+    db_connection_error: NotRequired[str]
+
+
+class BotStatus(TypedDict):
+    """Класс ответа для проверки работы бота."""
+    status: bool
+    method: NotRequired[str]
+    url: NotRequired[str]
+    error: NotRequired[str]
+
+
+class CommitStatus(TypedDict):
+    """Класс ответа для git коммита."""
+    last_commit: str
+    commit_date: str
+    tags: list[str]
 
 
 class HealthCheck(ResponseBase):
     """Класс модели запроса для проверки работы бота."""
 
-    check_db_connection: Dict[str, str] = {}
-    check_bot: Dict[str, str] = {}
-    last_commit: Dict[str, Union[str, list[str]]] = {}
+    check_db_connection: DBStatus = {}
+    check_bot: BotStatus = {}
+    last_commit: CommitStatus = {}
