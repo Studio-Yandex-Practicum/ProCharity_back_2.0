@@ -2,10 +2,10 @@ from dependency_injector import containers, providers
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.api.router import tags_metadata
 from src.bot.bot import create_bot
 from src.core.db import get_session
 from src.settings import get_settings
-from src.api.router import tags_metadata
 
 
 class Container(containers.DeclarativeContainer):
