@@ -1,5 +1,4 @@
 import datetime
-#import logging
 import os
 
 from fastapi import Depends
@@ -9,8 +8,10 @@ from telegram.ext import Application
 
 from src.api.constants import DATE_TIME_FORMAT
 from src.api.schemas import BotStatus, CommitStatus, DBStatus, HealthCheck
+from src.bot import init_bot
 from src.bot.bot import create_bot
 from src.core.db.repository import TaskRepository
+from src.depends import Container
 from src.settings import settings
 
 
@@ -19,16 +20,15 @@ class HealthCheckService:
 
     def __init__(
         self,
-        telegram_bot: Application = Depends(create_bot),
         task_repository: TaskRepository = Depends(),
     ) -> None:
-        self._bot: Application = telegram_bot
         self._repository: TaskRepository = task_repository
+        self._container = Container()
+        self._bot = init_bot(self._container.telegram_bot())
 
     async def check_bot(self) -> BotStatus:
         try:
             webhook_info = await self._bot.bot.get_webhook_info()
-            #logging.info("Health check: Bot connection succeeded")
             if settings.BOT_WEBHOOK_MODE:
                 bot_status: BotStatus = {"status": True, "method": "webhooks", "url": webhook_info.url}
                 return bot_status
@@ -36,7 +36,6 @@ class HealthCheckService:
                 bot_status: BotStatus = {"status": True, "method": "pulling"}
                 return bot_status
         except Exception as exc:
-            # logging.critical(f"Health check: Bot error '{str(exc)}'")
             bot_status: BotStatus = {"status": False, "error": f"{exc}"}
             return bot_status
 
@@ -57,14 +56,12 @@ class HealthCheckService:
             get_last_update = await self._repository.get_last_update()
             if get_last_update is None:
                 get_last_update = 0
-            # logging.info("Health check: Database connection succeeded")
             db_status: DBStatus = {
                 "status": True,
                 "last_update": get_last_update,
                 "active_tasks": active_tasks,
             }
             return db_status
-        except SQLAlchemyError as exc:  #TODO Если остановить контейнер, все падает с 500й ошибкой. Ловли искл. нет!!!
-            # logging.critical(f"Health check: Database error '{str(exc)}'")
+        except SQLAlchemyError as exc:
             db_status: DBStatus = {"status": False, "db_connection_error": f"{exc}"}
             return db_status
