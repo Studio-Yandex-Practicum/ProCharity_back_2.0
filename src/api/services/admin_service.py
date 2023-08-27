@@ -1,19 +1,17 @@
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
 
+from jose import JWTError, jwt
 
 from src.core.db.models import AdminUser
 from src.core.db.repository.admin_repository import AdminUserRepository
-from src.settings import settings
 from src.core.exceptions.exceptions import CredentialsException
+from src.settings import settings
 
 
 class AdminService:
     """Сервис для работы с моделью AdminUser."""
 
-    def __init__(
-        self, admin_repository: AdminUserRepository
-    ) -> None:
+    def __init__(self, admin_repository: AdminUserRepository) -> None:
         self._repository: AdminUserRepository = admin_repository
 
     async def authenticate_user(self, email: str, password: str) -> AdminUser | None:
