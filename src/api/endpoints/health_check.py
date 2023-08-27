@@ -6,10 +6,9 @@ from src.core.logging.utils import logger_decor
 
 health_check_router = APIRouter()
 
+
 @logger_decor
-@health_check_router.get(
-    "/", description="Проверяет соединение с БД, ботом и выводит информацию о последнем коммите."
-)
+@health_check_router.get("/", description="Проверяет соединение с БД, ботом и выводит информацию о последнем коммите.")
 async def get_health_check(health_check_service: HealthCheckService = Depends()) -> HealthCheck:
     return HealthCheck(
         check_db_connection=await health_check_service.check_db_connection(),
