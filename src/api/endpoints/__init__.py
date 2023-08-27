@@ -9,7 +9,7 @@ from .telegram_webhook import telegram_webhook_router
 __all__ = (
     "analytic_router",
     "category_router",
-    "health_check",
+    "health_check_router",
     "task_router",
     "telegram_webhook_router",
     "form_router",

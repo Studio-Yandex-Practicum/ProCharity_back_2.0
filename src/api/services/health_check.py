@@ -4,12 +4,10 @@ import os
 from fastapi import Depends
 from git import Repo
 from sqlalchemy.exc import SQLAlchemyError
-from telegram.ext import Application
 
 from src.api.constants import DATE_TIME_FORMAT
-from src.api.schemas import BotStatus, CommitStatus, DBStatus, HealthCheck
+from src.api.schemas import BotStatus, CommitStatus, DBStatus
 from src.bot import init_bot
-from src.bot.bot import create_bot
 from src.core.db.repository import TaskRepository
 from src.depends import Container
 from src.settings import settings
