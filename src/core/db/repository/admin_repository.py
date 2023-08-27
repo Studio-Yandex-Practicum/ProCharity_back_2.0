@@ -12,8 +12,10 @@ class AdminUserRepository(AbstractRepository):
 
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         super().__init__(session, AdminUser)
+        self._actual_session = get_session()
 
     async def get_by_email(self, email: str) -> AdminUser | None:
         """Возвращает пользователя (или None) по email."""
-        user = await self._session.execute(select(AdminUser).where(AdminUser.email == email))
-        return user.scalars().first()
+        async for session in self._actual_session:
+            user = await session.execute(select(AdminUser).where(AdminUser.email == email))
+            return user.scalars().first()
