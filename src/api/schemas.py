@@ -1,9 +1,9 @@
 import urllib
 from datetime import date
 from typing import Optional
-from typing_extensions import NotRequired, TypedDict
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
+from typing_extensions import NotRequired, TypedDict
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -174,6 +174,7 @@ class Analytic(BaseModel):
 
 class DBStatus(TypedDict):
     """Класс ответа для проверки работы базы данных."""
+
     status: bool
     last_update: NotRequired[str]
     active_tasks: NotRequired[int]
@@ -182,6 +183,7 @@ class DBStatus(TypedDict):
 
 class BotStatus(TypedDict):
     """Класс ответа для проверки работы бота."""
+
     status: bool
     method: NotRequired[str]
     url: NotRequired[str]
@@ -190,6 +192,7 @@ class BotStatus(TypedDict):
 
 class CommitStatus(TypedDict):
     """Класс ответа для git коммита."""
+
     last_commit: str
     commit_date: str
     tags: list[str]

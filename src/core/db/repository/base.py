@@ -78,9 +78,7 @@ class AbstractRepository(abc.ABC):
     async def count_active_all(self) -> int:
         """Возвращает количество неархивных (активных) объектов модели в базе данных."""
         objects = await self._session.execute(
-            select(func.count())
-            .select_from(self._model)
-            .where(self._model.is_archived == False) # noqa
+            select(func.count()).select_from(self._model).where(self._model.is_archived == False)  # noqa
         )
         return objects.scalar()
 
@@ -103,9 +101,10 @@ class ContentRepository(AbstractRepository, abc.ABC):
 
     async def get_last_update(self) -> str | None:
         """Получает из базы отсортированный по времени обновления объект модели.
-         В случае отсутствия возвращает None."""
+        В случае отсутствия возвращает None."""
         db_obj = await self._session.execute(
-            select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE))
-            .order_by(self._model.updated_at.desc())
+            select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE)).order_by(
+                self._model.updated_at.desc()
+            )
         )
         return db_obj.scalars().first()
