@@ -1,6 +1,6 @@
 import json
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, ContextTypes, MessageHandler
 from telegram.ext.filters import StatusUpdate
 
@@ -20,11 +20,7 @@ async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     ]
     keyboard = InlineKeyboardMarkup(buttons)
     await update.message.reply_text(
-        text=f"Спасибо, я передал информацию команде ProCharity! Ответ придет на почту {user_data['email']}",
-        reply_markup=ReplyKeyboardRemove(),
-    )
-    await update.message.reply_text(
-        text="Вы можете вернуться в меню или посмотреть открытые задания. Нажмите на нужную кнопку.",
+        text="Спасибо, я передал информацию команде ProCharity!",
         reply_markup=keyboard,
     )
     email_provider = EmailProvider()
