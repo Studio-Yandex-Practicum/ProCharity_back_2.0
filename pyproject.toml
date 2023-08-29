@@ -46,7 +46,6 @@ structlog = "^23.1.0"
 asgi-correlation-id = "^4.2.0"
 rich = "^13.3.5"
 fastapi-mail = "^1.4.0"
-werkzeug = "^2.3.6"
 dependency-injector = "^4.41.0"
 
 

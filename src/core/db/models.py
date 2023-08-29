@@ -1,6 +1,5 @@
 from datetime import date
 
-# from werkzeug.security import check_password_hash, generate_password_hash
 from passlib.context import CryptContext
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
