@@ -22,7 +22,7 @@ class Container(containers.DeclarativeContainer):
 
     # Database connection
     engine = providers.Singleton(create_async_engine, url=settings.provided.database_url)
-    sessionmaker = providers.Singleton(async_sessionmaker, engine=engine, expire_on_commit=False)
+    sessionmaker = providers.Singleton(async_sessionmaker, bind=engine, expire_on_commit=False)
     session = providers.Resource(get_session, sessionmaker=sessionmaker)
 
     # Applications
