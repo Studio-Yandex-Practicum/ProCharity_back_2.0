@@ -1,8 +1,6 @@
-from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db import get_session
 from src.core.db.models import AdminUser
 from src.core.db.repository.base import AbstractRepository
 
