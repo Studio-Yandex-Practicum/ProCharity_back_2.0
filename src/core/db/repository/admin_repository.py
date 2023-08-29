@@ -10,7 +10,7 @@ from src.core.db.repository.base import AbstractRepository
 class AdminUserRepository(AbstractRepository):
     """Репозиторий для работы с моделью AdminUser."""
 
-    def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, AdminUser)
 
     async def get_by_email(self, email: str) -> AdminUser | None:
