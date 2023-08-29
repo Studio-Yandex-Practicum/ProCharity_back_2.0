@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends
 from src.api.schemas import ExternalSiteUserRequest
 from src.api.services import ExternalSiteUserService
 
+
 site_user_router = APIRouter()
 
 
