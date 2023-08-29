@@ -2,11 +2,11 @@ from dependency_injector import containers, providers
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.api.services.admin_service import AdminService
 from src.bot.bot import create_bot
 from src.core.db import get_session
-from src.settings import get_settings
 from src.core.db.repository.admin_repository import AdminUserRepository
-from src.api.services.admin_service import AdminService
+from src.settings import get_settings
 
 
 class Container(containers.DeclarativeContainer):
