@@ -17,7 +17,7 @@ category_router = APIRouter()
 )
 @inject
 async def get_categories(
-    category_service: CategoryService = Depends(Provide[Container.category_service])
+    category_service: CategoryService = Depends(Provide[Container.category_service]),
 ) -> list[CategoryResponse]:
     return await category_service.get_all()
 

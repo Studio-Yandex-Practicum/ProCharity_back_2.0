@@ -1,9 +1,9 @@
-from src.depends import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.api.schemas import Analytic
 from src.api.services.analytics import AnalyticsService
+from src.depends import Container
 
 analytic_router = APIRouter()
 

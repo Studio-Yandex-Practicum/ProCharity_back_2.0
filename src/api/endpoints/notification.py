@@ -1,9 +1,9 @@
-from src.depends import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.api.schemas import TelegramNotificationRequest, TelegramNotificationUsersRequest
 from src.api.services.messages import TelegramNotificationService
+from src.depends import Container
 
 notification_router = APIRouter()
 
