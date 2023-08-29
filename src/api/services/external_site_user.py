@@ -7,9 +7,7 @@ from src.core.db.repository.external_site_user import ExternalSiteUserRepository
 class ExternalSiteUserService:
     """Сервис для работы с моделью ExternalSiteUser."""
 
-    def __init__(
-        self, site_user_repository: ExternalSiteUserRepository, session: AsyncSession
-    ) -> None:
+    def __init__(self, site_user_repository: ExternalSiteUserRepository, session: AsyncSession) -> None:
         self._repository: ExternalSiteUserRepository = site_user_repository
         self._session: AsyncSession = session
 

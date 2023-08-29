@@ -8,9 +8,7 @@ from src.core.db.repository.task import TaskRepository
 class TaskService(ContentService):
     """Сервис для работы с моделью Task."""
 
-    def __init__(
-        self, task_repository: TaskRepository, session: AsyncSession
-    ) -> None:
+    def __init__(self, task_repository: TaskRepository, session: AsyncSession) -> None:
         super().__init__(task_repository, session)
 
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:

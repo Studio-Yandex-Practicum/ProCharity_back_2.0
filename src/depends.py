@@ -37,7 +37,8 @@ class Container(containers.DeclarativeContainer):
 
     # API services:
     site_user_service = providers.Factory(
-        ExternalSiteUserService, site_user_repository=site_user_repository, session=session)
+        ExternalSiteUserService, site_user_repository=site_user_repository, session=session
+    )
     category_service = providers.Factory(CategoryService, category_repository=category_repository, session=session)
     task_service = providers.Factory(TaskService, task_repository=task_repository, session=session)
     message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot, session=session)
