@@ -29,17 +29,16 @@ class Container(containers.DeclarativeContainer):
     fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG)
     telegram_bot = providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN)
 
-    site_user_repository = providers.Factory(ExternalSiteUserRepository, session=session)
-    site_user_service = providers.Factory(ExternalSiteUserService, site_user_repository=site_user_repository)
-
-    category_repository = providers.Factory(CategoryRepository, session=session)
-    category_service = providers.Factory(CategoryService, category_repository=category_repository)
-
-    task_repository = providers.Factory(TaskRepository, session=session)
-    task_service = providers.Factory(TaskService, task_repository=task_repository)
-
-    message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot)
-
+    # Repositories:
     user_repository = providers.Factory(UserRepository, session=session)
+    site_user_repository = providers.Factory(ExternalSiteUserRepository, session=session)
+    category_repository = providers.Factory(CategoryRepository, session=session)
+    task_repository = providers.Factory(TaskRepository, session=session)
 
+    # API services:
+    site_user_service = providers.Factory(
+        ExternalSiteUserService, site_user_repository=site_user_repository, session=session)
+    category_service = providers.Factory(CategoryService, category_repository=category_repository, session=session)
+    task_service = providers.Factory(TaskService, task_repository=task_repository, session=session)
+    message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot, session=session)
     analytic_service = providers.Factory(AnalyticsService, user_repository=user_repository)
