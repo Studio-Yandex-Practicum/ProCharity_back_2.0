@@ -1,20 +1,21 @@
 from datetime import datetime, timedelta
+
 from jose import JWTError, jwt
 
 from src.core.db.models import AdminUser
 from src.core.db.repository.admin_repository import AdminUserRepository
-from src.settings import settings
 from src.core.exceptions.exceptions import CredentialsException
+from src.settings import settings
 
 
 class AdminService:
     """Сервис для работы с моделью AdminUser."""
 
     def __init__(self, admin_repository: AdminUserRepository) -> None:
-        self._admin_repository: AdminUserRepository = admin_repository
+        self._repository: AdminUserRepository = admin_repository
 
     async def authenticate_user(self, email: str, password: str) -> AdminUser | None:
-        user = await self._admin_repository.get_by_email(email)
+        user = await self._repository.get_by_email(email)
         if user and user.check_password(password):
             return user
         return None
@@ -37,7 +38,7 @@ class AdminService:
                 raise CredentialsException
         except JWTError:
             raise CredentialsException
-        user = await self._admin_repository.get_by_email(email)
+        user = await self._repository.get_by_email(email)
         if not user:
             raise CredentialsException
         return user
