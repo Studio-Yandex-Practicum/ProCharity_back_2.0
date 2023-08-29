@@ -640,6 +640,19 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jose"
+version = "1.0.0"
+description = "An implementation of the JOSE draft"
+optional = false
+python-versions = "*"
+files = [
+    {file = "jose-1.0.0.tar.gz", hash = "sha256:8436c3617cd94e1ba97828fbb1ce27c129f66c78fb855b4bb47e122b5f345fba"},
+]
+
+[package.dependencies]
+pycrypto = ">=2.6"
+
+[[package]]
 name = "mako"
 version = "1.2.4"
 description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
@@ -869,6 +882,16 @@ python-versions = ">=3.8"
 files = [
     {file = "pycodestyle-2.11.0-py2.py3-none-any.whl", hash = "sha256:5d1013ba8dc7895b548be5afb05740ca82454fd899971563d2ef625d090326f8"},
     {file = "pycodestyle-2.11.0.tar.gz", hash = "sha256:259bcc17857d8a8b3b4a2327324b79e5f020a13c16074670f9c8c8f872ea76d0"},
+]
+
+[[package]]
+name = "pycrypto"
+version = "2.6.1"
+description = "Cryptographic modules for Python."
+optional = false
+python-versions = "*"
+files = [
+    {file = "pycrypto-2.6.1.tar.gz", hash = "sha256:f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c"},
 ]
 
 [[package]]
@@ -1380,4 +1403,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "33c720d8981fc1748e8baf411fdc9315f7a7f2322b1c3d72b6ff3135408815de"
+content-hash = "38fbe8d971e85e6b38d7ff1602734def3c7f4a0470edbee56956f5021b1113b8"
