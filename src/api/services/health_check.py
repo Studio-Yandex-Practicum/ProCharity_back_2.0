@@ -33,10 +33,10 @@ class HealthCheckService:
     async def get_last_commit(self) -> CommitStatus:
         repo = Repo(os.getcwd())
         master = repo.head.reference
-        print(f'os.getcwd: {os.getcwd()}')  # !!! где-то тут падает: InvalidGitRepositoryError: /app
-        print(f'repo: {repo}')
-        print(f'master: {repo.head.reference}')
-        print(f'master.commit: {repo.head.reference.commit}')
+        print(f"os.getcwd: {os.getcwd()}")  # !!! где-то тут падает: InvalidGitRepositoryError: /app
+        print(f"repo: {repo}")
+        print(f"master: {repo.head.reference}")
+        print(f"master.commit: {repo.head.reference.commit}")
         commit_date = datetime.datetime.fromtimestamp(master.commit.committed_date)
         commit_status: CommitStatus = {
             "last_commit": str(master.commit)[:7],
