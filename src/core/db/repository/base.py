@@ -82,6 +82,16 @@ class AbstractRepository(abc.ABC):
         )
         return objects.scalar()
 
+    async def get_last_update(self) -> str | None:
+        """Получает из базы отсортированный по времени обновления объект модели.
+        В случае отсутствия возвращает None."""
+        db_obj = await self._session.execute(
+            select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE)).order_by(
+                self._model.updated_at.desc()
+            )
+        )
+        return db_obj.scalars().first()
+
 
 class ContentRepository(AbstractRepository, abc.ABC):
     @auto_commit
@@ -98,13 +108,3 @@ class ContentRepository(AbstractRepository, abc.ABC):
         """Возвращает id объектов модели из базы данных по указанным ids"""
         filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
         return filtered_ids
-
-    async def get_last_update(self) -> str | None:
-        """Получает из базы отсортированный по времени обновления объект модели.
-        В случае отсутствия возвращает None."""
-        db_obj = await self._session.execute(
-            select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE)).order_by(
-                self._model.updated_at.desc()
-            )
-        )
-        return db_obj.scalars().first()
