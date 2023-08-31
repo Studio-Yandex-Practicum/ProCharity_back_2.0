@@ -31,12 +31,14 @@ class HealthCheckService:
         return bot_status
 
     async def get_last_commit(self) -> CommitStatus:
+        path = os.path.dirname(os.path.abspath(__file__))
+        print(f"path: {path}")
+        print(f"os.getcwd: {os.getcwd()}")  # !!! где-то тут падает: InvalidGitRepositoryError: /app
+        print(f"Repo(os.getcwd()): {Repo(os.getcwd())}")
+        print(f"master = repo.head.reference: {Repo(os.getcwd()).head.reference}")
+        print(f"master.commit: {Repo(os.getcwd()).head.reference.commit}")
         repo = Repo(os.getcwd())
         master = repo.head.reference
-        print(f"os.getcwd: {os.getcwd()}")  # !!! где-то тут падает: InvalidGitRepositoryError: /app
-        print(f"repo: {repo}")
-        print(f"master: {repo.head.reference}")
-        print(f"master.commit: {repo.head.reference.commit}")
         commit_date = datetime.datetime.fromtimestamp(master.commit.committed_date)
         commit_status: CommitStatus = {
             "last_commit": str(master.commit)[:7],
