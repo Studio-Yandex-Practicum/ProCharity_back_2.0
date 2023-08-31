@@ -2,6 +2,7 @@ import datetime
 import os
 
 from git import Repo
+from git.exc import InvalidGitRepositoryError
 from sqlalchemy.exc import SQLAlchemyError
 from telegram.ext import Application
 
@@ -31,13 +32,16 @@ class HealthCheckService:
         return bot_status
 
     async def get_last_commit(self) -> CommitStatus:
-        path = os.path.dirname(os.path.abspath(__file__))
-        print(f"path: {path}")
-        print(f"os.getcwd: {os.getcwd()}")  # !!! где-то тут падает: InvalidGitRepositoryError: /app
-        print(f"Repo(os.getcwd()): {Repo(os.getcwd())}")
-        print(f"master = repo.head.reference: {Repo(os.getcwd()).head.reference}")
-        print(f"master.commit: {Repo(os.getcwd()).head.reference.commit}")
-        repo = Repo(os.getcwd())
+        try:
+            repo = Repo(os.getcwd())
+        except InvalidGitRepositoryError as exc:
+            commit_status: CommitStatus = {
+                "last_commit": f"-",
+                "commit_date": f"-",
+                "tags": [],
+                "commit_error": f"{exc}"
+            }
+            return commit_status
         master = repo.head.reference
         commit_date = datetime.datetime.fromtimestamp(master.commit.committed_date)
         commit_status: CommitStatus = {
