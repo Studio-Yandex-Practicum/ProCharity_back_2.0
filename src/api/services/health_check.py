@@ -36,8 +36,8 @@ class HealthCheckService:
             repo = Repo(os.getcwd())
         except InvalidGitRepositoryError as exc:
             commit_status: CommitStatus = {
-                "last_commit": f"-",
-                "commit_date": f"-",
+                "last_commit": "-",
+                "commit_date": "-",
                 "tags": [],
                 "commit_error": f"{exc}"
             }
