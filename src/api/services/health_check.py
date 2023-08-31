@@ -39,7 +39,7 @@ class HealthCheckService:
                 "last_commit": "-",
                 "commit_date": "-",
                 "tags": [],
-                "commit_error": f"{exc}"
+                "commit_error": f"{exc}",
             }
             return commit_status
         master = repo.head.reference
