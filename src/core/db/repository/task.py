@@ -1,10 +1,8 @@
-from fastapi import Depends
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import false
 
-from src.core.db.db import get_session
 from src.core.db.models import Category, Task, User
 from src.core.db.repository.base import ContentRepository
 
@@ -12,7 +10,7 @@ from src.core.db.repository.base import ContentRepository
 class TaskRepository(ContentRepository):
     """Репозиторий для работы с моделью Task."""
 
-    def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Task)
 
     async def get_tasks_for_user(self, user_id: int, limit: int = 3, offset: int = 0) -> list[Task]:

@@ -1,11 +1,8 @@
-from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
-from src.bot.bot import create_bot
-from src.core.db import get_session
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
@@ -17,8 +14,8 @@ class TelegramNotificationService:
 
     def __init__(
         self,
-        telegram_bot: Application = Depends(create_bot),
-        session: AsyncSession = Depends(get_session),
+        telegram_bot: Application,
+        session: AsyncSession,
     ) -> None:
         self._session = session
         self.telegram_notification = TelegramNotification(telegram_bot)

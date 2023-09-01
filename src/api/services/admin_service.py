@@ -35,10 +35,10 @@ class AdminService:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             email: str = payload.get("email")
             if email is None:
-                raise CredentialsException
+                raise CredentialsException("Don't have an email in the token")
         except JWTError:
-            raise CredentialsException
+            raise CredentialsException("Could not validate credentials(token)")
         user = await self._repository.get_by_email(email)
         if not user:
-            raise CredentialsException
+            raise CredentialsException("There is no user in db with such email")
         return user
