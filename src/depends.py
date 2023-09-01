@@ -2,13 +2,13 @@ from dependency_injector import containers, providers
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.api.services import CategoryService, ExternalSiteUserService, TaskService
 from src.api.services.admin_service import AdminService
+from src.api.services.analytics import AnalyticsService
+from src.api.services.messages import TelegramNotificationService
 from src.bot.bot import create_bot
 from src.core.db import get_session
 from src.core.db.repository.admin_repository import AdminUserRepository
-from src.api.services import CategoryService, ExternalSiteUserService, TaskService
-from src.api.services.analytics import AnalyticsService
-from src.api.services.messages import TelegramNotificationService
 from src.core.db.repository.category import CategoryRepository
 from src.core.db.repository.external_site_user import ExternalSiteUserRepository
 from src.core.db.repository.task import TaskRepository

@@ -5,7 +5,6 @@ from src.api.schemas import ExternalSiteUserRequest
 from src.api.services import ExternalSiteUserService
 from src.depends import Container
 
-
 site_user_router = APIRouter()
 
 
