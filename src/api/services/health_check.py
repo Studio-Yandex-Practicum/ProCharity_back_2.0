@@ -32,14 +32,21 @@ class HealthCheckService:
         return bot_status
 
     async def get_last_commit(self) -> CommitStatus:
+        if settings.COMMIT_WORKFLOW_MODE:
+            commit_status: CommitStatus = {
+                "last_commit": settings.LAST_COMMIT,
+                "commit_date": settings.COMMIT_DATE,
+                "tags": settings.TAGS,
+            }
+            return commit_status
         try:
             repo = Repo(os.getcwd())
         except InvalidGitRepositoryError as exc:
             commit_status: CommitStatus = {
-                "last_commit": "-",
-                "commit_date": "-",
-                "tags": [],
-                "commit_error": f"{exc}",
+                "last_commit": settings.LAST_COMMIT,
+                "commit_date": settings.COMMIT_DATE,
+                "tags": settings.TAGS,
+                "commit_error": f"InvalidGitRepositoryError: {exc}",
             }
             return commit_status
         master = repo.head.reference
