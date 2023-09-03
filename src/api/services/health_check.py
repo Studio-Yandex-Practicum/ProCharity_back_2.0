@@ -40,6 +40,7 @@ class HealthCheckService:
         try:
             from git import Repo
             from git.exc import InvalidGitRepositoryError
+
             Repo(os.getcwd())
         except NameError as exc:
             commit_status: CommitStatus = {
