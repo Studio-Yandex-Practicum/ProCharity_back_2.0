@@ -66,7 +66,6 @@ class Settings(BaseSettings):
     EMAIL_ADMIN: EmailStr
 
     # Настройки получения коммитов
-    COMMIT_WORKFLOW_MODE: bool = False
     LAST_COMMIT: str = ""
     COMMIT_DATE: str = ""
     TAGS: list = []

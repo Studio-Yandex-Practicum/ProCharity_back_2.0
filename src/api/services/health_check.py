@@ -1,12 +1,10 @@
 import datetime
 import os
 
-from git import Repo
-from git.exc import InvalidGitRepositoryError
 from sqlalchemy.exc import SQLAlchemyError
 from telegram.ext import Application
 
-from src.api.constants import DATE_TIME_FORMAT
+from src.api.constants import DATE_TIME_FORMAT, DOCKER_WORKDIR
 from src.api.schemas import BotStatus, CommitStatus, DBStatus
 from src.core.db.repository import TaskRepository
 from src.settings import settings
@@ -32,11 +30,23 @@ class HealthCheckService:
         return bot_status
 
     async def get_last_commit(self) -> CommitStatus:
-        if settings.COMMIT_WORKFLOW_MODE:
+        if str(os.getcwd()) == DOCKER_WORKDIR:
             commit_status: CommitStatus = {
                 "last_commit": settings.LAST_COMMIT,
                 "commit_date": settings.COMMIT_DATE,
-                "tags": settings.TAGS,
+                "git_tags": settings.TAGS,
+            }
+            return commit_status
+        try:
+            from git import Repo
+            from git.exc import InvalidGitRepositoryError
+            Repo(os.getcwd())
+        except NameError as exc:
+            commit_status: CommitStatus = {
+                "last_commit": settings.LAST_COMMIT,
+                "commit_date": settings.COMMIT_DATE,
+                "git_tags": settings.TAGS,
+                "commit_error": f"{exc}",
             }
             return commit_status
         try:
@@ -45,7 +55,7 @@ class HealthCheckService:
             commit_status: CommitStatus = {
                 "last_commit": settings.LAST_COMMIT,
                 "commit_date": settings.COMMIT_DATE,
-                "tags": settings.TAGS,
+                "git_tags": settings.TAGS,
                 "commit_error": f"InvalidGitRepositoryError: {exc}",
             }
             return commit_status
@@ -54,7 +64,7 @@ class HealthCheckService:
         commit_status: CommitStatus = {
             "last_commit": str(master.commit)[:7],
             "commit_date": commit_date.strftime(DATE_TIME_FORMAT),
-            "tags": repo.tags,
+            "git_tags": repo.tags,
         }
         return commit_status
 

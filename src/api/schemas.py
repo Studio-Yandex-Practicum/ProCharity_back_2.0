@@ -195,7 +195,7 @@ class CommitStatus(TypedDict):
 
     last_commit: str
     commit_date: str
-    tags: list[str]
+    git_tags: list[str]
     commit_error: NotRequired[str]
 
 
