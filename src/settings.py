@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
     BOT_WEBHOOK_MODE: bool = False
 
+    # Настройки jwt
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     # Настройки логирования
     LOG_LEVEL: str = "INFO"
     LOG_DIR: str | Path = BASE_DIR / "logs"

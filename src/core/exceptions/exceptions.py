@@ -43,3 +43,11 @@ class UnauthorizedError(ApplicationException):
 class WebhookOnError(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.NO_CONTENT
     detail = "Telegram Webhook выключен."
+
+
+class CredentialsException(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
+    headers = {"WWW-Authenticate": "Bearer"}
+
+    def __init__(self, detail: str):
+        self.detail = detail

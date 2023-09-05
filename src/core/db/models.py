@@ -1,10 +1,12 @@
 from datetime import date
 
+from passlib.context import CryptContext
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
-from werkzeug.security import check_password_hash, generate_password_hash
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class Base(DeclarativeBase):
@@ -120,16 +122,16 @@ class AdminUser(Base):
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     password: Mapped[str] = mapped_column(String(128))
-    last_login: Mapped[date]
+    last_login: Mapped[date] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<Admin User {self.first_name} {self.last_name}>"
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        self.password = pwd_context.hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        return pwd_context.verify(password, self.password)
 
 
 class AdminTokenRequest(Base):
