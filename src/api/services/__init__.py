@@ -1,3 +1,4 @@
+from .admin_service import AdminService
 from .base import ContentService
 from .category import CategoryService
 from .external_site_user import ExternalSiteUserService
@@ -8,4 +9,5 @@ __all__ = (
     "CategoryService",
     "TaskService",
     "ExternalSiteUserService",
+    "AdminService",
 )
