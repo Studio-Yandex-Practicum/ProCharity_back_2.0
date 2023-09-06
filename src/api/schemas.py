@@ -33,7 +33,7 @@ class CategoryRequest(RequestBase):
         None,
         ge=1,
         lt=10**10,
-        description=("Принадлежность к родительской категории." "Если null, то это родительская категория."),
+        description=("Принадлежность к родительской категории. Если null, то это родительская категория."),
     )
 
     @root_validator(skip_on_failure=True)
