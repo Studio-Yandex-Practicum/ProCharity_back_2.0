@@ -21,7 +21,7 @@ class HealthCheckService:
         try:
             webhook_info = await self._bot.bot.get_webhook_info()
         except Exception as exc:
-            bot_status: BotStatus = {"status": False, "error": f"{exc.__name___}: {exc}"}
+            bot_status: BotStatus = {"status": False, "error": f"{exc.__name__}: {exc}"}
             return bot_status
         if settings.BOT_WEBHOOK_MODE:
             method = "webhooks"
@@ -41,7 +41,7 @@ class HealthCheckService:
                 "last_commit": settings.LAST_COMMIT,
                 "commit_date": settings.COMMIT_DATE,
                 "git_tags": settings.TAGS,
-                "commit_error": f"{exc.__name___}: {exc}",
+                "commit_error": f"{exc.__name__}: {exc}",
             }
             return commit_status
         master = repo.head.reference
@@ -58,7 +58,7 @@ class HealthCheckService:
             active_tasks = await self._repository.count_active_all()
             get_last_update = await self._repository.get_last_update()
         except SQLAlchemyError as exc:
-            db_status: DBStatus = {"status": False, "db_connection_error": f"{exc.__name___}: {exc}"}
+            db_status: DBStatus = {"status": False, "db_connection_error": f"{exc.__name__}: {exc}"}
             return db_status
         if get_last_update is None:
             get_last_update = 0
