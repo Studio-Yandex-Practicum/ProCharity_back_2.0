@@ -35,10 +35,8 @@ class HealthCheckService:
         """В режиме dev - возвращает сведения о последнем коммите, или берет данные из переменных окружения."""
         try:
             from git import Repo
-            from git.exc import InvalidGitRepositoryError
-
             repo = Repo(os.getcwd())
-        except (ImportError, InvalidGitRepositoryError, NameError) as exc:
+        except (ImportError, NameError) as exc:
             commit_status: CommitStatus = {
                 "last_commit": settings.LAST_COMMIT,
                 "commit_date": settings.COMMIT_DATE,
