@@ -4,7 +4,7 @@ import os
 from sqlalchemy.exc import SQLAlchemyError
 from telegram.ext import Application
 
-from src.api.constants import DATE_TIME_FORMAT, DOCKER_WORKDIR
+from src.api.constants import DATE_TIME_FORMAT
 from src.api.schemas import BotStatus, CommitStatus, DBStatus
 from src.core.db.repository import TaskRepository
 from src.settings import settings
@@ -21,43 +21,28 @@ class HealthCheckService:
         try:
             webhook_info = await self._bot.bot.get_webhook_info()
         except Exception as exc:
-            bot_status: BotStatus = {"status": False, "error": f"{exc}"}
+            bot_status: BotStatus = {"status": False, "error": f"{exc.__name___}: {exc}"}
             return bot_status
         if settings.BOT_WEBHOOK_MODE:
-            bot_status: BotStatus = {"status": True, "method": "webhooks", "url": webhook_info.url}
+            method = "webhooks"
+            bot_status: BotStatus = {"status": True, "method": method, "url": webhook_info.url}
             return bot_status
-        bot_status: BotStatus = {"status": True, "method": "pulling"}
+        method = "pulling"
+        bot_status: BotStatus = {"status": True, "method": method}
         return bot_status
 
     async def get_last_commit(self) -> CommitStatus:
-        if str(os.getcwd()) == DOCKER_WORKDIR:
-            commit_status: CommitStatus = {
-                "last_commit": settings.LAST_COMMIT,
-                "commit_date": settings.COMMIT_DATE,
-                "git_tags": settings.TAGS,
-            }
-            return commit_status
+        """В режиме dev - возвращает сведения о последнем коммите, или берет данные из переменных окружения."""
         try:
             from git import Repo
             from git.exc import InvalidGitRepositoryError
-
-            Repo(os.getcwd())
-        except NameError as exc:
-            commit_status: CommitStatus = {
-                "last_commit": settings.LAST_COMMIT,
-                "commit_date": settings.COMMIT_DATE,
-                "git_tags": settings.TAGS,
-                "commit_error": f"{exc}",
-            }
-            return commit_status
-        try:
             repo = Repo(os.getcwd())
-        except InvalidGitRepositoryError as exc:
+        except (ImportError, InvalidGitRepositoryError, NameError) as exc:
             commit_status: CommitStatus = {
                 "last_commit": settings.LAST_COMMIT,
                 "commit_date": settings.COMMIT_DATE,
                 "git_tags": settings.TAGS,
-                "commit_error": f"InvalidGitRepositoryError: {exc}",
+                "commit_error": f"{exc.__name___}: {exc}",
             }
             return commit_status
         master = repo.head.reference
@@ -74,7 +59,7 @@ class HealthCheckService:
             active_tasks = await self._repository.count_active_all()
             get_last_update = await self._repository.get_last_update()
         except SQLAlchemyError as exc:
-            db_status: DBStatus = {"status": False, "db_connection_error": f"{exc}"}
+            db_status: DBStatus = {"status": False, "db_connection_error": f"{exc.__name___}: {exc}"}
             return db_status
         if get_last_update is None:
             get_last_update = 0

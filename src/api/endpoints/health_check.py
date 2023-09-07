@@ -16,7 +16,7 @@ async def get_health_check(
     health_check_service: HealthCheckService = Depends(Provide[Container.health_check_service]),
 ) -> HealthCheck:
     return HealthCheck(
-        check_db_connection=await health_check_service.check_db_connection(),
-        check_bot=await health_check_service.check_bot(),
-        last_commit=await health_check_service.get_last_commit(),
+        db=await health_check_service.check_db_connection(),
+        bot=await health_check_service.check_bot(),
+        git=await health_check_service.get_last_commit(),
     )

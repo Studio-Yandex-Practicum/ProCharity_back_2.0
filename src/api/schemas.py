@@ -202,6 +202,6 @@ class CommitStatus(TypedDict):
 class HealthCheck(ResponseBase):
     """Класс модели запроса для проверки работы бота."""
 
-    check_db_connection: DBStatus = {}
-    check_bot: BotStatus = {}
-    last_commit: CommitStatus = {}
+    db: DBStatus = {}
+    bot: BotStatus = {}
+    git: CommitStatus = {}
