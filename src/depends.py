@@ -14,6 +14,7 @@ from src.core.db.repository.category import CategoryRepository
 from src.core.db.repository.external_site_user import ExternalSiteUserRepository
 from src.core.db.repository.task import TaskRepository
 from src.core.db.repository.user import UserRepository
+from src.core.db.repository.unsubscribe_reason import UnsubscribeReasonRepository
 from src.settings import get_settings
 
 
@@ -39,6 +40,7 @@ class Container(containers.DeclarativeContainer):
     site_user_repository = providers.Factory(ExternalSiteUserRepository, session=session)
     category_repository = providers.Factory(CategoryRepository, session=session)
     task_repository = providers.Factory(TaskRepository, session=session)
+    unsubscribe_reason_repository = providers.Factory(UnsubscribeReasonRepository, session=session)
 
     # API services:
     site_user_service = providers.Factory(
