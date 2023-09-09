@@ -13,8 +13,8 @@ from src.core.db.repository.admin_repository import AdminUserRepository
 from src.core.db.repository.category import CategoryRepository
 from src.core.db.repository.external_site_user import ExternalSiteUserRepository
 from src.core.db.repository.task import TaskRepository
-from src.core.db.repository.user import UserRepository
 from src.core.db.repository.unsubscribe_reason import UnsubscribeReasonRepository
+from src.core.db.repository.user import UserRepository
 from src.settings import get_settings
 
 
