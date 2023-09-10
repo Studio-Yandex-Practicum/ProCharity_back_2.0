@@ -56,5 +56,6 @@ class Container(containers.DeclarativeContainer):
     )
     unsubscribe_reason_service = providers.Factory(
         UnsubscribeReasonService,
-        unsubscribe_reason_repository=unsubscribe_reason_repository, user_repository=user_repository
+        unsubscribe_reason_repository=unsubscribe_reason_repository,
+        user_repository=user_repository,
     )

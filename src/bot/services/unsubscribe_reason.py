@@ -13,6 +13,7 @@ class UnsubscribeReasonService:
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         is_exists = await self._reason_repository.get_by_user(user)
         if is_exists:
-            await self._reason_repository.update(is_exists.id, UnsubscribeReason(user=user.id, unsubscribe_reason=reason))
+            await self._reason_repository.update(
+                is_exists.id, UnsubscribeReason(user=user.id, unsubscribe_reason=reason)
+            )
         await self._reason_repository.create(UnsubscribeReason(user=user.id, unsubscribe_reason=reason))
-

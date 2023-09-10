@@ -11,7 +11,6 @@ from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
 from src.depends import Container
 
-
 log = structlog.get_logger()
 
 
@@ -56,9 +55,9 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @logger_decor
 async def reason_handler(
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE,
-        unsubscribe_reason_service=Provide[Container.unsubscribe_reason_service]
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    unsubscribe_reason_service=Provide[Container.unsubscribe_reason_service],
 ):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
