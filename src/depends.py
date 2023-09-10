@@ -8,6 +8,7 @@ from src.api.services.analytics import AnalyticsService
 from src.api.services.health_check import HealthCheckService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.bot import create_bot
+from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.core.db import get_session
 from src.core.db.repository.admin_repository import AdminUserRepository
 from src.core.db.repository.category import CategoryRepository
@@ -52,4 +53,8 @@ class Container(containers.DeclarativeContainer):
     analytic_service = providers.Factory(AnalyticsService, user_repository=user_repository)
     health_check_service = providers.Factory(
         HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
+    )
+    unsubscribe_reason_service = providers.Factory(
+        UnsubscribeReasonService,
+        unsubscribe_reason_repository=unsubscribe_reason_repository, user_repository=user_repository
     )

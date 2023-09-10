@@ -1,9 +1,3 @@
-import contextlib
-from typing import Generator
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.core.db import get_session
 from src.core.db.models import UnsubscribeReason
 from src.core.db.repository import UnsubscribeReasonRepository, UserRepository
 
@@ -11,12 +5,14 @@ from src.core.db.repository import UnsubscribeReasonRepository, UserRepository
 class UnsubscribeReasonService:
     """Сервис для работы с моделью UnsubscribeReason."""
 
-    def __init__(self, sessionmaker: Generator[AsyncSession, None, None] = get_session) -> None:
-        self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
+    def __init__(self, user_repository: UserRepository, reason_repository: UnsubscribeReasonRepository) -> None:
+        self._user_repository = user_repository
+        self._reason_repository = reason_repository
 
-    async def save_reason(self, telegram_id: int, reason: str):
-        async with self._sessionmaker() as session:
-            user_repository = UserRepository(session)
-            reason_repository = UnsubscribeReasonRepository(session)
-            user = await user_repository.get_by_telegram_id(telegram_id)
-            return await reason_repository.create(UnsubscribeReason(user=user.id, unsubscribe_reason=reason))
+    async def save_reason(self, telegram_id: int, reason: str) -> None:
+        user = await self._user_repository.get_by_telegram_id(telegram_id)
+        is_exists = await self._reason_repository.get_by_user(user)
+        if is_exists:
+            await self._reason_repository.update(is_exists.id, UnsubscribeReason(user=user.id, unsubscribe_reason=reason))
+        await self._reason_repository.create(UnsubscribeReason(user=user.id, unsubscribe_reason=reason))
+
