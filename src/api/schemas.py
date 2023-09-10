@@ -1,8 +1,9 @@
 import urllib
 from datetime import date
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
+from pydantic import (BaseModel, Extra, Field, NonNegativeInt, StrictStr,
+    field_validator, root_validator, conlist)
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -27,14 +28,15 @@ class RequestBase(BaseModel):
 class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
-    id: int = Field(..., ge=1, lt=10**10)
+    id: int = Field(..., ge=1, lt=10 ** 10)
     name: str = Field(..., min_length=2, max_length=100)
-    parent_id: Optional[int] = Field(None, ge=1, lt=10**10)
+    parent_id: Optional[int] = Field(None, ge=1, lt=10 ** 10)
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
         if values["parent_id"] and values["parent_id"] == values["id"]:
-            raise ValueError("Категория не может быть дочерней для самой себя.")
+            raise ValueError(
+                "Категория не может быть дочерней для самой себя.")
         return values
 
 
@@ -129,6 +131,26 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
         }
 
 
+class Message(BaseModel):
+    telegram_id: int
+    message: str
+
+class MessageList(BaseModel):
+    messages: List[Message]
+
+    class Config:
+        extra = Extra.forbid
+        json_schema_extra = {
+                "example": {
+                    "messages": [
+                        {"telegram_id": 1123, "message": "some text"},
+                        {"telegram_id": 7984, "message": "some text"},
+                        {"telegram_id": 1156, "message": "some text"},
+                    ]
+                }
+            }
+
+
 class ExternalSiteUserRequest(RequestBase):
     """Класс модели запроса для ExternalSiteUser."""
 
@@ -157,7 +179,8 @@ class ExternalSiteUserRequest(RequestBase):
             new_value = [int(value) for value in value.split(", ")]
             return new_value
         except ValueError:
-            raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
+            raise ValueError(
+                'Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
 
 
 class Analytic(BaseModel):

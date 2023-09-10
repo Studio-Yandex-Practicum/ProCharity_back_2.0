@@ -1,7 +1,11 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
-from src.api.schemas import TelegramNotificationRequest, TelegramNotificationUsersRequest
+from src.api.schemas import (
+    MessageList,
+    TelegramNotificationRequest,
+    TelegramNotificationUsersRequest
+)
 from src.api.services.messages import TelegramNotificationService
 from src.depends import Container
 
@@ -17,7 +21,7 @@ async def send_telegram_notification(
     notifications: TelegramNotificationUsersRequest,
     telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
 ) -> None:
-    """Отправляет сообщение указаной группе пользователей"""
+    """Отправляет сообщение указанной группе пользователей"""
     await telegram_notification_service.send_messages_to_group_of_users(notifications)
 
 
@@ -34,3 +38,18 @@ async def send_user_message(
 ) -> str:
     await telegram_notification_service.send_message_to_user(telegram_id, notifications)
     return notifications.message
+
+
+@notification_router.post(
+    "/group", description="Send messages to group"
+)
+async def send_group_messages(
+        message_list: MessageList):
+    for message in message_list.messages:
+        # Process each message
+        print(
+            f"Telegram ID: {message.telegram_id}, Message: {message.message}"
+        )
+
+    return message_list
+
