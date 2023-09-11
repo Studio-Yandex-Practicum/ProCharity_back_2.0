@@ -19,6 +19,7 @@ class TelegramNotification:
         try:
             await self.__bot.send_message(chat_id=user_id, text=message, parse_mode=ParseMode.HTML)
             logger.debug(f"Отправлено оповещение пользователю {user_id}")
+            return True
         except TelegramError as exc:
             msg = f"Ошибка отправки сообщения пользователю {user_id}."
             match exc:
@@ -28,6 +29,8 @@ class TelegramNotification:
                     msg += " Бот заблокирован?"
             msg += " " + exc.message
             logger.info(msg)
+            return False
+
 
     async def send_messages(
         self,
@@ -44,4 +47,4 @@ class TelegramNotification:
         user_id: int,
     ) -> None:
         """Отправляет сообщение message конкретному пользователю user."""
-        await self.__send_message(user_id, message)
+        return await self.__send_message(user_id, message)

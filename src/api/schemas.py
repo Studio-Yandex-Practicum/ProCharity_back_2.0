@@ -131,11 +131,11 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
         }
 
 
-class Message(BaseModel):
+class Message(RequestBase):
     telegram_id: int
-    message: str
+    message: str = Field(..., min_length=2, max_length=500)
 
-class MessageList(BaseModel):
+class MessageList(RequestBase):
     messages: List[Message]
 
     class Config:
@@ -143,9 +143,8 @@ class MessageList(BaseModel):
         json_schema_extra = {
                 "example": {
                     "messages": [
-                        {"telegram_id": 1123, "message": "some text"},
-                        {"telegram_id": 7984, "message": "some text"},
-                        {"telegram_id": 1156, "message": "some text"},
+                        {"telegram_id": 263879665, "message": "263879665"},
+                        {"telegram_id": 731553832, "message": "731553832"},
                     ]
                 }
             }
