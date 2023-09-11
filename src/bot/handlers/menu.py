@@ -1,4 +1,5 @@
 import structlog
+from dependency_injector.wiring import Provide
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
@@ -8,27 +9,37 @@ from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_k
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
+from src.depends import Container
 
 log = structlog.get_logger()
 
 
 @logger_decor
 @delete_previous_message
-async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def menu_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.user_service],
+):
     """Возвращает в меню."""
+    user_service = user_service
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(await UserService().get_by_telegram_id(update.effective_user.id)),
+        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
     )
 
 
 @logger_decor
 @delete_previous_message
-async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def set_mailing(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.user_service],
+):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
-    user_service = UserService()
+    user_service = user_service
     has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
         text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
