@@ -2,20 +2,26 @@ from dependency_injector import containers, providers
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from src.api.services import CategoryService, ExternalSiteUserService, TaskService
-from src.api.services.admin_service import AdminService
-from src.api.services.analytics import AnalyticsService
-from src.api.services.health_check import HealthCheckService
-from src.api.services.messages import TelegramNotificationService
+from src.api.services import (
+    AdminService,
+    AnalyticsService,
+    CategoryService,
+    ExternalSiteUserService,
+    HealthCheckService,
+    TaskService,
+    TelegramNotificationService,
+)
 from src.bot.bot import create_bot
-from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
+from src.bot.services import UnsubscribeReasonService
 from src.core.db import get_session
-from src.core.db.repository.admin_repository import AdminUserRepository
-from src.core.db.repository.category import CategoryRepository
-from src.core.db.repository.external_site_user import ExternalSiteUserRepository
-from src.core.db.repository.task import TaskRepository
-from src.core.db.repository.unsubscribe_reason import UnsubscribeReasonRepository
-from src.core.db.repository.user import UserRepository
+from src.core.db.repository import (
+    AdminUserRepository,
+    CategoryRepository,
+    ExternalSiteUserRepository,
+    TaskRepository,
+    UnsubscribeReasonRepository,
+    UserRepository,
+)
 from src.settings import get_settings
 
 
