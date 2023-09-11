@@ -2,8 +2,14 @@ import urllib
 from datetime import date
 
 from pydantic import (
-    BaseModel, Extra, Field, NonNegativeInt, StrictStr,
-    field_validator, root_validator)
+    BaseModel,
+    Extra,
+    Field,
+    NonNegativeInt,
+    StrictStr,
+    field_validator,
+    root_validator
+)
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -36,7 +42,8 @@ class CategoryRequest(RequestBase):
     def validate_self_parent(cls, values):
         if values["parent_id"] and values["parent_id"] == values["id"]:
             raise ValueError(
-                "Категория не может быть дочерней для самой себя.")
+                "Категория не может быть дочерней для самой себя."
+            )
         return values
 
 
