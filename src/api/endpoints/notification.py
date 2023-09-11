@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from src.api.schemas import (
     Message, MessageList,
     TelegramNotificationRequest,
-    TelegramNotificationUsersRequest
+    TelegramNotificationUsersRequest,
 )
 from src.api.services.messages import TelegramNotificationService
 from src.depends import Container

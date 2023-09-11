@@ -1,9 +1,9 @@
 import urllib
 from datetime import date
-from typing import Dict, List, Optional
 
-from pydantic import (BaseModel, Extra, Field, NonNegativeInt, StrictStr,
-    field_validator, root_validator, conlist)
+from pydantic import (
+    BaseModel, Extra, Field, NonNegativeInt, StrictStr,
+    field_validator, root_validator)
 
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
@@ -30,7 +30,7 @@ class CategoryRequest(RequestBase):
 
     id: int = Field(..., ge=1, lt=10 ** 10)
     name: str = Field(..., min_length=2, max_length=100)
-    parent_id: Optional[int] = Field(None, ge=1, lt=10 ** 10)
+    parent_id: int | None = Field(None, ge=1, lt=10 ** 10)
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
@@ -45,7 +45,7 @@ class CategoryResponse(ResponseBase):
 
     id: int
     name: str
-    parent_id: Optional[int]
+    parent_id: int | None
     is_archived: bool
 
 
@@ -60,7 +60,7 @@ class TaskRequest(RequestBase):
     bonus: NonNegativeInt = Field(...)
     location: StrictStr = Field(...)
     link: StrictStr = Field(...)
-    description: Optional[StrictStr] = None
+    description: StrictStr | None = None
 
     class Config:
         json_schema_extra = {
@@ -104,7 +104,10 @@ class FeedbackFormQueryParams(BaseModel):
 
 
 class TelegramNotificationRequest(RequestBase):
-    """Класс формирования параметров запроса для отправки сообщения определенному пользователю."""
+    """
+    Класс формирования параметров запроса для отправки
+    сообщения определенному пользователю.
+    """
 
     message: str = Field(..., min_length=2, max_length=500)
 
@@ -135,8 +138,9 @@ class Message(RequestBase):
     telegram_id: int
     message: str = Field(..., min_length=2, max_length=500)
 
+
 class MessageList(RequestBase):
-    messages: List[Message]
+    messages: list[Message]
 
     class Config:
         extra = Extra.forbid
@@ -155,8 +159,8 @@ class ExternalSiteUserRequest(RequestBase):
 
     id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
-    first_name: Optional[str] = Field(None, max_length=64)
-    last_name: Optional[str] = Field(None, max_length=64)
+    first_name: str | None = Field(None, max_length=64)
+    last_name: str | None = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
     specializations: list[int] | None = None
 
@@ -179,15 +183,17 @@ class ExternalSiteUserRequest(RequestBase):
             return new_value
         except ValueError:
             raise ValueError(
-                'Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
+                'Для передачи строки с числами в поле specializations '
+                'используйте формат: "1, 2, 3" '
+            )
 
 
 class Analytic(BaseModel):
     """Класс модели запроса для статистики."""
 
-    command_stats: Dict[str, str] = {}
+    command_stats: dict[str, str] = {}
     reasons_canceling: str = ""
     number_users: int = 0
-    all_users_statistic: Dict[str, str] = {}
-    active_users_statistic: Dict[str, str] = {}
-    tasks: Dict[str, str] = {}
+    all_users_statistic: dict[str, str] = {}
+    active_users_statistic: dict[str, str] = {}
+    tasks: dict[str, str] = {}
