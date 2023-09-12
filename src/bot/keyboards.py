@@ -22,10 +22,48 @@ SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ош
 QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
 
 
-async def get_categories_keyboard(categories: list[Category]) -> InlineKeyboardMarkup:
-    keyboard = [
-        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
-    ]
+async def get_checked_categories_keyboard(categories: dict[Category, int], selected_categories: dict[Category] = {}) -> InlineKeyboardButton:
+    keyboard = []
+
+    for category in categories.keys():
+        if category.id in selected_categories:
+            if categories[category] == len(selected_categories[category.id]):
+                button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"category_{category.id}")
+            else:
+                button = InlineKeyboardButton(f"☑️  {category.name}", callback_data=f"category_{category.id}")
+        else:
+            button = InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")
+        keyboard.append([button])
+
+    keyboard.extend(
+        [
+            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
+            [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
+        ]
+    )
+
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_categories_keyboard(categories: list[Category], selected_categories: dict[Category] = {}) -> InlineKeyboardMarkup:
+    keyboard = [[InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories]
+    #     if category.id in selected_categories:
+    #         pass
+    #     else:
+    #         b
+    # ]
+    # keyboard = []
+
+    # for category in categories.keys():
+    #     if category.id in selected_categories:
+    #         if categories[category] == selected_categories[category.id]:
+    #             button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")
+    #         else:
+    #             button = InlineKeyboardButton(f"☑️  {category.name}", callback_data=f"select_category_{category.id}")
+    #     else:
+    #         button = InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")
+    #     keyboard.append([button])
+
     keyboard.extend(
         [
             [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
