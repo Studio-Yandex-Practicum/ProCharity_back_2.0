@@ -46,8 +46,6 @@ async def send_messages_to_group_of_users(
             message.telegram_id,
             message
         )
-        d = respond
-        d = telegram_notification_service
         if respond:
             successful_rate += 1
         else:
