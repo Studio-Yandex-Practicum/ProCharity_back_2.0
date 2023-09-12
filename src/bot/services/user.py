@@ -75,7 +75,8 @@ class UserService:
             return {category.id: category.name for category in categories}
 
     async def get_user_categories_with_parents(self, telegram_id: int) -> dict[int, dict[int, str]]:
-        """Возвращает словарь с id родительской группы словарей с id и name категорий пользователя по его telegram_id."""
+        """Возвращает словарь с id родительской группы словарей с id и name категорий пользователя
+        по его telegram_id."""
         async with self._sessionmaker() as session:
             repository = UserRepository(session)
             user = await repository.get_by_telegram_id(telegram_id)
