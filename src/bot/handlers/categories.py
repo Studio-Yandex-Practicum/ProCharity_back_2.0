@@ -3,8 +3,11 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import (get_checked_categories_keyboard, get_open_tasks_and_menu_keyboard,
-                               get_subcategories_keyboard)
+from src.bot.keyboards import (
+    get_checked_categories_keyboard,
+    get_open_tasks_and_menu_keyboard,
+    get_subcategories_keyboard,
+)
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
