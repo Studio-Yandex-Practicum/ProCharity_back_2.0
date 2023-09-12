@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from src.api.services import CategoryService, ExternalSiteUserService, TaskService
 from src.api.services.admin_service import AdminService
 from src.api.services.analytics import AnalyticsService
+from src.api.services.health_check import HealthCheckService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.bot import create_bot
 from src.core.db import get_session
@@ -47,3 +48,6 @@ class Container(containers.DeclarativeContainer):
     task_service = providers.Factory(TaskService, task_repository=task_repository, session=session)
     message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot, session=session)
     analytic_service = providers.Factory(AnalyticsService, user_repository=user_repository)
+    health_check_service = providers.Factory(
+        HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
+    )
