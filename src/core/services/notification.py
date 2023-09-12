@@ -7,6 +7,7 @@ from telegram.ext import Application
 
 from src.core.db.models import User
 
+
 logger = logging.getLogger(__name__)
 
 

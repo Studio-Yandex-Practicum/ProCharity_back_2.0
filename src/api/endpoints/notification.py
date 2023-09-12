@@ -27,16 +27,6 @@ async def send_telegram_notification(
     await telegram_notification_service.send_messages_to_group_of_users(notifications)
 
 
-def get_logger():
-    logger = logging.getLogger("send_to_group_logger")
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
-
 @notification_router.post(
     "/group",
     description="Сообщение для группы пользователей",
@@ -47,24 +37,23 @@ async def send_messages_to_group_of_users(
         telegram_notification_service: TelegramNotificationService = Depends(
             Provide[Container.message_service]
         ),
-        logger: logging.Logger = Depends(get_logger)
 ):
-    logger.info("Sending messages to group")
-    SUCCESSFUL_COUNT = 0
-    UNSUCCESSFUL_COUNT = 0
+    successful_rate = 0
+    unsuccessful_rate = 0
 
     for message in message_list.messages:
         respond = await telegram_notification_service.send_message_to_user(
             message.telegram_id,
             message
         )
+        d = respond
+        d = telegram_notification_service
         if respond:
-            SUCCESSFUL_COUNT += 1
+            successful_rate += 1
         else:
-            UNSUCCESSFUL_COUNT += 1
-    result = (f'Successful sending - {SUCCESSFUL_COUNT}, '
-              f'Unsuccessful sending - {UNSUCCESSFUL_COUNT}')
-    logger.info(result)
+            unsuccessful_rate += 1
+    result = (f'Successful sending - {successful_rate}, '
+              f'Unsuccessful sending - {unsuccessful_rate}')
     return (message_list, result)
 
 
