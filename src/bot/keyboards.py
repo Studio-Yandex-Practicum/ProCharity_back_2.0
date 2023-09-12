@@ -22,7 +22,9 @@ SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ош
 QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
 
 
-async def get_checked_categories_keyboard(categories: dict[Category, int], selected_categories: dict[Category] = {}) -> InlineKeyboardButton:
+async def get_checked_categories_keyboard(
+    categories: dict[Category, int], selected_categories: dict[Category] = {}
+) -> InlineKeyboardButton:
     keyboard = []
 
     for category in categories.keys():
@@ -45,8 +47,12 @@ async def get_checked_categories_keyboard(categories: dict[Category, int], selec
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_categories_keyboard(categories: list[Category], selected_categories: dict[Category] = {}) -> InlineKeyboardMarkup:
-    keyboard = [[InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories]
+async def get_categories_keyboard(
+    categories: list[Category], selected_categories: dict[Category] = {}
+) -> InlineKeyboardMarkup:
+    keyboard = [
+        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
+    ]
     #     if category.id in selected_categories:
     #         pass
     #     else:
