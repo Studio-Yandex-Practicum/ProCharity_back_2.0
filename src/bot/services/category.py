@@ -5,7 +5,7 @@ from src.core.db.repository.category import CategoryRepository
 class CategoryService:
     """Сервис бота для работы с моделью Category."""
 
-    def __init__(self, category_repository: CategoryRepository):
+    def __init__(self, category_repository: CategoryRepository) -> None:
         self._category_repository = category_repository
 
     async def get_unarchived_parents(self) -> list[Category]:

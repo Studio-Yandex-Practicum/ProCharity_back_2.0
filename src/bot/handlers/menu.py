@@ -19,7 +19,7 @@ log = structlog.get_logger()
 async def menu_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.user_service],
+    user_service: UserService = Provide[Container.bot_user_service],
 ):
     """Возвращает в меню."""
     user_service = user_service
@@ -35,7 +35,7 @@ async def menu_callback(
 async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.user_service],
+    user_service: UserService = Provide[Container.bot_user_service],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id

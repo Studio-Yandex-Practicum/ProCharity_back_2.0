@@ -13,11 +13,10 @@ from src.depends import Container
 
 
 @logger_decor
-@inject
 async def task_details_callback(
     update: Update,
     context: CallbackContext,
-    task_service: TaskService = Provide[Container.task_service],
+    task_service: TaskService = Provide[Container.bot_task_service],
 ):
     query = update.callback_query
     task_service = task_service
@@ -33,7 +32,7 @@ async def view_task_callback(
     update: Update,
     context: CallbackContext,
     limit: int = 3,
-    task_service: TaskService = Provide[Container.task_service],
+    task_service: TaskService = Provide[Container.bot_task_service],
 ):
     task_service = task_service
     telegram_id = context._user_id

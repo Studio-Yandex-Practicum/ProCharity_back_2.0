@@ -1,4 +1,4 @@
-from dependency_injector.wiring import Provide
+from dependency_injector.wiring import Provide, inject
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
@@ -13,11 +13,12 @@ from src.depends import Container
 
 
 @logger_decor
+@inject
 async def start_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    ext_user_service: ExternalSiteUserService = Provide[Container.site_user_service],
-    user_service: UserService = Provide[Container.user_service],
+    ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
+    user_service: UserService = Provide[Container.bot_user_service],
 ):
     ext_user_service = ext_user_service
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
@@ -64,7 +65,7 @@ async def start_command(
 async def confirm_chosen_categories(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.user_service],
+    user_service: UserService = Provide[Container.bot_user_service],
 ):
     keyboard = get_confirm_keyboard()
 
