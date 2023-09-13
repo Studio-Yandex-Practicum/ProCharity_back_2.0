@@ -1,4 +1,4 @@
-from dependency_injector.wiring import Provide, inject
+from dependency_injector.wiring import Provide
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
