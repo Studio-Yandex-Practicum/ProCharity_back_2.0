@@ -1,10 +1,13 @@
 import logging
 
+import structlog
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.api.schemas import (
-    Message, MessageList,
+    InfoRate,
+    Message,
+    MessageList,
     TelegramNotificationRequest,
     TelegramNotificationUsersRequest,
 )
@@ -13,6 +16,7 @@ from src.depends import Container
 
 
 notification_router = APIRouter()
+log = structlog.get_logger()
 
 @notification_router.post(
     "/",
@@ -29,6 +33,7 @@ async def send_telegram_notification(
 
 @notification_router.post(
     "/group",
+    response_model=InfoRate,
     description="Сообщение для группы пользователей",
 )
 @inject
@@ -38,21 +43,16 @@ async def send_messages_to_group_of_users(
             Provide[Container.message_service]
         ),
 ):
-    successful_rate = 0
-    unsuccessful_rate = 0
-
+    log.info('Начало отправки сообщений для группы пользователей')
+    rate = InfoRate()
     for message in message_list.messages:
         respond = await telegram_notification_service.send_message_to_user(
             message.telegram_id,
             message
         )
-        if respond:
-            successful_rate += 1
-        else:
-            unsuccessful_rate += 1
-    result = (f'Successful sending - {successful_rate}, '
-              f'Unsuccessful sending - {unsuccessful_rate}')
-    return (message_list, result)
+        rate = telegram_notification_service.count_rate(respond, rate)
+    log.info('Конец отправки сообщений для группы пользователей')
+    return (rate)
 
 
 @notification_router.post(

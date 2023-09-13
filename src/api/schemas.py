@@ -11,10 +11,9 @@ from pydantic import (
     root_validator
 )
 
+from src.api.constants import DATE_FORMAT
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
-
-from .constants import DATE_FORMAT
 
 
 class ResponseBase(BaseModel):
@@ -154,11 +153,19 @@ class MessageList(RequestBase):
         json_schema_extra = {
                 "example": {
                     "messages": [
-                        {"telegram_id": 263879665, "message": "263879665"},
-                        {"telegram_id": 731553832, "message": "731553832"},
+                        {"telegram_id": 000000000, "message": "hi there"},
+                        {"telegram_id": 000000000, "message": "hi there"},
                     ]
                 }
             }
+
+
+class InfoRate(BaseModel):
+    """
+    Класс для вывода информации о количестве успешных и неуспешных отправлений
+    """
+    successful_rate: int = 0
+    unsuccessful_rate: int = 0
 
 
 class ExternalSiteUserRequest(RequestBase):
