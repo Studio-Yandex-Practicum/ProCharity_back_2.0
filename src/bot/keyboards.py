@@ -43,7 +43,6 @@ async def get_checked_categories_keyboard(
             [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
         ]
     )
-
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -53,23 +52,6 @@ async def get_categories_keyboard(
     keyboard = [
         [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
     ]
-    #     if category.id in selected_categories:
-    #         pass
-    #     else:
-    #         b
-    # ]
-    # keyboard = []
-
-    # for category in categories.keys():
-    #     if category.id in selected_categories:
-    #         if categories[category] == selected_categories[category.id]:
-    #             button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"select_category_{category.id}")
-    #         else:
-    #             button = InlineKeyboardButton(f"☑️  {category.name}", callback_data=f"select_category_{category.id}")
-    #     else:
-    #         button = InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")
-    #     keyboard.append([button])
-
     keyboard.extend(
         [
             [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
