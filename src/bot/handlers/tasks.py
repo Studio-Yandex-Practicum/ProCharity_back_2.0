@@ -19,7 +19,6 @@ async def task_details_callback(
     task_service: TaskService = Provide[Container.bot_task_service],
 ):
     query = update.callback_query
-    task_service = task_service
     task_id = int(context.match.group(1))
     task = await task_service.get_task_by_id(task_id)
     detailed_text = display_task_verbosely(task)
@@ -34,7 +33,6 @@ async def view_task_callback(
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_task_service],
 ):
-    task_service = task_service
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
         context.user_data.get("page_number", 1),

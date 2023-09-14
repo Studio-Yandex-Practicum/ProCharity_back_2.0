@@ -22,7 +22,6 @@ async def menu_callback(
     user_service: UserService = Provide[Container.bot_user_service],
 ):
     """Возвращает в меню."""
-    user_service = user_service
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Выбери, что тебя интересует:",
@@ -39,7 +38,6 @@ async def set_mailing(
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
-    user_service = user_service
     has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
         text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."

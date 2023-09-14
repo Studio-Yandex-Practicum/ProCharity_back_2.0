@@ -19,7 +19,6 @@ async def categories_callback(
     context: ContextTypes.DEFAULT_TYPE,
     category_service: CategoryService = Provide[Container.bot_category_service],
 ):
-    category_service = category_service
     context.user_data["parent_id"] = None
     categories = await category_service.get_unarchived_parents()
 
@@ -40,7 +39,6 @@ async def confirm_categories_callback(
     """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
     query = update.callback_query
     telegram_id = update.effective_user.id
-    user_service = user_service
 
     categories = await user_service.get_user_categories(telegram_id)
     if not categories:
@@ -66,8 +64,6 @@ async def subcategories_callback(
     user_service: UserService = Provide[Container.bot_user_service],
 ):
     query = update.callback_query
-    category_service = category_service
-    user_service = user_service
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
@@ -89,8 +85,6 @@ async def select_subcategory_callback(
     user_service: UserService = Provide[Container.bot_user_service],
 ):
     query = update.callback_query
-    category_service = category_service
-    user_service = user_service
     subcategory_id = int(context.match.group(1))
     selected_categories = await user_service.get_user_categories(update.effective_user.id)
 
@@ -119,7 +113,6 @@ async def back_subcategory_callback(
     category_service: CategoryService = Provide[Container.bot_category_service],
 ):
     query = update.callback_query
-    category_service = category_service
     categories = await category_service.get_unarchived_parents()
 
     await query.message.edit_text(

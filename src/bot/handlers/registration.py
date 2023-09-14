@@ -20,9 +20,7 @@ async def start_command(
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_user_service],
 ):
-    ext_user_service = ext_user_service
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
-    user_service = user_service
     if ext_user is not None:
         await user_service.register_user(
             telegram_id=update.effective_user.id,
@@ -68,8 +66,6 @@ async def confirm_chosen_categories(
     user_service: UserService = Provide[Container.bot_user_service],
 ):
     keyboard = get_confirm_keyboard()
-
-    user_service = user_service
     categories = await user_service.get_user_categories(update.effective_user.id)
     context.user_data["selected_categories"] = {category: None for category in categories}
     text = ", ".join(categories.values())
