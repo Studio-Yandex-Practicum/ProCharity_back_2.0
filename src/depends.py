@@ -74,7 +74,7 @@ class Container(containers.DeclarativeContainer):
         user_repository=user_repository,
     )
     bot_site_user_service = providers.Factory(BotExternalSiteUserService, site_user_repository=site_user_repository)
-        unsubscribe_reason_service = providers.Factory(
+    unsubscribe_reason_service = providers.Factory(
         UnsubscribeReasonService,
         unsubscribe_reason_repository=unsubscribe_reason_repository,
         user_repository=user_repository,
