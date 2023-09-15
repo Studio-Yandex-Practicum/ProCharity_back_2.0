@@ -13,7 +13,7 @@ exclude = '''
 (
   /(
     | .env
-    | .env.example
+    | env.example
     | .git
     | __pycache__
     | venv/
