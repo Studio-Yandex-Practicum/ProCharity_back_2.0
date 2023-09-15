@@ -1,3 +1,4 @@
+from dependency_injector.wiring import Provide
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
@@ -8,12 +9,16 @@ from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
 from src.core.utils import display_task_verbosely, display_tasks
+from src.depends import Container
 
 
 @logger_decor
-async def task_details_callback(update: Update, context: CallbackContext):
+async def task_details_callback(
+    update: Update,
+    context: CallbackContext,
+    task_service: TaskService = Provide[Container.bot_task_service],
+):
     query = update.callback_query
-    task_service = TaskService()
     task_id = int(context.match.group(1))
     task = await task_service.get_task_by_id(task_id)
     detailed_text = display_task_verbosely(task)
@@ -22,8 +27,12 @@ async def task_details_callback(update: Update, context: CallbackContext):
 
 @logger_decor
 @delete_previous_message
-async def view_task_callback(update: Update, context: CallbackContext, limit: int = 3):
-    task_service = TaskService()
+async def view_task_callback(
+    update: Update,
+    context: CallbackContext,
+    limit: int = 3,
+    task_service: TaskService = Provide[Container.bot_task_service],
+):
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
         context.user_data.get("page_number", 1),
