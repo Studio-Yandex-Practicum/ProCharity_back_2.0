@@ -100,7 +100,7 @@ ProCharity (НКО Фонд Друзья).
     > **Note**
     > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
 
-3. Переименовать [`.env.example`](.env) в `.env` и задать переменные окружения.
+3. Переименовать [`.env.example`](.env.example) в `.env` и задать переменные окружения.
 
     ```dotenv
     BOT_TOKEN=<Токен аутентификации бота>
