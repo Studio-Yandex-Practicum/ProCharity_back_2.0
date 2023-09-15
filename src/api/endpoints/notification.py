@@ -1,12 +1,9 @@
-import logging
-
 import structlog
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.api.schemas import (
     InfoRate,
-    Message,
     MessageList,
     TelegramNotificationRequest,
     TelegramNotificationUsersRequest,
@@ -17,6 +14,7 @@ from src.depends import Container
 
 notification_router = APIRouter()
 log = structlog.get_logger()
+
 
 @notification_router.post(
     "/",
