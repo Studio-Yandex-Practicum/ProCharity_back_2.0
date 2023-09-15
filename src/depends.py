@@ -13,6 +13,10 @@ from src.api.services import (
 )
 from src.bot.bot import create_bot
 from src.bot.services import UnsubscribeReasonService
+from src.bot.services.category import CategoryService as BotCategoryService
+from src.bot.services.external_site_user import ExternalSiteUserService as BotExternalSiteUserService
+from src.bot.services.task import TaskService as BotTaskService
+from src.bot.services.user import UserService as BotUserService
 from src.core.db import get_session
 from src.core.db.repository import (
     AdminUserRepository,
@@ -60,7 +64,17 @@ class Container(containers.DeclarativeContainer):
     health_check_service = providers.Factory(
         HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
     )
-    unsubscribe_reason_service = providers.Factory(
+
+    # BOT services:
+    bot_category_service = providers.Factory(BotCategoryService, category_repository=category_repository)
+    bot_user_service = providers.Factory(BotUserService, user_repository=user_repository)
+    bot_task_service = providers.Factory(
+        BotTaskService,
+        task_repository=task_repository,
+        user_repository=user_repository,
+    )
+    bot_site_user_service = providers.Factory(BotExternalSiteUserService, site_user_repository=site_user_repository)
+        unsubscribe_reason_service = providers.Factory(
         UnsubscribeReasonService,
         unsubscribe_reason_repository=unsubscribe_reason_repository,
         user_repository=user_repository,

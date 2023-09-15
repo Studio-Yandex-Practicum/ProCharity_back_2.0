@@ -1,6 +1,5 @@
 import structlog
 from dependency_injector.wiring import Provide
-from fastapi import Depends
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
@@ -18,21 +17,28 @@ log = structlog.get_logger()
 
 @logger_decor
 @delete_previous_message
-async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def menu_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     """Возвращает в меню."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(await UserService().get_by_telegram_id(update.effective_user.id)),
+        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
     )
 
 
 @logger_decor
 @delete_previous_message
-async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def set_mailing(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
-    user_service = UserService()
     has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
         text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
@@ -59,7 +65,7 @@ async def set_mailing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    unsubscribe_reason_service: UnsubscribeReasonService = Depends(Provide[Container.unsubscribe_reason_service]),
+    unsubscribe_reason_service: UnsubscribeReasonService = Provide[Container.unsubscribe_reason_service],
 ):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
