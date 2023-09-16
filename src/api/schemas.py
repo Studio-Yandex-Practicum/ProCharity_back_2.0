@@ -232,7 +232,7 @@ class TaskResponse(ResponseBase):
             "example": {
                 "title": "Task Title",
                 "name_organization": "My Organization",
-                "deadline": "2025-12-31",
+                "deadline": "31-12-2025",
                 "category_id": 1,
                 "bonus": 5,
                 "location": "My Location",
