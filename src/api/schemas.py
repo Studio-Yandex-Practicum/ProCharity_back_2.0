@@ -141,7 +141,7 @@ class TaskRequest(RequestBase):
         ...,
         ge=1,
         lt=10,
-        example=1,
+        example=5,
         description="Величина бонуса за выполнение задачи."
     )
     location: StrictStr = Field(
@@ -204,7 +204,7 @@ class TaskResponse(ResponseBase):
         ...,
         ge=1,
         lt=10,
-        example=1,
+        example=5,
         description="Величина бонуса за выполнение задачи."
     )
     location: StrictStr = Field(
