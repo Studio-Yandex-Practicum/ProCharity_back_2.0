@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from src.api.endpoints import (
+    admin_user_router,
     analytic_router,
     category_router,
     health_check_router,
@@ -8,7 +9,6 @@ from src.api.endpoints import (
     site_user_router,
     task_router,
     telegram_webhook_router,
-    admin_user_router
 )
 from src.settings import settings
 
