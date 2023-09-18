@@ -1,11 +1,11 @@
 import json
 
+from schemas import InfoRate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
-from schemas import InfoRate
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
@@ -33,7 +33,6 @@ class TelegramNotificationService:
             case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
         await self.telegram_notification.send_messages(message=notifications.message, users=users)
-
 
     async def send_message_to_user(self, telegram_id, notifications):
         """Отправляет сообщение указанному по telegram_id пользователю"""

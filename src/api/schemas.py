@@ -1,18 +1,9 @@
 import urllib
 from datetime import date
 from typing import Optional
+
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 from typing_extensions import NotRequired, TypedDict
-
-from pydantic import (
-    BaseModel,
-    Extra,
-    Field,
-    NonNegativeInt,
-    StrictStr,
-    field_validator,
-    root_validator
-)
 
 from src.api.constants import DATE_FORMAT
 from src.core.db.models import ExternalSiteUser
@@ -36,16 +27,14 @@ class RequestBase(BaseModel):
 class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
-    id: int = Field(..., ge=1, lt=10 ** 10)
+    id: int = Field(..., ge=1, lt=10**10)
     name: str = Field(..., min_length=2, max_length=100)
-    parent_id: int | None = Field(None, ge=1, lt=10 ** 10)
+    parent_id: int | None = Field(None, ge=1, lt=10**10)
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
         if values["parent_id"] and values["parent_id"] == values["id"]:
-            raise ValueError(
-                "Категория не может быть дочерней для самой себя."
-            )
+            raise ValueError("Категория не может быть дочерней для самой себя.")
         return values
 
 
@@ -154,19 +143,20 @@ class MessageList(RequestBase):
     class Config:
         extra = Extra.forbid
         json_schema_extra = {
-                "example": {
-                    "messages": [
-                        {"telegram_id": 000000000, "message": "hi there"},
-                        {"telegram_id": 000000000, "message": "hi there"},
-                    ]
-                }
+            "example": {
+                "messages": [
+                    {"telegram_id": 000000000, "message": "hi there"},
+                    {"telegram_id": 000000000, "message": "hi there"},
+                ]
             }
+        }
 
 
 class InfoRate(BaseModel):
     """
     Класс для вывода информации о количестве успешных и неуспешных отправлений
     """
+
     successful_rate: int = 0
     unsuccessful_rate: int = 0
 
@@ -199,10 +189,7 @@ class ExternalSiteUserRequest(RequestBase):
             new_value = [int(value) for value in value.split(", ")]
             return new_value
         except ValueError:
-            raise ValueError(
-                'Для передачи строки с числами в поле specializations '
-                'используйте формат: "1, 2, 3" '
-            )
+            raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
 
 
 class Analytic(BaseModel):
@@ -215,7 +202,7 @@ class Analytic(BaseModel):
     active_users_statistic: dict[str, str] = {}
     tasks: dict[str, str] = {}
 
-      
+
 class DBStatus(TypedDict):
     """Класс ответа для проверки работы базы данных."""
 

@@ -7,7 +7,6 @@ from telegram.ext import Application
 
 from src.core.db.models import User
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +30,6 @@ class TelegramNotification:
             msg += " " + exc.message
             logger.info(msg)
             return False
-
 
     async def send_messages(
         self,
