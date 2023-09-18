@@ -1,9 +1,18 @@
 import urllib
 from datetime import date
-from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 from typing_extensions import NotRequired, TypedDict
+
+from pydantic import (
+    BaseModel,
+    Extra,
+    Field,
+    NonNegativeInt,
+    StrictStr,
+    field_validator,
+    root_validator
+)
 
 from src.api.constants import DATE_FORMAT
 from src.core.db.models import ExternalSiteUser
@@ -156,7 +165,6 @@ class InfoRate(BaseModel):
     """
     Класс для вывода информации о количестве успешных и неуспешных отправлений
     """
-
     successful_rate: int = 0
     unsuccessful_rate: int = 0
 
@@ -189,7 +197,10 @@ class ExternalSiteUserRequest(RequestBase):
             new_value = [int(value) for value in value.split(", ")]
             return new_value
         except ValueError:
-            raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
+            raise ValueError(
+                'Для передачи строки с числами в поле specializations '
+                'используйте формат: "1, 2, 3" '
+            )
 
 
 class Analytic(BaseModel):
@@ -202,7 +213,7 @@ class Analytic(BaseModel):
     active_users_statistic: dict[str, str] = {}
     tasks: dict[str, str] = {}
 
-
+      
 class DBStatus(TypedDict):
     """Класс ответа для проверки работы базы данных."""
 

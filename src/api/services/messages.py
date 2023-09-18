@@ -1,5 +1,3 @@
-import json
-
 from schemas import InfoRate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
