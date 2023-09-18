@@ -62,18 +62,14 @@ ProCharity (НКО Фонд Друзья).
 
 1. Создайте и заполните файл `.env`:
 
-```dotenv
-# Переменные приложения
-APPLICATION_URL=procharity.duckdns.org  # Домен, на котором развернуто приложение
-DEBUG=False  # Включение(True) | Выключение(False) режима отладки
-ROOT_PATH=/api/  # Для корректной работы без прокси ставится пустая строка, для работы с прокси "/api/"
-BOT_TOKEN=<your_token_from_botfather>  # Токен аутентификации бота
-BOT_WEBHOOK_MODE=False  # Запустить бота в режиме webhook(True) | polling(False)
-```
-> **Note**
+    ```dotenv
+    # Переменные приложения
+    BOT_TOKEN=<your_token_from_botfather>  # Токен аутентификации бота
+    ```
+    > **Note**
     > [Полный пример переменных окружения](env.example).
 
-> **Note**
+    > **Note**
     > Для получения токена аутентификации бота обратитесь к
     разделу [Регистрация бота Telegram](#регистрация-бота-telegram).
 
@@ -111,37 +107,32 @@ BOT_WEBHOOK_MODE=False  # Запустить бота в режиме webhook(Tr
     ```
 
     > **Note**
-    > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
+   > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
 3. Настроить pre-commit.
 В режиме ```poetry shell```
    ```
    pre-commit install
    ```
    > **Note**
-    > Перед каждым коммитом будет запущен линтер и форматтер,
-    который автоматически отформатирует код согласно принятому в команде codestyle.
+   > Перед каждым коммитом будет запущен линтер и форматтер,
+   который автоматически отформатирует код согласно принятому в команде codestyle.
 
 4. Создайте и заполните файл `.env`:
 
-```dotenv
-# Переменные приложения
-APPLICATION_URL=procharity.duckdns.org  # Домен, на котором развернуто приложение
-DEBUG=False  # Включение(True) | Выключение(False) режима отладки
-ROOT_PATH=/api/  # Для корректной работы без прокси ставится пустая строка, для работы с прокси "/api/"
-BOT_TOKEN=  # Токен аутентификации бота
-BOT_WEBHOOK_MODE=False  # Запустить бота в режиме webhook(True) | polling(False)
-# Переменные базы данных
-POSTGRES_DB=procharity_back_db_local  # Название базы данных
-POSTGRES_USER=postgres  # Логин для подключения к базе данных
-POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
-DB_HOST=localhost  # Название сервиса (контейнера)
-DB_PORT=5432  # Порт для подключения к базе данных
-```
+    ```dotenv
+    BOT_TOKEN=  # Токен аутентификации бота
+    # Переменные базы данных
+    POSTGRES_DB=procharity_back_db_local  # Название базы данных
+    POSTGRES_USER=postgres  # Логин для подключения к базе данных
+    POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
+    DB_HOST=localhost  # Название сервиса (контейнера)
+    DB_PORT=5432  # Порт для подключения к базе данных
+    ```
 
-> **Note**
+    > **Note**
     > [Полный пример переменных окружения](env.example).
 
-> **Note**
+    > **Note**
     > Для получения токена аутентификации бота обратитесь к
     разделу [Регистрация бота Telegram](#регистрация-бота-telegram).
 
@@ -205,40 +196,40 @@ DB_PORT=5432  # Порт для подключения к базе данных
 <details>
   <summary><h3>Режимы работы бота</h3></summary>
 
-#### Запуск без API приложения
+1. Запуск без API приложения
 
-Выполнить скрипт запуска.
+    Выполнить скрипт запуска.
 
-```shell
-python src/run.py
-```
+    ```shell
+    python src/run.py
+    ```
 
-> **Warning**:
-> Возможно только в режиме [polling](#polling).
+    > **Warning**:
+         Возможно только в режиме [polling](#polling).
 
-#### Polling
+2. Polling
 
-Задать значение переменной окружения (`.env`).
+    Задать значение переменной окружения (`.env`).
 
-```dotenv
-BOT_WEBHOOK_MODE=False
-```
+    ```dotenv
+    BOT_WEBHOOK_MODE=False
+    ```
 
-#### Webhook
+3. Webhook
 
-Задать значение переменным окружения (`.env`).
+    Задать значение переменным окружения (`.env`).
 
-```dotenv
-BOT_WEBHOOK_MODE=True
-APPLICATION_URL=http://example.com  # Пример
-```
+    ``` dotenv
+    BOT_WEBHOOK_MODE=True
+    APPLICATION_URL=http://example.com  # Пример
+    ```
 
-> **Note**
-> [Подробнее о webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
+    > **Note**
+    > [Подробнее о webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
 
-> **Note**
-> Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/)
-> (см. раздел "[Использование Ngrok](#использование-ngrok)").
+    > **Note**
+    > Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/)
+    > (см. раздел "[Использование Ngrok](#использование-ngrok)").
 </details>
 
 <details>
@@ -269,11 +260,11 @@ APPLICATION_URL=http://example.com  # Пример
 
 #### Откат миграций
 
-Откатить последнюю миграцию:
+1. Откатить последнюю миграцию:
 
-```shell
-alembic downgrade -1
-```
+    ```shell
+    alembic downgrade -1
+    ```
 </details>
 
 <details>
@@ -283,29 +274,29 @@ alembic downgrade -1
 
 Подробнее: https://python-poetry.org/docs/cli/
 
-#### Настройка окружения проекта
+1. Настройка окружения проекта
 Установку необходимо выполнять через curl, как в документации.
 
     ```shell
     poetry env use python3.11; poetry install
     ```
 
-#### Активировать виртуальное окружение
+2. Активировать виртуальное окружение
 
     ```shell
     poetry shell
     ```
 
-#### Добавить зависимость
+3. Добавить зависимость
 
     ```shell
     poetry add <package_name>
     ```
 
-> **Note**
-> Использование флага `--dev (-D)` позволяет установить зависимость,
-> необходимую только для разработки.
-> Это полезно для разделения develop и prod зависимостей.
+    > **Note**
+    > Использование флага `--dev (-D)` позволяет установить зависимость,
+    необходимую только для разработки.
+    Это полезно для разделения develop и prod зависимостей.
 
 #### Запустить скрипт без активации виртуального окружения
 
@@ -335,8 +326,8 @@ SSL-сертификатом.
     ```shell
     ngrok http 80
     ```
-> **Note**
-    > Если задать переменную в следующем пункте 3, то пункт два можно пропустить.
+    > **Note**
+        > Если задать переменную в следующем пункте 3, то пункт два можно пропустить.
 
 3. Задать значение переменной окружения (.env).
 
