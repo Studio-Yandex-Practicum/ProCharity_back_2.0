@@ -9,6 +9,7 @@ from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
 
 DatabaseModel = TypeVar("DatabaseModel")
+DATE_TIME_FORMAT_LAST_UPDATE = "YYYY-MM-DD HH24:MI:SS"
 
 
 class AbstractRepository(abc.ABC):
@@ -70,9 +71,26 @@ class AbstractRepository(abc.ABC):
         self._session.add_all(objects)
 
     async def count_all(self) -> int:
-        """Возвращает количество юнитов категории."""
+        """Возвращает количество объектов модели в базе данных."""
         objects = await self._session.execute(select(func.count()).select_from(self._model))
         return objects.scalar()
+
+    async def count_active_all(self) -> int:
+        """Возвращает количество неархивных (активных) объектов модели в базе данных."""
+        objects = await self._session.execute(
+            select(func.count()).select_from(self._model).where(self._model.is_archived == False)  # noqa
+        )
+        return objects.scalar()
+
+    async def get_last_update(self) -> str | None:
+        """Получает из базы отсортированный по времени обновления объект модели.
+        В случае отсутствия возвращает None."""
+        db_obj = await self._session.execute(
+            select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE)).order_by(
+                self._model.updated_at.desc()
+            )
+        )
+        return db_obj.scalars().first()
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
