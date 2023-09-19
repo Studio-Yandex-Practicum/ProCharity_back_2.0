@@ -64,7 +64,6 @@ jobs:
     needs: build-and-push-image-to-github-packages
     environment:
       name: deploy
-      DATE: $(git show -s --format=%ci dd28288f)
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -104,8 +103,7 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
-            LAST_COMMIT=${{ github.sha }}
-            COMMIT_DATE=DATE
+            LAST_COMMIT=${{ github.event.head_commit }}
             EOM
   start_application:
     name: Start application
