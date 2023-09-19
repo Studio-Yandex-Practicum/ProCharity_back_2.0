@@ -69,6 +69,11 @@ class Settings(BaseSettings):
     # Адреса электронной почты администраторов
     EMAIL_ADMIN: EmailStr
 
+    # Настройки получения коммитов
+    LAST_COMMIT: str = ""
+    COMMIT_DATE: str = ""
+    TAGS: list[str] = []
+
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
         """Добавить 'https://' к домену."""

@@ -5,8 +5,13 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from src.api.services import CategoryService, ExternalSiteUserService, TaskService
 from src.api.services.admin_service import AdminService
 from src.api.services.analytics import AnalyticsService
+from src.api.services.health_check import HealthCheckService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.bot import create_bot
+from src.bot.services.category import CategoryService as BotCategoryService
+from src.bot.services.external_site_user import ExternalSiteUserService as BotExternalSiteUserService
+from src.bot.services.task import TaskService as BotTaskService
+from src.bot.services.user import UserService as BotUserService
 from src.core.db import get_session
 from src.core.db.repository.admin_repository import AdminUserRepository
 from src.core.db.repository.category import CategoryRepository
@@ -47,3 +52,16 @@ class Container(containers.DeclarativeContainer):
     task_service = providers.Factory(TaskService, task_repository=task_repository, session=session)
     message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot, session=session)
     analytic_service = providers.Factory(AnalyticsService, user_repository=user_repository)
+    health_check_service = providers.Factory(
+        HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
+    )
+
+    # BOT services:
+    bot_category_service = providers.Factory(BotCategoryService, category_repository=category_repository)
+    bot_user_service = providers.Factory(BotUserService, user_repository=user_repository)
+    bot_task_service = providers.Factory(
+        BotTaskService,
+        task_repository=task_repository,
+        user_repository=user_repository,
+    )
+    bot_site_user_service = providers.Factory(BotExternalSiteUserService, site_user_repository=site_user_repository)
