@@ -19,4 +19,6 @@ class UnsubscribeReasonService:
                 reason_obj.id, UnsubscribeReason(user_id=user.id, unsubscribe_reason=reason)
             )
         else:
-            await self._unsubscribe_reason_repository.create(UnsubscribeReason(user_id=user.id, unsubscribe_reason=reason))
+            await self._unsubscribe_reason_repository.create(
+                UnsubscribeReason(user_id=user.id, unsubscribe_reason=reason)
+            )
