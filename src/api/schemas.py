@@ -28,7 +28,7 @@ class CategoryRequest(RequestBase):
 
     id: int = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор категории.")
     name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
-    parent_id: Optional[int] = Field(
+    parent_id: int = Field(
         None,
         ge=1,
         lt=10,
@@ -57,7 +57,7 @@ class CategoryResponse(ResponseBase):
 
     id: int = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор категории.")
     name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
-    parent_id: Optional[int] = Field(
+    parent_id: int = Field(
         None,
         ge=1,
         lt=10,
@@ -89,7 +89,7 @@ class TaskRequest(RequestBase):
     bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
     location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
     link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
-    description: Optional[StrictStr] = Field(None, example="Task description", description="Описание задачи.")
+    description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
 
     class Config:
         json_schema_extra = {
@@ -123,7 +123,7 @@ class TaskResponse(ResponseBase):
     bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
     location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
     link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
-    description: Optional[StrictStr] = Field(None, example="Task description", description="Описание задачи.")
+    description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
     is_archived: bool = Field(example=False, description="Статус задачи. Если True, то эта задача заархивирована.")
 
     class Config:
