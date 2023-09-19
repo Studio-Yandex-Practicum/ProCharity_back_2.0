@@ -1,14 +1,12 @@
 import urllib
 from datetime import date
-from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 from typing_extensions import NotRequired, TypedDict
 
+from src.api.constants import DATE_FORMAT
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import TelegramNotificationUsersGroups
-
-from .constants import DATE_FORMAT
 
 
 class ResponseBase(BaseModel):
@@ -93,6 +91,7 @@ class TaskRequest(RequestBase):
     link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
     description: Optional[StrictStr] = Field(None, example="Task description", description="Описание задачи.")
 
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -156,7 +155,10 @@ class FeedbackFormQueryParams(BaseModel):
 
 
 class TelegramNotificationRequest(RequestBase):
-    """Класс формирования параметров запроса для отправки сообщения определенному пользователю."""
+    """
+    Класс формирования параметров запроса для отправки
+    сообщения определенному пользователю.
+    """
 
     message: str = Field(..., min_length=2, max_length=500)
 
@@ -183,13 +185,42 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
         }
 
 
+class Message(RequestBase):
+    telegram_id: int
+    message: str = Field(..., min_length=2, max_length=500)
+
+
+class MessageList(RequestBase):
+    messages: list[Message]
+
+    class Config:
+        extra = Extra.forbid
+        json_schema_extra = {
+            "example": {
+                "messages": [
+                    {"telegram_id": 000000000, "message": "hi there"},
+                    {"telegram_id": 000000000, "message": "hi there"},
+                ]
+            }
+        }
+
+
+class InfoRate(BaseModel):
+    """
+    Класс для вывода информации о количестве успешных и неуспешных отправлений
+    """
+
+    successful_rate: int = 0
+    unsuccessful_rate: int = 0
+
+
 class ExternalSiteUserRequest(RequestBase):
     """Класс модели запроса для ExternalSiteUser."""
 
     id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
-    first_name: Optional[str] = Field(None, max_length=64)
-    last_name: Optional[str] = Field(None, max_length=64)
+    first_name: str | None = Field(None, max_length=64)
+    last_name: str | None = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
     specializations: list[int] | None = None
 
@@ -211,7 +242,7 @@ class ExternalSiteUserRequest(RequestBase):
             new_value = [int(value) for value in value.split(", ")]
             return new_value
         except ValueError:
-            raise ValueError('Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3" ')
+            raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
 
 
 class Analytic(BaseModel):
