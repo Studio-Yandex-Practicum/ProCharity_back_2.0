@@ -105,6 +105,7 @@ jobs:
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT=${{ github.event.id }}
             COMMIT_DATE=${{ github.event.created_at }}
+            NAME=${{ github.event.pusher.name }}
             EOM
   start_application:
     name: Start application
