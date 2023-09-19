@@ -7,8 +7,8 @@ concurrency:
 on:
   push:
     branches:
-      - master
-      - develop
+      - fix/commit_info_to_workflow
+      
 
   workflow_dispatch:
 
@@ -103,6 +103,8 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
+            LAST_COMMIT=${{ github.workflow_sha }}
+            COMMIT_DATE=$(git show -s --format=%ci ${LAST_COMMIT})
             EOM
   start_application:
     name: Start application
