@@ -103,7 +103,8 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
-            LAST_COMMIT=${{ github.event.head_commit[0] }}
+            LAST_COMMIT=${{ github.event.id }}
+            COMMIT_DATE=${{ github.event.created_at }}
             EOM
   start_application:
     name: Start application
