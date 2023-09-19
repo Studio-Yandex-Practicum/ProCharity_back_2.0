@@ -57,7 +57,7 @@ class User(Base):
     categories: Mapped[list["Category"]] = relationship(
         "Category", secondary="users_categories", back_populates="users"
     )
-    unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship("UnsubscribeReason", backref="users")
+    unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship(back_populates="user")
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
@@ -149,7 +149,8 @@ class AdminTokenRequest(Base):
 class UnsubscribeReason(Base):
     __tablename__ = "unsubscribe_reason"
 
-    user: Mapped[int] = mapped_column(Integer(), ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(Integer(), ForeignKey("users.id"))
+    user: Mapped["User"] = relationship("User", back_populates="unsubscribe_reason")
     unsubscribe_reason: Mapped[str] = mapped_column(String(128), nullable=True)
 
     def __repr__(self):
