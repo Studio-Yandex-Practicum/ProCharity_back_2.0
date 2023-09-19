@@ -6,7 +6,7 @@ class UnsubscribeReasonService:
     """Сервис для работы с моделью UnsubscribeReason."""
 
     def __init__(
-            self, user_repository: UserRepository, unsubscribe_reason_repository: UnsubscribeReasonRepository
+        self, user_repository: UserRepository, unsubscribe_reason_repository: UnsubscribeReasonRepository
     ) -> None:
         self._user_repository = user_repository
         self._unsubscribe_reason_repository = unsubscribe_reason_repository
