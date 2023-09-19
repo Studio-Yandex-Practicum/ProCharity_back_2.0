@@ -103,7 +103,7 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
-            LAST_COMMIT=${{ github.ref_name }}
+            LAST_COMMIT=${{ github.run_id }}
             COMMIT_DATE=${{ github.event.created_at }}
             NAME=${{ github.event.pusher.name }}
             EOM
