@@ -103,6 +103,9 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
+            LAST_COMMIT=${{ github.workflow_sha }}
+            COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%dh%H%M%S)
+            TAGS=${{ github.workflow_ref }}
             EOM
   start_application:
     name: Start application
