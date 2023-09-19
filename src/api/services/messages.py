@@ -1,9 +1,9 @@
-from schemas import InfoRate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
+from src.api.schemas import InfoRate
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
