@@ -91,7 +91,6 @@ class TaskRequest(RequestBase):
     link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
     description: Optional[StrictStr] = Field(None, example="Task description", description="Описание задачи.")
 
-
     class Config:
         json_schema_extra = {
             "example": {
