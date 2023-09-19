@@ -104,7 +104,7 @@ jobs:
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT=${{ github.workflow_sha }}
-            export COMMIT_DATE=$(git show -s --format=%ci ${{ github.workflow_sha::8 }})
+            export COMMIT_DATE=$(git show -s --format=%ci 2f29b52)
             EOM
   start_application:
     name: Start application
