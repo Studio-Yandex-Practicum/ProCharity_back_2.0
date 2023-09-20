@@ -65,7 +65,7 @@ ProCharity (НКО Фонд Друзья).
     ```dotenv
    # Переменные приложения
    BOT_TOKEN= # Токен аутентификации бота
-   SECRET_KEY=a84167ccb889a32e12e639db236a6b98877d73d54b42e54f511856e20ccaf2ab  # Cекретный ключ для генерации jwt-токенов
+   SECRET_KEY=  # Cекретный ключ для генерации jwt-токенов
 
    # Переменные базы данных
    POSTGRES_DB=procharity_back_db_local  # Название базы данных
@@ -137,7 +137,7 @@ ProCharity (НКО Фонд Друзья).
     ```dotenv
    # Переменные приложения
    BOT_TOKEN= # Токен аутентификации бота
-   SECRET_KEY=a84167ccb889a32e12e639db236a6b98877d73d54b42e54f511856e20ccaf2ab  # Cекретный ключ для генерации jwt-токенов
+   SECRET_KEY=  # Cекретный ключ для генерации jwt-токенов
 
    # Переменные базы данных
    POSTGRES_DB=procharity_back_db_local  # Название базы данных
