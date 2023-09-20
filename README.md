@@ -63,8 +63,22 @@ ProCharity (НКО Фонд Друзья).
 1. Создайте и заполните файл `.env`:
 
     ```dotenv
-    # Переменные приложения
-    BOT_TOKEN=<your_token_from_botfather>  # Токен аутентификации бота
+   # Переменные приложения
+   BOT_TOKEN= # Токен аутентификации бота
+   SECRET_KEY=a84167ccb889a32e12e639db236a6b98877d73d54b42e54f511856e20ccaf2ab  # Cекретный ключ для генерации jwt-токенов
+
+   # Переменные базы данных
+   POSTGRES_DB=procharity_back_db_local  # Название базы данных
+   POSTGRES_USER=postgres  # Логин для подключения к базе данных
+   POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
+   DB_HOST=localhost  # Название сервиса (контейнера)
+   DB_PORT=5432  # Порт для подключения к базе данных
+
+   # Organization data
+   ORGANIZATIONS_EMAIL=procharity@yandex.ru
+
+   # Адреса электронной почты администраторов
+   EMAIL_ADMIN=procharity.admin_1@yandex.ru
     ```
 
     > **Note**
@@ -121,13 +135,22 @@ ProCharity (НКО Фонд Друзья).
 4. Создайте и заполните файл `.env`:
 
     ```dotenv
-    BOT_TOKEN=  # Токен аутентификации бота
-    # Переменные базы данных
-    POSTGRES_DB=procharity_back_db_local  # Название базы данных
-    POSTGRES_USER=postgres  # Логин для подключения к базе данных
-    POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
-    DB_HOST=localhost  # Название сервиса (контейнера)
-    DB_PORT=5432  # Порт для подключения к базе данных
+   # Переменные приложения
+   BOT_TOKEN= # Токен аутентификации бота
+   SECRET_KEY=a84167ccb889a32e12e639db236a6b98877d73d54b42e54f511856e20ccaf2ab  # Cекретный ключ для генерации jwt-токенов
+
+   # Переменные базы данных
+   POSTGRES_DB=procharity_back_db_local  # Название базы данных
+   POSTGRES_USER=postgres  # Логин для подключения к базе данных
+   POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
+   DB_HOST=localhost  # Название сервиса (контейнера)
+   DB_PORT=5432  # Порт для подключения к базе данных
+
+   # Organization data
+   ORGANIZATIONS_EMAIL=procharity@yandex.ru
+
+   # Адреса электронной почты администраторов
+   EMAIL_ADMIN=procharity.admin_1@yandex.ru
     ```
 
     > **Note**
@@ -322,18 +345,16 @@ SSL-сертификатом.
 
     https://ngrok.com/download
 
-2. Запустить туннель.
+2. При запуске бота, локально.
+   Запустить туннель.
 
     ```shell
     ngrok http 80
     ```
-    > **Note**
-   > Если задать переменную в следующем пункте 3, то пункт два можно пропустить.
 
-3. Задать значение переменной окружения (.env).
+3. В режиме разработки. Задать значение переменной окружения (.env).
 
     ```dotenv
-    APPLICATION_URL=https://1234-56-78-9.eu.ngrok.io  # Пример
     USE_NGROK=True
     ```
 </details>
