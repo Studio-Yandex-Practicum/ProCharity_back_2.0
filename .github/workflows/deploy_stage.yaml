@@ -79,7 +79,7 @@ jobs:
       - name: Get SHORT_SHA
         run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
       - name: Get COMMIT_DATE
-        run: export COMMIT_DATE=$(git show -s --format=%ci ${{ env.SHORT_SHA }}) >> $GITHUB_ENV
+        run: echo COMMIT_DATE=$(git show -s --format=%ci ${{ env.SHORT_SHA }}) >> $GITHUB_ENV
       - name: Create .env file
         uses: appleboy/ssh-action@master
         with:
