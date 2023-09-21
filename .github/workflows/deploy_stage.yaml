@@ -104,7 +104,7 @@ jobs:
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT1=${{ github.sha }}
-            LAST_COMMIT2=${{ github.sha :: 5 }}
+            LAST_COMMIT2=${{ github.sha[:5] }}
             COMMIT_DATE=${{ steps.date.outputs.date }}
             EOM
   start_application:
