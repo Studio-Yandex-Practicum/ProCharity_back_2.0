@@ -105,8 +105,9 @@ jobs:
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT1=${{ github.sha }}
-            LAST_COMMIT2=LAST_COMMIT
-            COMMIT_DATE=${{ github.event.repository.updated_at}}
+            LAST_COMMIT2=SHORT_SHA
+            LAST_COMMIT3 = echo ${{ github.sha }} | cut -c1-8
+            COMMIT_DATE=${{ github.event.created_at}}
             EOM
   start_application:
     name: Start application
