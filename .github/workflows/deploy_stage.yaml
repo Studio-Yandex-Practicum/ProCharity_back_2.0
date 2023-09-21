@@ -108,7 +108,6 @@ jobs:
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT=${{ env.SHORT_SHA }}
             COMMIT_DATE=${{ env.COMMIT_DATE }}
-            DATE = ${{ steps.date.outputs.date }}
             EOM
   start_application:
     name: Start application
