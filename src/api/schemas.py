@@ -106,7 +106,7 @@ class TelegramNotificationRequest(RequestBase):
     сообщения определенному пользователю.
     """
 
-    message: str = Field(..., min_length=2, max_length=500)
+    message: str = Field(..., min_length=2)
 
     class Config:
         json_schema_extra = {
@@ -131,9 +131,8 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
         }
 
 
-class Message(RequestBase):
+class Message(TelegramNotificationRequest):
     telegram_id: int
-    message: str = Field(..., min_length=2, max_length=500)
 
 
 class MessageList(RequestBase):
