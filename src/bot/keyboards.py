@@ -23,18 +23,18 @@ QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[Category, int], selected_categories: dict[Category] = {}
+    categories: dict[str, int, int], selected_categories: dict[Category] = {}
 ) -> InlineKeyboardButton:
     keyboard = []
 
-    for category in categories.keys():
-        if category.id in selected_categories:
-            if categories[category] == len(selected_categories[category.id]):
-                button = InlineKeyboardButton(f"✅ {category.name}", callback_data=f"category_{category.id}")
+    for category_name, category_id, category_children_count in categories:
+        if category_id in selected_categories:
+            if category_children_count == len(selected_categories[category_id]):
+                button = InlineKeyboardButton(f"✅ {category_name}", callback_data=f"category_{category_id}")
             else:
-                button = InlineKeyboardButton(f"☑️  {category.name}", callback_data=f"category_{category.id}")
+                button = InlineKeyboardButton(f"☑️  {category_name}", callback_data=f"category_{category_id}")
         else:
-            button = InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")
+            button = InlineKeyboardButton(category_name, callback_data=f"category_{category_id}")
         keyboard.append([button])
 
     keyboard.extend(
