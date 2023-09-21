@@ -6,6 +6,7 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 
 from src.bot.constants import callback_data, commands, enum, patterns
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
+from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
@@ -61,9 +62,14 @@ async def set_mailing(
 
 
 @logger_decor
-async def reason_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def reason_handler(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    unsubscribe_reason_service: UnsubscribeReasonService = Provide[Container.unsubscribe_reason_service],
+):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
+    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
         f"рассылки по причине: {reason}"
