@@ -7,8 +7,8 @@ concurrency:
 on:
   push:
     branches:
-      - fix/commit_info_to_workflow
-      
+      - master
+      - develop      
 
   workflow_dispatch:
 
