@@ -155,6 +155,7 @@ class InfoRate(BaseModel):
     Класс для вывода информации о количестве успешных и неуспешных отправлений
     """
 
+    message: list[str] = []
     successful_rate: int = 0
     unsuccessful_rate: int = 0
 

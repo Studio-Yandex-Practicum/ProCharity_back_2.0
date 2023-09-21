@@ -26,7 +26,7 @@ async def send_telegram_notification(
 @notification_router.post(
     "/group",
     response_model=InfoRate,
-    description="Сообщение для группы пользователей",
+    description="Сообщения для разных пользователей",
 )
 @inject
 async def send_messages_to_group_of_users(
@@ -36,8 +36,9 @@ async def send_messages_to_group_of_users(
     log.info("Начало отправки сообщений для группы пользователей")
     rate = InfoRate()
     for message in message_list.messages:
-        respond = await telegram_notification_service.send_message_to_user(message.telegram_id, message)
+        respond, msg = await telegram_notification_service.send_message_to_user(message.telegram_id, message)
         rate = telegram_notification_service.count_rate(respond, rate)
+        rate.message.append(msg)
     log.info("Конец отправки сообщений для группы пользователей")
     return rate
 
@@ -53,5 +54,5 @@ async def send_user_message(
     notifications: TelegramNotificationRequest,
     telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
 ) -> str:
-    await telegram_notification_service.send_message_to_user(telegram_id, notifications)
-    return notifications.message
+    _, message = await telegram_notification_service.send_message_to_user(telegram_id, notifications)
+    return message

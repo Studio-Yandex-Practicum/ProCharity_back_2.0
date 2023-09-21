@@ -18,8 +18,9 @@ class TelegramNotification:
     async def __send_message(self, user_id: int, message: str) -> None:
         try:
             await self.__bot.send_message(chat_id=user_id, text=message, parse_mode=ParseMode.HTML)
-            logger.debug(f"Отправлено оповещение пользователю {user_id}")
-            return True
+            msg = f"Отправлено оповещение пользователю {user_id}"
+            logger.debug(msg)
+            return True, msg
         except TelegramError as exc:
             msg = f"Ошибка отправки сообщения пользователю {user_id}."
             match exc:
@@ -29,7 +30,7 @@ class TelegramNotification:
                     msg += " Бот заблокирован?"
             msg += " " + exc.message
             logger.info(msg)
-            return False
+            return False, msg
 
     async def send_messages(
         self,
@@ -37,8 +38,9 @@ class TelegramNotification:
         users: list[User],
     ) -> None:
         """Делает массовую рассылку сообщения message пользователям users."""
-        send_message_tasks = (self.__send_message(user.telegram_id, message) for user in users)
+        send_message_tasks = [self.__send_message(user.telegram_id, message) for user in users]
         self.__bot_application.create_task(asyncio.gather(*send_message_tasks))
+        return send_message_tasks
 
     async def send_message(
         self,

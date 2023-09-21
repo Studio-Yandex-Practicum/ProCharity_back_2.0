@@ -30,7 +30,7 @@ class TelegramNotificationService:
                 users = await self._session.scalars(select(User).where(User.has_mailing == True))  # noqa
             case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
-        await self.telegram_notification.send_messages(message=notifications.message, users=users)
+        return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
     async def send_message_to_user(self, telegram_id, notifications):
         """Отправляет сообщение указанному по telegram_id пользователю"""
