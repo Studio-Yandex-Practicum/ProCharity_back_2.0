@@ -79,7 +79,7 @@ jobs:
       - name: Get SHORT_SHA
         run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
       - name: Get COMMIT_DATE
-        run: COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%dh%H%M%S) >> $GITHUB_ENV
+        run: COMMIT_DATE=$(git show -s --format=%ci ${{ env.SHORT_SHA }}) >> $GITHUB_ENV
       - name: Create .env file
         uses: appleboy/ssh-action@master
         with:
@@ -106,8 +106,7 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
-            LAST_COMMIT1=${{ github.sha }}
-            LAST_COMMIT2=${{ env.SHORT_SHA }}
+            LAST_COMMIT=${{ env.SHORT_SHA }}
             COMMIT_DATE=${{ env.COMMIT_DATE }}
             EOM
   start_application:
