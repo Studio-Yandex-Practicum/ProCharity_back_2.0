@@ -76,8 +76,10 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           source: "infra/docker-compose.swag.yml, infra/nginx/*.conf"
           target: ${{ env.DEPLOY_PATH }}
-      - name: Add SHORT_SHA env property with commit short sha
-        run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" 
+      - name: Get SHORT_SHA
+        run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_OUTPUT
+      - name: Get COMMIT_DATE
+        run: COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%dh%H%M%S) >> $GITHUB_OUTPUT
       - name: Create .env file
         uses: appleboy/ssh-action@master
         with:
@@ -105,9 +107,8 @@ jobs:
             ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT1=${{ github.sha }}
-            LAST_COMMIT2=SHORT_SHA
-            LAST_COMMIT3 = echo ${{ github.sha }} | cut -c1-8
-            COMMIT_DATE=${{ github.event.created_at}}
+            LAST_COMMIT2=${{ steps.vars.outputs.SHORT_SHA }}
+            COMMIT_DATE=${{ steps.vars.outputs.COMMIT_DATE }}
             EOM
   start_application:
     name: Start application
