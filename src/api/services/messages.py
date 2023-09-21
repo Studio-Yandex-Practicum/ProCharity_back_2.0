@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
+from src.api.schemas import InfoRate
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
@@ -33,7 +34,7 @@ class TelegramNotificationService:
 
     async def send_message_to_user(self, telegram_id, notifications):
         """Отправляет сообщение указанному по telegram_id пользователю"""
-        await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
+        return await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
 
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
@@ -42,3 +43,10 @@ class TelegramNotificationService:
         )
         category = category.first()
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
+
+    def count_rate(self, respond: bool, rate: InfoRate):
+        if respond:
+            rate.successful_rate += 1
+        else:
+            rate.unsuccessful_rate += 1
+        return rate
