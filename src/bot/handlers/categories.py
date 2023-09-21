@@ -1,3 +1,4 @@
+from dependency_injector.wiring import Provide
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
@@ -12,12 +13,16 @@ from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
+from src.depends import Container
 
 
 @logger_decor
 @delete_previous_message
-async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    category_service = CategoryService()
+async def categories_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    category_service: CategoryService = Provide[Container.bot_category_service],
+):
     context.user_data["parent_id"] = None
     categories = await category_service.get_unarchived_parents_with_children_count()
     user_service = UserService()
@@ -31,11 +36,14 @@ async def categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE
     )
 
 
-async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def confirm_categories_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
     query = update.callback_query
     telegram_id = update.effective_user.id
-    user_service = UserService()
 
     categories = await user_service.get_user_categories(telegram_id)
     if not categories:
@@ -54,10 +62,13 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
 
 @logger_decor
-async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def subcategories_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    category_service: CategoryService = Provide[Container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     query = update.callback_query
-    category_service = CategoryService()
-    user_service = UserService()
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
@@ -72,10 +83,13 @@ async def subcategories_callback(update: Update, context: ContextTypes.DEFAULT_T
 
 
 @logger_decor
-async def select_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def select_subcategory_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    category_service: CategoryService = Provide[Container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     query = update.callback_query
-    category_service = CategoryService()
-    user_service = UserService()
     subcategory_id = int(context.match.group(1))
     selected_categories = await user_service.get_user_categories(update.effective_user.id)
 
@@ -98,7 +112,11 @@ async def select_subcategory_callback(update: Update, context: ContextTypes.DEFA
 
 
 @logger_decor
-async def back_subcategory_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def back_subcategory_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    category_service: CategoryService = Provide[Container.bot_category_service],
+):
     query = update.callback_query
     category_service = CategoryService()
     categories = await category_service.get_unarchived_parents_with_children_count()

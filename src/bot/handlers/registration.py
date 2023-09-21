@@ -1,3 +1,4 @@
+from dependency_injector.wiring import Provide, inject
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
@@ -8,13 +9,18 @@ from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
+from src.depends import Container
 
 
 @logger_decor
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    ext_user_service = ExternalSiteUserService()
+@inject
+async def start_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
-    user_service = UserService()
     if ext_user is not None:
         await user_service.register_user(
             telegram_id=update.effective_user.id,
@@ -54,10 +60,12 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @logger_decor
 @delete_previous_message
-async def confirm_chosen_categories(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def confirm_chosen_categories(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.bot_user_service],
+):
     keyboard = get_confirm_keyboard()
-
-    user_service = UserService()
     categories = await user_service.get_user_categories(update.effective_user.id)
     context.user_data["selected_categories"] = {category: None for category in categories}
     text = ", ".join(categories.values())
