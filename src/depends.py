@@ -83,7 +83,7 @@ class Container(containers.DeclarativeContainer):
         user_repository=user_repository,
     )
 
-        # JWT services:
+    # JWT services:
     access_security = providers.Factory(
         JwtAccessBearerCookie,
         secret_key=settings.provided.SECRET_KEY,
