@@ -150,12 +150,22 @@ class MessageList(RequestBase):
         }
 
 
+class ErrorsSending(BaseModel):
+    """
+    Класс для вывода ошибок при отправке сообщения.
+    """
+
+    type: str = "TelegramError"
+    message: str = ""
+
+
 class InfoRate(BaseModel):
     """
     Класс для вывода информации о количестве успешных и неуспешных отправлений
     """
 
-    message: list[str] = []
+    messages: list[str] = []
+    errors: list[ErrorsSending] = []
     successful_rate: int = 0
     unsuccessful_rate: int = 0
 

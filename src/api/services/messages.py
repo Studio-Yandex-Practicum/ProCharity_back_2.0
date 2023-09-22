@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
-from src.api.schemas import InfoRate
+from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
@@ -44,9 +44,13 @@ class TelegramNotificationService:
         category = category.first()
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
 
-    def count_rate(self, respond: bool, rate: InfoRate):
+    def count_rate(self, respond: bool, msg: str, rate: InfoRate):
+        errors_sending = ErrorsSending()
         if respond:
             rate.successful_rate += 1
+            rate.messages.append(msg)
         else:
             rate.unsuccessful_rate += 1
+            errors_sending.message = msg
+            rate.errors.append(errors_sending)
         return rate

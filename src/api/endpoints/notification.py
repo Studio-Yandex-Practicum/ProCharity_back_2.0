@@ -12,15 +12,20 @@ log = structlog.get_logger()
 
 @notification_router.post(
     "/",
+    response_model=InfoRate,
     description="Сообщение для группы пользователей",
 )
 @inject
 async def send_telegram_notification(
     notifications: TelegramNotificationUsersRequest,
     telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
-) -> None:
+) -> InfoRate:
     """Отправляет сообщение указанной группе пользователей"""
-    await telegram_notification_service.send_messages_to_group_of_users(notifications)
+    result = await telegram_notification_service.send_messages_to_group_of_users(notifications)
+    rate = InfoRate()
+    for res in result:
+        rate = telegram_notification_service.count_rate(res[0], res[1], rate)
+    return rate
 
 
 @notification_router.post(
@@ -36,16 +41,15 @@ async def send_messages_to_group_of_users(
     log.info("Начало отправки сообщений для группы пользователей")
     rate = InfoRate()
     for message in message_list.messages:
-        respond, msg = await telegram_notification_service.send_message_to_user(message.telegram_id, message)
-        rate = telegram_notification_service.count_rate(respond, rate)
-        rate.message.append(msg)
+        status, msg = await telegram_notification_service.send_message_to_user(message.telegram_id, message)
+        rate = telegram_notification_service.count_rate(status, msg, rate)
     log.info("Конец отправки сообщений для группы пользователей")
     return rate
 
 
 @notification_router.post(
     "/{telegram_id}",
-    response_model=str,
+    response_model=InfoRate,
     description="Отправляет сообщение определенному пользователю.",
 )
 @inject
@@ -53,6 +57,8 @@ async def send_user_message(
     telegram_id: int,
     notifications: TelegramNotificationRequest,
     telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
-) -> str:
-    _, message = await telegram_notification_service.send_message_to_user(telegram_id, notifications)
-    return message
+) -> InfoRate:
+    rate = InfoRate()
+    status, notifications.message = await telegram_notification_service.send_message_to_user(telegram_id, notifications)
+    rate = telegram_notification_service.count_rate(status, notifications.message, rate)
+    return rate
