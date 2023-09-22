@@ -26,9 +26,15 @@ class RequestBase(BaseModel):
 class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
-    id: int = Field(..., ge=1, lt=10**10)
-    name: str = Field(..., min_length=2, max_length=100)
-    parent_id: int | None = Field(None, ge=1, lt=10**10)
+    id: int = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор категории.")
+    name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
+    parent_id: int = Field(
+        None,
+        ge=1,
+        lt=10,
+        example=1,
+        description="Принадлежность к родительской категории. Если null, то это родительская категория.",
+    )
 
     @root_validator(skip_on_failure=True)
     def validate_self_parent(cls, values):
@@ -36,28 +42,54 @@ class CategoryRequest(RequestBase):
             raise ValueError("Категория не может быть дочерней для самой себя.")
         return values
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "name": "Category Name",
+                "parent_id": 1,
+            }
+        }
+
 
 class CategoryResponse(ResponseBase):
     """Класс модели ответа для Category."""
 
-    id: int
-    name: str
-    parent_id: int | None
-    is_archived: bool
+    id: int = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор категории.")
+    name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
+    parent_id: int = Field(
+        None,
+        ge=1,
+        lt=10,
+        example=1,
+        description="Принадлежность к родительской категории. Если null, то это родительская категория.",
+    )
+    is_archived: bool = Field(
+        example=False, description="Статус категории. Если True, то эта категория заархивирована."
+    )
+
+    class Config:
+        json_schema_extra = {"example": {"id": 1, "name": "Category Name", "parent_id": 1, "is_archived": False}}
 
 
 class TaskRequest(RequestBase):
     """Класс модели запроса для Task."""
 
-    id: NonNegativeInt = Field(...)
-    title: StrictStr = Field(...)
-    name_organization: StrictStr = Field(...)
-    deadline: date = Field(..., format=DATE_FORMAT)
-    category_id: NonNegativeInt = Field(...)
-    bonus: NonNegativeInt = Field(...)
-    location: StrictStr = Field(...)
-    link: StrictStr = Field(...)
-    description: StrictStr | None = None
+    id: NonNegativeInt = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор задачи.")
+    title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
+    name_organization: StrictStr = Field(
+        ..., example="My Organization", description="Название организации, оставившей задачу."
+    )
+    deadline: date = Field(
+        ..., format=DATE_FORMAT, example="31-12-2025", description="Время, до которого нужно выполнить задачу."
+    )
+    category_id: NonNegativeInt = Field(
+        ..., example=1, description="Показывает, к какой дочерней категории относится задача."
+    )
+    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
+    location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
+    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
+    description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
 
     class Config:
         json_schema_extra = {
@@ -65,7 +97,7 @@ class TaskRequest(RequestBase):
                 "id": 1,
                 "title": "Task Title",
                 "name_organization": "My Organization",
-                "deadline": "2025-12-31",
+                "deadline": "31-12-2025",
                 "category_id": 1,
                 "bonus": 5,
                 "location": "My Location",
@@ -78,15 +110,36 @@ class TaskRequest(RequestBase):
 class TaskResponse(ResponseBase):
     """Класс модели ответа для Task."""
 
-    title: str
-    name_organization: str
-    deadline: date
-    category_id: int
-    bonus: int
-    location: str
-    link: str
-    description: str
-    is_archived: bool
+    title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
+    name_organization: StrictStr = Field(
+        ..., example="My Organization", description="Название организации, оставившей задачу."
+    )
+    deadline: date = Field(
+        ..., format=DATE_FORMAT, example="31-12-2025", description="Время, до которого нужно выполнить задачу."
+    )
+    category_id: NonNegativeInt = Field(
+        ..., example=1, description="Показывает, к какой дочерней категории относится задача."
+    )
+    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
+    location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
+    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
+    description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
+    is_archived: bool = Field(example=False, description="Статус задачи. Если True, то эта задача заархивирована.")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "Task Title",
+                "name_organization": "My Organization",
+                "deadline": "31-12-2025",
+                "category_id": 1,
+                "bonus": 5,
+                "location": "My Location",
+                "link": "https://example.com",
+                "description": "Task description",
+                "is_archived": False,
+            }
+        }
 
 
 class FeedbackFormQueryParams(BaseModel):
