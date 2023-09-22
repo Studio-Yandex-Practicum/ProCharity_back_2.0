@@ -25,10 +25,11 @@ def auth(
     ),
 ):
     user = admin_service.authenticate_user(admin_data.email, admin_data.password)
-    if user is not None:
-        data = {"email": admin_data.email, "password": admin_data.password}
-        access_token = access_security.create_access_token(subject=data)
-        refresh_token = refresh_security.create_refresh_token(subject=data)
-        return {"access_token": access_token, "refresh_token": refresh_token}
-    else:
+    if user is None:
         return HTTPStatus.BAD_REQUEST("Неверный почтовый адрес или пароль.")
+    data = {"email": admin_data.email, "password": admin_data.password}
+    access_token = access_security.create_access_token(subject=data)
+    refresh_token = refresh_security.create_refresh_token(subject=data)
+    return {"access_token": access_token, "refresh_token": refresh_token}
+
+        

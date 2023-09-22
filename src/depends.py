@@ -59,6 +59,15 @@ class Container(containers.DeclarativeContainer):
         HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
     )
 
+    # JWT services:
+    access_security = providers.Factory(
+        JwtAccessBearerCookie,
+        secret_key=settings.provided.SECRET_KEY,
+        auto_error=False,
+        access_expires_delta=timedelta(hours=1),
+    )
+    refresh_security = providers.Factory(JwtRefreshBearer, secret_key=settings.provided.SECRET_KEY, auto_error=True)
+
     # BOT services:
     bot_category_service = providers.Factory(BotCategoryService, category_repository=category_repository)
     bot_user_service = providers.Factory(BotUserService, user_repository=user_repository)
@@ -68,12 +77,3 @@ class Container(containers.DeclarativeContainer):
         user_repository=user_repository,
     )
     bot_site_user_service = providers.Factory(BotExternalSiteUserService, site_user_repository=site_user_repository)
-
-    # JWT services:
-    access_security = providers.Factory(
-        JwtAccessBearerCookie,
-        secret_key=settings.provided.SECRET_KEY,
-        auto_error=False,
-        access_expires_delta=timedelta(hours=1),
-    )
-    refresh_security = providers.Factory(JwtRefreshBearer, secret_key=settings.provided.SECRET_KEY, auto_error=True)
