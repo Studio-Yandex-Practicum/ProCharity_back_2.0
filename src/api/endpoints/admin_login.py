@@ -31,5 +31,3 @@ def auth(
     access_token = access_security.create_access_token(subject=data)
     refresh_token = refresh_security.create_refresh_token(subject=data)
     return {"access_token": access_token, "refresh_token": refresh_token}
-
-        
