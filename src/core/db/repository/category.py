@@ -1,4 +1,4 @@
-from sqlalchemy import func, select
+from sqlalchemy import false, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.models import Category
@@ -13,27 +13,27 @@ class CategoryRepository(ContentRepository):
 
     async def get_unarchived_parents(self) -> list[Category]:
         categories = await self._session.scalars(
-            select(Category).where(Category.is_archived == False).where(Category.parent_id == None)  # noqa
+            select(Category).where(Category.is_archived == false()).where(Category.parent_id == null())
         )
         return categories
 
     async def get_unarchived_subcategories(self, parent_id: int) -> list[Category]:
         categories = await self._session.scalars(
-            select(Category).where(Category.is_archived == False).where(Category.parent_id == parent_id)  # noqa
+            select(Category).where(Category.is_archived == false()).where(Category.parent_id == parent_id)
         )
         return categories
 
     async def get_unarchived_parents_with_children_count(self):
-        subq = (
+        parent_and_children_count_subquery = (
             select(Category.parent_id, func.count(Category.id).label("children_count"))
-            .where(Category.is_archived == False)  # noqa
-            .where(Category.parent_id != None)  # noqa
+            .where(Category.is_archived == false())
+            .where(Category.parent_id != null())
             .group_by(Category.parent_id)
             .subquery()
         )
         parents_with_children_count = await self._session.execute(
-            select(Category.name, Category.id, subq.c.children_count)
+            select(Category.name, Category.id, parent_and_children_count_subquery.c.children_count)
             .select_from(Category)
-            .join(subq, Category.id == subq.c.parent_id)
+            .join(parent_and_children_count_subquery, Category.id == parent_and_children_count_subquery.c.parent_id)
         )
         return parents_with_children_count.all()

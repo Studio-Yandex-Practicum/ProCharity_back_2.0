@@ -26,7 +26,6 @@ async def categories_callback(
 ):
     context.user_data["parent_id"] = None
     categories = await category_service.get_unarchived_parents_with_children_count()
-    user_service = user_service
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -120,9 +119,7 @@ async def back_subcategory_callback(
     user_service: UserService = Provide[Container.bot_user_service],
 ):
     query = update.callback_query
-    category_service = category_service
     categories = await category_service.get_unarchived_parents_with_children_count()
-    user_service = user_service
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
 
     await query.message.edit_text(
