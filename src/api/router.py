@@ -20,4 +20,4 @@ api_router.include_router(notification_router, prefix="/messages", tags=["Messag
 api_router.include_router(site_user_router, prefix="/external_user_registration", tags=["ExternalSiteUser"])
 api_router.include_router(task_router, prefix="/tasks", tags=["Content"])
 api_router.include_router(telegram_webhook_router, prefix="/telegram", tags=["Telegram"])
-api_router.include_router(admin_user_router, prefix="/v1/auth", tags=["AdminUser"])
+api_router.include_router(admin_user_router, prefix="/auth", tags=["AdminUser"])
