@@ -10,7 +10,7 @@ from src.depends import Container
 admin_user_router = APIRouter()
 
 
-@admin_user_router.post("/", description="Логин для админа")
+@admin_user_router.post("/login", description="Логин для админа")
 @inject
 def auth(
     admin_data: AdminUserRequest,
