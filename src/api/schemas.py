@@ -288,3 +288,18 @@ class HealthCheck(ResponseBase):
     db: DBStatus = {}
     bot: BotStatus = {}
     git: CommitStatus = {}
+
+
+class AdminUserRequest(RequestBase):
+    """Класс модели запроса для AdminUser."""
+
+    email: str = Field(..., max_length=48)
+    password: str = Field(..., max_length=48)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "email",
+                "password": "password",
+            }
+        }
