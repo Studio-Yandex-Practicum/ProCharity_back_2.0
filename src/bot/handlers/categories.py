@@ -4,7 +4,11 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_categories_keyboard, get_open_tasks_and_menu_keyboard, get_subcategories_keyboard
+from src.bot.keyboards import (
+    get_checked_categories_keyboard,
+    get_open_tasks_and_menu_keyboard,
+    get_subcategories_keyboard,
+)
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
@@ -18,16 +22,17 @@ async def categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     category_service: CategoryService = Provide[Container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_user_service],
 ):
     context.user_data["parent_id"] = None
-    categories = await category_service.get_unarchived_parents()
-
+    categories = await category_service.get_unarchived_parents_with_children_count()
+    selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_categories_keyboard(categories),
+        reply_markup=await get_checked_categories_keyboard(categories, selected_categories_with_parents),
     )
 
 
@@ -111,15 +116,17 @@ async def back_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     category_service: CategoryService = Provide[Container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_user_service],
 ):
     query = update.callback_query
-    categories = await category_service.get_unarchived_parents()
+    categories = await category_service.get_unarchived_parents_with_children_count()
+    selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
         'несколько). После этого, нажми на пункт "Готово 👌"',
-        reply_markup=await get_categories_keyboard(categories),
+        reply_markup=await get_checked_categories_keyboard(categories, selected_categories_with_parents),
     )
 
 
