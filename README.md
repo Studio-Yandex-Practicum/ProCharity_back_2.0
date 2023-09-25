@@ -71,7 +71,7 @@ ProCharity (НКО Фонд Друзья).
    POSTGRES_DB=procharity_back_db_local  # Название базы данных
    POSTGRES_USER=postgres  # Логин для подключения к базе данных
    POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
-   DB_HOST=procharity_postgres  # Название хоста (контейнера)
+   DB_HOST=procharity_postgres  # Название хоста с БД
    DB_PORT=5432  # Порт для подключения к базе данных
 
    # Organization data
@@ -143,7 +143,7 @@ ProCharity (НКО Фонд Друзья).
    POSTGRES_DB=procharity_back_db_local  # Название базы данных
    POSTGRES_USER=postgres  # Логин для подключения к базе данных
    POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
-   DB_HOST=localhost  # Название хоста (контейнера)
+   DB_HOST=localhost  # Название хоста с БД
    DB_PORT=5432  # Порт для подключения к базе данных
 
    # Organization data
@@ -345,7 +345,7 @@ SSL-сертификатом.
 
     https://ngrok.com/download
 
-### В режиме локального запуска.
+**В режиме локального запуска.**
 
 1. Запустите сервер:
 
@@ -360,7 +360,7 @@ SSL-сертификатом.
    в появившемся окне ngrock п.1
    ```
 
-### В режиме разработки. Задайте значение переменной окружения в (.env).
+**В режиме разработки. Задайте значение переменной окружения в (.env).**
 
    ``` dotenv
    USE_NGROK=True
