@@ -54,3 +54,11 @@ class TelegramNotificationService:
             errors_sending.message = msg
             rate.errors.append(errors_sending)
         return rate
+
+    def collect_respond_and_status(self, result, rate):
+        """
+        Функция для формирования отчета об отправке
+        """
+        for res in result:
+            rate = self.count_rate(res[0], res[1], rate)
+        return rate
