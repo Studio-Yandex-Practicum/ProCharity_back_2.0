@@ -159,7 +159,7 @@ class TelegramNotificationRequest(RequestBase):
     сообщения определенному пользователю.
     """
 
-    message: str = Field(..., min_length=2, max_length=500)
+    message: str = Field(..., min_length=2)
 
     class Config:
         json_schema_extra = {
@@ -184,9 +184,8 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
         }
 
 
-class Message(RequestBase):
+class Message(TelegramNotificationRequest):
     telegram_id: int
-    message: str = Field(..., min_length=2, max_length=500)
 
 
 class MessageList(RequestBase):
@@ -204,11 +203,22 @@ class MessageList(RequestBase):
         }
 
 
+class ErrorsSending(BaseModel):
+    """
+    Класс для вывода ошибок при отправке сообщения.
+    """
+
+    type: str = "TelegramError"
+    message: str = ""
+
+
 class InfoRate(BaseModel):
     """
     Класс для вывода информации о количестве успешных и неуспешных отправлений
     """
 
+    messages: list[str] = []
+    errors: list[ErrorsSending] = []
     successful_rate: int = 0
     unsuccessful_rate: int = 0
 
