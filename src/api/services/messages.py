@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
-from src.api.schemas import InfoRate
+from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
@@ -30,7 +30,7 @@ class TelegramNotificationService:
                 users = await self._session.scalars(select(User).where(User.has_mailing == True))  # noqa
             case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
-        await self.telegram_notification.send_messages(message=notifications.message, users=users)
+        return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
     async def send_message_to_user(self, telegram_id, notifications):
         """Отправляет сообщение указанному по telegram_id пользователю"""
@@ -44,9 +44,21 @@ class TelegramNotificationService:
         category = category.first()
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
 
-    def count_rate(self, respond: bool, rate: InfoRate):
+    def count_rate(self, respond: bool, msg: str, rate: InfoRate):
+        errors_sending = ErrorsSending()
         if respond:
             rate.successful_rate += 1
+            rate.messages.append(msg)
         else:
             rate.unsuccessful_rate += 1
+            errors_sending.message = msg
+            rate.errors.append(errors_sending)
+        return rate
+
+    def collect_respond_and_status(self, result, rate):
+        """
+        Функция для формирования отчета об отправке
+        """
+        for res in result:
+            rate = self.count_rate(res[0], res[1], rate)
         return rate

@@ -13,3 +13,6 @@ class CategoryService:
 
     async def get_unarchived_subcategories(self, parent_id) -> list[Category]:
         return await self._category_repository.get_unarchived_subcategories(parent_id)
+
+    async def get_unarchived_parents_with_children_count(self):  # -> dict[Category, int]:
+        return await self._category_repository.get_unarchived_parents_with_children_count()

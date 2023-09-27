@@ -15,7 +15,7 @@
     <li>
       <a href="#для-разработки">Для разработки</a>
       <ul>
-        <li><a href="#установка-приложения">Установка приложения</a></li>
+        <li><a href="#установка-и-настройка-приложения">Установка и настройка приложения</a></li>
         <li><a href="#запуск">Запуск</a></li>
       </ul>
     </li>
@@ -28,7 +28,6 @@
         <li><a href="#работа-с-базой-данных">Работа с базой данных</a></li>
         <li><a href="#работа-с-poetry">Работа с Poetry</a></li>
         <li><a href="#использование-ngrok">Использование Ngrok</a></li>
-        <li><a href="#переменные-окружения-env">Переменные окружения (.env)</a></li>
       </ul>
     </li>
   </ol>
@@ -61,7 +60,34 @@ ProCharity (НКО Фонд Друзья).
 
 ## Запуск бота локально
 
-1. Создайте и заполните файл .env как в [инструкции](.env.example).
+1. Создайте и заполните файл `.env`:
+
+    ```dotenv
+   # Переменные приложения
+   BOT_TOKEN= # Токен аутентификации бота
+   SECRET_KEY=  # Cекретный ключ для генерации jwt-токенов
+
+   # Переменные базы данных
+   POSTGRES_DB=procharity_back_db_local  # Название базы данных
+   POSTGRES_USER=postgres  # Логин для подключения к базе данных
+   POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
+   DB_HOST=procharity_postgres  # Название хоста с БД
+   DB_PORT=5432  # Порт для подключения к базе данных
+
+   # Organization data
+   ORGANIZATIONS_EMAIL=procharity@yandex.ru
+
+   # Адреса электронной почты администраторов
+   EMAIL_ADMIN=procharity.admin_1@yandex.ru
+    ```
+
+    > **Note**
+   > [Полный пример переменных окружения](env.example).
+
+    > **Note**
+   > Для получения токена аутентификации бота обратитесь к
+    разделу [Регистрация бота Telegram](#регистрация-бота-telegram).
+
 
 2. Собрать и запустить контейнеры из файла infra/docker-compose.local.yml.
 
@@ -78,7 +104,7 @@ ProCharity (НКО Фонд Друзья).
 
 ## Для разработки
 
-### Установка приложения
+### Установка и настройка приложения
 
 1. Клонировать репозиторий.
 
@@ -96,21 +122,43 @@ ProCharity (НКО Фонд Друзья).
     ```
 
     > **Note**
-    > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
+   > [Документация по установке Poetry](https://python-poetry.org/docs/#installation)
+3. Настроить pre-commit.
+В режиме ```poetry shell```
+   ```
+   pre-commit install
+   ```
+   > **Note**
+   > Перед каждым коммитом будет запущен линтер и форматтер,
+   который автоматически отформатирует код согласно принятому в команде codestyle.
 
-3. Переименовать [`.env.example`](.env.example) в `.env` и задать переменные окружения.
+4. Создайте и заполните файл `.env`:
 
     ```dotenv
-    BOT_TOKEN=<Токен аутентификации бота>
+   # Переменные приложения
+   BOT_TOKEN= # Токен аутентификации бота
+   SECRET_KEY=  # Cекретный ключ для генерации jwt-токенов
+
+   # Переменные базы данных
+   POSTGRES_DB=procharity_back_db_local  # Название базы данных
+   POSTGRES_USER=postgres  # Логин для подключения к базе данных
+   POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
+   DB_HOST=localhost  # Название хоста с БД
+   DB_PORT=5432  # Порт для подключения к базе данных
+
+   # Organization data
+   ORGANIZATIONS_EMAIL=procharity@yandex.ru
+
+   # Адреса электронной почты администраторов
+   EMAIL_ADMIN=procharity.admin_1@yandex.ru
     ```
 
     > **Note**
-    > Полный список переменных окружения проекта находится в
-    > разделе "[Переменные окружения (.env)](#переменные-окружения-env)".
+   > [Полный пример переменных окружения](env.example).
 
     > **Note**
-    > Для получения токена аутентификации бота обратитесь к
-    > разделу "[Регистрация бота Telegram](#регистрация-бота-telegram)".
+   > Для получения токена аутентификации бота обратитесь к
+    разделу [Регистрация бота Telegram](#регистрация-бота-telegram).
 
 ### Запуск
 
@@ -172,40 +220,40 @@ ProCharity (НКО Фонд Друзья).
 <details>
   <summary><h3>Режимы работы бота</h3></summary>
 
-#### Запуск без API приложения
+1. Запуск без API приложения
 
-Выполнить скрипт запуска.
+    Выполнить скрипт запуска.
 
-```shell
-python src/run.py
-```
+    ```shell
+    python src/run.py
+    ```
 
-> **Warning**:
-> Возможно только в режиме [polling](#polling).
+    > **Warning**:
+         Возможно только в режиме [polling](#polling).
 
-#### Polling
+2. Polling
 
-Задать значение переменной окружения (`.env`).
+    Задать значение переменной окружения (`.env`).
 
-```dotenv
-BOT_WEBHOOK_MODE=False
-```
+    ```dotenv
+    BOT_WEBHOOK_MODE=False
+    ```
 
-#### Webhook
+3. Webhook
 
-Задать значение переменным окружения (`.env`).
+    Задать значение переменным окружения (`.env`).
 
-```dotenv
-BOT_WEBHOOK_MODE=True
-APPLICATION_URL=http://example.com  # Пример
-```
+    ``` dotenv
+    BOT_WEBHOOK_MODE=True
+    APPLICATION_URL=http://example.com  # Пример
+    ```
 
-> **Note**
-> [Подробнее о webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
+    > **Note**
+   > [Подробнее о webhooks](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks)
 
-> **Note**
-> Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/)
-> (см. раздел "[Использование Ngrok](#использование-ngrok)").
+    > **Note**
+   > Для теста через HTTPS можно использовать [Ngrok](https://ngrok.com/)
+   > (см. раздел "[Использование Ngrok](#использование-ngrok)").
 </details>
 
 <details>
@@ -236,11 +284,11 @@ APPLICATION_URL=http://example.com  # Пример
 
 #### Откат миграций
 
-Откатить последнюю миграцию:
+1. Откатить последнюю миграцию:
 
-```shell
-alembic downgrade -1
-```
+    ```shell
+    alembic downgrade -1
+    ```
 </details>
 
 <details>
@@ -250,29 +298,29 @@ alembic downgrade -1
 
 Подробнее: https://python-poetry.org/docs/cli/
 
-#### Настройка окружения проекта
+1. Настройка окружения проекта
 Установку необходимо выполнять через curl, как в документации.
 
     ```shell
     poetry env use python3.11; poetry install
     ```
 
-#### Активировать виртуальное окружение
+2. Активировать виртуальное окружение
 
     ```shell
     poetry shell
     ```
 
-#### Добавить зависимость
+3. Добавить зависимость
 
     ```shell
     poetry add <package_name>
     ```
 
-> **Note**
-> Использование флага `--dev (-D)` позволяет установить зависимость,
-> необходимую только для разработки.
-> Это полезно для разделения develop и prod зависимостей.
+    > **Note**
+   > Использование флага `--dev (-D)` позволяет установить зависимость,
+   > необходимую только для разработки.
+   > Это полезно для разделения develop и prod зависимостей.
 
 #### Запустить скрипт без активации виртуального окружения
 
@@ -293,39 +341,33 @@ SSL-сертификатом.
 
 Подробнее: https://ngrok.com/
 
-1. Установить, следуя официальным инструкциям.
+### Для установки следуйте официальным инструкциям.
 
     https://ngrok.com/download
 
-2. Запустить туннель.
+**В режиме локального запуска.**
 
-    ```shell
-    ngrok http 80
-    ```
+1. Запустите сервер:
 
-3. Задать значение переменной окружения (.env).
+   ```
+   ngrok http http://127.0.0.1:8000/
+   ```
+2. Задайте значение переменной окружения в файле (.env) :
 
-    ```dotenv
-    APPLICATION_URL=https://1234-56-78-9.eu.ngrok.io  # Пример
-    ```
+   ```
+   APPLICATION_URL=https://1234-56-78-9.eu.ngrok.io  
+   # Это пример. Рабочее значение нужно взять
+   в появившемся окне ngrock п.1
+   ```
+
+**В режиме разработки. Задайте значение переменной окружения в (.env).**
+
+   ``` dotenv
+   USE_NGROK=True
+   ```
 </details>
 
-### Переменные окружения (.env)
 
-```dotenv
-# Переменные приложения
-APPLICATION_URL=  # Домен, на котором развернуто приложение
-DEBUG=False  # Включение(True) | Выключение(False) режима отладки
-ROOT_PATH=/api/  # Для корректной работы без прокси ставится пустая строка, для работы с прокси "/api/"
-BOT_TOKEN=  # Токен аутентификации бота
-BOT_WEBHOOK_MODE=False  # Запустить бота в режиме webhook(True) | polling(False)
-# Переменные базы данных
-POSTGRES_DB=procharity_back_db_local  # Название базы данных
-POSTGRES_USER=postgres  # Логин для подключения к базе данных
-POSTGRES_PASSWORD=postgres  # Пароль для подключения к базе данных
-DB_HOST=localhost  # Название сервиса (контейнера)
-DB_PORT=5432  # Порт для подключения к базе данных
-```
 
 <!-- MARKDOWN LINKS & BADGES -->
 
