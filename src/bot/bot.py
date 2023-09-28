@@ -30,6 +30,19 @@ async def startup_bot(
     bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, secret_key: str
 ) -> Application:
     bot_instance = await start_bot(bot, bot_webhook_mode, telegram_webhook_url, secret_key)
+    result = await bot_instance.bot.setMyCommands(
+        [
+            [
+                "start",
+                "Запустить бота",
+            ],
+            [
+                "menu",
+                "Открыть меню",
+            ],
+        ]
+    )
+    logging.info(result)
     return bot_instance
 
 
