@@ -15,7 +15,6 @@ class ContentService(abc.ABC):
     async def actualize_objects(self, objects: list[any], model_class: any) -> list[any]:
         to_create, to_update = [], []
         ids = [obj.id for obj in objects]
-        # async with self._session.begin() as session:
         async with self._session as session:
             await self._repository.archive_by_ids(ids, commit=False)
             already_have = await self._repository.get_by_ids(ids)

@@ -84,7 +84,6 @@ class TaskRequest(RequestBase):
     category_id: NonNegativeInt = Field(
         ..., example=1, description="ID дочерней категории, к которой относится задача."
     )
-    category: StrictStr = Field(..., example="Категория", description="Дочерняя категории, к которой относится задача.")
     bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
     location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
     link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
