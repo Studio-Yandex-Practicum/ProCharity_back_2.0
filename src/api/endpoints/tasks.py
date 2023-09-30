@@ -1,6 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
+from src.api.auth import check_token
 from src.api.schemas import TaskRequest, TaskResponse
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
@@ -11,7 +12,7 @@ from src.depends import Container
 task_router = APIRouter()
 
 
-@task_router.post("/", description="Актуализирует список задач.")
+@task_router.post(path="/", dependencies=[Depends(check_token)], description="Актуализирует список задач.")
 @inject
 async def actualize_tasks(
     tasks: list[TaskRequest],
