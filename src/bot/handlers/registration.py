@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
-from src.bot.constants import callback_data, commands
+from src.bot.constants import callback_data, commands, urls
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
@@ -31,6 +31,7 @@ async def start_command(
             external_id=ext_user.id,
         )
         await user_service.set_categories_to_user(update.effective_user.id, ext_user.specializations)
+        url_connect = urls.PROCHARITY_URL_USER.format(external_id=ext_user.id, telegram_id=update.effective_user.id)
     else:
         await user_service.register_user(
             telegram_id=update.effective_user.id,
@@ -38,9 +39,10 @@ async def start_command(
             first_name=update.effective_user.first_name,
             last_name=update.effective_user.last_name,
         )
+        url_connect = urls.PROCHARITY_URL_AUTH
     categories = await user_service.get_user_categories(update.effective_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
-    keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start)
+    keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start, url_for_connection=url_connect)
     keyboard_feedback = await feedback_buttons(update.effective_user)
     await context.bot.send_message(
         chat_id=update.effective_user.id,
