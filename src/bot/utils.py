@@ -4,6 +4,8 @@ from typing import ParamSpec, TypeVar
 
 from telegram import Update
 
+from src.settings import settings
+
 ReturnType = TypeVar("ReturnType")
 ParameterTypes = ParamSpec("ParameterTypes")
 
@@ -22,3 +24,12 @@ def delete_previous_message(
         return result
 
     return wrapper
+
+
+def get_connection_url(telegram_id: int, external_id: int = None) -> str:
+    """Получение ссылки для связи аккаунта с ботом по external_id и telegram_id.
+    В случае отсутствия external_id возвращает ссылку на страницу авторизации"""
+    if external_id:
+        return settings.PROCHARITY_URL_USER.format(external_id=external_id, telegram_id=telegram_id)
+    else:
+        return settings.PROCHARITY_URL_AUTH
