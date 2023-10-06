@@ -1,12 +1,13 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
+from src.api.auth import check_token
 from src.api.schemas import CategoryRequest, CategoryResponse
 from src.api.services import CategoryService
 from src.core.db.models import Category
 from src.depends import Container
 
-category_router = APIRouter()
+category_router = APIRouter(dependencies=[Depends(check_token)])
 
 
 @category_router.get(

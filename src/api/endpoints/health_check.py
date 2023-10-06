@@ -1,12 +1,13 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
+from src.api.auth import check_token
 from src.api.schemas import HealthCheck
 from src.api.services.health_check import HealthCheckService
 from src.core.logging.utils import logger_decor
 from src.depends import Container
 
-health_check_router = APIRouter()
+health_check_router = APIRouter(dependencies=[Depends(check_token)])
 
 
 @logger_decor

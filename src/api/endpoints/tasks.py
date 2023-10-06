@@ -9,10 +9,10 @@ from src.core.db.models import Task
 from src.core.utils import display_tasks
 from src.depends import Container
 
-task_router = APIRouter()
+task_router = APIRouter(dependencies=[Depends(check_token)])
 
 
-@task_router.post(path="/", dependencies=[Depends(check_token)], description="Актуализирует список задач.")
+@task_router.post(path="/", description="Актуализирует список задач.")
 @inject
 async def actualize_tasks(
     tasks: list[TaskRequest],
