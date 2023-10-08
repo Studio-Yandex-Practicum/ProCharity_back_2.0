@@ -2,12 +2,12 @@ import structlog
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
-from src.api.auth import check_token
+from src.api.auth import check_header_contains_token
 from src.api.schemas import InfoRate, MessageList, TelegramNotificationRequest, TelegramNotificationUsersRequest
 from src.api.services.messages import TelegramNotificationService
 from src.depends import Container
 
-notification_router = APIRouter(dependencies=[Depends(check_token)])
+notification_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 log = structlog.get_logger()
 
 

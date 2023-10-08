@@ -1,25 +1,27 @@
-import logging
+import structlog
+from fastapi import Request
 
-from fastapi import HTTPException, Request, status
+from src.core.exceptions import InvalidToken, TokenNotProvided
+from src.depends import Container
 
-from src.settings import settings
+log = structlog.get_logger()
 
 
-async def check_token(request: Request):
+async def check_header_contains_token(request: Request):
+    """Проверяем, содержится ли в заголовке запроса token, и сравниваем его
+    со значением ACCESS_TOKEN_FOR_PROCAHRITY из settings.py"""
+    settings = Container().settings()
     if not hasattr(settings, "ACCESS_TOKEN_FOR_PROCHARITY"):
+        await log.awarning(
+            "ACCESS_TOKEN_FOR_PROCHARITY не определен, возможны проблемы безопасности. " "Проверьте настройки проекта."
+        )
         return
     match request.headers.get("token"):
         case None:
-            status_code, log_message, message = (
-                status.HTTP_401_UNAUTHORIZED,
-                "Request without any token provided",
-                "Request without token",
-            )
+            await log.ainfo("В заголовке запроса не содержится токен.")
+            raise TokenNotProvided
         case settings.ACCESS_TOKEN_FOR_PROCHARITY:
-            status_code = status.HTTP_200_OK
+            return
         case _:
-            status_code, log_message, message = (status.HTTP_403_FORBIDDEN, "Token is invalid!", "Token is invalid!")
-    logging.info(log_message)
-    if status_code == status.HTTP_200_OK:
-        return
-    raise HTTPException(status_code=status_code, detail=message)
+            await log.info("Токен в заголовке запроса неверный.")
+            raise InvalidToken

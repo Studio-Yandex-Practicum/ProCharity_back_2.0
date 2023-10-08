@@ -51,3 +51,13 @@ class CredentialsException(ApplicationException):
 
     def __init__(self, detail: str):
         self.detail = detail
+
+
+class TokenNotProvided(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
+    detail = "В заголовке запроса не содержится токен."
+
+
+class InvalidToken(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.FORBIDDEN
+    detail = "Токен в заголовке запроса неверный."
