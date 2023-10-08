@@ -74,6 +74,12 @@ class Settings(BaseSettings):
     COMMIT_DATE: str = ""
     TAGS: list[str] = []
 
+    # Для связи аккаунта с ботом
+    PROCHARITY_URL_AUTH: str = "https://procharity.ru/auth/"
+    PROCHARITY_URL_USER: str = (
+        "https://procharity.ru/auth/bot_procharity.php?user_id={external_id}&telegram_id={telegram_id}"
+    )
+
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
         """Добавить 'https://' к домену."""

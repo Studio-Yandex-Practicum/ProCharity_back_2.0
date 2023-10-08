@@ -1,4 +1,5 @@
 DATE_FORMAT = "%d-%m-%Y"
+DATE_FORMAT_FOR_TASK_SCHEMA = "%d.%m.%Y"
 DATE_TIME_FORMAT = "%d-%m-%Y %H:%M:%S"
 API_DESCRIPTION = """
 ## Content

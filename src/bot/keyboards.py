@@ -112,10 +112,11 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_keyboard(callback_data_on_start: str) -> InlineKeyboardMarkup:
+async def get_start_keyboard(callback_data_on_start: str, url_for_connection: str) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Начнём", callback_data=callback_data_on_start)],
         [InlineKeyboardButton("Перейти на сайт ProCharity", url=urls.PROCHARITY_URL)],
+        [InlineKeyboardButton("Связать аккаунт с ботом", url=url_for_connection)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
