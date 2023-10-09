@@ -10,7 +10,7 @@ from src.core.logging.setup import setup_logging
 from src.settings import settings
 
 
-def init_app(fastpi_app: FastAPI) -> FastAPI:
+def init_fastapi(fastpi_app: FastAPI) -> FastAPI:
     """Инициализация приложения FastAPI."""
     origins = ["*"]
     fastpi_app.add_middleware(
