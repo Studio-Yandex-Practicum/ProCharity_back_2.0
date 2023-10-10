@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     STATIC_DIR: str | Path = BASE_DIR / "templates/"
     STATIC_URL: str = "static/"
 
+    # Токен доступа к API
+    ACCESS_TOKEN_FOR_PROCHARITY: str = ""
+
     # Параметры подключения к БД
     POSTGRES_DB: str
     POSTGRES_USER: str
