@@ -1,3 +1,3 @@
-from .exceptions import AlreadyExistsException, NotFoundException
+from .exceptions import AlreadyExistsException, InvalidToken, NotFoundException, TokenNotProvided
 
-__all__ = ("AlreadyExistsException", "NotFoundException")
+__all__ = ("AlreadyExistsException", "NotFoundException", "InvalidToken", "TokenNotProvided")

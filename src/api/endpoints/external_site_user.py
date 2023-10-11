@@ -1,11 +1,12 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
+from src.api.auth import check_header_contains_token
 from src.api.schemas import ExternalSiteUserRequest
 from src.api.services import ExternalSiteUserService
 from src.depends import Container
 
-site_user_router = APIRouter()
+site_user_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
 @site_user_router.post("/", description="Актуализирует пользователя с сайта ProCharity.")
