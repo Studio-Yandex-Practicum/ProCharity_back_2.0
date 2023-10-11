@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearer
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.api.main import init_fastapi
 from src.api.services import (
     AdminService,
     AnalyticsService,
@@ -15,6 +16,7 @@ from src.api.services import (
     TelegramNotificationService,
 )
 from src.bot.bot import create_bot
+from src.bot.main import init_bot
 from src.bot.services import UnsubscribeReasonService
 from src.bot.services.category import CategoryService as BotCategoryService
 from src.bot.services.external_site_user import ExternalSiteUserService as BotExternalSiteUserService
@@ -46,8 +48,14 @@ class Container(containers.DeclarativeContainer):
     admin_service = providers.Factory(AdminService, admin_repository=admin_repository)
 
     # Applications
-    fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG)
-    telegram_bot = providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN)
+    fastapi_app = providers.Singleton(
+        init_fastapi,
+        fastpi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
+    )
+    telegram_bot = providers.Singleton(
+        init_bot,
+        telegram_bot=providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN),
+    )
 
     # Repositories:
     user_repository = providers.Factory(UserRepository, session=session)

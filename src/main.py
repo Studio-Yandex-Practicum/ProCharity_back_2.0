@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 
-from src.api import init_fastapi
 from src.bot import shutdown_bot, startup_bot
-from src.bot.handlers import init_bot
 from src.core.utils import set_ngrok
 from src.depends import Container
 
@@ -10,8 +8,8 @@ from src.depends import Container
 def main(run_bot: bool = True) -> FastAPI:
     container = Container()
     container.wire(packages=(__package__,))
-    fastapi_app = init_fastapi(container.fastapi_app())
-    bot = init_bot(container.telegram_bot())
+    fastapi_app = container.fastapi_app()
+    bot = container.telegram_bot()
 
     @fastapi_app.on_event("startup")
     async def on_startup():
