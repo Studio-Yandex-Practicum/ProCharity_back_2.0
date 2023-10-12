@@ -48,13 +48,15 @@ class Container(containers.DeclarativeContainer):
     admin_service = providers.Factory(AdminService, admin_repository=admin_repository)
 
     # Applications
-    fastapi_app = providers.Singleton(
-        init_fastapi,
-        fastpi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
-    )
     telegram_bot = providers.Singleton(
         init_bot,
         telegram_bot=providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN),
+    )
+    fastapi_app = providers.Singleton(
+        init_fastapi,
+        fastapi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
+        settings=settings,
+        bot=telegram_bot,
     )
 
     # Repositories:
