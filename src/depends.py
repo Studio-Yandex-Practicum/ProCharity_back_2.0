@@ -56,7 +56,6 @@ class Container(containers.DeclarativeContainer):
         init_fastapi,
         fastapi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
         settings=settings,
-        bot=telegram_bot,
     )
 
     # Repositories:

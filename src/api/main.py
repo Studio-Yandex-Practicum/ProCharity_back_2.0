@@ -2,7 +2,6 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from telegram.ext import Application
 
 from src.api.constants import API_DESCRIPTION
 from src.core.logging.middleware import LoggingMiddleware
@@ -48,7 +47,6 @@ def set_events(fastapi_app: FastAPI, run_bot: bool):
 def init_fastapi(
     fastapi_app: FastAPI,
     settings: Settings,
-    bot: Application,
     run_bot: bool,
 ) -> FastAPI:
     """Инициализация приложения FastAPI."""
