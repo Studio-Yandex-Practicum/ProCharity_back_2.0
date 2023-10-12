@@ -5,10 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from telegram.ext import Application
 
 from src.api.constants import API_DESCRIPTION
-from src.bot import shutdown_bot, startup_bot
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
-from src.core.utils import set_ngrok
 from src.settings import Settings
 
 
@@ -32,32 +30,19 @@ def include_router(fastapi_app: FastAPI):
     fastapi_app.include_router(api_router)
 
 
-def set_events(
-    fastapi_app: FastAPI,
-    settings: Settings,
-    bot: Application,
-    run_bot: bool,
-):
+def set_events(fastapi_app: FastAPI, run_bot: bool):
     @fastapi_app.on_event("startup")
     async def on_startup():
-        if settings.USE_NGROK is True:
-            set_ngrok()
-        if run_bot:
-            fastapi_app.state.bot_instance = await startup_bot(
-                bot=bot,
-                bot_webhook_mode=settings.BOT_WEBHOOK_MODE,
-                telegram_webhook_url=settings.telegram_webhook_url,
-                secret_key=settings.SECRET_KEY,
-            )
+        from .events import startup
+
+        await startup(fastapi_app, run_bot)
 
     @fastapi_app.on_event("shutdown")
     async def on_shutdown():
         """Действия после остановки сервера."""
-        if run_bot:
-            await shutdown_bot(
-                fastapi_app.state.bot_instance,
-                bot_webhook_mode=settings.provided.BOT_WEBHOOK_MODE,
-            )
+        from .events import shutdown
+
+        await shutdown(fastapi_app, run_bot)
 
 
 def init_fastapi(
@@ -70,7 +55,7 @@ def init_fastapi(
 
     add_middleware(fastapi_app)
     include_router(fastapi_app)
-    set_events(fastapi_app, settings, bot, run_bot)
+    set_events(fastapi_app, run_bot)
 
     fastapi_app.description = API_DESCRIPTION
 
