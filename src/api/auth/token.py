@@ -1,6 +1,6 @@
 import structlog
 from dependency_injector.wiring import Provide, inject
-from fastapi import Request
+from fastapi import Depends, Request
 
 from src.core.exceptions import InvalidToken, TokenNotProvided
 from src.depends import Container
@@ -10,7 +10,7 @@ log = structlog.get_logger()
 
 
 @inject
-async def check_header_contains_token(request: Request, settings: Settings = Provide[Container.settings]):
+async def check_header_contains_token(request: Request, settings: Settings = Depends(Provide[Container.settings])):
     """Проверяем, содержится ли в заголовке запроса token, и сравниваем его
     со значением ACCESS_TOKEN_FOR_PROCAHRITY из settings.py"""
     if not settings.ACCESS_TOKEN_FOR_PROCHARITY:
