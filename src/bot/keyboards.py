@@ -46,22 +46,6 @@ async def get_checked_categories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_categories_keyboard(
-    categories: list[Category], selected_categories: dict[Category] = {}
-) -> InlineKeyboardMarkup:
-    keyboard = [
-        [InlineKeyboardButton(category.name, callback_data=f"category_{category.id}")] for category in categories
-    ]
-    keyboard.extend(
-        [
-            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
-            [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
-        ]
-    )
-
-    return InlineKeyboardMarkup(keyboard)
-
-
 async def get_subcategories_keyboard(
     parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = {}
 ) -> InlineKeyboardMarkup:
