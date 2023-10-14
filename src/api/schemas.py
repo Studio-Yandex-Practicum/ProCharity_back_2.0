@@ -1,5 +1,6 @@
 import urllib
 from datetime import date, datetime
+from typing import Optional
 
 from pydantic import BaseModel, Extra, Field, NonNegativeInt, StrictStr, field_validator, root_validator
 from typing_extensions import NotRequired, TypedDict
@@ -26,12 +27,10 @@ class RequestBase(BaseModel):
 class CategoryRequest(RequestBase):
     """Класс модели запроса для Category."""
 
-    id: int = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор категории.")
+    id: int = Field(..., example=1, description="Уникальный идентификатор категории.")
     name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
-    parent_id: int = Field(
+    parent_id: Optional[int] = Field(
         None,
-        ge=1,
-        lt=10,
         example=1,
         description="Принадлежность к родительской категории. Если null, то это родительская категория.",
     )
@@ -55,12 +54,10 @@ class CategoryRequest(RequestBase):
 class CategoryResponse(ResponseBase):
     """Класс модели ответа для Category."""
 
-    id: int = Field(..., ge=1, lt=10, example=1, description="Уникальный идентификатор категории.")
+    id: int = Field(..., example=1, description="Уникальный идентификатор категории.")
     name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
-    parent_id: int = Field(
+    parent_id: Optional[int] = Field(
         None,
-        ge=1,
-        lt=10,
         example=1,
         description="Принадлежность к родительской категории. Если null, то это родительская категория.",
     )

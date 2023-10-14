@@ -62,7 +62,7 @@ class HealthCheckService:
             db_status: DBStatus = {"status": False, "db_connection_error": f"{exc.__class__.__name__}: {exc}"}
             return db_status
         if get_last_update is None:
-            get_last_update = 0
+            get_last_update = "Unable to get last_update"
         db_status: DBStatus = {
             "status": True,
             "last_update": get_last_update,
