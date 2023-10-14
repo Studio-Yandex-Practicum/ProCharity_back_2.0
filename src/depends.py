@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearer
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.api.main import init_fastapi
 from src.api.services import (
     AdminService,
     AnalyticsService,
@@ -15,6 +16,7 @@ from src.api.services import (
     TelegramNotificationService,
 )
 from src.bot.bot import create_bot
+from src.bot.main import init_bot
 from src.bot.services import UnsubscribeReasonService
 from src.bot.services.category import CategoryService as BotCategoryService
 from src.bot.services.external_site_user import ExternalSiteUserService as BotExternalSiteUserService
@@ -42,12 +44,17 @@ class Container(containers.DeclarativeContainer):
     engine = providers.Singleton(create_async_engine, url=settings.provided.database_url)
     sessionmaker = providers.Singleton(async_sessionmaker, bind=engine, expire_on_commit=False)
     session = providers.Resource(get_session, sessionmaker=sessionmaker)
-    admin_repository = providers.Factory(AdminUserRepository, session=session)
-    admin_service = providers.Factory(AdminService, admin_repository=admin_repository)
 
     # Applications
-    fastapi_app = providers.Singleton(FastAPI, debug=settings.provided.DEBUG)
-    telegram_bot = providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN)
+    telegram_bot = providers.Singleton(
+        init_bot,
+        telegram_bot=providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN),
+    )
+    fastapi_app = providers.Singleton(
+        init_fastapi,
+        fastapi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
+        settings=settings,
+    )
 
     # Repositories:
     user_repository = providers.Factory(UserRepository, session=session)
@@ -55,8 +62,10 @@ class Container(containers.DeclarativeContainer):
     category_repository = providers.Factory(CategoryRepository, session=session)
     task_repository = providers.Factory(TaskRepository, session=session)
     unsubscribe_reason_repository = providers.Factory(UnsubscribeReasonRepository, session=session)
+    admin_repository = providers.Factory(AdminUserRepository, session=session)
 
     # API services:
+    admin_service = providers.Factory(AdminService, admin_repository=admin_repository)
     site_user_service = providers.Factory(
         ExternalSiteUserService, site_user_repository=site_user_repository, session=session
     )
