@@ -1,6 +1,6 @@
 import asyncio
-import structlog
 
+import structlog
 from telegram.constants import ParseMode
 from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application

@@ -1,7 +1,5 @@
 import structlog
-
 from telegram.ext import AIORateLimiter, Application
-
 
 log = structlog.get_logger()
 
