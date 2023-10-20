@@ -1,5 +1,5 @@
 import asyncio
-import logging
+import structlog
 
 from telegram.constants import ParseMode
 from telegram.error import BadRequest, Forbidden, TelegramError
@@ -7,7 +7,7 @@ from telegram.ext import Application
 
 from src.core.db.models import User
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(module=__name__)
 
 
 class TelegramNotification:
