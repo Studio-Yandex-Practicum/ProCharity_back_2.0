@@ -23,7 +23,7 @@ async def start_bot(
     else:
         await bot.updater.start_polling()  # type: ignore
     await bot.start()
-    log.info("Bot started")
+    await log.ainfo("Bot started")
     return bot
 
 
@@ -43,7 +43,7 @@ async def startup_bot(
             ],
         ]
     )
-    log.info(result)
+    await log.ainfo(result)
     return bot_instance
 
 
