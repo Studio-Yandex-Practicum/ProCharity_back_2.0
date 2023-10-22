@@ -1,13 +1,13 @@
 import asyncio
-import logging
 
+import structlog
 from telegram.constants import ParseMode
 from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application
 
 from src.core.db.models import User
 
-logger = logging.getLogger(__name__)
+log = structlog.get_logger(module=__name__)
 
 
 class TelegramNotification:
@@ -19,7 +19,7 @@ class TelegramNotification:
         try:
             await self.__bot.send_message(chat_id=user_id, text=message, parse_mode=ParseMode.HTML)
             msg = f"Отправлено оповещение пользователю {user_id}"
-            logger.debug(msg)
+            await log.adebug(msg)
             return True, msg
         except TelegramError as exc:
             msg = f"Ошибка отправки сообщения пользователю {user_id}."
@@ -29,7 +29,7 @@ class TelegramNotification:
                 case Forbidden():
                     msg += " Бот заблокирован."
             msg += " " + exc.message
-            logger.info(msg)
+            await log.ainfo(msg)
             return False, msg
 
     async def send_messages(

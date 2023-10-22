@@ -1,6 +1,7 @@
-import logging
-
+import structlog
 from telegram.ext import AIORateLimiter, Application
+
+log = structlog.get_logger()
 
 
 def create_bot(bot_token) -> Application:
@@ -22,7 +23,7 @@ async def start_bot(
     else:
         await bot.updater.start_polling()  # type: ignore
     await bot.start()
-    logging.info("Bot started")
+    await log.ainfo("Bot started")
     return bot
 
 
@@ -42,7 +43,7 @@ async def startup_bot(
             ],
         ]
     )
-    logging.info(result)
+    await log.ainfo(result)
     return bot_instance
 
 

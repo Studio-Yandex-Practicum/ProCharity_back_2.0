@@ -38,12 +38,12 @@ async def send_messages_to_group_of_users(
     message_list: MessageList,
     telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
 ):
-    log.info("Начало отправки сообщений для группы пользователей")
+    await log.ainfo("Начало отправки сообщений для группы пользователей")
     rate = InfoRate()
     for message in message_list.messages:
         status, msg = await telegram_notification_service.send_message_to_user(message.telegram_id, message)
         rate = telegram_notification_service.count_rate(status, msg, rate)
-    log.info("Конец отправки сообщений для группы пользователей")
+    await log.ainfo("Конец отправки сообщений для группы пользователей")
     return rate
 
 

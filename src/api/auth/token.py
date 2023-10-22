@@ -25,5 +25,5 @@ async def check_header_contains_token(request: Request, settings: Settings = Dep
         case settings.ACCESS_TOKEN_FOR_PROCHARITY:
             return
         case _:
-            await log.info("Токен в заголовке запроса неверный.")
+            await log.ainfo("Токен в заголовке запроса неверный.")
             raise InvalidToken
