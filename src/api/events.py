@@ -35,5 +35,5 @@ async def shutdown(
     if run_bot:
         await shutdown_bot(
             fastapi_app.state.bot_instance,
-            bot_webhook_mode=settings.provided.BOT_WEBHOOK_MODE,
+            bot_webhook_mode=settings.BOT_WEBHOOK_MODE,
         )
