@@ -99,7 +99,7 @@ class TaskRequest(RequestBase):
                 "id": 1,
                 "title": "Task Title",
                 "name_organization": "My Organization",
-                "deadline": "31-12-2025",
+                "deadline": "31.12.2025",
                 "category_id": 1,
                 "bonus": 5,
                 "location": "My Location",
