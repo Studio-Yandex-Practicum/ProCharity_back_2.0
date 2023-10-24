@@ -104,7 +104,7 @@ class ContentRepository(AbstractRepository, abc.ABC):
             .values({"is_archived": True})
         )
 
-    async def get_by_ids(self, ids: list[int]) -> ScalarResult:
+    async def get_by_ids(self, ids: list[int]) -> list[int]:
         """Возвращает id объектов модели из базы данных по указанным ids"""
         filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
-        return filtered_ids
+        return filtered_ids.all()
