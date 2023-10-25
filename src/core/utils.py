@@ -10,6 +10,7 @@ def display_tasks(task):
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
     bonus_link = "https://help.procharity.ru/article/10053"
     return (
+        f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}\n\n"
         f"Категория: {task.category.name}\n\n"
         f"Срок: {deadline}\n"
@@ -22,10 +23,11 @@ def display_task_verbosely(task):
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
     bonus_link = "https://help.procharity.ru/article/10053"
     return (
-        f"От фонда: {task.name_organization}\n\n"
+        f"<b>{task.title}\n\n</b>"
+        f"От фонда: {task.name_organization}, {task.location}\n\n"
         f"Категория: {task.category.name}\n\n"
         f"Срок: {deadline}\n"
-        f"Бонусы: {task.bonus * '💎'}{bonus_link}\n"
+        f"Бонусы: <a href='{bonus_link}'>{task.bonus * '💎'}</a>\n"
         f"{task.description}"
     )
 
