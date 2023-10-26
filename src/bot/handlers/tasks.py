@@ -22,7 +22,11 @@ async def task_details_callback(
     task_id = int(context.match.group(1))
     task = await task_service.get_task_by_id(task_id)
     detailed_text = display_task_verbosely(task)
-    await query.message.edit_text(detailed_text)
+    await query.message.edit_text(
+        detailed_text,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+    )
 
 
 @logger_decor
