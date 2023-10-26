@@ -12,9 +12,9 @@ def display_tasks(task):
     return (
         f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}\n\n"
-        f"Категория: {task.category.name}\n\n"
-        f"Срок: {deadline}\n"
         f"Бонусы: <a href='{bonus_link}'>{task.bonus * '💎'}</a>\n"
+        f"Категория: {task.category.name}\n"
+        f"Срок: {deadline}\n\n"
         f"<a href='{task.link}'>{'Посмотреть задание'}</a>"
     )
 
@@ -25,9 +25,9 @@ def display_task_verbosely(task):
     return (
         f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}, {task.location}\n\n"
-        f"Категория: {task.category.name}\n\n"
-        f"Срок: {deadline}\n"
         f"Бонусы: <a href='{bonus_link}'>{task.bonus * '💎'}</a>\n"
+        f"Категория: {task.category.name}\n"
+        f"Срок: {deadline}\n\n"
         f"{task.description}"
     )
 
