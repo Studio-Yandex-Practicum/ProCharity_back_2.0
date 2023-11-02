@@ -1,15 +1,15 @@
 // validation settings and check actions
 const validationConfig = {
   name: {
-    pattern: /[^ЁА-Яёа-я-]/g,
+   // pattern: /[^ЁА-Яёа-я-]/g,
     isCapitalize: true,
   },
   surname: {
-    pattern: /[^ЁА-Яёа-я-]/g,
+   // pattern: /[^ЁА-Яёа-я-]/g,
     isCapitalize: true,
   },
   email: {
-    pattern: /[А-ЯЁа-яё]/g,
+   // pattern: /[А-ЯЁа-яё]/g,
     isCapitalize: false,
   },
   feedback: {
@@ -25,7 +25,7 @@ const errMsg = {
     max: 'Допускается ввод не более 100 символов',
     capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
     dashPattern: 'Убедитесь, что дефис находится в нужном месте',
-    nameSurnamePattern: 'Доступно использование только кириллицы и "-"',
+    nameSurnamePattern: 'Доступно использование только кириллицы, латиницы и "-"',
   },
   surname: {
     required: 'Пожалуйста, укажите фамилию',
@@ -33,7 +33,7 @@ const errMsg = {
     max: 'Допускается ввод не более 100 символов',
     capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
     dashPattern: 'Убедитесь, что дефис находится в нужном месте',
-    nameSurnamePattern: 'Доступно использование только кириллицы и "-"',
+    nameSurnamePattern: 'Доступно использование только кириллицы, латиницы и "-"',
   },
   email: {
     required: 'Пожалуйста, укажите ваш email',
@@ -71,7 +71,7 @@ const checkInputValidity = (element, errElement, pattern, isCapitalize) => {
   const capsPattern = /[А-ЯЁ]{2,}/g;
   const dashPattern = /( -)|(- )|(^-)|(-$)/g;
   const phonePattern = /^\+7 [3489]\d{2} \d{3}-\d{2}-\d{2}$/;
-  const nameSurnamePattern = /^[А-ЯЁ][а-яё]*([-][А-ЯЁ][а-яё]+)*$/g;
+  const nameSurnamePattern = /^[А-ЯЁA-Z][а-яёa-z]*([-][А-ЯЁA-Z][а-яёa-z]+)*$/g;
   const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
   const feedbackPattern = /[А-ЯЁа-яёa-zA-Z0-9._!@/-]/g;
 
