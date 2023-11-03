@@ -1,19 +1,15 @@
 // validation settings and check actions
 const validationConfig = {
   name: {
-   // pattern: /[^ЁА-Яёа-я-]/g,
     isCapitalize: true,
   },
   surname: {
-   // pattern: /[^ЁА-Яёа-я-]/g,
     isCapitalize: true,
   },
   email: {
-   // pattern: /[А-ЯЁа-яё]/g,
     isCapitalize: false,
   },
   feedback: {
-    // pattern: /[|/\_!@-]/g,
     isCapitalize: false,
   },
 };
