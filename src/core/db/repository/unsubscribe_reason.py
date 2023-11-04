@@ -16,7 +16,7 @@ class UnsubscribeReasonRepository(AbstractRepository):
         db_obj = await self._session.execute(select(UnsubscribeReason).where(UnsubscribeReason.user == user))
         return db_obj.scalars().first()
 
-    async def get_reason_cancelling_statistics(self):
+    async def get_reason_cancelling_statistics(self) -> list[tuple[str, int]]:
         query = select(
             UnsubscribeReason.unsubscribe_reason,
             func.count(UnsubscribeReason.unsubscribe_reason),
