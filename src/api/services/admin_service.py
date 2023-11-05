@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from jose import JWTError, jwt
 
 from src.core.db.models import AdminUser
@@ -19,16 +17,6 @@ class AdminService:
         if user and user.check_password(password):
             return user
         return None
-
-    def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-        return encoded_jwt
 
     async def get_current_user(self, token: str) -> AdminUser:
         try:
