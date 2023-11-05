@@ -18,8 +18,8 @@ class UnsubscribeReasonRepository(AbstractRepository):
 
     async def get_reason_cancelling_statistics(self) -> list[tuple[str, int]]:
         query = select(
-            UnsubscribeReason.unsubscribe_reason,
-            func.count(UnsubscribeReason.unsubscribe_reason),
+            UnsubscribeReason.unsubscribe_reason.label("reason"),
+            func.count(UnsubscribeReason.unsubscribe_reason).label("count"),
         ).group_by(UnsubscribeReason.unsubscribe_reason)
         reasons = await self._session.execute(query)
-        return reasons.all()
+        return reasons.fetchall()
