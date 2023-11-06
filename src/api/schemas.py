@@ -264,7 +264,7 @@ class Analytic(BaseModel):
     number_users: int = 0
     all_users_statistic: dict[str, str] = {}
     active_users_statistic: dict[str, str] = {}
-    tasks: dict[str, str] = {}
+    tasks: dict[str, int] = {}
 
 
 class DBStatus(TypedDict):

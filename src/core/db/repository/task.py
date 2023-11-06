@@ -59,3 +59,10 @@ class TaskRepository(ContentRepository):
         """Получить список задач по ids из категорий на которые подписан пользователь."""
         tasks = await self._session.execute(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
         return tasks.scalars().all()
+
+    async def get_count_active_tasks(self) -> int:
+        """Получить количество активных задач"""
+        tasks_count = await self._session.execute(
+            func.count(select(Task).join(Category).where(Task.is_archived == false()))
+        )
+        return tasks_count
