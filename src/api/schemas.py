@@ -256,6 +256,13 @@ class ExternalSiteUserRequest(RequestBase):
             raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
 
 
+class ActiveTasks(TypedDict):
+    """Класс ответа для аналитики по задачам."""
+
+    last_update: str
+    active_tasks: int
+
+
 class Analytic(BaseModel):
     """Класс модели запроса для статистики."""
 
@@ -264,7 +271,7 @@ class Analytic(BaseModel):
     number_users: int = 0
     all_users_statistic: dict[str, str] = {}
     active_users_statistic: dict[str, str] = {}
-    tasks: dict[str, int] = {}
+    tasks: ActiveTasks = {}
 
 
 class DBStatus(TypedDict):

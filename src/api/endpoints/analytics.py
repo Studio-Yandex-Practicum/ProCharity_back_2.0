@@ -1,7 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
-from src.api.schemas import Analytic
+from src.api.schemas import ActiveTasks, Analytic
 from src.api.services.analytics import AnalyticsService
 from src.depends import Container
 
@@ -13,7 +13,8 @@ analytic_router = APIRouter()
 async def get_analytics(analytic_service: AnalyticsService = Depends(Provide[Container.analytic_service])) -> Analytic:
     return Analytic(
         number_users=await analytic_service.get_user_number(),
-        tasks=dict(
-            last_update=analytic_service.get_last_update(), active_tasks=analytic_service.get_count_active_tasks()
+        tasks=ActiveTasks(
+            last_update=await analytic_service.get_last_update(),
+            active_tasks=await analytic_service.get_count_active_tasks(),
         ),
     )
