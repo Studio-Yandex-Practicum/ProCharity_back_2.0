@@ -23,11 +23,11 @@ class AnalyticsService:
 
     async def get_all_users_statistic(self, date_limit) -> AllUsersStatistic:
         date_begin = date_limit - timedelta(days=DAYS_NUMBER - 1)
-        added_users = await self._user_repository.get_all_users_statistic(
+        added_users = await self._user_repository.get_statistics_by_days(
             date_begin, date_limit, 'created_at')
-        added_external_users = await self._user_repository.get_all_users_statistic(
+        added_external_users = await self._user_repository.get_statistics_by_days(
             date_begin, date_limit, 'external_signup_date')
-        users_unsubscribed = await self._unsubscribe_reason_repository.get_all_users_statistic(
+        users_unsubscribed = await self._unsubscribe_reason_repository.get_statistics_by_days(
             date_begin, date_limit, 'created_at')
         return {'added_users': added_users,
                 'added_external_users': added_external_users,

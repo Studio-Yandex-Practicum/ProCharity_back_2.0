@@ -93,7 +93,7 @@ class AbstractRepository(abc.ABC):
         )
         return db_obj.scalars().first()
 
-    async def get_all_users_statistic(self, date_begin, date_limit, column_name) -> dict[str, int]:
+    async def get_statistics_by_days(self, date_begin, date_limit, column_name) -> dict[str, int]:
         """Получает из базы отсортированный и отфильтрованный сводный набор записей модели
         по полю column_name.
         """
