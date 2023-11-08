@@ -245,10 +245,8 @@ async def filling_user_in_db(
     days_period = 90
     for id in range(1, USERS_TABLE_ROWS + 1):
         email = choice([None, user_fake.unique.email()])
-        external_id = choice(
-            [None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
-        created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period),
-                                            datetime.now())
+        external_id = choice([None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
+        created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
         user = User(
             telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
             username=user_fake.unique.user_name(),
@@ -260,7 +258,7 @@ async def filling_user_in_db(
             external_signup_date=None if external_id is None else created_at,
             banned=user_fake.boolean(),
             id=id,
-            created_at=created_at
+            created_at=created_at,
         )
         session.add(user)
     await session.commit()
@@ -279,8 +277,7 @@ async def filling_unsubscribe_reason_in_db(
         unsubscribe_reason = UnsubscribeReason(
             user_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
             unsubscribe_reason=choice(TEST_UNSUBSCRIBE_REASON),
-            created_at=user_fake.date_between(
-                datetime.now() - timedelta(days=days_period), datetime.now())
+            created_at=user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now()),
         )
         session.add(unsubscribe_reason)
     await session.commit()
@@ -290,8 +287,7 @@ async def delete_all_data(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
     """The function deletes data from the tables Category, Tasks."""
-    await session.execute(text(
-        """TRUNCATE TABLE tasks, categories, unsubscribe_reason, users CASCADE"""))
+    await session.execute(text("""TRUNCATE TABLE tasks, categories, unsubscribe_reason, users CASCADE"""))
     await session.commit()
 
 
