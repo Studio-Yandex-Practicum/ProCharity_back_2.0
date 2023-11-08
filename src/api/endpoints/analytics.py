@@ -1,3 +1,5 @@
+from datetime import date
+
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
@@ -10,5 +12,11 @@ analytic_router = APIRouter()
 
 @analytic_router.get("/", description="Возращает статистику сервиса.")
 @inject
-async def get_analytics(analytic_service: AnalyticsService = Depends(Provide[Container.analytic_service])) -> Analytic:
-    return Analytic(number_users=await analytic_service.get_user_number())
+async def get_analytics(
+        date_limit: date = '2023-11-20',
+        analytic_service: AnalyticsService = Depends(Provide[Container.analytic_service]),
+) -> Analytic:
+    return Analytic(
+        number_users=await analytic_service.get_user_number(),
+        all_users_statistic=await analytic_service.get_all_users_statistic(date_limit),
+    )

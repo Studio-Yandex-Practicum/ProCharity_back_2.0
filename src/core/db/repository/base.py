@@ -10,6 +10,7 @@ from src.core.utils import auto_commit
 
 DatabaseModel = TypeVar("DatabaseModel")
 DATE_TIME_FORMAT_LAST_UPDATE = "YYYY-MM-DD HH24:MI:SS"
+DATE_FORMAT = "YYYY-MM-DD"
 
 
 class AbstractRepository(abc.ABC):
@@ -91,6 +92,19 @@ class AbstractRepository(abc.ABC):
             )
         )
         return db_obj.scalars().first()
+
+    async def get_all_users_statistic(self, date_begin, date_limit, column_name) -> dict[str, int]:
+        """Получает из базы отсортированный и отфильтрованный сводный набор записей модели
+        по полю column_name.
+        """
+        column = self._model.__dict__[column_name]
+        db_data = await self._session.execute(
+            select(func.to_char(column, DATE_FORMAT), func.count(column))
+            .where(column >= date_begin, column <= date_limit)
+            .group_by(column)
+            .order_by(column)
+        )
+        return dict(db_data.fetchall())
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
