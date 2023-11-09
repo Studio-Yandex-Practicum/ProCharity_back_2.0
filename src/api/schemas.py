@@ -256,7 +256,7 @@ class ExternalSiteUserRequest(RequestBase):
             raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
 
 
-class ActiveTasks(TypedDict):
+class ActiveTasks(BaseModel):
     """Класс ответа для аналитики по задачам."""
 
     last_update: str

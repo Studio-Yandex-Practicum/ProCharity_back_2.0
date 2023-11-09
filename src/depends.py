@@ -72,11 +72,11 @@ class Container(containers.DeclarativeContainer):
     category_service = providers.Factory(CategoryService, category_repository=category_repository, session=session)
     task_service = providers.Factory(TaskService, task_repository=task_repository, session=session)
     message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot, session=session)
-    analytic_service = providers.Factory(
-        AnalyticsService, user_repository=user_repository, task_repository=task_repository
-    )
     health_check_service = providers.Factory(
         HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
+    )
+    analytic_service = providers.Factory(
+        AnalyticsService, user_repository=user_repository, health_check_service=health_check_service
     )
 
     # BOT services:
