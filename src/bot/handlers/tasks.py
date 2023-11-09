@@ -16,7 +16,7 @@ from src.depends import Container
 async def task_details_callback(
     update: Update,
     context: CallbackContext,
-    task_service: TaskService = Provide[Container.bot_task_service],
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
     query = update.callback_query
     task_id = int(context.match.group(1))
@@ -35,7 +35,7 @@ async def view_task_callback(
     update: Update,
     context: CallbackContext,
     limit: int = 3,
-    task_service: TaskService = Provide[Container.bot_task_service],
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(

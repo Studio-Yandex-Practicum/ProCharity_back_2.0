@@ -15,13 +15,13 @@ admin_user_router = APIRouter()
 def auth(
     admin_data: AdminUserRequest,
     admin_service: AdminService = Depends(
-        Provide[Container.admin_service],
+        Provide[Container.api_services_container.admin_service],
     ),
     access_security=Depends(
-        Provide[Container.access_security],
+        Provide[Container.jwt_services_container.access_security],
     ),
     refresh_security=Depends(
-        Provide[Container.refresh_security],
+        Provide[Container.jwt_services_container.refresh_security],
     ),
 ):
     user = admin_service.authenticate_user(admin_data.email, admin_data.password)

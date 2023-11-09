@@ -21,8 +21,8 @@ from src.depends import Container
 async def categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    category_service: CategoryService = Provide[Container.bot_category_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+    category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     context.user_data["parent_id"] = None
     categories = await category_service.get_unarchived_parents_with_children_count()
@@ -39,7 +39,7 @@ async def categories_callback(
 async def confirm_categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
     query = update.callback_query
@@ -65,8 +65,8 @@ async def confirm_categories_callback(
 async def subcategories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    category_service: CategoryService = Provide[Container.bot_category_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+    category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     query = update.callback_query
     parent_id = int(context.match.group(1))
@@ -86,8 +86,8 @@ async def subcategories_callback(
 async def select_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    category_service: CategoryService = Provide[Container.bot_category_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+    category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
@@ -115,8 +115,8 @@ async def select_subcategory_callback(
 async def back_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    category_service: CategoryService = Provide[Container.bot_category_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+    category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     query = update.callback_query
     categories = await category_service.get_unarchived_parents_with_children_count()

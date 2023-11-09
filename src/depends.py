@@ -34,69 +34,172 @@ from src.core.db.repository import (
 from src.settings import get_settings
 
 
-class Container(containers.DeclarativeContainer):
-    """Контейнер dependency_injector."""
+class SettingsContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей Settings."""
 
-    # Settings
     settings = providers.Singleton(get_settings)
 
-    # Database connection
-    engine = providers.Singleton(create_async_engine, url=settings.provided.database_url)
-    sessionmaker = providers.Singleton(async_sessionmaker, bind=engine, expire_on_commit=False)
-    session = providers.Resource(get_session, sessionmaker=sessionmaker)
 
-    # Applications
+class DataBaseConnectionContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей DataBase connection."""
+
+    settings = providers.Container(SettingsContainer)
+    engine = providers.Singleton(
+        create_async_engine,
+        url=settings.settings.provided.database_url,
+    )
+    sessionmaker = providers.Singleton(
+        async_sessionmaker,
+        bind=engine,
+        expire_on_commit=False,
+    )
+    session = providers.Resource(
+        get_session,
+        sessionmaker=sessionmaker,
+    )
+
+
+class ApplicationsContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей Applications."""
+
+    settings = providers.Container(SettingsContainer)
     telegram_bot = providers.Singleton(
         init_bot,
-        telegram_bot=providers.Singleton(create_bot, bot_token=settings.provided.BOT_TOKEN),
+        telegram_bot=providers.Singleton(
+            create_bot,
+            bot_token=settings.settings.provided.BOT_TOKEN,
+        ),
     )
     fastapi_app = providers.Singleton(
         init_fastapi,
-        fastapi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
-        settings=settings,
+        fastapi_app=providers.Singleton(FastAPI, debug=settings.settings.provided.DEBUG),
+        settings=settings.settings,
     )
 
-    # Repositories:
-    user_repository = providers.Factory(UserRepository, session=session)
-    site_user_repository = providers.Factory(ExternalSiteUserRepository, session=session)
-    category_repository = providers.Factory(CategoryRepository, session=session)
-    task_repository = providers.Factory(TaskRepository, session=session)
-    unsubscribe_reason_repository = providers.Factory(UnsubscribeReasonRepository, session=session)
-    admin_repository = providers.Factory(AdminUserRepository, session=session)
 
-    # API services:
-    admin_service = providers.Factory(AdminService, admin_repository=admin_repository)
+class RepositoriesContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей Repositories."""
+
+    data_base_connection = providers.Container(DataBaseConnectionContainer)
+    user_repository = providers.Factory(
+        UserRepository,
+        session=data_base_connection.session,
+    )
+    site_user_repository = providers.Factory(
+        ExternalSiteUserRepository,
+        session=data_base_connection.session,
+    )
+    category_repository = providers.Factory(
+        CategoryRepository,
+        session=data_base_connection.session,
+    )
+    task_repository = providers.Factory(
+        TaskRepository,
+        session=data_base_connection.session,
+    )
+    unsubscribe_reason_repository = providers.Factory(
+        UnsubscribeReasonRepository,
+        session=data_base_connection.session,
+    )
+    admin_repository = providers.Factory(
+        AdminUserRepository,
+        session=data_base_connection.session,
+    )
+
+
+class APIServicesContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей API Service."""
+
+    repositories = providers.Container(RepositoriesContainer)
+    data_base_connection = providers.Container(DataBaseConnectionContainer)
+    applications = providers.Container(ApplicationsContainer)
+    admin_service = providers.Factory(
+        AdminService,
+        admin_repository=repositories.admin_repository,
+    )
     site_user_service = providers.Factory(
-        ExternalSiteUserService, site_user_repository=site_user_repository, session=session
+        ExternalSiteUserService,
+        site_user_repository=repositories.site_user_repository,
+        session=data_base_connection.session,
     )
-    category_service = providers.Factory(CategoryService, category_repository=category_repository, session=session)
-    task_service = providers.Factory(TaskService, task_repository=task_repository, session=session)
-    message_service = providers.Factory(TelegramNotificationService, telegram_bot=telegram_bot, session=session)
-    analytic_service = providers.Factory(AnalyticsService, user_repository=user_repository)
+    category_service = providers.Factory(
+        CategoryService,
+        category_repository=repositories.category_repository,
+        session=data_base_connection.session,
+    )
+    task_service = providers.Factory(
+        TaskService,
+        task_repository=repositories.task_repository,
+        session=data_base_connection.session,
+    )
+    message_service = providers.Factory(
+        TelegramNotificationService,
+        telegram_bot=applications.telegram_bot,
+        session=data_base_connection.session,
+    )
+    analytic_service = providers.Factory(
+        AnalyticsService,
+        user_repository=repositories.user_repository,
+    )
     health_check_service = providers.Factory(
-        HealthCheckService, task_repository=task_repository, telegram_bot=telegram_bot
+        HealthCheckService,
+        task_repository=repositories.task_repository,
+        telegram_bot=applications.telegram_bot,
     )
 
-    # BOT services:
-    bot_category_service = providers.Factory(BotCategoryService, category_repository=category_repository)
-    bot_user_service = providers.Factory(BotUserService, user_repository=user_repository)
+
+class BotServicesContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей Bot services."""
+
+    repositories = providers.Container(RepositoriesContainer)
+    bot_category_service = providers.Factory(
+        BotCategoryService,
+        category_repository=repositories.category_repository,
+    )
+    bot_user_service = providers.Factory(
+        BotUserService,
+        user_repository=repositories.user_repository,
+    )
     bot_task_service = providers.Factory(
         BotTaskService,
-        task_repository=task_repository,
-        user_repository=user_repository,
+        task_repository=repositories.task_repository,
+        user_repository=repositories.user_repository,
     )
-    bot_site_user_service = providers.Factory(BotExternalSiteUserService, site_user_repository=site_user_repository)
+    bot_site_user_service = providers.Factory(
+        BotExternalSiteUserService,
+        site_user_repository=repositories.site_user_repository,
+    )
     unsubscribe_reason_service = providers.Factory(
         UnsubscribeReasonService,
-        unsubscribe_reason_repository=unsubscribe_reason_repository,
-        user_repository=user_repository,
+        unsubscribe_reason_repository=repositories.unsubscribe_reason_repository,
+        user_repository=repositories.user_repository,
     )
 
-    # JWT services:
+
+class JWTServicesContainer(containers.DeclarativeContainer):
+    """Контейнер зависимостей JWT services."""
+
+    settings = providers.DependenciesContainer()
     access_security = providers.Factory(
         JwtAccessBearerCookie,
-        secret_key=settings.provided.SECRET_KEY,
+        secret_key=settings.SECRET_KEY,
         auto_error=False,
         access_expires_delta=timedelta(hours=1),
     )
-    refresh_security = providers.Factory(JwtRefreshBearer, secret_key=settings.provided.SECRET_KEY, auto_error=True)
+    refresh_security = providers.Factory(
+        JwtRefreshBearer,
+        secret_key=settings.SECRET_KEY,
+        auto_error=True,
+    )
+
+
+class Container(containers.DeclarativeContainer):
+    """Главный контейнер приложения."""
+
+    settings_container = providers.Container(SettingsContainer)
+    database_connection_container = providers.Container(DataBaseConnectionContainer)
+    applications_container = providers.Container(ApplicationsContainer)
+    repositories_container = providers.Container(RepositoriesContainer)
+    api_services_container = providers.Container(APIServicesContainer)
+    bot_services_container = providers.Container(BotServicesContainer)
+    jwt_services_container = providers.Container(JWTServicesContainer)

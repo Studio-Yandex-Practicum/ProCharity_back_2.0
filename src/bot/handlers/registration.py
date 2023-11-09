@@ -17,8 +17,8 @@ from src.depends import Container
 async def start_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+    ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     if ext_user is not None:
@@ -65,7 +65,7 @@ async def start_command(
 async def confirm_chosen_categories(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     keyboard = get_confirm_keyboard()
     categories = await user_service.get_user_categories(update.effective_user.id)

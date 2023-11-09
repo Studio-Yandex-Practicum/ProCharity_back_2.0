@@ -20,7 +20,7 @@ log = structlog.get_logger()
 async def menu_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Возвращает в меню."""
     await context.bot.send_message(
@@ -35,7 +35,7 @@ async def menu_callback(
 async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
@@ -65,7 +65,9 @@ async def set_mailing(
 async def reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    unsubscribe_reason_service: UnsubscribeReasonService = Provide[Container.unsubscribe_reason_service],
+    unsubscribe_reason_service: UnsubscribeReasonService = Provide[
+        Container.bot_services_container.unsubscribe_reason_service
+    ],
 ):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]

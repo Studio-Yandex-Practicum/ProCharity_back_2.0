@@ -19,7 +19,9 @@ log = structlog.get_logger()
 @inject
 async def send_telegram_notification(
     notifications: TelegramNotificationUsersRequest,
-    telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
 ) -> InfoRate:
     """Отправляет сообщение указанной группе пользователей"""
     result = await telegram_notification_service.send_messages_to_group_of_users(notifications)
@@ -36,7 +38,9 @@ async def send_telegram_notification(
 @inject
 async def send_messages_to_group_of_users(
     message_list: MessageList,
-    telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
 ):
     await log.ainfo("Начало отправки сообщений для группы пользователей")
     rate = InfoRate()
@@ -56,7 +60,9 @@ async def send_messages_to_group_of_users(
 async def send_user_message(
     telegram_id: int,
     notifications: TelegramNotificationRequest,
-    telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
 ) -> InfoRate:
     rate = InfoRate()
     status, notifications.message = await telegram_notification_service.send_message_to_user(telegram_id, notifications)

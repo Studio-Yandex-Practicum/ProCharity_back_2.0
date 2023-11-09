@@ -10,9 +10,13 @@ log = structlog.get_logger()
 
 
 @inject
-async def check_header_contains_token(request: Request, settings: Settings = Depends(Provide[Container.settings])):
+async def check_header_contains_token(
+    request: Request,
+    settings: Settings = Depends(Provide[Container.settings_container.settings]),
+):
     """Проверяем, содержится ли в заголовке запроса token, и сравниваем его
     со значением ACCESS_TOKEN_FOR_PROCAHRITY из settings.py"""
+
     if not settings.ACCESS_TOKEN_FOR_PROCHARITY:
         await log.awarning(
             "ACCESS_TOKEN_FOR_PROCHARITY не определен, возможны проблемы безопасности. Проверьте настройки проекта."

@@ -12,8 +12,8 @@ from src.settings import Settings
 async def startup(
     fastapi_app: FastAPI,
     run_bot: bool,
-    bot: Application = Provide[Container.telegram_bot],
-    settings: Settings = Provide[Container.settings],
+    bot: Application = Provide[Container.applications_container.telegram_bot],
+    settings: Settings = Provide[Container.settings_container.settings],
 ):
     if settings.USE_NGROK is True:
         set_ngrok()
@@ -30,7 +30,7 @@ async def startup(
 async def shutdown(
     fastapi_app: FastAPI,
     run_bot: bool,
-    settings: Settings = Provide[Container.settings],
+    settings: Settings = Provide[Container.settings_container.settings],
 ):
     if run_bot:
         await shutdown_bot(
