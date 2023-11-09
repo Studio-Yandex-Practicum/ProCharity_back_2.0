@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from src.api.schemas import AllUsersStatistic
 from src.core.db.repository import UnsubscribeReasonRepository, UserRepository
