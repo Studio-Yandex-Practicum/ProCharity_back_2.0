@@ -1,4 +1,4 @@
-from src.api.schemas import ActiveTasks
+from src.api.schemas import ActiveTasks, DBStatus
 from src.api.services.health_check import HealthCheckService
 from src.core.db.repository import UserRepository
 
@@ -14,7 +14,12 @@ class AnalyticsService:
         return await self._user_repository.count_all()
 
     async def get_count_active_tasks(self) -> ActiveTasks:
-        data = await self._health_check_service.check_db_connection()
-        last_update = data["last_update"]
-        active_tasks = data["active_tasks"]
+        db_status: DBStatus = await self._health_check_service.check_db_connection()
+        if db_status["status"] is False:
+            tasks: ActiveTasks = {"last_update": "Unable to get last_update", "active_tasks": 0}
+            return tasks
+        last_update = db_status["last_update"]
+        if last_update is None:
+            last_update = "Unable to get last_update"
+        active_tasks = db_status["active_tasks"]
         return ActiveTasks(last_update=last_update, active_tasks=active_tasks)
