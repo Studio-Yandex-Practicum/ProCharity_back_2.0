@@ -1,3 +1,4 @@
+from src.api.schemas import ReasonCancelingStatistics
 from src.core.db.repository import UnsubscribeReasonRepository, UserRepository
 
 
@@ -15,6 +16,6 @@ class AnalyticsService:
     async def get_user_number(self) -> None:
         return await self._user_repository.count_all()
 
-    async def get_reason_cancelling_statistics(self) -> dict[str, int]:
+    async def get_reason_cancelling_statistics(self) -> ReasonCancelingStatistics:
         reasons_statistic_from_db = await self._unsubscribe_reason_repository.get_reason_cancelling_statistics()
-        return dict(reasons_statistic_from_db)
+        return ReasonCancelingStatistics(**dict(reasons_statistic_from_db), exclude_unset=True)
