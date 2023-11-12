@@ -18,4 +18,4 @@ class AnalyticsService:
 
     async def get_reason_cancelling_statistics(self) -> ReasonCancelingStatistics:
         reasons_statistic_from_db = await self._unsubscribe_reason_repository.get_reason_cancelling_statistics()
-        return ReasonCancelingStatistics(**dict(reasons_statistic_from_db), exclude_unset=True)
+        return ReasonCancelingStatistics(dict(reasons_statistic_from_db))
