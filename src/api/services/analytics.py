@@ -15,11 +15,7 @@ class AnalyticsService:
 
     async def get_count_active_tasks(self) -> ActiveTasks:
         db_status: DBStatus = await self._health_check_service.check_db_connection()
-        if db_status["status"] is False:
-            tasks: ActiveTasks = {"last_update": "Unable to get last_update", "active_tasks": 0}
-            return tasks
         last_update = db_status["last_update"]
-        if last_update is None:
+        if not (db_status["status"] or db_status["last_update"]):
             last_update = "Unable to get last_update"
-        active_tasks = db_status["active_tasks"]
-        return ActiveTasks(last_update=last_update, active_tasks=active_tasks)
+        return ActiveTasks(last_update=last_update, active_tasks=db_status["active_tasks"])
