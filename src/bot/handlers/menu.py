@@ -69,7 +69,7 @@ async def reason_handler(
 ):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
-    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason)
+    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
         f"рассылки по причине: {reason}"
