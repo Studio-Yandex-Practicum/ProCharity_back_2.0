@@ -2,8 +2,8 @@ import structlog
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, Request
 
+from src.core.depends.container import Container
 from src.core.exceptions import InvalidToken, TokenNotProvided
-from src.depends import Container
 from src.settings import Settings
 
 log = structlog.get_logger()

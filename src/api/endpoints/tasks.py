@@ -6,8 +6,8 @@ from src.api.schemas import TaskRequest, TaskResponse
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.core.db.models import Task
+from src.core.depends.container import Container
 from src.core.utils import display_tasks
-from src.depends import Container
 
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 

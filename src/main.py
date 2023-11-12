@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.depends import Container
+from src.core.depends.container import Container
 
 
 def main(run_bot: bool = True) -> FastAPI:

@@ -12,8 +12,8 @@ from src.bot.keyboards import (
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
+from src.core.depends.container import Container
 from src.core.logging.utils import logger_decor
-from src.depends import Container
 
 
 @logger_decor

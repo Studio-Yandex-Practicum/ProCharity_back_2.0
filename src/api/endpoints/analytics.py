@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from src.api.schemas import Analytic
 from src.api.services.analytics import AnalyticsService
-from src.depends import Container
+from src.core.depends.container import Container
 
 analytic_router = APIRouter()
 
