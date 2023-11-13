@@ -22,4 +22,4 @@ class UnsubscribeReasonRepository(AbstractRepository):
             func.count(UnsubscribeReason.unsubscribe_reason).label("count"),
         ).group_by(UnsubscribeReason.unsubscribe_reason)
         reasons = await self._session.execute(query)
-        return reasons.fetchall()
+        return reasons.all()

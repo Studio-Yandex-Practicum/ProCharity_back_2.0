@@ -256,13 +256,13 @@ class ExternalSiteUserRequest(RequestBase):
             raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
 
 
-class ReasonCancelingStatistics(TypedDict):
-    to_much_messages: NotRequired[int]
-    no_time: NotRequired[int]
-    no_match: NotRequired[int]
-    uncomfortable: NotRequired[int]
-    funds_dont_choose: NotRequired[int]
-    other: NotRequired[int]
+class ReasonCancelingStatistics(BaseModel):
+    to_much_messages: int = 0
+    no_time: int = 0
+    no_match: int = 0
+    uncomfortable: int = 0
+    funds_dont_choose: int = 0
+    other: int = 0
 
 
 class Analytic(BaseModel):
