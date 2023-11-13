@@ -256,12 +256,12 @@ class ExternalSiteUserRequest(RequestBase):
             raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
 
 
-class AllUsersStatistic(TypedDict):
+class AllUsersStatistic(BaseModel):
     """Класс ответа для подробной аналитики по пользователям."""
 
-    added_users: dict[str, int]
-    added_external_users: dict[str, int]
-    users_unsubscribed: dict[str, int]
+    added_users: dict[str, int] = {}
+    added_external_users: dict[str, int] = {}
+    users_unsubscribed: dict[str, int] = {}
 
 
 class Analytic(BaseModel):
@@ -270,7 +270,7 @@ class Analytic(BaseModel):
     command_stats: dict[str, str] = {}
     reasons_canceling: str = ""
     number_users: int = 0
-    all_users_statistic: AllUsersStatistic = {}
+    all_users_statistic: AllUsersStatistic
     active_users_statistic: dict[str, str] = {}
     tasks: dict[str, str] = {}
 

@@ -5,12 +5,12 @@ from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.constants import DATE_FORMAT_FOR_STATISTICS
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
 
 DatabaseModel = TypeVar("DatabaseModel")
 DATE_TIME_FORMAT_LAST_UPDATE = "YYYY-MM-DD HH24:MI:SS"
-DATE_FORMAT = "YYYY-MM-DD"
 
 
 class AbstractRepository(abc.ABC):
@@ -99,7 +99,7 @@ class AbstractRepository(abc.ABC):
         """
         column = self._model.__dict__[column_name]
         db_data = await self._session.execute(
-            select(func.to_char(column, DATE_FORMAT), func.count(column))
+            select(func.to_char(column, DATE_FORMAT_FOR_STATISTICS), func.count(column))
             .where(column >= date_begin, column <= date_limit)
             .group_by(column)
             .order_by(column)

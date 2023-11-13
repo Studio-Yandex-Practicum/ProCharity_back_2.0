@@ -50,7 +50,6 @@ dependency-injector = "^4.41.0"
 passlib = "^1.7.4"
 python-jose = "^3.3.0"
 fastapi-jwt = "^0.1.12"
-faker = "19.13.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -61,6 +60,7 @@ pyngrok = "^6.0.0"
 python-dotenv = "^1.0.0"
 pre-commit = "^3.3.2"
 gitpython = "^3.1.32"
+faker = "19.13.0"
 
 
 [build-system]
