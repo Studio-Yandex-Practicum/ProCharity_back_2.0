@@ -8,13 +8,12 @@ from src.core.db.repository import (
     UnsubscribeReasonRepository,
     UserRepository,
 )
-from src.core.depends.data_base_connection import DataBaseConnectionContainer
 
 
 class RepositoriesContainer(containers.DeclarativeContainer):
     """Контейнер зависимостей Repositories."""
 
-    data_base_connection = providers.Container(DataBaseConnectionContainer)
+    data_base_connection = providers.DependenciesContainer()
     user_repository = providers.Factory(
         UserRepository,
         session=data_base_connection.session,

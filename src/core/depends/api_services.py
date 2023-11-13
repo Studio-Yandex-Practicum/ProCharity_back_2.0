@@ -9,17 +9,14 @@ from src.api.services import (
     TaskService,
     TelegramNotificationService,
 )
-from src.core.depends.applications import ApplicationsContainer
-from src.core.depends.data_base_connection import DataBaseConnectionContainer
-from src.core.depends.repositories import RepositoriesContainer
 
 
 class APIServicesContainer(containers.DeclarativeContainer):
     """Контейнер зависимостей API Service."""
 
-    repositories = providers.Container(RepositoriesContainer)
-    data_base_connection = providers.Container(DataBaseConnectionContainer)
-    applications = providers.Container(ApplicationsContainer)
+    repositories = providers.DependenciesContainer()
+    data_base_connection = providers.DependenciesContainer()
+    applications = providers.DependenciesContainer()
     admin_service = providers.Factory(
         AdminService,
         admin_repository=repositories.admin_repository,

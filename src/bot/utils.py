@@ -31,7 +31,7 @@ def delete_previous_message(
 def get_connection_url(
     telegram_id: int,
     external_id: int = None,
-    settings: Settings = Provide[Container.settings_container.settings],
+    settings: Settings = Provide[Container.settings],
 ) -> str:
     """Получение ссылки для связи аккаунта с ботом по external_id и telegram_id.
     В случае отсутствия external_id возвращает ссылку на страницу авторизации"""

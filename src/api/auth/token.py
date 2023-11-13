@@ -12,7 +12,7 @@ log = structlog.get_logger()
 @inject
 async def check_header_contains_token(
     request: Request,
-    settings: Settings = Depends(Provide[Container.settings_container.settings]),
+    settings: Settings = Depends(Provide[Container.settings]),
 ):
     """Проверяем, содержится ли в заголовке запроса token, и сравниваем его
     со значением ACCESS_TOKEN_FOR_PROCAHRITY из settings.py"""
