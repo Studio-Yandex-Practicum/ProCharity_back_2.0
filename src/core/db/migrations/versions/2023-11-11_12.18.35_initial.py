@@ -43,27 +43,27 @@ def upgrade() -> None:
         )
     else:
         op.alter_column('users', 'date_registration', new_column_name='created_at')
-        op.alter_column('users', 'external_signup_date', new_column_name='updated_at')
+        op.add_column('users', sa.Column('updated_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
         op.add_column('users', sa.Column('id', sa.Integer()))
         op.execute("CREATE SEQUENCE users_id_seq")
         op.execute("UPDATE users SET id = nextval('users_id_seq')")
         op.alter_column('users', 'id', nullable=False)
         op.create_unique_constraint('users_id_key', 'users', ['id'])
 
-    if not inspector.has_table('admin_token_requests'):
-        op.create_table('admin_token_requests',
-            sa.Column('email', sa.String(length=48), nullable=False),
-            sa.Column('token', sa.String(length=128), nullable=False),
-            sa.Column('token_expiration_date', sa.Date(), nullable=False),
-            sa.Column('id', sa.Integer(), nullable=False),
-            sa.Column('created_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-            sa.Column('updated_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-            sa.PrimaryKeyConstraint('id'),
-            sa.UniqueConstraint('email')
-        )
-    else:
-        op.add_column('admin_token_requests', sa.Column('created_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
-        op.add_column('admin_token_requests', sa.Column('updated_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
+    # if not inspector.has_table('admin_token_requests'):
+    #     op.create_table('admin_token_requests',
+    #         sa.Column('email', sa.String(length=48), nullable=False),
+    #         sa.Column('token', sa.String(length=128), nullable=False),
+    #         sa.Column('token_expiration_date', sa.Date(), nullable=False),
+    #         sa.Column('id', sa.Integer(), nullable=False),
+    #         sa.Column('created_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    #         sa.Column('updated_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    #         sa.PrimaryKeyConstraint('id'),
+    #         sa.UniqueConstraint('email')
+    #     )
+    # else:
+    #     op.add_column('admin_token_requests', sa.Column('created_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
+    #     op.add_column('admin_token_requests', sa.Column('updated_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
 
 
     if not inspector.has_table('admin_users'):
@@ -134,6 +134,9 @@ def upgrade() -> None:
             sa.Column('sent_by', sa.String(length=48)),
             sa.PrimaryKeyConstraint('id')
         )
+    else:
+        op.add_column('notifications', sa.Column('created_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
+        op.add_column('notifications', sa.Column('updated_at', sa.Date(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False))
   
     if not inspector.has_table('reasons_canceling') and not inspector.has_table('unsubscribe_reason'):
         op.create_table(
@@ -154,15 +157,15 @@ def upgrade() -> None:
         op.alter_column('unsubscribe_reason', 'updated_date', new_column_name='updated_at')
         op.add_column('unsubscribe_reason', sa.Column("user_id", sa.Integer(), sa.ForeignKey("users.id"), nullable=True))
 
-    if not inspector.has_table('statistics'):
-        op.create_table(
-            'statistics',
-            sa.Column('id', sa.Integer(), nullable=False),
-            sa.Column('telegram_id', sa.BigInteger()),
-            sa.Column('command', sa.String(length=100)),
-            sa.Column('added_date', sa.TIMESTAMP(), nullable=False, server_default=sa.func.current_timestamp()),
-            sa.PrimaryKeyConstraint('id')
-        )
+    # if not inspector.has_table('statistics'):
+    #     op.create_table(
+    #         'statistics',
+    #         sa.Column('id', sa.Integer(), nullable=False),
+    #         sa.Column('telegram_id', sa.BigInteger()),
+    #         sa.Column('command', sa.String(length=100)),
+    #         sa.Column('added_date', sa.TIMESTAMP(), nullable=False, server_default=sa.func.current_timestamp()),
+    #         sa.PrimaryKeyConstraint('id')
+    #     )
 
     if not inspector.has_table('tasks'):
         op.create_table(

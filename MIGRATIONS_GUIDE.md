@@ -2,23 +2,6 @@
 
 Этот README-файл содержит инструкции по восстановлению базы данных из дампа и применению миграций с использованием Docker и Alembic.
 
-## Шаги по восстановлению базы данных
-
-1. Запустите Docker-контейнер с PostgreSQL.
-
-2. Создайте пользователя procharity:
-
-   ```
-   docker exec -it infra-postgres-1 psql -U postgres -d procharity_back_db_local -c "CREATE ROLE procharity;"
-   ```
-
-3. Предоставьте пользователю procharity права доступа к базе данных procharity_back_db_local:
-
-   ```
-   docker exec -it infra-postgres-1 psql -U postgres -d procharity_back_db_local -c "GRANT ALL PRIVILEGES ON DATABASE procharity_back_db_local TO procharity;"
-   ```
-   > Если БД не создана docker exec -it infra-postgres-1 psql -U postgres -d procharity_back_db_local -c "CREATE DATABASE procharity_back_db_local;"
-
 
 ## Шаги по восстановлению данных из дампа
 
