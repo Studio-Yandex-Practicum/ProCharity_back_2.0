@@ -24,7 +24,7 @@
    ```
    docker exec -it infra-postgres-1 psql -U postgres -d procharity_back_db_local -c "DROP TABLE alembic_version;"
    ```
-   
+
 
 2. Примените миграции с помощью Alembic:
 
