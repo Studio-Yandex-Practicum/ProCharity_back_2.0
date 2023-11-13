@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from src.api.constants import DAYS_NUMBER
-from src.api.schemas import AllUsersStatistic
 from src.core.db.repository import UnsubscribeReasonRepository, UserRepository
 
 
@@ -9,13 +8,12 @@ class AnalyticsService:
     """Сервис для работы с моделью Analytics."""
 
     def __init__(
-            self,
-            user_repository: UserRepository,
-            unsubscribe_reason_repository: UnsubscribeReasonRepository,
+        self,
+        user_repository: UserRepository,
+        unsubscribe_reason_repository: UnsubscribeReasonRepository,
     ) -> None:
         self._user_repository: UserRepository = user_repository
-        self._unsubscribe_reason_repository: UnsubscribeReasonRepository = (
-            unsubscribe_reason_repository)
+        self._unsubscribe_reason_repository: UnsubscribeReasonRepository = unsubscribe_reason_repository
 
     async def get_user_number(self) -> None:
         return await self._user_repository.count_all()
@@ -37,10 +35,3 @@ class AnalyticsService:
         users_unsubscribed = await self._unsubscribe_reason_repository.get_statistics_by_days(
             date_begin, date_limit, 'created_at')
         return users_unsubscribed
-
-    # async def get_all_users_statistic(self, date_limit) -> AllUsersStatistic:
-    #     date_begin = date_limit - timedelta(days=DAYS_NUMBER - 1)
-
-    #     return {'added_users': added_users,
-    #             'added_external_users': added_external_users,
-    #             'users_unsubscribed': users_unsubscribed}
