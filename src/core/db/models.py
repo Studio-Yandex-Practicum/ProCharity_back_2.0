@@ -156,6 +156,7 @@ class UnsubscribeReason(Base):
     def __repr__(self):
         return f"<Unsubscribe reason: {self.unsubscribe_reason} for user {self.user}>"
 
+
 class Notification(Base):
     """Модель уведомления."""
 
