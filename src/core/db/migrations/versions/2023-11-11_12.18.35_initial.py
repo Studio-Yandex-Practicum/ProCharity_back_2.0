@@ -190,6 +190,8 @@ def upgrade() -> None:
             sa.Column("category_id", sa.Integer(), sa.ForeignKey("categories.id"), primary_key=True),
             sa.Column("user_id", sa.Integer(), sa.ForeignKey("users.id"), primary_key=True),
             sa.Column("telegram_id", sa.BigInteger()),
+            sa.Column("created_at", sa.TIMESTAMP(), nullable=False, server_default=sa.func.current_timestamp()),
+            sa.Column("updated_at", sa.TIMESTAMP(), nullable=False, server_default=sa.func.current_timestamp()),
         )
     else:
         op.add_column("users_categories", sa.Column("user_id", sa.Integer()))
@@ -200,6 +202,14 @@ def upgrade() -> None:
         op.drop_constraint("users_categories_telegram_id_fkey", "users_categories", type_="foreignkey")
         op.drop_constraint("users_pkey", "users", type_="primary")
         op.create_primary_key("users_pkey", "users", ["id"])
+        op.add_column(
+            "users_categories",
+            sa.Column("created_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        )
+        op.add_column(
+            "users_categories",
+            sa.Column("updated_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
+        )
 
 
 def downgrade() -> None:
