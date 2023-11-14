@@ -4,6 +4,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands
+from src.bot.constants.urls import TEST_PROCHARITY_URL
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
@@ -51,7 +52,7 @@ async def start_command(
     )
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text='Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
+        text=f'Я бот платформы интеллектуального волонтерства <a href="{TEST_PROCHARITY_URL}">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,

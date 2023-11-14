@@ -1,6 +1,7 @@
 import sys
 from functools import wraps
 
+from src.bot.constants.urls import HELP_PROCHARITY_URL
 from src.settings import settings
 
 TASK_DEADLINE_FORMAT = "%d.%m.%y"
@@ -8,7 +9,7 @@ TASK_DEADLINE_FORMAT = "%d.%m.%y"
 
 def display_tasks(task):
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
-    bonus_link = "https://help.procharity.ru/article/10053"
+    bonus_link = f"{HELP_PROCHARITY_URL}article/10053"
     return (
         f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}\n\n"
@@ -21,7 +22,7 @@ def display_tasks(task):
 
 def display_task_verbosely(task):
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
-    bonus_link = "https://help.procharity.ru/article/10053"
+    bonus_link = f"{HELP_PROCHARITY_URL}article/10053"
     return (
         f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}, {task.location}\n\n"

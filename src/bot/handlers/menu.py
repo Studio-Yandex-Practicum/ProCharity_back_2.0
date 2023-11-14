@@ -5,6 +5,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands, enum, patterns
+from src.bot.constants.urls import TEST_PROCHARITY_URL, YA_PRAKTIKUM_URL
 from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
@@ -47,7 +48,7 @@ async def set_mailing(
     else:
         text = (
             "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-            '<a href="https://procharity.ru">ProCharity</a>.\n\n'
+            f'<a href="{TEST_PROCHARITY_URL}">ProCharity</a>.\n\n'
             "Поделись, пожалуйста, почему ты решил отписаться?"
         )
         keyboard = get_no_mailing_keyboard()
@@ -91,7 +92,7 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
         "время и профессиональные навыки, позволяя решать задачи, "
         "которые трудно закрыть силами штатных сотрудников.\n\n"
-        'Сделано студентами <a href="https://praktikum.yandex.ru/">Яндекс.Практикума.</a>',
+        f'Сделано студентами <a href="{YA_PRAKTIKUM_URL}">Яндекс.Практикума.</a>',
         reply_markup=await get_back_menu(),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
