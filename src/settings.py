@@ -5,8 +5,6 @@ from urllib.parse import urljoin
 from pydantic import EmailStr, validator
 from pydantic_settings import BaseSettings
 
-from src.bot.constants.urls import TEST_PROCHARITY_URL
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -79,11 +77,14 @@ class Settings(BaseSettings):
     COMMIT_DATE: str = ""
     TAGS: list[str] = []
 
+    # URLs проекта Procharity
+    PROCHARITY_URL: str
+    YA_PRAKTIKUM_URL: str
+    HELP_PROCHARITY_URL: str
+
     # Для связи аккаунта с ботом
-    PROCHARITY_URL_AUTH: str = f"{TEST_PROCHARITY_URL}auth/"
-    PROCHARITY_URL_USER: str = (
-        f"{TEST_PROCHARITY_URL}auth/bot_procharity.php?user_id={{external_id}}&telegram_id={{telegram_id}}"
-    )
+    PROCHARITY_URL_AUTH: str
+    PROCHARITY_URL_USER: str
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:

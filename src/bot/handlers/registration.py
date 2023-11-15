@@ -4,13 +4,13 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands
-from src.bot.constants.urls import TEST_PROCHARITY_URL
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
 from src.core.logging.utils import logger_decor
 from src.depends import Container
+from src.settings import Settings
 
 
 @logger_decor
@@ -20,6 +20,7 @@ async def start_command(
     context: ContextTypes.DEFAULT_TYPE,
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_user_service],
+    settings: Settings = Provide[Container.settings],
 ):
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     if ext_user is not None:
@@ -52,7 +53,7 @@ async def start_command(
     )
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text=f'Я бот платформы интеллектуального волонтерства <a href="{TEST_PROCHARITY_URL}">ProCharity</a>. '
+        text=f'Я бот платформы интеллектуального волонтерства <a href="{settings.PROCHARITY_URL}">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
