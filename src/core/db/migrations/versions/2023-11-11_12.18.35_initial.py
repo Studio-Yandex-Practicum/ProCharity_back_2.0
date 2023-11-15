@@ -74,6 +74,7 @@ def upgrade() -> None:
             "admin_users",
             sa.Column("updated_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
         )
+        op.alter_column("admin_users", "last_logon", new_column_name="last_login")
 
     if not inspector.has_table("categories"):
         op.create_table(
