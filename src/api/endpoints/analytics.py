@@ -24,7 +24,7 @@ async def get_analytics(
             added_external_users=await analytic_service.get_added_external_users_statistic(date_limit),
             users_unsubscribed=await analytic_service.get_unsubscribed_users_statistic(date_limit),
         ),
-        tasks=await get_active_tasks_analytic()
+        tasks=await get_active_tasks_analytic(),
     )
 
 
