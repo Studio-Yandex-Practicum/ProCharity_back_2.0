@@ -20,7 +20,9 @@ class AnalyticsService:
 
     async def get_added_users_statistic(self, date_limit) -> dict[str, int]:
         date_begin = date_limit - timedelta(days=DAYS_NUMBER_FOR_USERS_STATISTIC - 1)
-        added_users = await self._user_repository.get_statistics_by_days(date_begin, date_limit, "created_at")
+        added_users = await self._user_repository.get_statistics_by_days(
+            date_begin, date_limit, "created_at"
+        )
         return added_users
 
     async def get_added_external_users_statistic(self, date_limit) -> dict[str, int]:
