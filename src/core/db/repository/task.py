@@ -30,7 +30,7 @@ class TaskRepository(ContentRepository):
     async def get_all_user_tasks(self) -> list[Task]:
         """Получить список задач из категорий на которые подписан пользователь."""
         all_tasks = await self._session.execute(select(Task).options(joinedload(Task.category)))
-        return List[Task](all_tasks.scalars().all())
+        return list(all_tasks.scalars().all())
 
     async def get_tasks_limit_for_user(self, limit: int, offset: int, user: User) -> list[Task]:
         """Получить limit-выборку из списка всех задач пользователя."""
