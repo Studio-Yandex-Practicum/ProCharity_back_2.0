@@ -34,5 +34,6 @@ def get_connection_url(
     """Получение ссылки для связи аккаунта с ботом по external_id и telegram_id.
     В случае отсутствия external_id возвращает ссылку на страницу авторизации"""
     if external_id:
-        return settings.PROCHARITY_URL_USER.format(external_id=external_id, telegram_id=telegram_id)
-    return settings.PROCHARITY_URL_AUTH
+        # return settings.PROCHARITY_URL_USER.format(external_id=external_id, telegram_id=telegram_id)
+        return f"{settings.PROCHARITY_URL}auth/bot_procharity.php?user_id={external_id}&telegram_id={telegram_id}"
+    return f"{settings.PROCHARITY_URL}auth/"

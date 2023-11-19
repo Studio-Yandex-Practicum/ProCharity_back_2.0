@@ -1,11 +1,14 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 from urllib.parse import urljoin
 
-from pydantic import EmailStr, validator
+from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, validator
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+Url = Annotated[str, BeforeValidator(lambda value: str(TypeAdapter(AnyHttpUrl).validate_python(value)))]
 
 
 @lru_cache
@@ -78,13 +81,9 @@ class Settings(BaseSettings):
     TAGS: list[str] = []
 
     # URLs проекта Procharity
-    PROCHARITY_URL: str
-    YA_PRAKTIKUM_URL: str
-    HELP_PROCHARITY_URL: str
-
-    # Для связи аккаунта с ботом
-    PROCHARITY_URL_AUTH: str
-    PROCHARITY_URL_USER: str
+    PROCHARITY_URL: Url = "https://procharity.ru"
+    YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
+    HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:

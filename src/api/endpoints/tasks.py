@@ -19,7 +19,7 @@ async def actualize_tasks(
     tasks: list[TaskRequest],
     task_service: TaskService = Depends(Provide[Container.task_service]),
     telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
-    settings: Settings = Depends(Provide[Container.task_service]),
+    settings: Settings = Provide(Container.settings),
 ) -> None:
     new_tasks_ids = await task_service.actualize_objects(tasks, Task)
     new_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids)
