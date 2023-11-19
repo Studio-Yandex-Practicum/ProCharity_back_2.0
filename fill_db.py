@@ -4,11 +4,12 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from random import choice, choices, randint
 
+from faker import Faker
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.core.db import get_session
-from src.core.db.models import Category, Task
+from src.core.db.models import Category, Task, UnsubscribeReason, User
 
 CHARACTERS = string.ascii_uppercase + string.digits
 
@@ -153,6 +154,14 @@ TEST_TASKS = [
         ],
     },
 ]
+TEST_UNSUBSCRIBE_REASON = [
+    "Нехватка времени",
+    "Переезд",
+    "Большая загруженность",
+    "Отсутствие мотивации",
+    "Другое",
+]
+USERS_TABLE_ROWS = 30
 
 
 async def get_task_name_by_id(category_id):
@@ -224,11 +233,61 @@ async def filling_task_in_db(
             await session.commit()
 
 
+async def filling_user_in_db(
+    session: async_sessionmaker[AsyncSession],
+) -> None:
+    """Filling the database with test data: Users.
+    The fields telegram_id, username, email, external_id, first_name,
+    last_name, has_mailing, external_signup_date, banned.
+    """
+    user_fake = Faker(locale="ru_RU")
+    external_id_fake = Faker()
+    days_period = 90
+    for id in range(1, USERS_TABLE_ROWS + 1):
+        email = choice([None, user_fake.unique.email()])
+        external_id = choice([None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
+        created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
+        user = User(
+            telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
+            username=user_fake.unique.user_name(),
+            email=email,
+            external_id=external_id,
+            first_name=user_fake.first_name(),
+            last_name=user_fake.last_name(),
+            has_mailing=False if email is None else True,
+            external_signup_date=None if external_id is None else created_at,
+            banned=user_fake.boolean(),
+            id=id,
+            created_at=created_at,
+        )
+        session.add(user)
+    await session.commit()
+
+
+async def filling_unsubscribe_reason_in_db(
+    session: async_sessionmaker[AsyncSession],
+) -> None:
+    """Filling the database with test data: UnsubscribeReason.
+    The fields telegram_id, username, email, external_id, first_name,
+    last_name, has_mailing, external_signup_date, banned.
+    """
+    user_fake = Faker()
+    days_period = 60
+    for _ in range(1, int(USERS_TABLE_ROWS / 3) + 1):
+        unsubscribe_reason = UnsubscribeReason(
+            user_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
+            unsubscribe_reason=choice(TEST_UNSUBSCRIBE_REASON),
+            created_at=user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now()),
+        )
+        session.add(unsubscribe_reason)
+    await session.commit()
+
+
 async def delete_all_data(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
     """The function deletes data from the tables Category, Tasks."""
-    await session.execute(text("""TRUNCATE TABLE tasks, categories CASCADE"""))
+    await session.execute(text("""TRUNCATE TABLE tasks, categories, unsubscribe_reason, users CASCADE"""))
     await session.commit()
 
 
@@ -239,6 +298,8 @@ async def run():
         await filling_category_in_db(session)
         await filling_subcategory_in_db(session)
         await filling_task_in_db(session)
+        await filling_user_in_db(session)
+        await filling_unsubscribe_reason_in_db(session)
         print("Тестовые данные загружены в БД.")
 
 

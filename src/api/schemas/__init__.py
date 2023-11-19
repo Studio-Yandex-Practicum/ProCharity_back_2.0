@@ -1,5 +1,5 @@
 from .admin import AdminUserRequest
-from .analytics import ActiveTasks, Analytic
+from .analytics import ActiveTasks, AllUsersStatistic, Analytic
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
 from .external_site_user import ExternalSiteUser, ExternalSiteUserRequest
@@ -19,6 +19,7 @@ from .tasks import TaskRequest, TaskResponse
 __all__ = (
     "ActiveTasks",
     "AdminUserRequest",
+    "AllUsersStatistic",
     "Analytic",
     "RequestBase",
     "ResponseBase",
