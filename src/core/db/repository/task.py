@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -23,32 +25,35 @@ class TaskRepository(ContentRepository):
             .limit(limit)
             .offset(offset)
         )
-        return tasks.scalars().all()
+        return list(tasks.scalars().all())
 
     async def get_all_user_tasks(self) -> list[Task]:
         """Получить список задач из категорий на которые подписан пользователь."""
-        return await self._session.scalars(select(Task).options(joinedload(Task.category)))
+        all_tasks = await self._session.execute(select(Task).options(joinedload(Task.category)))
+        return List[Task](all_tasks.scalars().all())
 
     async def get_tasks_limit_for_user(self, limit: int, offset: int, user: User) -> list[Task]:
         """Получить limit-выборку из списка всех задач пользователя."""
-        return await self._session.scalars(
+        task_limit_for_user = await self._session.execute(
             select(Task)
             .join(Category)
             .options(joinedload(Task.category))
             .where(Category.users.any(id=user.id))
             .where(Task.is_archived == false())
             .limit(limit)
-            .offset(offset)
-        )
+            .offset(offset))
+
+        return list(task_limit_for_user.scalars().all())
 
     async def get_user_tasks_count(self, user: User) -> int:
         """Получить общее количество задач для пользователя."""
-        return await self._session.scalar(
+        user_tasks_count =  await self._session.execute(
             select(func.count(Task.id))
             .join(Category)
             .where(Category.users.any(id=user.id))
-            .where(Task.is_archived == false())
-        )
+            .where(Task.is_archived == false()))
+
+        return user_tasks_count.scalar()
 
     async def get_user_task_id(self, task_id) -> list[Task]:
         """Получить задачу по id из категорий на которые подписан пользователь."""
@@ -58,4 +63,4 @@ class TaskRepository(ContentRepository):
     async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
         """Получить список задач по ids из категорий на которые подписан пользователь."""
         tasks = await self._session.execute(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
-        return tasks.scalars().all()
+        return list(tasks.scalars().all())

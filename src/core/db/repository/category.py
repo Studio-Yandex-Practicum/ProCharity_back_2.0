@@ -12,9 +12,10 @@ class CategoryRepository(ContentRepository):
         super().__init__(session, Category)
 
     async def get_unarchived_subcategories(self, parent_id: int) -> list[Category]:
-        return await self._session.scalars(
+        unarchived_subcategories = await self._session.execute(
             select(Category).where(Category.is_archived == false()).where(Category.parent_id == parent_id)
         )
+        return list(unarchived_subcategories.scalars().all())
 
     async def get_unarchived_parents_with_children_count(self):
         parent_and_children_count_subquery = (

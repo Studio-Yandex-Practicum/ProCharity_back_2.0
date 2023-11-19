@@ -63,7 +63,7 @@ class AbstractRepository(abc.ABC):
     async def get_all(self) -> list[DatabaseModel]:
         """Возвращает все объекты модели из базы данных."""
         objects = await self._session.execute(select(self._model))
-        return objects.scalars().all()
+        return list(objects.scalars().all())
 
     @auto_commit
     async def create_all(self, objects: list[DatabaseModel]) -> None:
@@ -106,5 +106,5 @@ class ContentRepository(AbstractRepository, abc.ABC):
 
     async def get_by_ids(self, ids: list[int]) -> list[int]:
         """Возвращает id объектов модели из базы данных по указанным ids"""
-        filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
-        return filtered_ids.all()
+        filtered_ids = await self._session.execute(select(self._model.id).where(self._model.id.in_(ids)))
+        return [row[0] for row in filtered_ids.all()]

@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 from src.core.db.models import Category, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
 from src.core.utils import auto_commit
+from typing import List
 
 
 class UserRepository(AbstractRepository):
@@ -56,7 +57,8 @@ class UserRepository(AbstractRepository):
 
     async def get_user_categories(self, user: User) -> list[Category]:
         """Возвращает список категорий пользователя."""
-        return await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))
+        user_categories = await self._session.execute(select(Category).join(User.categories).where(User.id == user.id))
+        return list(user_categories.scalars().all())
 
     async def set_mailing(self, user: User, has_mailing: bool) -> None:
         """
