@@ -3,7 +3,7 @@ from datetime import date
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query
 
-from src.api.schemas import ActiveTasks, AllUsersStatistic, Analytic, DBStatus
+from src.api.schemas import ActiveTasks, AllUsersStatistic, Analytic, DBStatus, ReasonCancelingStatistics
 from src.api.services.analytics import AnalyticsService
 from src.api.services.health_check import HealthCheckService
 from src.depends import Container
@@ -19,6 +19,7 @@ async def get_analytics(
 ) -> Analytic:
     return Analytic(
         number_users=await analytic_service.get_user_number(),
+        reasons_canceling=ReasonCancelingStatistics(**await analytic_service.get_reason_cancelling_statistics()),
         all_users_statistic=AllUsersStatistic(
             added_users=await analytic_service.get_added_users_statistic(date_limit),
             added_external_users=await analytic_service.get_added_external_users_statistic(date_limit),

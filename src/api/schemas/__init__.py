@@ -1,5 +1,5 @@
 from .admin import AdminUserRequest
-from .analytics import ActiveTasks, AllUsersStatistic, Analytic
+from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCancelingStatistics
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
 from .external_site_user import ExternalSiteUser, ExternalSiteUserRequest
@@ -36,6 +36,7 @@ __all__ = (
     "InfoRate",
     "Message",
     "MessageList",
+    "ReasonCancelingStatistics",
     "TelegramNotificationRequest",
     "TelegramNotificationUsersGroups",
     "TelegramNotificationUsersRequest",
