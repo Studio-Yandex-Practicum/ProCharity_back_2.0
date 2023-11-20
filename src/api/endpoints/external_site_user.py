@@ -9,7 +9,7 @@ from src.core.depends import Container
 site_user_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
-@site_user_router.post("/", description="Актуализирует пользователя с сайта ProCharity.")
+@site_user_router.post("/external_user_registration/", description="Актуализирует пользователя с сайта ProCharity.")
 @inject
 async def external_user_registration(
     site_user: ExternalSiteUserRequest,
