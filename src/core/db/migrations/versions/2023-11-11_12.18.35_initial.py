@@ -21,6 +21,7 @@ def column_exists(table_name, column_name):
     columns = insp.get_columns(table_name)
     return any(c["name"] == column_name for c in columns)
 
+
 def upgrade() -> None:
     connection = op.get_bind()
     inspector = sa.inspect(connection)
@@ -47,7 +48,7 @@ def upgrade() -> None:
             sa.UniqueConstraint("username"),
         )
     else:
-        if column_exists('users', 'date_registration'):
+        if column_exists("users", "date_registration"):
             op.alter_column("users", "date_registration", new_column_name="created_at")
             op.add_column(
                 "users", sa.Column("updated_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False)
@@ -73,17 +74,17 @@ def upgrade() -> None:
             sa.UniqueConstraint("email"),
         )
     else:
-        if not column_exists('admin_users', 'created_at'):
+        if not column_exists("admin_users", "created_at"):
             op.add_column(
                 "admin_users",
                 sa.Column("created_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
-            )  
+            )
             op.add_column(
                 "admin_users",
                 sa.Column("updated_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
             )
             op.alter_column("admin_users", "last_logon", new_column_name="last_login")
-        if column_exists('admin_users', 'password'):
+        if column_exists("admin_users", "password"):
             op.alter_column("admin_users", "password", new_column_name="hashed_password")
 
     if not inspector.has_table("categories"):
@@ -102,7 +103,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
     else:
-        if not column_exists('categories', 'created_at'):
+        if not column_exists("categories", "created_at"):
             op.add_column(
                 "categories",
                 sa.Column("created_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
@@ -129,10 +130,10 @@ def upgrade() -> None:
             sa.UniqueConstraint("email"),
         )
     else:
-        if column_exists('external_site_users', 'external_id'):
+        if column_exists("external_site_users", "external_id"):
             op.alter_column("external_site_users", "external_id", new_column_name="id")
             op.alter_column("external_site_users", "external_id_hash", new_column_name="id_hash")
-            op.alter_column("external_site_users", "created_date", new_column_name="created_at")       
+            op.alter_column("external_site_users", "created_date", new_column_name="created_at")
             op.alter_column("external_site_users", "updated_date", new_column_name="updated_at")
 
     if not inspector.has_table("notifications"):
@@ -146,7 +147,7 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint("id"),
         )
     else:
-        if not column_exists('notifications', 'created_at'):
+        if not column_exists("notifications", "created_at"):
             op.add_column(
                 "notifications",
                 sa.Column("created_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
@@ -195,7 +196,7 @@ def upgrade() -> None:
             sa.Column("updated_at", sa.TIMESTAMP(), nullable=False, server_default=sa.func.current_timestamp()),
         )
     else:
-        if column_exists('tasks', 'created_date'):
+        if column_exists("tasks", "created_date"):
             op.alter_column("tasks", "created_date", new_column_name="created_at")
             op.alter_column("tasks", "updated_date", new_column_name="updated_at")
             op.alter_column("tasks", "archive", new_column_name="is_archived")
@@ -210,7 +211,7 @@ def upgrade() -> None:
             sa.Column("updated_at", sa.TIMESTAMP(), nullable=False, server_default=sa.func.current_timestamp()),
         )
     else:
-        if not column_exists('users_categories', 'user_id'):
+        if not column_exists("users_categories", "user_id"):
             op.add_column("users_categories", sa.Column("user_id", sa.Integer()))
             op.execute(
                 "UPDATE users_categories SET user_id = users.id FROM users WHERE users_categories.telegram_id = users.telegram_id"
