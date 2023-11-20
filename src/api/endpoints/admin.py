@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 
 from src.api.schemas import AdminUserRequest
 from src.api.services.admin_service import AdminService
-from src.core.depends.container import Container
+from src.core.depends import Container
 
 admin_user_router = APIRouter()
 

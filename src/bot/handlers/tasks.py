@@ -7,7 +7,7 @@ from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_back_menu, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
-from src.core.depends.container import Container
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.utils import display_task_verbosely, display_tasks
 

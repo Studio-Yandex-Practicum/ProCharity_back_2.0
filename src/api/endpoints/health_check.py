@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from src.api.auth import check_header_contains_token
 from src.api.schemas import HealthCheck
 from src.api.services.health_check import HealthCheckService
-from src.core.depends.container import Container
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 
 health_check_router = APIRouter(dependencies=[Depends(check_header_contains_token)])

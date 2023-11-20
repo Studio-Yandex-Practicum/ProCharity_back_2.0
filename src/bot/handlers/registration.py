@@ -8,7 +8,7 @@ from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
-from src.core.depends.container import Container
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 
 

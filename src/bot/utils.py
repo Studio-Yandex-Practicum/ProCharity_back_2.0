@@ -5,7 +5,7 @@ from typing import ParamSpec, TypeVar
 from dependency_injector.wiring import Provide
 from telegram import Update
 
-from src.core.depends.container import Container
+from src.core.depends import Container
 from src.settings import Settings
 
 ReturnType = TypeVar("ReturnType")

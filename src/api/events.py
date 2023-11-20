@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from telegram.ext import Application
 
 from src.bot import shutdown_bot, startup_bot
-from src.core.depends.container import Container
+from src.core.depends import Container
 from src.core.utils import set_ngrok
 from src.settings import Settings
 

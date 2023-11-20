@@ -4,12 +4,13 @@ from fastapi import FastAPI
 from src.api.main import init_fastapi
 from src.bot import create_bot
 from src.bot.main import init_bot
+from src.settings import Settings
 
 
 class ApplicationsContainer(containers.DeclarativeContainer):
     """Контейнер зависимостей Applications."""
 
-    settings = providers.Dependency()
+    settings = providers.Dependency(instance_of=Settings)
     telegram_bot = providers.Singleton(
         init_bot,
         telegram_bot=providers.Singleton(

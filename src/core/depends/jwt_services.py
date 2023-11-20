@@ -3,11 +3,13 @@ from datetime import timedelta
 from dependency_injector import containers, providers
 from fastapi_jwt import JwtAccessBearerCookie, JwtRefreshBearer
 
+from src.settings import Settings
+
 
 class JWTServicesContainer(containers.DeclarativeContainer):
     """Контейнер зависимостей JWT services."""
 
-    settings = providers.Dependency()
+    settings = providers.Dependency(instance_of=Settings)
     access_security = providers.Factory(
         JwtAccessBearerCookie,
         secret_key=settings.provided.SECRET_KEY,
