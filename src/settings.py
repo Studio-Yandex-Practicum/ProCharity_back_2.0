@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated
 from urllib.parse import urljoin
 
-from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, validator
+from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, field_validator, validator
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,6 +84,14 @@ class Settings(BaseSettings):
     PROCHARITY_URL: Url = "https://procharity.ru"
     YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
+
+    @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
+    def check_last_slash_url(cls, v) -> str:
+        """Кастомный валидатор-добавлятор последнего слэша в константе URL."""
+
+        if v[-1] != "/":
+            return urljoin(v, "/")
+        return v
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:
