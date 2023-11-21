@@ -7,11 +7,11 @@ from .jwt_services import JWTServicesContainer
 from .repositories import RepositoriesContainer
 
 __all__ = (
-    APIServicesContainer,
-    ApplicationsContainer,
-    BotServicesContainer,
-    Container,
-    DataBaseConnectionContainer,
-    JWTServicesContainer,
-    RepositoriesContainer,
+    "APIServicesContainer",
+    "ApplicationsContainer",
+    "BotServicesContainer",
+    "Container",
+    "DataBaseConnectionContainer",
+    "JWTServicesContainer",
+    "RepositoriesContainer",
 )
