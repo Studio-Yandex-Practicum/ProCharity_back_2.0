@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -5,7 +7,6 @@ from sqlalchemy.orm import selectinload
 from src.core.db.models import Category, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
 from src.core.utils import auto_commit
-from typing import List
 
 
 class UserRepository(AbstractRepository):

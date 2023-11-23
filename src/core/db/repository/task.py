@@ -41,17 +41,19 @@ class TaskRepository(ContentRepository):
             .where(Category.users.any(id=user.id))
             .where(Task.is_archived == false())
             .limit(limit)
-            .offset(offset))
+            .offset(offset)
+        )
 
         return list(task_limit_for_user.scalars().all())
 
     async def get_user_tasks_count(self, user: User) -> int:
         """Получить общее количество задач для пользователя."""
-        user_tasks_count =  await self._session.execute(
+        user_tasks_count = await self._session.execute(
             select(func.count(Task.id))
             .join(Category)
             .where(Category.users.any(id=user.id))
-            .where(Task.is_archived == false()))
+            .where(Task.is_archived == false())
+        )
 
         return user_tasks_count.scalar()
 
