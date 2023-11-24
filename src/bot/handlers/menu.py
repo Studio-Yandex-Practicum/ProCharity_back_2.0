@@ -11,6 +11,7 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.logging.utils import logger_decor
 from src.depends import Container
+from src.settings import Settings
 
 log = structlog.get_logger()
 
@@ -36,6 +37,7 @@ async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_user_service],
+    settings: Settings = Provide[Container.settings],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
@@ -47,7 +49,7 @@ async def set_mailing(
     else:
         text = (
             "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-            '<a href="https://procharity.ru">ProCharity</a>.\n\n'
+            f'<a href="{settings.PROCHARITY_URL}">ProCharity</a>.\n\n'
             "Поделись, пожалуйста, почему ты решил отписаться?"
         )
         keyboard = get_no_mailing_keyboard()
@@ -83,7 +85,9 @@ async def reason_handler(
 
 @logger_decor
 @delete_previous_message
-async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def about_project(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, settings: Settings = Provide[Container.settings]
+):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="С ProCharity профессионалы могут помочь некоммерческим "
@@ -91,7 +95,7 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
         "время и профессиональные навыки, позволяя решать задачи, "
         "которые трудно закрыть силами штатных сотрудников.\n\n"
-        'Сделано студентами <a href="https://praktikum.yandex.ru/">Яндекс.Практикума.</a>',
+        f'Сделано студентами <a href="{settings.YA_PRAKTIKUM_URL}">Яндекс.Практикума.</a>',
         reply_markup=await get_back_menu(),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
