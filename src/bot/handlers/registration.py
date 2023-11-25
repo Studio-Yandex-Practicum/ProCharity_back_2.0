@@ -10,6 +10,7 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.settings import Settings
 
 
 @logger_decor
@@ -19,6 +20,7 @@ async def start_command(
     context: ContextTypes.DEFAULT_TYPE,
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    settings: Settings = Provide[Container.settings],
 ):
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     if ext_user is not None:
@@ -51,7 +53,7 @@ async def start_command(
     )
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text='Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
+        text=f'Я бот платформы интеллектуального волонтерства <a href="{settings.PROCHARITY_URL}">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,

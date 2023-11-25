@@ -1,11 +1,14 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 from urllib.parse import urljoin
 
-from pydantic import EmailStr, validator
+from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, field_validator, validator
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+Url = Annotated[str, BeforeValidator(lambda value: str(TypeAdapter(AnyHttpUrl).validate_python(value)))]
 
 
 @lru_cache
@@ -77,11 +80,18 @@ class Settings(BaseSettings):
     COMMIT_DATE: str = ""
     TAGS: list[str] = []
 
-    # Для связи аккаунта с ботом
-    PROCHARITY_URL_AUTH: str = "https://procharity.ru/auth/"
-    PROCHARITY_URL_USER: str = (
-        "https://procharity.ru/auth/bot_procharity.php?user_id={external_id}&telegram_id={telegram_id}"
-    )
+    # URLs проекта Procharity
+    PROCHARITY_URL: Url = "https://procharity.ru"
+    YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
+    HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
+
+    @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
+    def check_last_slash_url(cls, v) -> str:
+        """Кастомный валидатор-добавлятор последнего слэша в константе URL."""
+
+        if v[-1] != "/":
+            return urljoin(v, "/")
+        return v
 
     @validator("APPLICATION_URL")
     def check_domain_startswith_https_or_add_https(cls, v) -> str:

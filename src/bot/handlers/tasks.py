@@ -10,6 +10,7 @@ from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.utils import display_task_verbosely, display_tasks
+from src.settings import Settings
 
 
 @logger_decor
@@ -17,11 +18,12 @@ async def task_details_callback(
     update: Update,
     context: CallbackContext,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+    settings: Settings = Provide[Container.settings],
 ):
     query = update.callback_query
     task_id = int(context.match.group(1))
     task = await task_service.get_task_by_id(task_id)
-    detailed_text = display_task_verbosely(task)
+    detailed_text = display_task_verbosely(task, settings.HELP_PROCHARITY_URL)
     await query.message.edit_text(
         detailed_text,
         parse_mode=ParseMode.HTML,
@@ -36,6 +38,7 @@ async def view_task_callback(
     context: CallbackContext,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+    settings: Settings = Provide[Container.settings],
 ):
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
@@ -45,7 +48,7 @@ async def view_task_callback(
     )
 
     for task in tasks_to_show:
-        message = display_tasks(task)
+        message = display_tasks(task, settings.HELP_PROCHARITY_URL)
         inline_keyboard = [[InlineKeyboardButton("ℹ️ Подробнее", callback_data=f"task_details_{task.id}")]]
         reply_markup = InlineKeyboardMarkup(inline_keyboard)
         await context.bot.send_message(
