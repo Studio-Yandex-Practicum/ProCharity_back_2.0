@@ -10,11 +10,12 @@ env:
   POSTGRES_PASSWORD: postgres
   POSTGRES_DB: procharity_back_db_local
   POSTGRES_USER: postgres
-  DB_HOST: procharity_postgres
+  DB_HOST: localhost
   DB_PORT: 5432
-  APPLICATION_URL: 'procharity.duckdns.org'
-  HEALTHCHECK_API_URL: 'procharity.duckdns.org/ping'
-  HEALTHCHECK_URL: 'procharity.duckdns.org/healthcheck'
+  APPLICATION_URL: 'http://localhost:8000'
+  HEALTHCHECK_URL: 'http://localhost:8000/api/health_check/'
+  ORGANIZATIONS_EMAIL: 'procharity@yandex.ru'
+  EMAIL_ADMIN: 'procharityadmin_1@yandex.ru'
 
 jobs:
   healthcheck:
@@ -56,9 +57,10 @@ jobs:
       name: Create .env file
       run: |
         touch .env
-        echo BOT_TOKEN=${{ env.TELEGRAM_BOT_TOKEN }} >> .env
-        echo APPLICATION_URL=$APPLICATION_URL >> .env
-        echo HEALTHCHECK_API_URL=$HEALTHCHECK_API_URL >> .env
+        echo BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
+        echo APPLICATION_URL={{ env.APPLICATION_URL }} >> .env
+        echo ORGANIZATIONS_EMAIL={{ env.ORGANIZATIONS_EMAIL }} >> .env
+        echo EMAIL_ADMIN={{ env.EMAIL_ADMIN }} >> .env
     -
       name: Alembic Upgrade
       run: poetry run alembic upgrade head
