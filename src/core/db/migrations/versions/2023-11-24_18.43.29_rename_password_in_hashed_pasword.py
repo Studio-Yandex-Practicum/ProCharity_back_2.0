@@ -27,15 +27,9 @@ def upgrade() -> None:
         op.alter_column("admin_users", "password", new_column_name="hashed_password")
 
     if not column_exists("admin_users", "is_superuser"):
-        op.add_column(
-            "admin_users", sa.Column("is_superuser", sa.Boolean(), server_default='false', nullable=False)
-        )
-        op.add_column(
-            "admin_users", sa.Column("is_verified", sa.Boolean(), server_default='false', nullable=False)
-        )
-        op.add_column(
-            "admin_users", sa.Column("is_active", sa.Boolean(), server_default='false', nullable=False)
-        )
+        op.add_column("admin_users", sa.Column("is_superuser", sa.Boolean(), server_default="false", nullable=False))
+        op.add_column("admin_users", sa.Column("is_verified", sa.Boolean(), server_default="false", nullable=False))
+        op.add_column("admin_users", sa.Column("is_active", sa.Boolean(), server_default="false", nullable=False))
 
 
 def downgrade() -> None:
