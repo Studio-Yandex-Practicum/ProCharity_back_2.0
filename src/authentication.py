@@ -1,23 +1,43 @@
 import structlog
-import uuid
-from typing import Optional
+from typing import AsyncGenerator, Optional
 
 from fastapi import Depends, Request, Response
-from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
+from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin, schemas
 from fastapi_users.authentication import (
     AuthenticationBackend, BearerTransport, JWTStrategy
 )
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from src.core.db.models import AdminUser, Base
 from src.settings import settings
-from src.core.db import get_session
-from src.core.db.models import AdminUser
 
 log = structlog.get_logger()
 
+engine = create_async_engine(settings.database_url)
+async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-async def get_user_db(session: AsyncSession = Depends(get_session)):
+
+async def create_db_and_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
+
+
+async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, AdminUser)
+
+
+class UserRead(schemas.BaseUser[int]):
+    pass
+
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
 
 
 bearer_transport = BearerTransport(tokenUrl="auth/login")
@@ -34,7 +54,7 @@ auth_backend = AuthenticationBackend(
 )
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[AdminUser, uuid.UUID]):
+class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
     async def on_after_login(
         self,
         user: AdminUser,
@@ -44,11 +64,11 @@ class UserManager(UUIDIDMixin, BaseUserManager[AdminUser, uuid.UUID]):
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
-async def get_user_manager(user_db=Depends(get_user_db)):
-    yield UserManager(user_db)
+async def get_user_manager(admin_db=Depends(get_admin_db)):
+    yield UserManager(admin_db)
 
 
-fastapi_users = FastAPIUsers[AdminUser, uuid.UUID](
+fastapi_users = FastAPIUsers[AdminUser, int](
     get_user_manager,
     [auth_backend],
 )
