@@ -1,5 +1,6 @@
 import abc
 from typing import TypeVar
+from collections.abc import Sequence
 
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
@@ -21,8 +22,8 @@ class AbstractRepository(abc.ABC):
 
     async def get_or_none(self, _id: int) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия возвращает None."""
-        db_obj = await self._session.execute(select(self._model).where(self._model.id == _id))
-        return db_obj.scalars().first()
+        db_obj = await self._session.scalars(select(self._model).where(self._model.id == _id))
+        return db_obj.first()
 
     async def get(self, _id: int) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта бросает ошибку."""
@@ -55,47 +56,47 @@ class AbstractRepository(abc.ABC):
         return instance  # noqa: R504
 
     @auto_commit
-    async def update_all(self, instances: list[dict]) -> list[DatabaseModel]:
+    async def update_all(self, instances: list[dict]) -> Sequence[DatabaseModel]:
         """Обновляет несколько измененных объектов модели в базе."""
         await self._session.execute(update(self._model), instances)
         return instances
 
-    async def get_all(self) -> list[DatabaseModel]:
+    async def get_all(self) -> Sequence[DatabaseModel]:
         """Возвращает все объекты модели из базы данных."""
-        objects = await self._session.execute(select(self._model))
-        return list(objects.scalars().all())
+        objects = await self._session.scalars(select(self._model))
+        return objects.all()
 
     @auto_commit
-    async def create_all(self, objects: list[DatabaseModel]) -> None:
+    async def create_all(self, objects: Sequence[DatabaseModel]) -> None:
         """Создает несколько объектов модели в базе данных."""
         self._session.add_all(objects)
 
     async def count_all(self) -> int:
         """Возвращает количество объектов модели в базе данных."""
-        objects = await self._session.execute(select(func.count()).select_from(self._model))
-        return objects.scalar()
+        objects = await self._session.scalar(select(func.count()).select_from(self._model))
+        return objects
 
     async def count_active_all(self) -> int:
         """Возвращает количество неархивных (активных) объектов модели в базе данных."""
-        objects = await self._session.execute(
+        objects = await self._session.scalar(
             select(func.count()).select_from(self._model).where(self._model.is_archived == False)  # noqa
         )
-        return objects.scalar()
+        return objects
 
     async def get_last_update(self) -> str | None:
         """Получает из базы отсортированный по времени обновления объект модели.
         В случае отсутствия возвращает None."""
-        db_obj = await self._session.execute(
+        db_obj = await self._session.scalars(
             select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE)).order_by(
                 self._model.updated_at.desc()
             )
         )
-        return db_obj.scalars().first()
+        return db_obj.first()
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
     @auto_commit
-    async def archive_by_ids(self, ids: list[int]) -> None:
+    async def archive_by_ids(self, ids: Sequence[int]) -> None:
         """Изменяет is_archived с False на True у не указанных ids."""
         await self._session.execute(
             update(self._model)
@@ -104,7 +105,10 @@ class ContentRepository(AbstractRepository, abc.ABC):
             .values({"is_archived": True})
         )
 
-    async def get_by_ids(self, ids: list[int]) -> list[int]:
+    async def get_by_ids(self, ids: list[int]) -> Sequence[int]:
         """Возвращает id объектов модели из базы данных по указанным ids"""
-        filtered_ids = await self._session.execute(select(self._model.id).where(self._model.id.in_(ids)))
-        return [row[0] for row in filtered_ids.all()]
+        filtered_ids = await self._session.scalar(
+            select(self._model.id)
+            .where(self._model.id.in_(ids))
+        )
+        return filtered_ids or []

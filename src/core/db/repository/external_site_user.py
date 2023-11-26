@@ -13,5 +13,5 @@ class ExternalSiteUserRepository(AbstractRepository):
 
     async def get_by_id_hash(self, id_hash: str) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по id_hash."""
-        user = await self._session.execute(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
-        return user.scalars().first()
+        user = await self._session.scalars(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
+        return user.first()
