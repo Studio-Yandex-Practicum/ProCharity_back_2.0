@@ -47,20 +47,17 @@ class TaskRepository(ContentRepository):
 
     async def get_user_tasks_count(self, user: User) -> int:
         """Получить общее количество задач для пользователя."""
-        user_tasks_count =  await self._session.scalar(
+        return await self._session.scalar(
             select(func.count(Task.id))
             .join(Category)
             .where(Category.users.any(id=user.id))
             .where(Task.is_archived == false()))
 
-        return user_tasks_count
-
     async def get_user_task_id(self, task_id) -> Sequence[Task]:
         """Получить задачу по id из категорий на которые подписан пользователь."""
-        task = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
-        return task.first()
+        return await self._session.scalar(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
 
     async def get_user_tasks_ids(self, ids: list[int]) -> Sequence[Task]:
         """Получить список задач по ids из категорий на которые подписан пользователь."""
-        tasks = await self._session.scalar(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
+        tasks = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
         return tasks.all()

@@ -1,6 +1,5 @@
 import abc
-from typing import TypeVar
-from collections.abc import Sequence
+from typing import TypeVar, Sequence
 
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
@@ -22,8 +21,7 @@ class AbstractRepository(abc.ABC):
 
     async def get_or_none(self, _id: int) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия возвращает None."""
-        db_obj = await self._session.scalars(select(self._model).where(self._model.id == _id))
-        return db_obj.first()
+        return await self._session.scalar(select(self._model).where(self._model.id == _id))
 
     async def get(self, _id: int) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта бросает ошибку."""
@@ -73,25 +71,22 @@ class AbstractRepository(abc.ABC):
 
     async def count_all(self) -> int:
         """Возвращает количество объектов модели в базе данных."""
-        objects = await self._session.scalar(select(func.count()).select_from(self._model))
-        return objects
+        return await self._session.scalar(select(func.count()).select_from(self._model))
 
     async def count_active_all(self) -> int:
         """Возвращает количество неархивных (активных) объектов модели в базе данных."""
-        objects = await self._session.scalar(
+        return await self._session.scalar(
             select(func.count()).select_from(self._model).where(self._model.is_archived == False)  # noqa
         )
-        return objects
 
     async def get_last_update(self) -> str | None:
         """Получает из базы отсортированный по времени обновления объект модели.
         В случае отсутствия возвращает None."""
-        db_obj = await self._session.scalars(
+        return await self._session.scalar(
             select(func.to_char(self._model.updated_at, DATE_TIME_FORMAT_LAST_UPDATE)).order_by(
                 self._model.updated_at.desc()
             )
         )
-        return db_obj.first()
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
@@ -107,8 +102,8 @@ class ContentRepository(AbstractRepository, abc.ABC):
 
     async def get_by_ids(self, ids: list[int]) -> Sequence[int]:
         """Возвращает id объектов модели из базы данных по указанным ids"""
-        filtered_ids = await self._session.scalar(
+        filtered_ids = await self._session.scalars(
             select(self._model.id)
             .where(self._model.id.in_(ids))
         )
-        return filtered_ids or []
+        return filtered_ids.all()

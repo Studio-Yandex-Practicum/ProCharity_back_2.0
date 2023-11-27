@@ -12,5 +12,4 @@ class UnsubscribeReasonRepository(AbstractRepository):
         super().__init__(session, UnsubscribeReason)
 
     async def get_by_user(self, user):
-        db_obj = await self._session.scalars(select(UnsubscribeReason).where(UnsubscribeReason.user == user))
-        return db_obj.first()
+        return await self._session.scalar(select(UnsubscribeReason).where(UnsubscribeReason.user == user))

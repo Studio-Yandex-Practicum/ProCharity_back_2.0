@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from typing import Sequence
 
 from sqlalchemy import false, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
