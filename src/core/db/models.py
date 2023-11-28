@@ -148,3 +148,17 @@ class UnsubscribeReason(Base):
 
     def __repr__(self):
         return f"<Unsubscribe reason: {self.unsubscribe_reason} for user {self.user}>"
+
+
+class Notification(Base):
+    """Модель уведомления."""
+
+    __tablename__ = "notifications"
+
+    message: Mapped[str] = mapped_column(String(length=4096), nullable=False)
+    was_sent: Mapped[bool] = mapped_column(server_default=expression.false())
+    sent_date: Mapped[date]
+    sent_by: Mapped[str] = mapped_column(String(length=48))
+
+    def __repr__(self):
+        return f"<Notifications {self.message}>"

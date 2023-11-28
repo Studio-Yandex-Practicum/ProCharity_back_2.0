@@ -1,14 +1,15 @@
 import sys
 from functools import wraps
 
+from src.core.db.models import Task
 from src.settings import settings
 
 TASK_DEADLINE_FORMAT = "%d.%m.%y"
 
 
-def display_tasks(task):
+def display_tasks(task: Task, url: str) -> str:
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
-    bonus_link = "https://help.procharity.ru/article/10053"
+    bonus_link = f"{url}article/10053"
     return (
         f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}\n\n"
@@ -19,9 +20,9 @@ def display_tasks(task):
     )
 
 
-def display_task_verbosely(task):
+def display_task_verbosely(task: Task, url: str) -> str:
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT)
-    bonus_link = "https://help.procharity.ru/article/10053"
+    bonus_link = f"{url}article/10053"
     return (
         f"<b>{task.title}\n\n</b>"
         f"От фонда: {task.name_organization}, {task.location}\n\n"
