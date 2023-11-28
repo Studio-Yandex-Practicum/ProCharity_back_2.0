@@ -5,7 +5,7 @@ from typing import ParamSpec, TypeVar
 from dependency_injector.wiring import Provide
 from telegram import Update
 
-from src.depends import Container
+from src.core.depends import Container
 from src.settings import Settings
 
 ReturnType = TypeVar("ReturnType")
@@ -29,7 +29,9 @@ def delete_previous_message(
 
 
 def get_connection_url(
-    telegram_id: int, external_id: int = None, settings: Settings = Provide[Container.settings]
+    telegram_id: int,
+    external_id: int = None,
+    settings: Settings = Provide[Container.settings],
 ) -> str:
     """Получение ссылки для связи аккаунта с ботом по external_id и telegram_id.
     В случае отсутствия external_id возвращает ссылку на страницу авторизации"""

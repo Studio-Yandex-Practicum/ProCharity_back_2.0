@@ -6,8 +6,8 @@ from src.api.schemas import TaskRequest, TaskResponse
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.core.db.models import Task
+from src.core.depends import Container
 from src.core.utils import display_tasks
-from src.depends import Container
 from src.settings import Settings
 
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
@@ -17,8 +17,10 @@ task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 @inject
 async def actualize_tasks(
     tasks: list[TaskRequest],
-    task_service: TaskService = Depends(Provide[Container.task_service]),
-    telegram_notification_service: TelegramNotificationService = Depends(Provide[Container.message_service]),
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
     settings: Settings = Provide(Container.settings),
 ) -> None:
     new_tasks_ids = await task_service.actualize_objects(tasks, Task)
@@ -36,7 +38,8 @@ async def actualize_tasks(
 )
 @inject
 async def get_tasks_for_user(
-    user_id: int, task_service: TaskService = Depends(Provide[Container.task_service])
+    user_id: int,
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> list[TaskResponse]:
     return await task_service.get_tasks_for_user(user_id)
 
@@ -48,5 +51,7 @@ async def get_tasks_for_user(
     description="Получает список всех задач.",
 )
 @inject
-async def get_all_tasks(task_service: TaskService = Depends(Provide[Container.task_service])) -> list[TaskResponse]:
+async def get_all_tasks(
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
+) -> list[TaskResponse]:
     return await task_service.get_all()

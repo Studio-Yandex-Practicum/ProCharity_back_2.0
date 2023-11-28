@@ -6,7 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton,
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
 from src.core.db.models import Category, User
-from src.depends import Container
+from src.core.depends import Container
 from src.settings import Settings, settings
 
 MENU_KEYBOARD = [

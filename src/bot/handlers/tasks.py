@@ -7,9 +7,9 @@ from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_back_menu, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.utils import display_task_verbosely, display_tasks
-from src.depends import Container
 from src.settings import Settings
 
 
@@ -17,7 +17,7 @@ from src.settings import Settings
 async def task_details_callback(
     update: Update,
     context: CallbackContext,
-    task_service: TaskService = Provide[Container.bot_task_service],
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     settings: Settings = Provide[Container.settings],
 ):
     query = update.callback_query
@@ -37,7 +37,7 @@ async def view_task_callback(
     update: Update,
     context: CallbackContext,
     limit: int = 3,
-    task_service: TaskService = Provide[Container.bot_task_service],
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     settings: Settings = Provide[Container.settings],
 ):
     telegram_id = context._user_id

@@ -8,8 +8,8 @@ from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.depends import Container
 from src.settings import Settings
 
 
@@ -18,8 +18,8 @@ from src.settings import Settings
 async def start_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+    ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     settings: Settings = Provide[Container.settings],
 ):
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
@@ -67,7 +67,7 @@ async def start_command(
 async def confirm_chosen_categories(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     keyboard = get_confirm_keyboard()
     categories = await user_service.get_user_categories(update.effective_user.id)
