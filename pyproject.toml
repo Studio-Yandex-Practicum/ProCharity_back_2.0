@@ -60,6 +60,7 @@ pyngrok = "^6.0.0"
 python-dotenv = "^1.0.0"
 pre-commit = "^3.3.2"
 gitpython = "^3.1.32"
+faker = "19.13.0"
 
 
 [build-system]

@@ -5,6 +5,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.constants import DATE_FORMAT_FOR_STATISTICS
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
 
@@ -87,6 +88,19 @@ class AbstractRepository(abc.ABC):
                 self._model.updated_at.desc()
             )
         )
+
+    async def get_statistics_by_days(self, date_begin, date_limit, column_name) -> dict[str, int]:
+        """Получает из базы отсортированный и отфильтрованный сводный набор записей модели
+        по полю column_name.
+        """
+        column = self._model.__dict__[column_name]
+        db_data = await self._session.execute(
+            select(func.to_char(column, DATE_FORMAT_FOR_STATISTICS), func.count(column))
+            .where(column >= date_begin, column <= date_limit)
+            .group_by(column)
+            .order_by(column)
+        )
+        return dict(db_data.fetchall())
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
