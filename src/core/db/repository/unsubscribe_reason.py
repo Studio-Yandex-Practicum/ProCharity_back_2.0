@@ -13,8 +13,7 @@ class UnsubscribeReasonRepository(AbstractRepository):
         super().__init__(session, UnsubscribeReason)
 
     async def get_by_user(self, user):
-        db_obj = await self._session.execute(select(UnsubscribeReason).where(UnsubscribeReason.user == user))
-        return db_obj.scalars().first()
+        return await self._session.scalar(select(UnsubscribeReason).where(UnsubscribeReason.user == user))
 
     async def get_reason_cancelling_statistics(self) -> list[tuple[str, int]]:
         query = select(
