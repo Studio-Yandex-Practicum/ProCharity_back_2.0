@@ -1,5 +1,5 @@
 import abc
-from typing import TypeVar, Sequence
+from typing import Sequence, TypeVar
 
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
@@ -116,8 +116,5 @@ class ContentRepository(AbstractRepository, abc.ABC):
 
     async def get_by_ids(self, ids: list[int]) -> Sequence[int]:
         """Возвращает id объектов модели из базы данных по указанным ids"""
-        filtered_ids = await self._session.scalars(
-            select(self._model.id)
-            .where(self._model.id.in_(ids))
-        )
+        filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
         return filtered_ids.all()

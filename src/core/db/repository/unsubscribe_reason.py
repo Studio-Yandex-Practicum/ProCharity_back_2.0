@@ -22,4 +22,3 @@ class UnsubscribeReasonRepository(AbstractRepository):
         ).group_by(UnsubscribeReason.unsubscribe_reason)
         reasons = await self._session.execute(query)
         return reasons.all()
-

@@ -34,14 +34,17 @@ class TaskRepository(ContentRepository):
 
     async def get_tasks_limit_for_user(self, limit: int, offset: int, user: User) -> Sequence[Task]:
         """Получить limit-выборку из списка всех задач пользователя."""
-        task_limit_for_user = await self._session.scalars((
-            select(Task)
-            .join(Category)
-            .options(joinedload(Task.category))
-            .where(Category.users.any(id=user.id))
-            .where(Task.is_archived == false())
-            .limit(limit)
-            .offset(offset)))
+        task_limit_for_user = await self._session.scalars(
+            (
+                select(Task)
+                .join(Category)
+                .options(joinedload(Task.category))
+                .where(Category.users.any(id=user.id))
+                .where(Task.is_archived == false())
+                .limit(limit)
+                .offset(offset)
+            )
+        )
 
         return task_limit_for_user.all()
 
@@ -51,7 +54,8 @@ class TaskRepository(ContentRepository):
             select(func.count(Task.id))
             .join(Category)
             .where(Category.users.any(id=user.id))
-            .where(Task.is_archived == false()))
+            .where(Task.is_archived == false())
+        )
 
     async def get_user_task_id(self, task_id) -> Sequence[Task]:
         """Получить задачу по id из категорий на которые подписан пользователь."""
