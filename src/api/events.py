@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from telegram.ext import Application
 
 from src.bot import shutdown_bot, startup_bot
+from src.core.depends import Container
 from src.core.utils import set_ngrok
-from src.depends import Container
 from src.settings import Settings
 
 
@@ -12,7 +12,7 @@ from src.settings import Settings
 async def startup(
     fastapi_app: FastAPI,
     run_bot: bool,
-    bot: Application = Provide[Container.telegram_bot],
+    bot: Application = Provide[Container.applications_container.telegram_bot],
     settings: Settings = Provide[Container.settings],
 ):
     if settings.USE_NGROK is True:

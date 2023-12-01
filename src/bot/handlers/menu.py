@@ -9,8 +9,9 @@ from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_k
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.depends import Container
+from src.settings import Settings
 
 log = structlog.get_logger()
 
@@ -20,7 +21,7 @@ log = structlog.get_logger()
 async def menu_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Возвращает в меню."""
     await context.bot.send_message(
@@ -35,7 +36,8 @@ async def menu_callback(
 async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    settings: Settings = Provide[Container.settings],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
@@ -47,7 +49,7 @@ async def set_mailing(
     else:
         text = (
             "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-            '<a href="https://procharity.ru">ProCharity</a>.\n\n'
+            f'<a href="{settings.PROCHARITY_URL}">ProCharity</a>.\n\n'
             "Поделись, пожалуйста, почему ты решил отписаться?"
         )
         keyboard = get_no_mailing_keyboard()
@@ -65,11 +67,13 @@ async def set_mailing(
 async def reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    unsubscribe_reason_service: UnsubscribeReasonService = Provide[Container.unsubscribe_reason_service],
+    unsubscribe_reason_service: UnsubscribeReasonService = Provide[
+        Container.bot_services_container.unsubscribe_reason_service
+    ],
 ):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
-    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason)
+    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
         f"рассылки по причине: {reason}"
@@ -83,7 +87,9 @@ async def reason_handler(
 
 @logger_decor
 @delete_previous_message
-async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def about_project(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, settings: Settings = Provide[Container.settings]
+):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="С ProCharity профессионалы могут помочь некоммерческим "
@@ -91,7 +97,7 @@ async def about_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
         "время и профессиональные навыки, позволяя решать задачи, "
         "которые трудно закрыть силами штатных сотрудников.\n\n"
-        'Сделано студентами <a href="https://praktikum.yandex.ru/">Яндекс.Практикума.</a>',
+        f'Сделано студентами <a href="{settings.YA_PRAKTIKUM_URL}">Яндекс.Практикума.</a>',
         reply_markup=await get_back_menu(),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
