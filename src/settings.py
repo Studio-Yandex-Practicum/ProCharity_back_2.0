@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "secret_key"
     ROOT_PATH: str = "/api"
     DEBUG: bool = False
-    USE_NGROK: bool = False
+    USE_NGROK: bool = True
     STATIC_DIR: str | Path = BASE_DIR / "templates/"
     STATIC_URL: str = "static/"
 
