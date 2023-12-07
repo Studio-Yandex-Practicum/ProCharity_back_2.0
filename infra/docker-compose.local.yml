@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: procharity_bot_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../.env
+  postgres:
+    image: postgres:13.2
+    container_name: procharity_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ../.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:

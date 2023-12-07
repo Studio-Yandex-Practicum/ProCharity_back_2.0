@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "procharity-back-2-0"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+    | .env
+    | .env.example
+    | .git
+    | __pycache__
+    | venv/
+    | env/
+    | .*/tests/*
+    | .*/migrations/*
+    | .*/migrations/*
+  )/
+)
+'''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 120
+skip = ['src/core/db/migrations/',]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.100.0"
+uvicorn = "^0.21.1"
+sqlalchemy = "^2.0.9"
+alembic = "^1.10.3"
+asyncpg = "^0.27.0"
+greenlet = "^2.0.2"
+python-telegram-bot = {extras = ["rate-limiter"], version = "^20.2"}
+structlog = "^23.1.0"
+asgi-correlation-id = "^4.2.0"
+rich = "^13.3.5"
+fastapi-mail = "^1.4.0"
+dependency-injector = "^4.41.0"
+passlib = "^1.7.4"
+python-jose = "^3.3.0"
+fastapi-jwt = "^0.1.12"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+black = "^23.3.0"
+isort = "^5.12.0"
+pyngrok = "^6.0.0"
+python-dotenv = "^1.0.0"
+pre-commit = "^3.3.2"
+gitpython = "^3.1.32"
+faker = "19.13.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
