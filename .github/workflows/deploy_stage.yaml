@@ -28,7 +28,7 @@ jobs:
     name: Push backend Docker image to GitHub Packages
     runs-on: ubuntu-latest
     environment:
-      name: stage_deploy
+      name: deploy
     permissions:
       contents: read
       packages: write
