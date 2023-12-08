@@ -28,6 +28,12 @@ class AlreadyExistsException(ApplicationException):
         self.detail = f"Объект {obj} уже существует"
 
 
+class SendMessageError(Exception):
+    def __init__(self, user_id, error_message):
+        super().__init__(error_message)
+        self.user_id = user_id
+
+
 class EmailSendError(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
 
