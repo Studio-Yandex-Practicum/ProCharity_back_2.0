@@ -1,5 +1,6 @@
 from datetime import date
 
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
@@ -116,23 +117,15 @@ class Category(ContentBase):
         return f"<Category {self.name}>"
 
 
-class AdminUser(Base):
+class AdminUser(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = "admin_users"
 
-    email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    password: Mapped[str] = mapped_column(String(128))
     last_login: Mapped[date] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<Admin User {self.first_name} {self.last_name}>"
-
-    def set_password(self, password):
-        self.password = pwd_context.hash(password)
-
-    def check_password(self, password):
-        return pwd_context.verify(password, self.password)
 
 
 class AdminTokenRequest(Base):
