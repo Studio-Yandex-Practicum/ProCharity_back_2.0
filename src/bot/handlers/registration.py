@@ -10,16 +10,32 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
 from src.core.logging.utils import logger_decor
 from src.depends import Container
-
+from jwt import decode
 
 @logger_decor
 @inject
 async def start_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_user_service],
 ):
+    token = context.args[0] if context.args else None
+    public_key = """
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0cxDMqPDBCcaR+HVH4l0
+    iytQhBiryz4gOVBD574mK2JRDIE+KYgBW+1ul25euWbS9uHxWATsji+0VwNY0Yrd
+    QxheBmND93qF3PI430cKcagNBd0iBB/nBlCB99m9wSZ8MELUQjVGAGIiK18EqYuN
+    aiopxEla19wtKFkF2VgTMi8hgeOyFI4DrVnvY6W9y98j8sPHQI48KV+Ls0etu2V5
+    aChnW7IxXWhTUS9NewW8fVrxd3iRiyYdF1eBE48zcgTu/ji+68xfjrWtHewP47lc
+    j0OpiHEb2fwjlv+JpPkElOdRm6QcNfT1tL9AQexO/cusH0KBU349CAZO3ObrPWcw
+    EQIDAQAB
+    -----END PUBLIC KEY-----
+    """
+    if token:
+        user_site_info = decode(token, public_key, algorithms='RS256')
+
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     if ext_user is not None:
         await user_service.register_user(
