@@ -257,7 +257,6 @@ async def filling_user_in_db(
             has_mailing=False if email is None else True,
             external_signup_date=None if external_id is None else created_at,
             banned=user_fake.boolean(),
-            id=id,
             created_at=created_at,
         )
         session.add(user)
@@ -287,7 +286,9 @@ async def delete_all_data(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
     """The function deletes data from the tables Category, Tasks."""
-    await session.execute(text("""TRUNCATE TABLE tasks, categories, unsubscribe_reason, users CASCADE"""))
+    await session.execute(
+        text("""TRUNCATE TABLE tasks, categories, unsubscribe_reason, users RESTART IDENTITY CASCADE""")
+    )
     await session.commit()
 
 
