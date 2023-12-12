@@ -22,7 +22,7 @@ async def startup(
             bot=bot,
             bot_webhook_mode=settings.BOT_WEBHOOK_MODE,
             telegram_webhook_url=settings.telegram_webhook_url,
-            secret_key=settings.SECRET_KEY,
+            telegram_secret_token=settings.TELEGRAM_SECRET_TOKEN,
         )
 
 
