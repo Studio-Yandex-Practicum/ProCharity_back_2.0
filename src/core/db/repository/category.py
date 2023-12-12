@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy import false, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,11 +13,11 @@ class CategoryRepository(ContentRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Category)
 
-    async def get_unarchived_subcategories(self, parent_id: int) -> list[Category]:
-        unarchived_subcategories = await self._session.execute(
+    async def get_unarchived_subcategories(self, parent_id: int) -> Sequence[Category]:
+        unarchived_subcategories = await self._session.scalars(
             select(Category).where(Category.is_archived == false()).where(Category.parent_id == parent_id)
         )
-        return list(unarchived_subcategories.scalars().all())
+        return unarchived_subcategories.all()
 
     async def get_unarchived_parents_with_children_count(self):
         parent_and_children_count_subquery = (

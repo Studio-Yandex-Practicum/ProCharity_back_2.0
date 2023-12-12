@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -5,7 +7,6 @@ from sqlalchemy.orm import selectinload
 from src.core.db.models import Category, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
 from src.core.utils import auto_commit
-from typing import List
 
 
 class UserRepository(AbstractRepository):
@@ -16,8 +17,7 @@ class UserRepository(AbstractRepository):
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Возвращает пользователя (или None) по telegram_id."""
-        user = await self._session.execute(select(User).where(User.telegram_id == telegram_id))
-        return user.scalars().first()
+        return await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
 
     async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.
@@ -55,10 +55,10 @@ class UserRepository(AbstractRepository):
             .where(UsersCategories.category_id == category_id)
         )
 
-    async def get_user_categories(self, user: User) -> list[Category]:
+    async def get_user_categories(self, user: User) -> Sequence[Category]:
         """Возвращает список категорий пользователя."""
-        user_categories = await self._session.execute(select(Category).join(User.categories).where(User.id == user.id))
-        return list(user_categories.scalars().all())
+        user_categories = await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))
+        return user_categories.all()
 
     async def set_mailing(self, user: User, has_mailing: bool) -> None:
         """

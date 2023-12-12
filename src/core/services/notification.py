@@ -17,7 +17,9 @@ class TelegramNotification:
 
     async def __send_message(self, user_id: int, message: str) -> tuple[bool, str]:
         try:
-            await self.__bot.send_message(chat_id=user_id, text=message, parse_mode=ParseMode.HTML)
+            await self.__bot.send_message(
+                chat_id=user_id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
+            )
             msg = f"Отправлено оповещение пользователю {user_id}"
             await log.adebug(msg)
             return True, msg

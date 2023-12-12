@@ -12,8 +12,9 @@ from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
+from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.depends import Container
+from src.settings import Settings
 
 load_dotenv()
 
@@ -21,11 +22,12 @@ load_dotenv()
 @logger_decor
 @inject
 async def start_command(
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE,
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    settings: Settings = Provide[Container.settings],
 
-        ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
-        user_service: UserService = Provide[Container.bot_user_service],
 ):
     token = context.args[0] if context.args else None
     public_key = os.getenv('PUBLIC_KEY')
@@ -63,9 +65,9 @@ async def start_command(
     )
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text='Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
-             "Буду держать тебя в курсе новых задач и помогу "
-             "оперативно связаться с командой поддержки.\n\n",
+        text=f'Я бот платформы интеллектуального волонтерства <a href="{settings.PROCHARITY_URL}">ProCharity</a>. '
+        "Буду держать тебя в курсе новых задач и помогу "
+        "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
@@ -75,10 +77,9 @@ async def start_command(
 @logger_decor
 @delete_previous_message
 async def confirm_chosen_categories(
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE,
-        user_service: UserService = Provide[Container.bot_user_service],
-):
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     keyboard = get_confirm_keyboard()
     categories = await user_service.get_user_categories(update.effective_user.id)
     context.user_data["selected_categories"] = {category: None for category in categories}
