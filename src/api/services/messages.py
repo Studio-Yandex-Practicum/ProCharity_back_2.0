@@ -6,6 +6,7 @@ from telegram.ext import Application
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, User
 from src.core.enums import TelegramNotificationUsersGroups
+from src.core.exceptions.exceptions import TelegramIDNotFoundError, UserBlockedError, UserNotFoundError
 from src.core.services.notification import TelegramNotification
 
 
@@ -36,6 +37,21 @@ class TelegramNotificationService:
         """Отправляет сообщение указанному по telegram_id пользователю"""
         return await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
 
+    async def send_message_to_user_by_id(self, user_id, notifications) -> tuple[bool, str]:
+        """Отправляет сообщение указанному пользователю по user_id."""
+        user_i: User | None = await self._session.scalar(select(User).where(User.id == user_id))
+        if not user_i:
+            """Пользователь не найден."""
+            raise UserNotFoundError(user_id)
+        if not user_i.telegram_id:
+            """Telegram_id не найден."""
+            raise TelegramIDNotFoundError(user_id)
+        if user_i.banned:
+            """Пользователь отписался от уведомлений."""
+            raise UserBlockedError(user_id)
+
+        return await self.telegram_notification.send_message(user_id=user_i.telegram_id, message=notifications.message)
+
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
         category = await self._session.scalars(
@@ -44,14 +60,16 @@ class TelegramNotificationService:
         category = category.first()
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
 
-    def count_rate(self, respond: bool, msg: str, rate: InfoRate):
+    def count_rate(self, status: bool, msg: str, rate: InfoRate, error_type=None):
         errors_sending = ErrorsSending()
-        if respond:
+        if status:
             rate.successful_rate += 1
             rate.messages.append(msg)
         else:
             rate.unsuccessful_rate += 1
             errors_sending.message = msg
+            if error_type:
+                errors_sending.type = error_type
             rate.errors.append(errors_sending)
         return rate
 

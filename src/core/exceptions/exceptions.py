@@ -16,6 +16,32 @@ class ApplicationException(HTTPException):
         super().__init__(status_code=self.status_code, detail=self.detail, headers=self.headers)
 
 
+class SendMessageError(Exception):
+    def __init__(self, user_id, error_message=""):
+        super().__init__(error_message)
+        self.user_id = user_id
+        self.error_message = error_message
+        self.error_type = type(self).__name__
+
+    def __str__(self):
+        return f"{self.error_type}: {self.error_message}"
+
+
+class UserNotFoundError(SendMessageError):
+    def __init__(self, user_id):
+        super().__init__(user_id, "Unable to find the user")
+
+
+class TelegramIDNotFoundError(SendMessageError):
+    def __init__(self, user_id):
+        super().__init__(user_id, "Unable to find telegram_id for this user")
+
+
+class UserBlockedError(SendMessageError):
+    def __init__(self, user_id):
+        super().__init__(user_id, "User blocked the bot")
+
+
 class NotFoundException(ApplicationException):
     def __init__(self, object_name: str, object_id: int):
         self.status_code = HTTPStatus.NOT_FOUND
