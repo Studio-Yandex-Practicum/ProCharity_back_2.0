@@ -63,14 +63,16 @@ class TelegramNotificationService:
         category = category.first()
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
 
-    def count_rate(self, respond: bool, msg: str, rate: InfoRate):
+    def count_rate(self, status: bool, msg: str, rate: InfoRate, error_type=None):
         errors_sending = ErrorsSending()
-        if respond:
+        if status:
             rate.successful_rate += 1
             rate.messages.append(msg)
         else:
             rate.unsuccessful_rate += 1
             errors_sending.message = msg
+            if error_type:
+                errors_sending.type = error_type
             rate.errors.append(errors_sending)
         return rate
 

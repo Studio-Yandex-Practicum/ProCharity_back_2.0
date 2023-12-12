@@ -57,8 +57,8 @@ async def send_messages_to_group_of_users(
             rate = telegram_notification_service.count_rate(status, msg, rate)
         except SendMessageError as e:
             await log.ainfo(e)
-            status, msg = False, e.error_message
-            rate = telegram_notification_service.count_rate(status, msg, rate)
+            status, msg, error_type = False, e.error_message, e.error_type
+            rate = telegram_notification_service.count_rate(status, msg, rate, error_type)
 
     await log.ainfo("Конец отправки сообщений для группы пользователей")
     return rate

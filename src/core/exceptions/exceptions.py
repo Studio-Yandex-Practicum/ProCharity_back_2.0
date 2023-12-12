@@ -33,9 +33,10 @@ class SendMessageError(Exception):
         super().__init__(error_message)
         self.user_id = user_id
         self.error_message = error_message
+        self.error_type = type(self).__name__
 
     def __str__(self):
-        return f"{type(self).__name__}: {self.error_message}"
+        return f"{self.error_type}: {self.error_message}"
 
 
 class UserNotFound(SendMessageError):
