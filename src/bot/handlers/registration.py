@@ -1,4 +1,8 @@
+import os
+
 from dependency_injector.wiring import Provide, inject
+from dotenv import load_dotenv
+from jwt import decode
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
@@ -10,31 +14,23 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
 from src.core.logging.utils import logger_decor
 from src.depends import Container
-from jwt import decode
+
+load_dotenv()
+
 
 @logger_decor
 @inject
 async def start_command(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
 
-    ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
-    user_service: UserService = Provide[Container.bot_user_service],
+        ext_user_service: ExternalSiteUserService = Provide[Container.bot_site_user_service],
+        user_service: UserService = Provide[Container.bot_user_service],
 ):
     token = context.args[0] if context.args else None
-    public_key = """
-    -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0cxDMqPDBCcaR+HVH4l0
-    iytQhBiryz4gOVBD574mK2JRDIE+KYgBW+1ul25euWbS9uHxWATsji+0VwNY0Yrd
-    QxheBmND93qF3PI430cKcagNBd0iBB/nBlCB99m9wSZ8MELUQjVGAGIiK18EqYuN
-    aiopxEla19wtKFkF2VgTMi8hgeOyFI4DrVnvY6W9y98j8sPHQI48KV+Ls0etu2V5
-    aChnW7IxXWhTUS9NewW8fVrxd3iRiyYdF1eBE48zcgTu/ji+68xfjrWtHewP47lc
-    j0OpiHEb2fwjlv+JpPkElOdRm6QcNfT1tL9AQexO/cusH0KBU349CAZO3ObrPWcw
-    EQIDAQAB
-    -----END PUBLIC KEY-----
-    """
+    public_key = os.getenv('PUBLIC_KEY')
     if token:
-        user_site_info = decode(token, public_key, algorithms='RS256')
+        user_site_info = decode(token, public_key, algorithms=os.getenv('ALGORITHM'))
 
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     if ext_user is not None:
@@ -68,8 +64,8 @@ async def start_command(
     await context.bot.send_message(
         chat_id=update.effective_user.id,
         text='Я бот платформы интеллектуального волонтерства <a href="https://procharity.ru/">ProCharity</a>. '
-        "Буду держать тебя в курсе новых задач и помогу "
-        "оперативно связаться с командой поддержки.\n\n",
+             "Буду держать тебя в курсе новых задач и помогу "
+             "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
@@ -79,9 +75,9 @@ async def start_command(
 @logger_decor
 @delete_previous_message
 async def confirm_chosen_categories(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_user_service],
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
+        user_service: UserService = Provide[Container.bot_user_service],
 ):
     keyboard = get_confirm_keyboard()
     categories = await user_service.get_user_categories(update.effective_user.id)
