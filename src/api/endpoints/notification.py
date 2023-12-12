@@ -6,6 +6,7 @@ from src.api.auth import check_header_contains_token
 from src.api.schemas import InfoRate, MessageList, TelegramNotificationRequest, TelegramNotificationUsersRequest
 from src.api.services.messages import TelegramNotificationService
 from src.core.depends import Container
+from src.core.exceptions.exceptions import SendMessageError
 
 notification_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 log = structlog.get_logger()
@@ -51,8 +52,14 @@ async def send_messages_to_group_of_users(
     rate = InfoRate()
     await log.ainfo("Начало отправки сообщений для группы пользователей")
     for message in message_list.messages:
-        status, msg = await telegram_notification_service.send_message_to_user_by_id(message.user_id, message)
-        rate = telegram_notification_service.count_rate(status, msg, rate)
+        try:
+            status, msg = await telegram_notification_service.send_message_to_user_by_id(message.user_id, message)
+            rate = telegram_notification_service.count_rate(status, msg, rate)
+        except SendMessageError as e:
+            await log.ainfo(e)
+            status, msg = False, e.error_message
+            rate = telegram_notification_service.count_rate(status, msg, rate)
+
     await log.ainfo("Конец отправки сообщений для группы пользователей")
     return rate
 

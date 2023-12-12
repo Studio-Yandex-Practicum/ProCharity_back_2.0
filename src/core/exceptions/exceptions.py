@@ -29,9 +29,28 @@ class AlreadyExistsException(ApplicationException):
 
 
 class SendMessageError(Exception):
-    def __init__(self, user_id, error_message):
+    def __init__(self, user_id, error_message=""):
         super().__init__(error_message)
         self.user_id = user_id
+        self.error_message = error_message
+
+    def __str__(self):
+        return f"{type(self).__name__}: {self.error_message}"
+
+
+class UserNotFound(SendMessageError):
+    def __init__(self, user_id):
+        super().__init__(user_id, "Unable to find the user")
+
+
+class TelegramIDNotFound(SendMessageError):
+    def __init__(self, user_id):
+        super().__init__(user_id, "Unable to find telegram_id for this user")
+
+
+class UserBlocked(SendMessageError):
+    def __init__(self, user_id):
+        super().__init__(user_id, "User blocked the bot")
 
 
 class EmailSendError(ApplicationException):
