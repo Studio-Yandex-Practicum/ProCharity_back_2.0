@@ -58,9 +58,9 @@ jobs:
       run: |
         touch .env
         echo BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
-        echo APPLICATION_URL={{ env.APPLICATION_URL }} >> .env
-        echo ORGANIZATIONS_EMAIL={{ env.ORGANIZATIONS_EMAIL }} >> .env
-        echo EMAIL_ADMIN={{ env.EMAIL_ADMIN }} >> .env
+        echo APPLICATION_URL=${{ env.APPLICATION_URL }} >> .env
+        echo ORGANIZATIONS_EMAIL=${{ env.ORGANIZATIONS_EMAIL }} >> .env
+        echo EMAIL_ADMIN=${{ env.EMAIL_ADMIN }} >> .env
     -
       name: Alembic Upgrade
       run: poetry run alembic upgrade head
