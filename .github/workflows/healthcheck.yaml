@@ -1,6 +1,9 @@
 name: Check app
 
 on:
+  push:
+    branches:
+      - feature/add-healthcheck-in-workflow
   pull_request:
     branches:
       - develop
