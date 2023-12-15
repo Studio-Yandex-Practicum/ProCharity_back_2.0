@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     APPLICATION_URL: str = "http://localhost:8000"
     SECRET_KEY: str = "secret_key"
     ROOT_PATH: str = "/api"
-    DEBUG: bool = True
+    DEBUG: bool = False
     USE_NGROK: bool = False
     STATIC_DIR: str | Path = BASE_DIR / "templates/"
     STATIC_URL: str = "static/"
