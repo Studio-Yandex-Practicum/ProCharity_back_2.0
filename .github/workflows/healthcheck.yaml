@@ -17,8 +17,6 @@ env:
   DB_PORT: 5432
   APPLICATION_URL: 'http://localhost:8000'
   HEALTHCHECK_URL: 'http://localhost:8000/api/health_check/'
-  ORGANIZATIONS_EMAIL: 'procharity@yandex.ru'
-  EMAIL_ADMIN: 'procharityadmin_1@yandex.ru'
 
 jobs:
   healthcheck:
@@ -62,8 +60,6 @@ jobs:
         touch .env
         echo BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
         echo APPLICATION_URL=${{ env.APPLICATION_URL }} >> .env
-        echo ORGANIZATIONS_EMAIL=${{ env.ORGANIZATIONS_EMAIL }} >> .env
-        echo EMAIL_ADMIN=${{ env.EMAIL_ADMIN }} >> .env
     -
       name: Alembic Upgrade
       run: poetry run alembic upgrade head
