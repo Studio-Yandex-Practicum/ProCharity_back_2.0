@@ -1,3 +1,4 @@
+import uuid
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
@@ -47,6 +48,7 @@ class Settings(BaseSettings):
     # Настройки бота
     BOT_TOKEN: str
     BOT_WEBHOOK_MODE: bool = False
+    TELEGRAM_SECRET_TOKEN: str = str(uuid.uuid4())
 
     # Настройки jwt
     ALGORITHM: str = "HS256"
