@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - feature/add-healthcheck-in-workflow
-  pull_request:
-    branches:
-      - develop
-      - master
+  # pull_request:
+  #   branches:
+  #     - develop
+  #     - master
 
 env:
   POSTGRES_DB: procharity_back_db_local
@@ -57,6 +57,11 @@ jobs:
       name: Install Dependencies
       run: poetry install
     -
+      name: Get SHORT_SHA
+      run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
+    - name: Get COMMIT_DATE
+      run: echo COMMIT_DATE=$(git show -s --format=%ci ${{ env.SHORT_SHA }}) >> $GITHUB_ENV
+    -
       name: Create .env file
       run: |
         touch .env
@@ -64,6 +69,8 @@ jobs:
         echo APPLICATION_URL=${{ env.APPLICATION_URL }} >> .env
         echo ORGANIZATIONS_EMAIL=${{ env.ORGANIZATIONS_EMAIL }} >> .env
         echo EMAIL_ADMIN=${{ env.EMAIL_ADMIN }} >> .env
+        echo LAST_COMMIT=${{ env.SHORT_SHA }} >> .env
+        echo COMMIT_DATE=${{ env.COMMIT_DATE }} >> .env
     -
       name: Alembic Upgrade
       run: poetry run alembic upgrade head

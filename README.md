@@ -92,7 +92,7 @@ ProCharity (НКО Фонд Друзья).
 2. Собрать и запустить контейнеры из файла infra/docker-compose.local.yml.
 
     ```shell
-    docker-compose -f infra/docker-compose.local.yml up
+    docker compose -f infra/docker-compose.local.yml up
     ```
     Эта команда создаст и запустит все необходимые контейнеры, включая базу данных и бэкенд.
 
@@ -165,7 +165,7 @@ ProCharity (НКО Фонд Друзья).
 1. Запустить Docker с БД.
 
     ```shell
-    sudo docker-compose -f infra/docker-pg.yml up -d
+    sudo docker compose -f infra/docker-pg.yml up -d
     ````
 
 2. Применить миграции базы данных.
