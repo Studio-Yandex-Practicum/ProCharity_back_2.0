@@ -53,7 +53,9 @@ async def send_messages_to_group_of_users(
     await log.ainfo("Начало отправки сообщений для группы пользователей")
     for message in message_list.messages:
         try:
-            status, response = await telegram_notification_service.send_message_to_user_by_user_id(message.user_id, message)
+            status, response = await telegram_notification_service.send_message_to_user_by_user_id(
+                message.user_id, message
+            )
             rate = telegram_notification_service.count_rate(status, response, rate)
         except SendMessageError as e:
             await log.ainfo(e)
