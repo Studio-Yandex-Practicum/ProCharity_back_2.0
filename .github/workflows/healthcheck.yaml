@@ -1,13 +1,10 @@
 name: Check app
 
 on:
-  push:
+  pull_request:
     branches:
-      - feature/add-healthcheck-in-workflow
-  # pull_request:
-  #   branches:
-  #     - develop
-  #     - master
+      - develop
+      - master
 
 env:
   POSTGRES_DB: procharity_back_db_local
@@ -15,7 +12,6 @@ env:
   POSTGRES_USER: postgres
   DB_HOST: localhost
   DB_PORT: 5432
-  APPLICATION_URL: 'http://localhost:8000'
   HEALTHCHECK_URL: 'http://localhost:8000/api/health_check/'
   ORGANIZATIONS_EMAIL: 'procharity@yandex.ru'
   EMAIL_ADMIN: 'procharity.admin_1@yandex.ru'
