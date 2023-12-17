@@ -50,7 +50,7 @@ class TelegramNotificationService:
             """Пользователь отписался от уведомлений."""
             raise UserBlockedError(user_id)
 
-        return await self.telegram_notification.send_message(user_id=user_i.telegram_id, message=notifications.message)
+        return await self.telegram_notification.send_message(user_id=user_item.telegram_id, message=notifications.message)
 
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
