@@ -16,10 +16,10 @@ class TelegramNotificationService:
     определенному пользователю"""
 
     def __init__(
-            self,
-            telegram_bot: Application,
-            user_repository: UserRepository,
-            session: AsyncSession,
+        self,
+        telegram_bot: Application,
+        user_repository: UserRepository,
+        session: AsyncSession,
     ) -> None:
         self._session = session
         self.telegram_notification = TelegramNotification(telegram_bot)
