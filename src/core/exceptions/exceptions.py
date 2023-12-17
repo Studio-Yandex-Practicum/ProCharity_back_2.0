@@ -32,11 +32,6 @@ class UserNotFoundError(SendMessageError):
         super().__init__(user_id, "Unable to find the user")
 
 
-class TelegramIDNotFoundError(SendMessageError):
-    def __init__(self, user_id):
-        super().__init__(user_id, "Unable to find telegram_id for this user")
-
-
 class UserBlockedError(SendMessageError):
     def __init__(self, user_id):
         super().__init__(user_id, "User blocked the bot")

@@ -19,6 +19,10 @@ class UserRepository(AbstractRepository):
         """Возвращает пользователя (или None) по telegram_id."""
         return await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
 
+    async def get_by_user_id(self, user_id: int) -> User | None:
+        """Возвращает пользователя (или None) по user_id."""
+        return await self._session.scalar(select(User).where(User.id == user_id))
+
     async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.
 

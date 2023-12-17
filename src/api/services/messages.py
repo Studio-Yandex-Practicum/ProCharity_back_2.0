@@ -5,8 +5,9 @@ from telegram.ext import Application
 
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, User
+from src.core.db.repository import UserRepository
 from src.core.enums import TelegramNotificationUsersGroups
-from src.core.exceptions.exceptions import TelegramIDNotFoundError, UserBlockedError, UserNotFoundError
+from src.core.exceptions.exceptions import UserBlockedError, UserNotFoundError
 from src.core.services.notification import TelegramNotification
 
 
@@ -15,12 +16,14 @@ class TelegramNotificationService:
     определенному пользователю"""
 
     def __init__(
-        self,
-        telegram_bot: Application,
-        session: AsyncSession,
+            self,
+            telegram_bot: Application,
+            user_repository: UserRepository,
+            session: AsyncSession,
     ) -> None:
         self._session = session
         self.telegram_notification = TelegramNotification(telegram_bot)
+        self.user_repository = user_repository
 
     async def send_messages_to_group_of_users(self, notifications):
         """Отправляет сообщение указанной группе пользователей"""
@@ -37,15 +40,12 @@ class TelegramNotificationService:
         """Отправляет сообщение указанному по telegram_id пользователю"""
         return await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
 
-    async def send_message_to_user_by_id(self, user_id, notifications) -> tuple[bool, str]:
+    async def send_message_to_user_by_user_id(self, user_id, notifications) -> tuple[bool, str]:
         """Отправляет сообщение указанному пользователю по user_id."""
-        user_i: User | None = await self._session.scalar(select(User).where(User.id == user_id))
+        user_i: User | None = await self.user_repository.get_by_user_id(user_id=user_id)
         if not user_i:
             """Пользователь не найден."""
             raise UserNotFoundError(user_id)
-        if not user_i.telegram_id:
-            """Telegram_id не найден."""
-            raise TelegramIDNotFoundError(user_id)
         if user_i.banned:
             """Пользователь отписался от уведомлений."""
             raise UserBlockedError(user_id)
