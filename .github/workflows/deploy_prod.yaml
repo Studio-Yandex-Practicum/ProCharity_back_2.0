@@ -1,11 +1,13 @@
-name: Stage Deploy
+name: Prod Deploy
 
 concurrency:
-  group: stage_deploy
+  group: prod_deploy
   cancel-in-progress: true
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   deploy:
