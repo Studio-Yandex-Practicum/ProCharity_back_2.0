@@ -19,7 +19,7 @@ on:
         default: stage
       deploy_path:
         description: "Path to the application dir"
-        required: true
+        required: false
         type: string
         default: /procharity2/full
 
