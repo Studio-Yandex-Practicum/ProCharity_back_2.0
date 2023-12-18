@@ -17,12 +17,19 @@ on:
         required: true
         type: string
         default: stage
+      deploy_path:
+        description: "Path to the application dir"
+        required: true
+        type: string
+        default: /procharity2/full
+
 
 env:
   REGISTRY: ghcr.io
   REP_OWNER: studio-yandex-practicum
   IMAGE_NAME: procharity_back_2.0_backend
-  DEPLOY_PATH: /procharity2/full
+  DEPLOY_PATH: ${{ inputs.deploy_path }}
+
   WORK_DIR: /app
 
 defaults:
