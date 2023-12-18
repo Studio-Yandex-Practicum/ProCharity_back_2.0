@@ -16,4 +16,5 @@ jobs:
       environment: deploy-prod
       label: prod
       deploy_path: /PROCHARITY
+
     secrets: inherit
