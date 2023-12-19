@@ -1,0 +1,144 @@
+name: Build and deploy
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Deploy Environment."
+        required: true
+        type: string
+        default: stage_deploy
+      label:
+        description: "Docker image label"
+        required: true
+        type: string
+        default: stage
+      deploy_path:
+        description: "Path to the application dir"
+        required: false
+        type: string
+        default: /procharity2/full
+
+
+env:
+  REGISTRY: ghcr.io
+  REP_OWNER: studio-yandex-practicum
+  IMAGE_NAME: procharity_back_2.0_backend
+  DEPLOY_PATH: ${{ inputs.deploy_path }}
+
+  WORK_DIR: /app
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  build-and-push-image-to-github-packages:
+    name: Push backend Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: develop
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sanitize repo slug
+        uses: actions/github-script@v6
+        id: repo_slug
+        with:
+          result-encoding: string
+          script: return 'ghcr.io/${{ github.repository }}'.toLowerCase()
+      - name: Push Stage to GitHub Container Registry
+        uses: docker/build-push-action@v4
+        with:
+          context: "{{defaultContext}}"
+          push: true
+          tags: ${{ steps.repo_slug.outputs.result }}:${{ inputs.label }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build-and-push-image-to-github-packages
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Copy docker-compose and nginx files
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "infra/docker-compose.swag.yml, infra/nginx/*.conf"
+          target: ${{ env.DEPLOY_PATH }}
+      - name: Get SHORT_SHA
+        run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
+      - name: Get COMMIT_DATE
+        run: echo COMMIT_DATE=$(git show -s --format=%ci ${{ env.SHORT_SHA }}) >> $GITHUB_ENV
+      - name: Create .env file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}
+            mv infra/docker-compose.swag.yml infra/docker-compose.yaml
+            rm -f .env
+            cat > .env <<- EOM
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+            BOT_WEBHOOK_MODE=${{ secrets.BOT_WEBHOOK_MODE }}
+            APPLICATION_URL=${{ secrets.APPLICATION_URL }}
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            ROOT_PATH=${{ secrets.ROOT_PATH }}
+            MAIL_SERVER=${{ secrets.MAIL_SERVER }}
+            MAIL_LOGIN=${{ secrets.MAIL_LOGIN }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }}
+            EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
+            LAST_COMMIT=${{ env.SHORT_SHA }}
+            COMMIT_DATE=${{ env.COMMIT_DATE }}
+            EOM
+  start_application:
+    name: Start application
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    needs: deploy
+    steps:
+      - name: Start application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}/infra
+            docker compose --file docker-compose.yaml --env-file ../.env pull backend -q
+            docker compose --file docker-compose.yaml --env-file ../.env up -d --wait
+            docker system prune -f || true
+
+            docker compose --env-file ../.env exec -Tw ${{ env.WORK_DIR }} backend bash -c "alembic upgrade head"
