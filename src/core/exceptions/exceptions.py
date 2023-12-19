@@ -61,3 +61,31 @@ class TokenNotProvided(ApplicationException):
 class InvalidToken(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.FORBIDDEN
     detail = "Токен в заголовке запроса неверный."
+
+
+class InvalidInvitationToken(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.FORBIDDEN
+    # хочется добавить запятую в "Пожалуйста, свяжитесь"
+    detail = "Приглашение не было найдено или просрочено. Пожалуйста свяжитесь с администратором сайта."
+
+
+class UserAlreadyExists(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+    detail = "Пользователь с указанным почтовым адресом уже зарегистрирован."
+
+
+class PasswordNotProvided(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
+    detail = "Для регистрации необходимо указать пароль."
+
+
+class InvalidPassword(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+    detail = "Введенный пароль не соответствует политике паролей."
+
+
+class BadRequestException(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+
+    def __init__(self, detail: str):
+        self.detail = detail

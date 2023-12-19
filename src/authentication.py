@@ -1,15 +1,17 @@
+import re
+from datetime import date
 from typing import AsyncGenerator, Generic, Optional, Sequence, Tuple, Type, Union
 
 import structlog
+from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.param_functions import Form
 from fastapi.responses import JSONResponse
-from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
+from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
 from fastapi_users.authentication import AuthenticationBackend, Authenticator, BearerTransport, JWTStrategy, Strategy
 from fastapi_users.authentication.transport import Transport
 from fastapi_users.manager import UserManagerDependency
 from fastapi_users.openapi import OpenAPIResponseType
-from fastapi_users.router import get_register_router
 from fastapi_users.router.common import ErrorCode, ErrorModel
 from fastapi_users.schemas import model_dump
 from fastapi_users.types import DependencyCallable
@@ -19,7 +21,18 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from typing_extensions import Annotated
 
+from src.api.constants import PASSWORD_POLICY
+from src.api.schemas.admin import UserCreate
+from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser, Base
+from src.core.depends import Container
+from src.core.exceptions.exceptions import (
+    BadRequestException,
+    InvalidInvitationToken,
+    InvalidPassword,
+    PasswordNotProvided,
+    UserAlreadyExists,
+)
 from src.settings import settings
 
 log = structlog.get_logger()
@@ -40,14 +53,6 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, AdminUser)
-
-
-class UserRead(schemas.BaseUser[int]):
-    pass
-
-
-class UserCreate(schemas.BaseUserCreate):
-    pass
 
 
 class CustomBearerResponse(BaseModel):
@@ -108,6 +113,61 @@ auth_backend = AuthenticationBackendRefresh(
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
+    async def create(
+        self,
+        user_create: schemas.UC,
+        safe: bool = False,
+        request: Optional[Request] = None,
+        admin_token_request_service: AdminTokenRequestService = Depends(
+            Provide[Container.api_services_container.admin_token_request_service]
+        ),
+    ) -> models.UP:
+        token = user_create.token
+        registration_record = await admin_token_request_service.get_by_token(token)
+        if not registration_record or registration_record.token_expiration_date < date.today():
+            await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
+            raise InvalidInvitationToken
+        del user_create.token
+
+        email = registration_record.email
+        existing_user = await self.user_db.get_by_email(email)
+        if existing_user is not None:
+            await log.ainfo(f"Registration: The user with the specified mailing address {email} is already registered.")
+            raise UserAlreadyExists
+
+        password = user_create.password
+        if not password:
+            await log.ainfo(f"Registration: The password for registration not passed. User: {email}")
+            raise PasswordNotProvided
+        await self.validate_password(password, user_create, email)
+
+        user_dict = user_create.create_update_dict() if safe else user_create.create_update_dict_superuser()
+        password = user_dict.pop("password")
+        user_dict["hashed_password"] = self.password_helper.hash(password)
+        user_dict["email"] = email
+
+        try:
+            created_user = await self.user_db.create(user_dict)
+            await admin_token_request_service.remove(registration_record)
+        # не уверена в том, какую ошибку здесь нужно ловить (в первой версии бота ловили SQLAlchemyError)
+        # при тестировании смогла получить TypeError, так что её точно нужно
+        except TypeError as ex:
+            await log.ainfo(f'Registration: Database commit error "{str(ex)}"')
+            raise BadRequestException(f"Bad request: {str(ex)}")
+
+        await self.on_after_register(created_user, request)
+        return JSONResponse(content={"description": "Пользователь успешно зарегистрирован."})
+
+    async def validate_password(self, password: str, user: UserCreate | AdminUser, email: str) -> None:
+        if re.match(PASSWORD_POLICY, password) is None or email in password or user.last_name in password:
+            await log.ainfo(
+                f"Registration: The entered password does not comply with the password policy. User: {email}."
+            )
+            raise InvalidPassword
+
+    async def on_after_register(self, user: AdminUser, request: Optional[Request] = None) -> None:
+        await log.ainfo(f"Registration: User {user.email} is successfully registered.")
+
     async def on_after_login(
         self,
         user: AdminUser,
@@ -227,6 +287,90 @@ def get_auth_router(
     ):
         user, token = user_token
         return await backend.logout(strategy, user, token)
+
+    return router
+
+
+def get_register_router(
+    get_user_manager: UserManagerDependency[models.UP, models.ID],
+    user_schema: Type[schemas.U],
+    user_create_schema: Type[schemas.UC],
+) -> APIRouter:
+    """Generate a router with the register route."""
+    router = APIRouter()
+
+    @router.post(
+        "/register",
+        status_code=status.HTTP_200_OK,
+        name="User Registration",
+        responses={
+            status.HTTP_400_BAD_REQUEST: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            UserAlreadyExists.status_code: {
+                                "summary": "The user with the specified mailing address email is already registered.",
+                                "value": {"detail": UserAlreadyExists.detail},
+                            },
+                            InvalidPassword.status_code: {
+                                "summary": "The entered password does not comply with the password policy.",
+                                "value": {"detail": InvalidPassword.detail},
+                            },
+                        }
+                    }
+                },
+            },
+            status.HTTP_401_UNAUTHORIZED: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            PasswordNotProvided.status_code: {
+                                "summary": "The password for registration not passed.",
+                                "value": {"detail": PasswordNotProvided.detail},
+                            },
+                        }
+                    }
+                },
+            },
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
+                            },
+                        }
+                    }
+                },
+            },
+        },
+    )
+    async def register(
+        request: Request,
+        user_create: user_create_schema,
+        user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
+    ):
+        try:
+            message = await user_manager.create(user_create, safe=True, request=request)
+        except exceptions.UserAlreadyExists:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=ErrorCode.REGISTER_USER_ALREADY_EXISTS,
+            )
+        except exceptions.InvalidPasswordException as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "code": ErrorCode.REGISTER_INVALID_PASSWORD,
+                    "reason": e.reason,
+                },
+            )
+
+        return message
 
     return router
 
