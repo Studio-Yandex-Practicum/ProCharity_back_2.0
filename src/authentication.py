@@ -149,8 +149,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         try:
             created_user = await self.user_db.create(user_dict)
             await admin_token_request_service.remove(registration_record)
-        # не уверена в том, какую ошибку здесь нужно ловить (в первой версии бота ловили SQLAlchemyError)
-        # при тестировании смогла получить TypeError, так что её точно нужно
         except TypeError as ex:
             await log.ainfo(f'Registration: Database commit error "{str(ex)}"')
             raise BadRequestException(f"Bad request: {str(ex)}")

@@ -22,11 +22,8 @@ class AdminUserRequest(RequestBase):
 
 
 class UserCreate(schemas.CreateUpdateDictModel):
-    # хочется исправить на "Invitation token."
     token: str = Field(..., description="Invitation token")
-    # хочется исправить на "User's First Name."
     first_name: Optional[str] = Field(None, max_length=64, description="User' First Name.")
-    # хочется исправить на "User's Last Name."
     last_name: Optional[str] = Field(None, max_length=64, description="User' Last Name.")
     password: str = Field(..., description="Account password.")
 

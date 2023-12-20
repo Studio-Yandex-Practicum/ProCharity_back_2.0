@@ -65,7 +65,6 @@ class InvalidToken(ApplicationException):
 
 class InvalidInvitationToken(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.FORBIDDEN
-    # хочется добавить запятую в "Пожалуйста, свяжитесь"
     detail = "Приглашение не было найдено или просрочено. Пожалуйста свяжитесь с администратором сайта."
 
 
