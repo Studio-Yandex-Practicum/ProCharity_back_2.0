@@ -1,13 +1,12 @@
-import re
-from datetime import date
-from typing import AsyncGenerator, Generic, Optional, Sequence, Tuple, Type, Union
+from datetime import datetime
+from typing import AsyncGenerator, Generic, Sequence, Tuple, Type, Union
 
 import structlog
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.param_functions import Form
 from fastapi.responses import JSONResponse
-from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, models, schemas
+from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
 from fastapi_users.authentication import AuthenticationBackend, Authenticator, BearerTransport, JWTStrategy, Strategy
 from fastapi_users.authentication.transport import Transport
 from fastapi_users.manager import UserManagerDependency
@@ -21,8 +20,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from typing_extensions import Annotated
 
-from src.api.constants import PASSWORD_POLICY
-from src.api.schemas.admin import UserCreate
 from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser, Base
 from src.core.depends import Container
@@ -30,7 +27,6 @@ from src.core.exceptions.exceptions import (
     BadRequestException,
     InvalidInvitationToken,
     InvalidPassword,
-    PasswordNotProvided,
     UserAlreadyExists,
 )
 from src.settings import settings
@@ -117,14 +113,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         self,
         user_create: schemas.UC,
         safe: bool = False,
-        request: Optional[Request] = None,
+        request: Request | None = None,
         admin_token_request_service: AdminTokenRequestService = Depends(
             Provide[Container.api_services_container.admin_token_request_service]
         ),
     ) -> models.UP:
         token = user_create.token
         registration_record = await admin_token_request_service.get_by_token(token)
-        if not registration_record or registration_record.token_expiration_date < date.today():
+        if not registration_record or registration_record.token_expiration_date < datetime.now():
             await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
             raise InvalidInvitationToken
         del user_create.token
@@ -136,10 +132,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
             raise UserAlreadyExists
 
         password = user_create.password
-        if not password:
-            await log.ainfo(f"Registration: The password for registration not passed. User: {email}")
-            raise PasswordNotProvided
-        await self.validate_password(password, user_create, email)
+        await self.validate_password(password, user_create)
 
         user_dict = user_create.create_update_dict() if safe else user_create.create_update_dict_superuser()
         password = user_dict.pop("password")
@@ -154,23 +147,18 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
             raise BadRequestException(f"Bad request: {str(ex)}")
 
         await self.on_after_register(created_user, request)
-        return JSONResponse(content={"description": "Пользователь успешно зарегистрирован."})
+        return JSONResponse(
+            content={"description": "Пользователь успешно зарегистрирован."}, status_code=status.HTTP_201_CREATED
+        )
 
-    async def validate_password(self, password: str, user: UserCreate | AdminUser, email: str) -> None:
-        if re.match(PASSWORD_POLICY, password) is None or email in password or user.last_name in password:
-            await log.ainfo(
-                f"Registration: The entered password does not comply with the password policy. User: {email}."
-            )
-            raise InvalidPassword
-
-    async def on_after_register(self, user: AdminUser, request: Optional[Request] = None) -> None:
+    async def on_after_register(self, user: AdminUser, request: Request | None = None) -> None:
         await log.ainfo(f"Registration: User {user.email} is successfully registered.")
 
     async def on_after_login(
         self,
         user: AdminUser,
-        request: Optional[Request] = None,
-        response: Optional[Response] = None,
+        request: Request | None = None,
+        response: Request | None = None,
     ):
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
@@ -319,19 +307,6 @@ def get_register_router(
                     }
                 },
             },
-            status.HTTP_401_UNAUTHORIZED: {
-                "model": ErrorModel,
-                "content": {
-                    "application/json": {
-                        "examples": {
-                            PasswordNotProvided.status_code: {
-                                "summary": "The password for registration not passed.",
-                                "value": {"detail": PasswordNotProvided.detail},
-                            },
-                        }
-                    }
-                },
-            },
             status.HTTP_403_FORBIDDEN: {
                 "model": ErrorModel,
                 "content": {
@@ -352,23 +327,7 @@ def get_register_router(
         user_create: user_create_schema,
         user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
     ):
-        try:
-            message = await user_manager.create(user_create, safe=True, request=request)
-        except exceptions.UserAlreadyExists:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=ErrorCode.REGISTER_USER_ALREADY_EXISTS,
-            )
-        except exceptions.InvalidPasswordException as e:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail={
-                    "code": ErrorCode.REGISTER_INVALID_PASSWORD,
-                    "reason": e.reason,
-                },
-            )
-
-        return message
+        return await user_manager.create(user_create, safe=True, request=request)
 
     return router
 

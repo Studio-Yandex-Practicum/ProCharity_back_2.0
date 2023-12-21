@@ -65,17 +65,12 @@ class InvalidToken(ApplicationException):
 
 class InvalidInvitationToken(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.FORBIDDEN
-    detail = "Приглашение не было найдено или просрочено. Пожалуйста свяжитесь с администратором сайта."
+    detail = "Приглашение не было найдено или просрочено. Пожалуйста, свяжитесь с администратором сайта."
 
 
 class UserAlreadyExists(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
     detail = "Пользователь с указанным почтовым адресом уже зарегистрирован."
-
-
-class PasswordNotProvided(ApplicationException):
-    status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
-    detail = "Для регистрации необходимо указать пароль."
 
 
 class InvalidPassword(ApplicationException):
