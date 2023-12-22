@@ -18,7 +18,7 @@ async def get_health_check(
 ) -> HealthCheck:
     import os
 
-    from git import Repo
+    # from git import Repo
 
     gitlinks_folder = os.path.join(os.getcwd(), ".git", "refs")
     refs = []
@@ -35,8 +35,8 @@ async def get_health_check(
         packed_refs = file.read().splitlines()
     response_text = "\n".join(
         (
-            "Heads:",
-            *[head.__repr__() for head in Repo(os.getcwd()).heads],
+            # "Heads:",
+            # *[head.__repr__() for head in Repo(os.getcwd()).heads],
             "\nActive refs:",
             *refs,
             "\nPacked refs:",
