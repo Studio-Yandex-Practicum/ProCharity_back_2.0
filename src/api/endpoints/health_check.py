@@ -42,7 +42,7 @@ async def get_health_check(
         packed_refs = []
         with open(packed_refs_file, "r") as file:
             packed_refs = file.read().splitlines()
-        response_text = "666".join((f"Exception: {str(exc)}", "\nActive refs:", *refs, "\nPacked refs:" * packed_refs))
+        response_text = "\n".join((f"Exception: {str(exc)}", "\nActive refs:", *refs, "\nPacked refs:", *packed_refs))
 
         return {
             "db": {
