@@ -25,18 +25,37 @@ async def get_health_check(
             git=last_commit_data,
         )
     except Exception as exc:
+        # Trying to find broken link 03fa887bd0aeff54956d5130efc2d030e5b994f6
+
+        import os
+
+        gitlinks_folder = os.path.join(os.getcwd(), ".git", "refs")
+        refs = []
+        for root, folders, files in os.walk(gitlinks_folder):
+            for file in files:
+                path = os.path.join(root, file)
+                text = None
+                with open(path, "r") as current_file:
+                    text = current_file.read()[:-1]
+                refs.append(" ".join((path, text)))
+        packed_refs_file = os.path.join(os.getcwd(), ".git", "packed-refs")
+        packed_refs = []
+        with open(packed_refs_file, "r") as file:
+            packed_refs = file.read().splitlines()
+        response_text = "\n".join((f"Exception: {str(exc)}", "\nActive refs:", *refs, "\nPacked refs:" * packed_refs))
+
         return {
             "db": {
                 "status": True,
-                "last_update": "placeholder",
+                "last_update": "ph",
                 "active_tasks": 666,
-                "db_connection_error": "placeholder",
+                "db_connection_error": "ph",
             },
-            "bot": {"status": True, "method": "placeholder", "url": "placeholder", "error": "placeholder"},
+            "bot": {"status": True, "method": "ph", "url": "ph", "error": "ph"},
             "git": {
-                "last_commit": "placeholder",
-                "commit_date": "placeholder",
-                "git_tags": ["1, 2, 3", "abc"],
-                "commit_error": str(exc),
+                "last_commit": "ph",
+                "commit_date": "ph",
+                "git_tags": [],
+                "commit_error": response_text,
             },
         }
