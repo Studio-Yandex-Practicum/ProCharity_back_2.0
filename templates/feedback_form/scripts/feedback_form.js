@@ -204,7 +204,7 @@ if (params.update) {
   var buttonText = 'Подать заявку на участие в смене';
 } else {
   var formText = '* необходимо заполнить поля';
-  var buttonText = 'Зарегистрироваться в проекте';
+  var buttonText = 'Отправить';
 }
 
 document.getElementById('formtitle').innerHTML = formText;
