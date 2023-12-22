@@ -121,6 +121,7 @@ jobs:
             EMAIL_ADMIN=${{ secrets.EMAIL_ADMIN }}
             LAST_COMMIT=${{ env.SHORT_SHA }}
             COMMIT_DATE=${{ env.COMMIT_DATE }}
+            ACCESS_TOKEN_FOR_PROCHARITY=${{ secrets.ACCESS_TOKEN_FOR_PROCHARITY }}
             EOM
   start_application:
     name: Start application
