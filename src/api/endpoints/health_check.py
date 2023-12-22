@@ -16,27 +16,33 @@ health_check_router = APIRouter(dependencies=[Depends(check_header_contains_toke
 async def get_health_check(
     health_check_service: HealthCheckService = Depends(Provide[Container.api_services_container.health_check_service]),
 ) -> HealthCheck:
+    gag_response = {
+        "db": {"status": True, "last_update": "ph", "active_tasks": 666, "db_connection_error": "ph"},
+        "bot": {"status": True, "method": "ph", "url": "ph", "error": "ph"},
+        "git": {"last_commit": "ph", "commit_date": "ph", "git_tags": [], "commit_error": ""},
+    }
+    # try:
+    #     last_commit_data = await health_check_service.get_last_commit()
+    #     # last_commit_data["git_tags"] = [str(tag) for tag in last_commit_data["git_tags"]]
+    #     return HealthCheck(
+    #         db=await health_check_service.check_db_connection(),
+    #         bot=await health_check_service.check_bot(),
+    #         git=last_commit_data,
+    #     )
+    report = []
     try:
-        last_commit_data = await health_check_service.get_last_commit()
-        # last_commit_data["git_tags"] = [str(tag) for tag in last_commit_data["git_tags"]]
-        return HealthCheck(
-            db=await health_check_service.check_db_connection(),
-            bot=await health_check_service.check_bot(),
-            git=last_commit_data,
-        )
+        import os
+
+        from git import Repo
+
+        repo = Repo(os.getcwd())
+
+        master = repo.head.reference
+        report.append(f"master: {str(master)}")
+        report.append(f"commit_date: {str(master.commit.committed_date)}")
+        report.append(f"last_commit: {master.commit[:7]}")
     except Exception as exc:
-        return {
-            "db": {
-                "status": True,
-                "last_update": "ph",
-                "active_tasks": 666,
-                "db_connection_error": "ph",
-            },
-            "bot": {"status": True, "method": "ph", "url": "ph", "error": "ph"},
-            "git": {
-                "last_commit": "ph",
-                "commit_date": "ph",
-                "git_tags": [],
-                "commit_error": f"{type(exc)} {str(exc)}",
-            },
-        }
+        report.append(f"Exception: {type(exc)} {str(exc)}")
+    finally:
+        gag_response["git"]["commit_error"] = "\n".join(report)
+        return gag_response
