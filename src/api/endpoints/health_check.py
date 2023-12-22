@@ -16,6 +16,50 @@ health_check_router = APIRouter(dependencies=[Depends(check_header_contains_toke
 async def get_health_check(
     health_check_service: HealthCheckService = Depends(Provide[Container.api_services_container.health_check_service]),
 ) -> HealthCheck:
+    import os
+
+    from git import Repo
+
+    gitlinks_folder = os.path.join(os.getcwd(), ".git", "refs")
+    refs = []
+    for root, folders, files in os.walk(gitlinks_folder):
+        for file in files:
+            path = os.path.join(root, file)
+            text = None
+            with open(path, "r") as current_file:
+                text = current_file.read()[:-1]
+            refs.append(" ".join((path, text)))
+    packed_refs_file = os.path.join(os.getcwd(), ".git", "packed-refs")
+    packed_refs = []
+    with open(packed_refs_file, "r") as file:
+        packed_refs = file.read().splitlines()
+    response_text = "\n".join(
+        (
+            "Heads:",
+            *[head.__repr__() for head in Repo(os.getcwd()).heads],
+            "\nActive refs:",
+            *refs,
+            "\nPacked refs:",
+            *packed_refs,
+        )
+    )
+
+    return {
+        "db": {
+            "status": True,
+            "last_update": "ph",
+            "active_tasks": 666,
+            "db_connection_error": "ph",
+        },
+        "bot": {"status": True, "method": "ph", "url": "ph", "error": "ph"},
+        "git": {
+            "last_commit": "ph",
+            "commit_date": "ph",
+            "git_tags": [],
+            "commit_error": response_text,
+        },
+    }
+
     try:
         last_commit_data = await health_check_service.get_last_commit()
         # last_commit_data["git_tags"] = [str(tag) for tag in last_commit_data["git_tags"]]
