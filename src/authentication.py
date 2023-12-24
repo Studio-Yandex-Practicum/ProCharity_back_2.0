@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import AsyncGenerator, Generic, Sequence, Tuple, Type, Union
+from typing import AsyncGenerator, Generic, Sequence, Tuple, Type
 
 import structlog
 from dependency_injector.wiring import Provide
@@ -12,16 +12,15 @@ from fastapi_users.authentication.transport import Transport
 from fastapi_users.manager import UserManagerDependency
 from fastapi_users.openapi import OpenAPIResponseType
 from fastapi_users.router.common import ErrorCode, ErrorModel
-from fastapi_users.schemas import model_dump
 from fastapi_users.types import DependencyCallable
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from typing_extensions import Annotated
 
+from src.api.constants import JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
+from src.api.schemas.admin import CustomBearerResponse
 from src.api.services import AdminTokenRequestService
-from src.core.db.models import AdminUser, Base
+from src.core.db.models import AdminUser
 from src.core.depends import Container
 from src.core.exceptions.exceptions import (
     BadRequestException,
@@ -37,11 +36,6 @@ engine = create_async_engine(settings.database_url)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
-async def create_db_and_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
@@ -51,18 +45,13 @@ async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, AdminUser)
 
 
-class CustomBearerResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-
-
 class CustomBearerTransport(BearerTransport):
     async def get_login_response(self, token: str, refresh_token: str) -> Response:
         bearer_response = CustomBearerResponse(
             access_token=token,
             refresh_token=refresh_token,
         )
-        return JSONResponse(model_dump(bearer_response))
+        return JSONResponse(bearer_response.__dict__)
 
 
 class AuthenticationBackendRefresh(AuthenticationBackend):
@@ -93,11 +82,11 @@ bearer_transport = CustomBearerTransport(tokenUrl="auth/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=3600)
+    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=JWT_LIFETIME_SECONDS)
 
 
 def get_refresh_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=7200)
+    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=JWT_REFRESH_LIFETIME_SECONDS)
 
 
 auth_backend = AuthenticationBackendRefresh(
@@ -171,30 +160,12 @@ class OAuth2PasswordRequestForm:
     def __init__(
         self,
         *,
-        grant_type: Annotated[
-            Union[str, None],
-            Form(pattern="password"),
-        ] = None,
-        email: Annotated[
-            str,
-            Form(),
-        ],
-        password: Annotated[
-            str,
-            Form(),
-        ],
-        scope: Annotated[
-            str,
-            Form(),
-        ] = "",
-        client_id: Annotated[
-            Union[str, None],
-            Form(),
-        ] = None,
-        client_secret: Annotated[
-            Union[str, None],
-            Form(),
-        ] = None,
+        grant_type: str | None = Form(default=None, regex="password"),
+        email: str = Form(),
+        password: str = Form(),
+        scope: str = Form(default=""),
+        client_id: str | None = Form(default=None),
+        client_secret: str | None = Form(default=None),
     ):
         self.grant_type = grant_type
         self.username = email

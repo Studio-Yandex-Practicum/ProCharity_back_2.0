@@ -1,7 +1,7 @@
 import re
 
 from fastapi_users import schemas
-from pydantic import Field, validator
+from pydantic import BaseModel, Field, validator
 
 from src.api.constants import PASSWORD_POLICY
 from src.api.schemas.base import RequestBase
@@ -38,3 +38,8 @@ class UserCreate(schemas.CreateUpdateDictModel):
 
 class UserRead(schemas.BaseUser[int]):
     pass
+
+
+class CustomBearerResponse(BaseModel):
+    access_token: str
+    refresh_token: str
