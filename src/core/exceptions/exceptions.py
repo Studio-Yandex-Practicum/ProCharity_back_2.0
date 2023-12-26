@@ -4,6 +4,7 @@ from typing import Any
 from pydantic import EmailStr
 from starlette.exceptions import HTTPException
 
+from src.api.constants import PASSWORD_POLICY_EXPLANATION
 from src.core.db.models import Base as DatabaseModel
 
 
@@ -75,7 +76,7 @@ class UserAlreadyExists(ApplicationException):
 
 class InvalidPassword(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
-    detail = "Введенный пароль не соответствует политике паролей."
+    detail = f"Введенный пароль не соответствует политике паролей. {PASSWORD_POLICY_EXPLANATION}"
 
 
 class BadRequestException(ApplicationException):

@@ -4,7 +4,16 @@ DATE_FORMAT_FOR_TASK_SCHEMA = "%d.%m.%Y"
 DATE_TIME_FORMAT = "%d-%m-%Y %H:%M:%S"
 DAYS_NUMBER_FOR_USERS_STATISTIC = 30
 PASSWORD_POLICY = "^(?=.*?[A-Z])(?=.*?[a-z]).{8,32}$"
+PASSWORD_POLICY_EXPLANATION = (
+    "Требования к паролю: длина пароля - от 8 до 32 символов включительно; "
+    "не менее 1 строчной и 1 заглавной латинской буквы."
+)
 PASSWORD_POLICY_STRONG = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,32}$"
+PASSWORD_POLICY_STRONG_EXPLANATION = (
+    "Требования к паролю: длина пароля - от 8 до 32 символов включительно; "
+    "не менее 1 строчной и 1 заглавной латинской буквы; не менее 1 цифры; "
+    "не менее одного спец.символа #?!@$%^&*- ."
+)
 JWT_LIFETIME_SECONDS = 60 * 60
 JWT_REFRESH_LIFETIME_SECONDS = 2 * 60 * 60
 API_DESCRIPTION = """

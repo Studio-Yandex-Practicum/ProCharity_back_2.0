@@ -14,6 +14,7 @@ from fastapi_users.openapi import OpenAPIResponseType
 from fastapi_users.router.common import ErrorCode, ErrorModel
 from fastapi_users.types import DependencyCallable
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
+from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -51,7 +52,7 @@ class CustomBearerTransport(BearerTransport):
             access_token=token,
             refresh_token=refresh_token,
         )
-        return JSONResponse(bearer_response.__dict__)
+        return JSONResponse(bearer_response.model_dump())
 
 
 class AuthenticationBackendRefresh(AuthenticationBackend):
@@ -161,7 +162,7 @@ class OAuth2PasswordRequestForm:
         self,
         *,
         grant_type: str | None = Form(default=None, regex="password"),
-        email: str = Form(),
+        email: EmailStr = Form(),
         password: str = Form(),
         scope: str = Form(default=""),
         client_id: str | None = Form(default=None),
