@@ -12,7 +12,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class Base(DeclarativeBase):
     """Основа для базового класса."""
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     created_at: Mapped[date] = mapped_column(server_default=func.current_timestamp())
     updated_at: Mapped[date] = mapped_column(
         server_default=func.current_timestamp(),
