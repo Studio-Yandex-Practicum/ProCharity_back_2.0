@@ -6,12 +6,13 @@ from fastapi import APIRouter, Depends, Query
 from src.api.schemas import ActiveTasks, AllUsersStatistic, Analytic, DBStatus, ReasonCancelingStatistics
 from src.api.services import HealthCheckService
 from src.api.services.analytics import AnalyticsService
+from src.authentication import current_user
 from src.core.depends import Container
 
 analytic_router = APIRouter()
 
 
-@analytic_router.get("/", description="Возращает статистику сервиса.")
+@analytic_router.get("/", description="Возращает статистику сервиса.", dependencies=[Depends(current_user)])
 @inject
 async def get_analytics(
     date_limit: date = Query(..., example="2023-10-11"),
