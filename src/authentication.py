@@ -15,6 +15,7 @@ from fastapi_users.router.common import ErrorCode, ErrorModel
 from fastapi_users.types import DependencyCallable
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from pydantic import EmailStr
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -99,7 +100,7 @@ auth_backend = AuthenticationBackendRefresh(
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
-    async def create(
+    async def create_with_token(
         self,
         user_create: schemas.UC,
         safe: bool = False,
@@ -107,7 +108,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         admin_token_request_service: AdminTokenRequestService = Depends(
             Provide[Container.api_services_container.admin_token_request_service]
         ),
-    ) -> models.UP:
+    ) -> AdminUser:
         token = user_create.token
         registration_record = await admin_token_request_service.get_by_token(token)
         if not registration_record or registration_record.token_expiration_date < datetime.now():
@@ -132,7 +133,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         try:
             created_user = await self.user_db.create(user_dict)
             await admin_token_request_service.remove(registration_record)
-        except TypeError as ex:
+        except SQLAlchemyError as ex:
             await log.ainfo(f'Registration: Database commit error "{str(ex)}"')
             raise BadRequestException(f"Bad request: {str(ex)}")
 
@@ -299,7 +300,7 @@ def get_register_router(
         user_create: user_create_schema,
         user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
     ):
-        return await user_manager.create(user_create, safe=True, request=request)
+        return await user_manager.create_with_token(user_create, safe=True, request=request)
 
     return router
 
