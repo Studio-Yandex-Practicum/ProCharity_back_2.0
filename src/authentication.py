@@ -278,5 +278,3 @@ fastapi_users = CustomFastAPIUsers[AdminUser, int](
     get_user_manager,
     [auth_backend, auth_cookie_backend],
 )
-
-current_user = fastapi_users.current_user(active=True)

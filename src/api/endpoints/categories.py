@@ -4,11 +4,17 @@ from fastapi import APIRouter, Depends
 from src.api.auth import check_header_contains_token
 from src.api.schemas import CategoryRequest, CategoryResponse
 from src.api.services import CategoryService
-from src.authentication import current_user
+from src.authentication import fastapi_users
 from src.core.db.models import Category
 from src.core.depends import Container
+from src.settings import settings
 
-category_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+category_router = APIRouter(
+    dependencies=[
+        Depends(check_header_contains_token),
+        Depends(fastapi_users.current_user(optional=True if settings.DEBUG else False)),
+    ]
+)
 
 
 @category_router.get(
@@ -16,7 +22,6 @@ category_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
     response_model=list[CategoryResponse],
     response_model_exclude_none=True,
     description="Получает список всех категорий.",
-    dependencies=[Depends(current_user)],
 )
 @inject
 async def get_categories(
@@ -25,7 +30,7 @@ async def get_categories(
     return await category_service.get_all()
 
 
-@category_router.post("/", description="Актуализирует список категорий.", dependencies=[Depends(current_user)])
+@category_router.post("/", description="Актуализирует список категорий.")
 @inject
 async def actualize_categories(
     categories: list[CategoryRequest],

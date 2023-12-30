@@ -6,7 +6,7 @@ admin_user_router = APIRouter()
 
 admin_user_router.include_router(
     fastapi_users.get_auth_router(auth_cookie_backend),
-    prefix="/auth/jwt_cookies",
+    prefix="/auth/cookies",
     tags=["Admin Login Logout By Cookies"],
 )
 admin_user_router.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth", tags=["AdminUser"])
