@@ -12,7 +12,7 @@ from src.settings import settings
 
 analytic_router = APIRouter(
     dependencies=[
-        Depends(fastapi_users.current_user(optional=True if settings.DEBUG else False)),
+        Depends(fastapi_users.current_user(optional=settings.DEBUG)),
     ]
 )
 

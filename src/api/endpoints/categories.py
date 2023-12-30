@@ -12,7 +12,7 @@ from src.settings import settings
 category_router = APIRouter(
     dependencies=[
         Depends(check_header_contains_token),
-        Depends(fastapi_users.current_user(optional=True if settings.DEBUG else False)),
+        Depends(fastapi_users.current_user(optional=settings.DEBUG)),
     ]
 )
 
