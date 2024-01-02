@@ -302,7 +302,46 @@ def get_register_router(
     ):
         return await user_manager.create_with_token(user_create, safe=True, request=request)
 
+    @router.post(
+        "/token_checker",
+        status_code=status.HTTP_200_OK,
+        name="Checking invitation token.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
+                            },
+                        }
+                    }
+                },
+            },
+        },
+    )
+    async def check_token(
+        token: str,
+    ):
+        return await check_invitation_token(token)
+
     return router
+
+
+async def check_invitation_token(
+    token: str,
+    admin_token_request_service: AdminTokenRequestService = Depends(
+        Provide[Container.api_services_container.admin_token_request_service]
+    ),
+):
+    registration_record = await admin_token_request_service.get_by_token(token)
+    if not registration_record or registration_record.token_expiration_date < datetime.now():
+        await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
+        raise InvalidInvitationToken
+
+    return JSONResponse(content={"description": "Токен подтвержден."}, status_code=status.HTTP_201_CREATED)
 
 
 class CustomFastAPIUsers(Generic[models.UP, models.ID]):
@@ -327,6 +366,9 @@ class CustomFastAPIUsers(Generic[models.UP, models.ID]):
             self.authenticator,
             requires_verification,
         )
+
+    # def check_invitation_token(self):
+    #     return check_invitation_token()
 
 
 fastapi_users = CustomFastAPIUsers[AdminUser, int](
