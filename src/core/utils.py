@@ -56,13 +56,13 @@ def cached_coroutine(permanent: bool = None, on_each_n: int = None):  # noqa
     """Caches coroutine response permanently or for refreshes it on each N calls"""
     xor_exception = '"permanent" XOR "on_each_n" must be specified'
     if permanent is not None:
-        if type(permanent) is not bool:
+        if not isinstance(permanent, bool):
             raise TypeError('"permanent" must be bool')
         if on_each_n is None:
             if permanent is False:
                 raise ValueError(xor_exception)
     if on_each_n is not None:
-        if type(on_each_n) is not int:
+        if not isinstance(on_each_n, int):
             raise TypeError('"on_each_n" must be int')
         if on_each_n < 1:
             raise ValueError('"on_each_n" must be positive')
