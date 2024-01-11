@@ -1,6 +1,5 @@
 import sys
 from functools import wraps
-from typing import Coroutine
 
 from src.core.db.models import Task
 from src.settings import settings
@@ -50,47 +49,3 @@ def set_ngrok():
 
     port = sys.argv[sys.argv.index("--port") + 1] if "--port" in sys.argv else 8000
     settings.APPLICATION_URL = ngrok.connect(port).public_url
-
-
-def cached_coroutine(permanent: bool = None, on_each_n: int = None):  # noqa
-    """Caches coroutine response permanently or for refreshes it on each N calls"""
-    xor_exception = '"permanent" XOR "on_each_n" must be specified'
-    if permanent is not None:
-        if not isinstance(permanent, bool):
-            raise TypeError('"permanent" must be bool')
-        if on_each_n is None:
-            if permanent is False:
-                raise ValueError(xor_exception)
-    if on_each_n is not None:
-        if not isinstance(on_each_n, int):
-            raise TypeError('"on_each_n" must be int')
-        if on_each_n < 1:
-            raise ValueError('"on_each_n" must be positive')
-        if permanent is True:
-            raise ValueError(xor_exception)
-
-    def wrapped(coroutine: Coroutine):
-        result = None
-        nonlocal on_each_n
-        if on_each_n:
-            calls = 0
-
-            async def on_each(*args, **kwargs):
-                nonlocal result
-                nonlocal calls
-                if result is None or calls % on_each_n == 0:
-                    result = await coroutine(*args, **kwargs)
-                calls = (calls + 1) % on_each_n
-                return result
-
-            return on_each
-
-        async def permanent(*args, **kwargs):
-            nonlocal result
-            if result is None:
-                result = await coroutine(*args, **kwargs)
-            return result
-
-        return permanent
-
-    return wrapped
