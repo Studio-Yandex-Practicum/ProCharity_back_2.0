@@ -1,5 +1,6 @@
 import datetime
 import os
+from functools import cache
 
 from sqlalchemy.exc import SQLAlchemyError
 from telegram.ext import Application
@@ -7,7 +8,6 @@ from telegram.ext import Application
 from src.api.constants import DATE_TIME_FORMAT
 from src.api.schemas import BotStatus, CommitStatus, DBStatus
 from src.core.db.repository import TaskRepository
-from src.core.utils import cached_coroutine
 from src.settings import settings
 
 
@@ -32,8 +32,8 @@ class HealthCheckService:
         bot_status: BotStatus = {"status": True, "method": method}
         return bot_status
 
-    @cached_coroutine(permanent=True)
-    async def get_last_commit(self) -> CommitStatus:
+    @cache
+    def get_last_commit(self) -> CommitStatus:
         """В режиме dev - возвращает сведения о последнем коммите, или берет данные из переменных окружения."""
         try:
             from git import Repo
