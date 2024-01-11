@@ -24,7 +24,7 @@ async def start_command(
 ):
     ext_user = await ext_user_service.get_ext_user_by_args(context.args)
     if ext_user is not None:
-        await user_service.register_user(
+        user_item = await user_service.register_user(
             telegram_id=update.effective_user.id,
             username=update.effective_user.username,
             first_name=ext_user.first_name,
@@ -32,6 +32,8 @@ async def start_command(
             email=ext_user.email,
             external_id=ext_user.id,
         )
+        await ext_user_service.update_user_id_in_external_site_user(ext_user.id, user_item.id)
+
         await user_service.set_categories_to_user(update.effective_user.id, ext_user.specializations)
         url_connect = get_connection_url(update.effective_user.id, ext_user.id)
     else:

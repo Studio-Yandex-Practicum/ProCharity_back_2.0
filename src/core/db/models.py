@@ -58,6 +58,7 @@ class User(Base):
         "Category", secondary="users_categories", back_populates="users"
     )
     unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship(back_populates="user")
+    external_site_users: Mapped[list["ExternalSiteUser"]] = relationship("ExternalSiteUser", back_populates="user")
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
@@ -74,6 +75,9 @@ class ExternalSiteUser(Base):
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str] = mapped_column(nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", name="fk_external_site_users_user_id"), nullable=True)
+
+    user: Mapped["User"] = relationship("User", back_populates="external_site_users")
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"

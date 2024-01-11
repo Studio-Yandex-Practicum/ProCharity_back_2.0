@@ -40,15 +40,15 @@ class TelegramNotificationService:
         """Отправляет сообщение указанному по telegram_id пользователю"""
         return await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
 
-    async def send_message_to_user_by_user_id(self, user_id, notifications) -> tuple[bool, str]:
+    async def send_message_to_user_by_external_user_id(self, external_user_id, notifications) -> tuple[bool, str]:
         """Отправляет сообщение указанному пользователю по user_id."""
-        user_item: User | None = await self.user_repository.get_by_user_id(user_id=user_id)
+        user_item: User | None = await self.user_repository.get_user_by_external_user_id(external_user_id)
         if not user_item:
             """Пользователь не найден."""
-            raise UserNotFoundError(user_id)
+            raise UserNotFoundError(external_user_id)
         if user_item.banned:
             """Пользователь отписался от уведомлений."""
-            raise UserBlockedError(user_id)
+            raise UserBlockedError(external_user_id)
 
         return await self.telegram_notification.send_message(
             user_id=user_item.telegram_id, message=notifications.message
