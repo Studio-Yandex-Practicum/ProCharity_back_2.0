@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import ExternalSiteUserRequest
-from src.api.schemas.external_site_user import ExternalSiteUserUpdateRequest
 from src.core.db.repository.external_site_user import ExternalSiteUserRepository
 
 
@@ -15,7 +14,7 @@ class ExternalSiteUserService:
     async def register(self, site_user_schema: ExternalSiteUserRequest) -> None:
         await self._repository.create(site_user_schema.to_orm())
 
-    async def update(self, site_user_schema: ExternalSiteUserUpdateRequest) -> None:
+    async def update(self, site_user_schema: ExternalSiteUserRequest) -> None:
         site_user = await self._repository.get_or_none(site_user_schema.id)
         if not site_user:
             raise ValueError(f"Пользователь с id {site_user_schema.id} не найден")
