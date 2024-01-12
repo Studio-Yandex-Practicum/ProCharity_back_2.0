@@ -114,6 +114,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         request: Optional[Request] = None,
         response: Optional[Response] = None,
     ):
+        self.user_db.last_login_update()
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
