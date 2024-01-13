@@ -88,8 +88,8 @@ class Task(ContentBase):
     name_organization: Mapped[str] = mapped_column(nullable=True)
     deadline: Mapped[date] = mapped_column(nullable=True)
 
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category: Mapped["Category"] = relationship(back_populates="tasks")
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
+    category: Mapped["Category | None"] = relationship(back_populates="tasks")
 
     bonus: Mapped[int]
     location: Mapped[str]
@@ -131,7 +131,7 @@ class AdminUser(SQLAlchemyBaseUserTable[int], Base):
 class AdminTokenRequest(Base):
     __tablename__ = "admin_token_requests"
 
-    email: Mapped[str] = mapped_column(String(48), unique=True)
+    email: Mapped[str] = mapped_column(String(48))
     token: Mapped[str] = mapped_column(String(128))
     token_expiration_date: Mapped[date]
 
