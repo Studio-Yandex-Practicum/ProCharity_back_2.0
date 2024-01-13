@@ -1,12 +1,16 @@
 from collections.abc import Sequence
 
 from sqlalchemy import delete, select
+from sqlalchemy.exc import PendingRollbackError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from structlog import get_logger
 
 from src.core.db.models import Category, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
 from src.core.utils import auto_commit
+
+logger = get_logger()
 
 
 class UserRepository(AbstractRepository):
@@ -17,7 +21,11 @@ class UserRepository(AbstractRepository):
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Возвращает пользователя (или None) по telegram_id."""
-        return await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
+        try:
+            return await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
+        except PendingRollbackError as e:
+            logger.info(e)
+            return None
 
     async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.
