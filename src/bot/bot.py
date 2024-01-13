@@ -10,7 +10,7 @@ def create_bot(bot_token) -> Application:
 
 
 async def start_bot(
-    bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, secret_key: str
+    bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, telegram_secret_token: str
 ) -> Application:
     """Запуск бота в `Background` режиме."""
     await bot.initialize()
@@ -18,7 +18,7 @@ async def start_bot(
         bot.updater = None
         await bot.bot.set_webhook(
             url=telegram_webhook_url,
-            secret_token=secret_key,
+            secret_token=telegram_secret_token,
         )
     else:
         await bot.updater.start_polling()  # type: ignore
@@ -28,9 +28,9 @@ async def start_bot(
 
 
 async def startup_bot(
-    bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, secret_key: str
+    bot: Application, bot_webhook_mode: bool, telegram_webhook_url: str, telegram_secret_token: str
 ) -> Application:
-    bot_instance = await start_bot(bot, bot_webhook_mode, telegram_webhook_url, secret_key)
+    bot_instance = await start_bot(bot, bot_webhook_mode, telegram_webhook_url, telegram_secret_token)
     result = await bot_instance.bot.setMyCommands(
         [
             [
