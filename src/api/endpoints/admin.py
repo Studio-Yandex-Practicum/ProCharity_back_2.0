@@ -1,33 +1,13 @@
-from http import HTTPStatus
+from fastapi import APIRouter
 
-from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends
-
-from src.api.schemas import AdminUserRequest
-from src.api.services.admin_service import AdminService
-from src.core.depends import Container
+from src.authentication import UserCreate, UserRead, auth_backend, fastapi_users
 
 admin_user_router = APIRouter()
 
 
-@admin_user_router.post("/login/", description="Логин для админа")
-@inject
-def auth(
-    admin_data: AdminUserRequest,
-    admin_service: AdminService = Depends(
-        Provide[Container.api_services_container.admin_service],
-    ),
-    access_security=Depends(
-        Provide[Container.jwt_services_container.access_security],
-    ),
-    refresh_security=Depends(
-        Provide[Container.jwt_services_container.refresh_security],
-    ),
-):
-    user = admin_service.authenticate_user(admin_data.email, admin_data.password)
-    if user is None:
-        return HTTPStatus.BAD_REQUEST("Неверный почтовый адрес или пароль.")
-    data = {"email": admin_data.email, "password": admin_data.password}
-    access_token = access_security.create_access_token(subject=data)
-    refresh_token = refresh_security.create_refresh_token(subject=data)
-    return {"access_token": access_token, "refresh_token": refresh_token}
+admin_user_router.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth", tags=["AdminUser"])
+admin_user_router.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
