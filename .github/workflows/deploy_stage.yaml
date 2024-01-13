@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - develop
+      - dev-2.1
+
   workflow_dispatch:
 
 jobs:
