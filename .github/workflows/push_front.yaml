@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - develop
+      - dev-2.1
     paths:
       - 'front/**'
 
