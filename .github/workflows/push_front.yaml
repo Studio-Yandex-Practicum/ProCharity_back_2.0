@@ -22,7 +22,7 @@ jobs:
     name: Push front Docker image to Github Container Registry
     runs-on: ubuntu-latest
     environment:
-      name: stage_deploy
+      name: deploy
     permissions:
       contents: read
       packages: write
