@@ -1,5 +1,6 @@
 from datetime import date
 
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
@@ -87,8 +88,8 @@ class Task(ContentBase):
     name_organization: Mapped[str] = mapped_column(nullable=True)
     deadline: Mapped[date] = mapped_column(nullable=True)
 
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
-    category: Mapped["Category"] = relationship(back_populates="tasks")
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
+    category: Mapped["Category | None"] = relationship(back_populates="tasks")
 
     bonus: Mapped[int]
     location: Mapped[str]
@@ -116,29 +117,21 @@ class Category(ContentBase):
         return f"<Category {self.name}>"
 
 
-class AdminUser(Base):
+class AdminUser(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = "admin_users"
 
-    email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    password: Mapped[str] = mapped_column(String(128))
     last_login: Mapped[date] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<Admin User {self.first_name} {self.last_name}>"
 
-    def set_password(self, password):
-        self.password = pwd_context.hash(password)
-
-    def check_password(self, password):
-        return pwd_context.verify(password, self.password)
-
 
 class AdminTokenRequest(Base):
     __tablename__ = "admin_token_requests"
 
-    email: Mapped[str] = mapped_column(String(48), unique=True)
+    email: Mapped[str] = mapped_column(String(48))
     token: Mapped[str] = mapped_column(String(128))
     token_expiration_date: Mapped[date]
 
