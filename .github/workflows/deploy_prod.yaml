@@ -1,0 +1,20 @@
+name: Prod Deploy
+
+concurrency:
+  group: prod_deploy
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      environment: deploy-prod
+      label: prod
+      deploy_path: /PROCHARITY
+
+    secrets: inherit
