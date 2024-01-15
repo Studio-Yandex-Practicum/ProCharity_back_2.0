@@ -4,6 +4,7 @@ from typing import Any
 from pydantic import EmailStr
 from starlette.exceptions import HTTPException
 
+from src.api.constants import PASSWORD_POLICY_EXPLANATION
 from src.core.db.models import Base as DatabaseModel
 
 
@@ -61,3 +62,25 @@ class TokenNotProvided(ApplicationException):
 class InvalidToken(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.FORBIDDEN
     detail = "Токен в заголовке запроса неверный."
+
+
+class InvalidInvitationToken(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.FORBIDDEN
+    detail = "Приглашение не было найдено или просрочено. Пожалуйста, свяжитесь с администратором сайта."
+
+
+class UserAlreadyExists(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+    detail = "Пользователь с указанным почтовым адресом уже зарегистрирован."
+
+
+class InvalidPassword(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+    detail = f"Введенный пароль не соответствует политике паролей. {PASSWORD_POLICY_EXPLANATION}"
+
+
+class BadRequestException(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+
+    def __init__(self, detail: str):
+        self.detail = detail
