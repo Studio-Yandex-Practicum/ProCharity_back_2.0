@@ -19,5 +19,5 @@ async def get_health_check(
     return HealthCheck(
         db=await health_check_service.check_db_connection(),
         bot=await health_check_service.check_bot(),
-        git=await health_check_service.get_last_commit(),
+        git=health_check_service.get_last_commit(),
     )

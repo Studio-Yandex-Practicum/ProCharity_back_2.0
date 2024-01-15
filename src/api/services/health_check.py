@@ -1,5 +1,6 @@
 import datetime
 import os
+from functools import cache
 
 from sqlalchemy.exc import SQLAlchemyError
 from telegram.ext import Application
@@ -31,13 +32,22 @@ class HealthCheckService:
         bot_status: BotStatus = {"status": True, "method": method}
         return bot_status
 
-    async def get_last_commit(self) -> CommitStatus:
+    @cache
+    def get_last_commit(self) -> CommitStatus:
         """В режиме dev - возвращает сведения о последнем коммите, или берет данные из переменных окружения."""
         try:
             from git import Repo
 
             repo = Repo(os.getcwd())
-        except (ImportError, NameError) as exc:
+            master = repo.head.reference
+            commit_date = datetime.datetime.fromtimestamp(master.commit.committed_date)
+            commit_status: CommitStatus = {
+                "last_commit": str(master.commit)[:7],
+                "commit_date": commit_date.strftime(DATE_TIME_FORMAT),
+                "git_tags": repo.tags,
+            }
+            return commit_status
+        except (ImportError, NameError, TypeError) as exc:
             commit_status: CommitStatus = {
                 "last_commit": settings.LAST_COMMIT,
                 "commit_date": settings.COMMIT_DATE,
@@ -45,14 +55,6 @@ class HealthCheckService:
                 "commit_error": f"{exc.__class__.__name__}: {exc}",
             }
             return commit_status
-        master = repo.head.reference
-        commit_date = datetime.datetime.fromtimestamp(master.commit.committed_date)
-        commit_status: CommitStatus = {
-            "last_commit": str(master.commit)[:7],
-            "commit_date": commit_date.strftime(DATE_TIME_FORMAT),
-            "git_tags": repo.tags,
-        }
-        return commit_status
 
     async def check_db_connection(self) -> DBStatus:
         try:

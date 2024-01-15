@@ -1,0 +1,81 @@
+name: Check app
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+env:
+  POSTGRES_DB: procharity_back_db_local
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_USER: postgres
+  DB_HOST: localhost
+  DB_PORT: 5432
+  HEALTHCHECK_URL: 'http://localhost:8000/api/health_check/'
+  ORGANIZATIONS_EMAIL: 'procharity@yandex.ru'
+  EMAIL_ADMIN: 'procharity.admin_1@yandex.ru'
+
+jobs:
+  healthcheck:
+    name: Check app
+    runs-on: ubuntu-latest
+    environment:
+      name: healthcheck
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+    -
+      name: Check out the repo
+      uses: actions/checkout@v3
+    -
+      name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    -
+      name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.7.0
+    -
+      name: Install Dependencies
+      run: poetry install
+    -
+      name: Get SHORT_SHA
+      run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
+    - name: Get COMMIT_DATE
+      run: echo COMMIT_DATE=$(git show -s --format=%ci ${{ env.SHORT_SHA }}) >> $GITHUB_ENV
+    -
+      name: Create .env file
+      run: |
+        touch .env
+        echo BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
+        echo APPLICATION_URL=${{ env.APPLICATION_URL }} >> .env
+        echo ORGANIZATIONS_EMAIL=${{ env.ORGANIZATIONS_EMAIL }} >> .env
+        echo EMAIL_ADMIN=${{ env.EMAIL_ADMIN }} >> .env
+        echo LAST_COMMIT=${{ env.SHORT_SHA }} >> .env
+        echo COMMIT_DATE=${{ env.COMMIT_DATE }} >> .env
+    -
+      name: Alembic Upgrade
+      run: poetry run alembic upgrade head
+    -
+      name: Run App
+      run: timeout 20 poetry run python run.py &
+    -
+      name: Request healthcheck endpoint
+      uses: im-open/url-status-check@v1.1.0
+      with:
+        url: ${{env.HEALTHCHECK_URL}}
+        fail-on-bad-status: true
