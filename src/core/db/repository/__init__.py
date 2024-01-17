@@ -1,4 +1,5 @@
 from .admin_repository import AdminUserRepository
+from .admin_token_request import AdminTokenRequestRepository
 from .base import AbstractRepository, ContentRepository
 from .category import CategoryRepository
 from .external_site_user import ExternalSiteUserRepository
@@ -15,4 +16,5 @@ __all__ = (
     "ExternalSiteUserRepository",
     "UnsubscribeReasonRepository",
     "AdminUserRepository",
+    "AdminTokenRequestRepository",
 )

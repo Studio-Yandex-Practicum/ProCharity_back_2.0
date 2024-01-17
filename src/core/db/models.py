@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
@@ -133,7 +133,7 @@ class AdminTokenRequest(Base):
 
     email: Mapped[str] = mapped_column(String(48))
     token: Mapped[str] = mapped_column(String(128))
-    token_expiration_date: Mapped[date]
+    token_expiration_date: Mapped[datetime]
 
     def __repr__(self):
         return f"<Register {self.email}>"
