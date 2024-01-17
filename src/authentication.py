@@ -26,7 +26,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-
 from src.api.constants import COOKIE_LIFETIME_SECONDS, JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
 from src.api.schemas.admin import CustomBearerResponse
 from src.api.services import AdminTokenRequestService
