@@ -4,10 +4,17 @@ from fastapi import APIRouter, Depends
 from src.api.auth import check_header_contains_token
 from src.api.schemas import CategoryRequest, CategoryResponse
 from src.api.services import CategoryService
+from src.authentication import fastapi_users
 from src.core.db.models import Category
 from src.core.depends import Container
+from src.settings import settings
 
-category_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+category_router = APIRouter(
+    dependencies=[
+        Depends(check_header_contains_token),
+        Depends(fastapi_users.current_user(optional=settings.DEBUG)),
+    ]
+)
 
 
 @category_router.get(
