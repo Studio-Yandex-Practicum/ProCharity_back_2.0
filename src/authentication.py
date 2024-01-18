@@ -7,7 +7,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.param_functions import Form
 from fastapi.responses import JSONResponse
 from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
-from fastapi_users.authentication import AuthenticationBackend, Authenticator, BearerTransport, JWTStrategy, Strategy
+from fastapi_users.authentication import (
+    AuthenticationBackend,
+    Authenticator,
+    BearerTransport,
+    CookieTransport,
+    JWTStrategy,
+    Strategy,
+)
 from fastapi_users.authentication.transport import Transport
 from fastapi_users.manager import UserManagerDependency
 from fastapi_users.openapi import OpenAPIResponseType
@@ -19,7 +26,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.api.constants import JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
+from src.api.constants import COOKIE_LIFETIME_SECONDS, JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
 from src.api.schemas.admin import CustomBearerResponse
 from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser
@@ -96,6 +103,17 @@ auth_backend = AuthenticationBackendRefresh(
     transport=bearer_transport,
     get_strategy=get_jwt_strategy,
     get_refresh_strategy=get_refresh_jwt_strategy,
+)
+
+cookie_transport = CookieTransport(cookie_max_age=COOKIE_LIFETIME_SECONDS)
+
+
+def get_jwt_cookie_strategy() -> JWTStrategy:
+    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=COOKIE_LIFETIME_SECONDS)
+
+
+auth_cookie_backend = AuthenticationBackend(
+    name="auth_cookie_backend", transport=cookie_transport, get_strategy=get_jwt_cookie_strategy
 )
 
 
@@ -373,5 +391,5 @@ class CustomFastAPIUsers(Generic[models.UP, models.ID]):
 
 fastapi_users = CustomFastAPIUsers[AdminUser, int](
     get_user_manager,
-    [auth_backend],
+    [auth_backend, auth_cookie_backend],
 )
