@@ -169,6 +169,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         request: Request | None = None,
         response: Request | None = None,
     ):
+        await self.user_db.update(user, {"last_login": datetime.today()})
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
