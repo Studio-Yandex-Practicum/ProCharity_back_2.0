@@ -341,7 +341,7 @@ async def check_invitation_token(
         await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
         raise InvalidInvitationToken
 
-    return JSONResponse(content={"description": "Токен подтвержден."}, status_code=status.HTTP_201_CREATED)
+    return JSONResponse(content={"description": "Токен подтвержден."}, status_code=status.HTTP_200_OK)
 
 
 class CustomFastAPIUsers(Generic[models.UP, models.ID]):
@@ -366,9 +366,6 @@ class CustomFastAPIUsers(Generic[models.UP, models.ID]):
             self.authenticator,
             requires_verification,
         )
-
-    # def check_invitation_token(self):
-    #     return check_invitation_token()
 
 
 fastapi_users = CustomFastAPIUsers[AdminUser, int](
