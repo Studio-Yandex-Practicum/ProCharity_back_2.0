@@ -38,11 +38,15 @@ class UserService:
             )
         )
 
-    async def user_banned_update(self, telegram_id: int) -> None:
+    async def user_banned(self, telegram_id: int) -> None:
         """Обновляет статус User.banned на соответствующий."""
         user = await self._user_repository.get_by_telegram_id(telegram_id)
-        if user is not None:
-            await self._user_repository.update_user_banned(user=user)
+        await self._user_repository.update_user_banned(user, banned=True)
+
+    async def user_unbanned(self, telegram_id: int) -> None:
+        """Обновляет статус User.unbanned на соответствующий."""
+        user = await self._user_repository.get_by_telegram_id(telegram_id)
+        await self._user_repository.update_user_banned(user, banned=False)
 
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""

@@ -1,7 +1,15 @@
 from dependency_injector.wiring import Provide, inject
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler, CommandHandler, ContextTypes
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    ChatMember,
+    ChatMemberHandler,
+    ChatMemberUpdated,
+    CommandHandler,
+    ContextTypes,
+)
 
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
@@ -85,15 +93,19 @@ async def confirm_chosen_categories(
 @logger_decor
 @inject
 async def on_chat_member_update(
-    update: Update,
+    update: ChatMemberUpdated,
     context: ContextTypes.DEFAULT_TYPE,
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    await user_service.user_banned_update(telegram_id=update.effective_user.id)
+    old_status, new_status = update.difference().get("status", (None, None))
+    if old_status == ChatMember.MEMBER and new_status == ChatMember.BANNED:
+        await user_service.user_banned(update.effective_user.id)
+    elif old_status == ChatMember.BANNED and new_status == ChatMember.MEMBER:
+        await user_service.user_unbanned(update.effective_user.id)
 
 
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.START, start_command))
     app.add_handler(CallbackQueryHandler(confirm_chosen_categories, pattern=commands.GREETING_REGISTERED_USER))
-    app.add_handler(ChatMemberHandler(on_chat_member_update))
+    app.add_handler(ChatMemberHandler(on_chat_member_update, chat_member_types=ChatMemberHandler.MY_CHAT_MEMBER))
