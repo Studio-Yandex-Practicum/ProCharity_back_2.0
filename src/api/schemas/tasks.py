@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import Extra, Field, NonNegativeInt, StrictStr, field_validator
+from pydantic import Extra, Field, NonNegativeInt, StrictFloat, StrictStr, field_validator
 
 from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
@@ -13,6 +13,21 @@ class TaskRequest(RequestBase):
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
     name_organization: StrictStr = Field(
         ..., example="My Organization", description="Название организации, оставившей задачу."
+    )
+    legal_address: StrictStr = Field(
+        ..., example="My Organization Legal Adress", description="Юридический адрес организации, оставившей задачу."
+    )
+    fund_city: StrictStr = Field(
+        ..., example="My Organization City", description="Город, в которой находится организация, оставившей задачу."
+    )
+    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг организации, оставившей задачу.")
+    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Ссылка на сайт организации.")
+    yb_link: StrictStr = Field(
+        ..., example="https://youtubeexample.com", description="Ссылка на страницу youtube организации."
+    )
+    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Ссылка на страницу vk организации.")
+    fund_sections: list[NonNegativeInt] = Field(
+        ..., example=[1, 7], description="ID дочерней категории, к которой деятельность организации, оставившей задачу."
     )
     deadline: date = Field(..., example="31.12.2025", description="Время, до которого нужно выполнить задачу.")
     category_id: NonNegativeInt = Field(
@@ -36,6 +51,13 @@ class TaskRequest(RequestBase):
                 "id": 1,
                 "title": "Task Title",
                 "name_organization": "My Organization",
+                "legal_address": "My Organization Legal Adress",
+                "fund_city": "My Organization City",
+                "fund_rating": 78.65,
+                "fund_site": "https://fundexample.com",
+                "yb_link": "https://youtubeexample.com",
+                "vk_link": "https://vkexample.com",
+                "fund_sections": [1, 7],
                 "deadline": "31.12.2025",
                 "category_id": 1,
                 "bonus": 5,
@@ -52,6 +74,21 @@ class TaskResponse(ResponseBase):
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
     name_organization: StrictStr = Field(
         ..., example="My Organization", description="Название организации, оставившей задачу."
+    )
+    legal_address: StrictStr = Field(
+        ..., example="My Organization Legal Adress", description="Юридический адрес организации, оставившей задачу."
+    )
+    fund_city: StrictStr = Field(
+        ..., example="My Organization City", description="Город, в которой находится организация, оставившей задачу."
+    )
+    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг организации, оставившей задачу.")
+    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Ссылка на сайт организации.")
+    yb_link: StrictStr = Field(
+        ..., example="https://youtubeexample.com", description="Ссылка на страницу youtube организации."
+    )
+    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Ссылка на страницу vk организации.")
+    fund_sections: list[NonNegativeInt] = Field(
+        ..., example=[1, 7], description="ID дочерней категории, к которой деятельность организации, оставившей задачу."
     )
     deadline: date = Field(
         ..., format=DATE_FORMAT, example="31-12-2025", description="Время, до которого нужно выполнить задачу."
@@ -70,6 +107,13 @@ class TaskResponse(ResponseBase):
             "example": {
                 "title": "Task Title",
                 "name_organization": "My Organization",
+                "legal_address": "My Organization Legal Adress",
+                "fund_city": "My Organization City",
+                "fund_rating": 78.65,
+                "fund_site": "https://fundexample.com",
+                "yb_link": "https://youtubeexample.com",
+                "vk_link": "https://vkexample.com",
+                "fund_sections": [1, 7],
                 "deadline": "31-12-2025",
                 "category_id": 1,
                 "bonus": 5,

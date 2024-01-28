@@ -2,7 +2,7 @@ from datetime import date
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
-from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, BigInteger, Float, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
@@ -84,8 +84,16 @@ class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
+
     title: Mapped[str]
     name_organization: Mapped[str] = mapped_column(nullable=True)
+    fund_city: Mapped[str] = mapped_column(String)
+    fund_rating: Mapped[float] = mapped_column(Float)
+    fund_site: Mapped[str] = mapped_column(String)
+    yb_link: Mapped[str] = mapped_column(String)
+    vk_link: Mapped[str] = mapped_column(String)
+    fund_sections: Mapped[list["Category"]] = relationship("Category", back_populates="funds")
+
     deadline: Mapped[date] = mapped_column(nullable=True)
 
     category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
@@ -109,6 +117,8 @@ class Category(ContentBase):
     users: Mapped[list["User"]] = relationship("User", secondary="users_categories", back_populates="categories")
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
+
+    funds: Mapped[list["Task"]] = relationship("Task", back_populates="fund_sections")
 
     parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     children: Mapped["Category"] = relationship("Category", backref=backref("parent", remote_side="Category.id"))

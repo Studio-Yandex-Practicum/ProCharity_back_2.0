@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel, ConfigDict
 
 
 class ResponseBase(BaseModel):
@@ -12,4 +12,4 @@ class RequestBase(BaseModel):
     """Базовый класс для модели запроса."""
 
     class Config:
-        extra = Extra.forbid
+        model_config = ConfigDict(strict=False)
