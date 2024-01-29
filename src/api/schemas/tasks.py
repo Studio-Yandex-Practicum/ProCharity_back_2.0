@@ -11,31 +11,21 @@ class TaskRequest(RequestBase):
 
     id: NonNegativeInt = Field(..., ge=1, example=1, description="Уникальный идентификатор задачи.")
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
-    name_organization: StrictStr = Field(
-        ..., example="My Organization", description="Название организации, оставившей задачу."
-    )
-    legal_address: StrictStr = Field(
-        ..., example="My Organization Legal Adress", description="Юридический адрес организации, оставившей задачу."
-    )
-    fund_city: StrictStr = Field(
-        ..., example="My Organization City", description="Город, в которой находится организация, оставившей задачу."
-    )
-    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг организации, оставившей задачу.")
-    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Ссылка на сайт организации.")
-    yb_link: StrictStr = Field(
-        ..., example="https://youtubeexample.com", description="Ссылка на страницу youtube организации."
-    )
-    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Ссылка на страницу vk организации.")
-    fund_sections: list[NonNegativeInt] = Field(
-        ..., example=[1, 7], description="ID дочерней категории, к которой деятельность организации, оставившей задачу."
-    )
-    deadline: date = Field(..., example="31.12.2025", description="Время, до которого нужно выполнить задачу.")
+    name_organization: StrictStr = Field(..., example="My Fund", description="Название Фонда.")
+    legal_address: StrictStr = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
+    fund_city: StrictStr = Field(..., example="Fund City", description="Фактический адрес Фонда.")
+    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг Фонда.")
+    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Страница Фонда в сети интернет.")
+    yb_link: StrictStr = Field(..., example="https://youtubeexample.com", description="Страница Фонда в youtube.")
+    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
+    fund_sections: list[NonNegativeInt] = Field(..., example=[1, 7], description="Сферы деятельности Фонда.")
+    deadline: date = Field(..., format=DATE_FORMAT, example="31-12-2025", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
         ..., example=1, description="ID дочерней категории, к которой относится задача."
     )
-    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
-    location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
-    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
+    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Количество бонусов за выполнение задачи.")
+    location: StrictStr = Field(..., example="Task Location", description="Место выполнения задачи.")
+    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на страницу задачи.")
     description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
 
     @field_validator("deadline", mode="before")
@@ -50,9 +40,9 @@ class TaskRequest(RequestBase):
             "example": {
                 "id": 1,
                 "title": "Task Title",
-                "name_organization": "My Organization",
-                "legal_address": "My Organization Legal Adress",
-                "fund_city": "My Organization City",
+                "name_organization": "My Fund",
+                "legal_address": "Fund Legal Adress",
+                "fund_city": "Fund City",
                 "fund_rating": 78.65,
                 "fund_site": "https://fundexample.com",
                 "yb_link": "https://youtubeexample.com",
@@ -61,7 +51,7 @@ class TaskRequest(RequestBase):
                 "deadline": "31.12.2025",
                 "category_id": 1,
                 "bonus": 5,
-                "location": "My Location",
+                "location": "Task Location",
                 "link": "https://example.com",
                 "description": "Task description",
             }
@@ -72,33 +62,21 @@ class TaskResponse(ResponseBase):
     """Класс модели ответа для Task."""
 
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
-    name_organization: StrictStr = Field(
-        ..., example="My Organization", description="Название организации, оставившей задачу."
-    )
-    legal_address: StrictStr = Field(
-        ..., example="My Organization Legal Adress", description="Юридический адрес организации, оставившей задачу."
-    )
-    fund_city: StrictStr = Field(
-        ..., example="My Organization City", description="Город, в которой находится организация, оставившей задачу."
-    )
-    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг организации, оставившей задачу.")
-    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Ссылка на сайт организации.")
-    yb_link: StrictStr = Field(
-        ..., example="https://youtubeexample.com", description="Ссылка на страницу youtube организации."
-    )
-    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Ссылка на страницу vk организации.")
-    fund_sections: list[NonNegativeInt] = Field(
-        ..., example=[1, 7], description="ID дочерней категории, к которой деятельность организации, оставившей задачу."
-    )
-    deadline: date = Field(
-        ..., format=DATE_FORMAT, example="31-12-2025", description="Время, до которого нужно выполнить задачу."
-    )
+    name_organization: StrictStr = Field(..., example="My Fund", description="Название Фонда.")
+    legal_address: StrictStr = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
+    fund_city: StrictStr = Field(..., example="Fund City", description="Фактический адрес Фонда.")
+    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг Фонда.")
+    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Страница Фонда в сети интернет.")
+    yb_link: StrictStr = Field(..., example="https://youtubeexample.com", description="Страница Фонда в youtube.")
+    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
+    fund_sections: list[NonNegativeInt] = Field(..., example=[1, 7], description="Сферы деятельности Фонда.")
+    deadline: date = Field(..., format=DATE_FORMAT, example="31-12-2025", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
-        ..., example=1, description="Показывает, к какой дочерней категории относится задача."
+        ..., example=1, description="ID дочерней категории, к которой относится задача."
     )
-    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
-    location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
-    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
+    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Количество бонусов за выполнение задачи.")
+    location: StrictStr = Field(..., example="Task Location", description="Место выполнения задачи.")
+    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на страницу задачи.")
     description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
     is_archived: bool = Field(example=False, description="Статус задачи. Если True, то эта задача заархивирована.")
 
@@ -106,9 +84,9 @@ class TaskResponse(ResponseBase):
         json_schema_extra = {
             "example": {
                 "title": "Task Title",
-                "name_organization": "My Organization",
-                "legal_address": "My Organization Legal Adress",
-                "fund_city": "My Organization City",
+                "name_organization": "My Fund",
+                "legal_address": "Fund Legal Adress",
+                "fund_city": "Fund City",
                 "fund_rating": 78.65,
                 "fund_site": "https://fundexample.com",
                 "yb_link": "https://youtubeexample.com",
@@ -117,7 +95,7 @@ class TaskResponse(ResponseBase):
                 "deadline": "31-12-2025",
                 "category_id": 1,
                 "bonus": 5,
-                "location": "My Location",
+                "location": "Task Location",
                 "link": "https://example.com",
                 "description": "Task description",
                 "is_archived": False,

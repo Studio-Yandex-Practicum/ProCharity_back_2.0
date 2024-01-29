@@ -41,10 +41,43 @@ class UsersCategories(Base):
         return f"<User {self.user_id} - Category {self.category_id}>"
 
 
+class FundsCategories(Base):
+    """Модель отношений сферы деятельности фонда-категория."""
+
+    __tablename__ = "funds_categories"
+
+    id = None
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), primary_key=True)
+    fund_id: Mapped[int] = mapped_column(ForeignKey("funds.id"), primary_key=True)
+
+    def __repr__(self):
+        return f"<User {self.fund_id} - Category {self.category_id}>"
+
+
+class Fund(Base):
+    """Модель Фонд."""
+
+    __tablename__ = "funds"
+
+    name_organization: Mapped[str] = mapped_column(String, nullable=True)
+    fund_city: Mapped[str] = mapped_column(String, nullable=True)
+    fund_rating: Mapped[float] = mapped_column(Float, nullable=True)
+    fund_site: Mapped[str] = mapped_column(String, nullable=True)
+    yb_link: Mapped[str] = mapped_column(String, nullable=True)
+    vk_link: Mapped[str] = mapped_column(String, nullable=True)
+    fund_sections: Mapped[list["Category"]] = relationship(
+        "Category", secondary="funds_categories", back_populates="funds"
+    )
+
+    def __repr__(self):
+        return f"<Fund {self.name_organization}>"
+
+
 class User(Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
+
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
@@ -58,7 +91,7 @@ class User(Base):
     categories: Mapped[list["Category"]] = relationship(
         "Category", secondary="users_categories", back_populates="users"
     )
-    unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship(back_populates="user")
+    unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship("UnsubscribeReason", back_populates="user")
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
@@ -86,13 +119,15 @@ class Task(ContentBase):
     __tablename__ = "tasks"
 
     title: Mapped[str]
-    name_organization: Mapped[str] = mapped_column(nullable=True)
-    fund_city: Mapped[str] = mapped_column(String)
-    fund_rating: Mapped[float] = mapped_column(Float)
-    fund_site: Mapped[str] = mapped_column(String)
-    yb_link: Mapped[str] = mapped_column(String)
-    vk_link: Mapped[str] = mapped_column(String)
-    fund_sections: Mapped[list["Category"]] = relationship("Category", back_populates="funds")
+    name_organization: Mapped[str] = mapped_column(String, nullable=True)
+    fund_city: Mapped[str] = mapped_column(String, nullable=True)
+    fund_rating: Mapped[float] = mapped_column(Float, nullable=True)
+    fund_site: Mapped[str] = mapped_column(String, nullable=True)
+    yb_link: Mapped[str] = mapped_column(String, nullable=True)
+    vk_link: Mapped[str] = mapped_column(String, nullable=True)
+    fund_sections: Mapped[list["Category"]] = relationship(
+        "Category", secondary="funds_categories", back_populates="fund_obj"
+    )
 
     deadline: Mapped[date] = mapped_column(nullable=True)
 
@@ -118,7 +153,9 @@ class Category(ContentBase):
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
-    funds: Mapped[list["Task"]] = relationship("Task", back_populates="fund_sections")
+    funds: Mapped[list["Fund"]] = relationship("Fund", secondary="funds_categories", back_populates="fund_sections")
+
+    fund_obj: Mapped[list["Task"]] = relationship("Task", secondary="funds_categories", back_populates="fund_sections")
 
     parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     children: Mapped["Category"] = relationship("Category", backref=backref("parent", remote_side="Category.id"))
