@@ -6,6 +6,7 @@ from src.api.auth import check_header_contains_token
 from src.api.schemas import InfoRate, MessageList, TelegramNotificationRequest, TelegramNotificationUsersRequest
 from src.api.services.messages import TelegramNotificationService
 from src.core.depends import Container
+from src.core.exceptions.exceptions import SendMessageError
 
 notification_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 log = structlog.get_logger()
@@ -33,7 +34,7 @@ async def send_telegram_notification(
 @notification_router.post(
     "/group",
     response_model=InfoRate,
-    description="Сообщения для разных пользователей",
+    description="Отправить сообщения для разных пользователей по user_id",
 )
 @inject
 async def send_messages_to_group_of_users(
@@ -41,12 +42,26 @@ async def send_messages_to_group_of_users(
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
-):
-    await log.ainfo("Начало отправки сообщений для группы пользователей")
+) -> InfoRate:
+    """
+    Отправляет сообщения для разных пользователей по user_id
+    :param message_list: Список сообщений
+    :param telegram_notification_service: Сервис для отправки сообщений
+    :return: Количество успешных и неуспешных отправок
+    """
     rate = InfoRate()
+    await log.ainfo("Начало отправки сообщений для группы пользователей")
     for message in message_list.messages:
-        status, msg = await telegram_notification_service.send_message_to_user(message.telegram_id, message)
-        rate = telegram_notification_service.count_rate(status, msg, rate)
+        try:
+            status, response = await telegram_notification_service.send_message_to_user_by_external_user_id(
+                message.user_id, message
+            )
+            rate = telegram_notification_service.count_rate(status, response, rate)
+        except SendMessageError as e:
+            await log.ainfo(e)
+            status, error_message, error_type = False, e.error_message, e.error_type
+            rate = telegram_notification_service.count_rate(status, error_message, rate, error_type)
+
     await log.ainfo("Конец отправки сообщений для группы пользователей")
     return rate
 

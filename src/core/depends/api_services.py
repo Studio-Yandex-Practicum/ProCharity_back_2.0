@@ -40,6 +40,7 @@ class APIServicesContainer(containers.DeclarativeContainer):
         TelegramNotificationService,
         telegram_bot=applications.telegram_bot,
         session=data_base_connection.session,
+        user_repository=repositories.user_repository,
     )
     analytic_service = providers.Factory(
         AnalyticsService,

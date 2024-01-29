@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from structlog import get_logger
 
-from src.core.db.models import Category, User, UsersCategories
+from src.core.db.models import Category, ExternalSiteUser, User, UsersCategories
 from src.core.db.repository.base import AbstractRepository
 from src.core.utils import auto_commit
 
@@ -26,6 +26,13 @@ class UserRepository(AbstractRepository):
         except PendingRollbackError as e:
             logger.info(e)
             return None
+
+    async def get_user_by_external_user_id(self, external_user_id: str) -> User | None:
+        """Возвращает пользователя (или None) по external_user_id."""
+        query = select(User).join(ExternalSiteUser).where(ExternalSiteUser.user_id == external_user_id)
+
+        result = await self._session.execute(query)
+        return result.scalar_one_or_none()
 
     async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.

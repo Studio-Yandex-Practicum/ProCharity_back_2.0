@@ -49,7 +49,7 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
 
 
 class Message(TelegramNotificationRequest):
-    telegram_id: int
+    user_id: int
 
 
 class MessageList(RequestBase):
@@ -60,8 +60,8 @@ class MessageList(RequestBase):
         json_schema_extra = {
             "example": {
                 "messages": [
-                    {"telegram_id": 000000000, "message": "hi there"},
-                    {"telegram_id": 000000000, "message": "hi there"},
+                    {"user_id": 000000000, "message": "hi there"},
+                    {"user_id": 000000000, "message": "hi there"},
                 ]
             }
         }

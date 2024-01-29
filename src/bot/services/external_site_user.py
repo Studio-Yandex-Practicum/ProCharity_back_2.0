@@ -14,3 +14,6 @@ class ExternalSiteUserService:
             id_hash = args[0]
             return await self._site_user_repository.get_by_id_hash(id_hash)
         return None
+
+    async def update_user_id_in_external_site_user(self, ext_user_id, user_id):
+        await self._site_user_repository.update_user_id_in_external_site_user(ext_user_id, user_id)

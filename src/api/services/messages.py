@@ -5,7 +5,9 @@ from telegram.ext import Application
 
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, User
+from src.core.db.repository import UserRepository
 from src.core.enums import TelegramNotificationUsersGroups
+from src.core.exceptions.exceptions import UserBlockedError, UserNotFoundError
 from src.core.services.notification import TelegramNotification
 
 
@@ -16,10 +18,12 @@ class TelegramNotificationService:
     def __init__(
         self,
         telegram_bot: Application,
+        user_repository: UserRepository,
         session: AsyncSession,
     ) -> None:
         self._session = session
         self.telegram_notification = TelegramNotification(telegram_bot)
+        self.user_repository = user_repository
 
     async def send_messages_to_group_of_users(self, notifications):
         """Отправляет сообщение указанной группе пользователей"""
@@ -36,6 +40,20 @@ class TelegramNotificationService:
         """Отправляет сообщение указанному по telegram_id пользователю"""
         return await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
 
+    async def send_message_to_user_by_external_user_id(self, external_user_id, notifications) -> tuple[bool, str]:
+        """Отправляет сообщение указанному пользователю по user_id."""
+        user_item: User | None = await self.user_repository.get_user_by_external_user_id(external_user_id)
+        if not user_item:
+            """Пользователь не найден."""
+            raise UserNotFoundError(external_user_id)
+        if user_item.banned:
+            """Пользователь отписался от уведомлений."""
+            raise UserBlockedError(external_user_id)
+
+        return await self.telegram_notification.send_message(
+            user_id=user_item.telegram_id, message=notifications.message
+        )
+
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
         category = await self._session.scalars(
@@ -44,14 +62,16 @@ class TelegramNotificationService:
         category = category.first()
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
 
-    def count_rate(self, respond: bool, msg: str, rate: InfoRate):
+    def count_rate(self, status: bool, msg: str, rate: InfoRate, error_type=None):
         errors_sending = ErrorsSending()
-        if respond:
+        if status:
             rate.successful_rate += 1
             rate.messages.append(msg)
         else:
             rate.unsuccessful_rate += 1
             errors_sending.message = msg
+            if error_type:
+                errors_sending.type = error_type
             rate.errors.append(errors_sending)
         return rate
 
