@@ -21,6 +21,7 @@ from sqlalchemy.orm import sessionmaker
 
 from src.api.constants import JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
 from src.api.schemas.admin import CustomBearerResponse
+from src.api.schemas.token_schemas import TokenCheckResponse
 from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser
 from src.core.depends import Container
@@ -30,7 +31,6 @@ from src.core.exceptions.exceptions import (
     InvalidPassword,
     UserAlreadyExists,
 )
-from src.api.schemas.token_schemas import TokenCheckResponse
 from src.settings import settings
 
 log = structlog.get_logger()

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class TokenCheckResponse(BaseModel):
     description: str
 
