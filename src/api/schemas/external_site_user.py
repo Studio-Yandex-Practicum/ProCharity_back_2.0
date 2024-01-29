@@ -1,4 +1,4 @@
-from typing import Optional
+# from typing import Optional
 
 from pydantic import Field, field_validator
 
@@ -9,7 +9,7 @@ from src.core.db.models import ExternalSiteUser
 class ExternalSiteUserRequest(RequestBase):
     """Класс модели запроса для ExternalSiteUser."""
 
-    id: Optional[int] = Field(None)
+    id: int | None = None
     id_hash: str = Field(..., max_length=256)
     first_name: str | None = Field(None, max_length=64)
     last_name: str | None = Field(None, max_length=64)

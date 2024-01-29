@@ -70,7 +70,8 @@ class ExternalSiteUser(Base):
 
     __tablename__ = "external_site_users"
 
-    id_hash: Mapped[str] = mapped_column(String(256))
+    external_id: Mapped[str] = mapped_column(String(256), unique=True, index=True, nullable=True)
+    external_id_hash: Mapped[str] = mapped_column(String(256), unique=True, index=True, nullable=True)
     email: Mapped[str] = mapped_column(String(48), unique=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
