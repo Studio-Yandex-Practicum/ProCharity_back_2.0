@@ -30,6 +30,7 @@ from src.core.exceptions.exceptions import (
     InvalidPassword,
     UserAlreadyExists,
 )
+from src.api.schemas.token_schemas import TokenCheckResponse
 from src.settings import settings
 
 log = structlog.get_logger()
@@ -324,24 +325,12 @@ def get_register_router(
     )
     async def check_token(
         token: str,
+        admin_token_request_service: AdminTokenRequestService = Depends(
+            Provide[Container.api_services_container.admin_token_request_service]
+        ),
     ):
-        return await check_invitation_token(token)
-
-    return router
-
-
-async def check_invitation_token(
-    token: str,
-    admin_token_request_service: AdminTokenRequestService = Depends(
-        Provide[Container.api_services_container.admin_token_request_service]
-    ),
-):
-    registration_record = await admin_token_request_service.get_by_token(token)
-    if not registration_record or registration_record.token_expiration_date < datetime.now():
-        await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
-        raise InvalidInvitationToken
-
-    return JSONResponse(content={"description": "Токен подтвержден."}, status_code=status.HTTP_200_OK)
+        await admin_token_request_service.get_by_token(token)
+        return TokenCheckResponse(description="Токен подтвержден.")
 
 
 class CustomFastAPIUsers(Generic[models.UP, models.ID]):
