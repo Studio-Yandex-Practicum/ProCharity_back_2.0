@@ -3,6 +3,7 @@ DATE_FORMAT_FOR_STATISTICS = "YYYY-MM-DD"
 DATE_FORMAT_FOR_TASK_SCHEMA = "%d.%m.%Y"
 DATE_TIME_FORMAT = "%d-%m-%Y %H:%M:%S"
 DAYS_NUMBER_FOR_USERS_STATISTIC = 30
+COOKIE_LIFETIME_SECONDS = 24 * 60 * 60
 PASSWORD_POLICY = "^(?=.*?[A-Z])(?=.*?[a-z]).{8,32}$"
 PASSWORD_POLICY_EXPLANATION = (
     "Требования к паролю: длина пароля - от 8 до 32 символов включительно; "
