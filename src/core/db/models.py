@@ -48,29 +48,10 @@ class FundsCategories(Base):
 
     id = None
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), primary_key=True)
-    fund_id: Mapped[int] = mapped_column(ForeignKey("funds.id"), primary_key=True)
+    fund_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), primary_key=True)
 
     def __repr__(self):
-        return f"<User {self.fund_id} - Category {self.category_id}>"
-
-
-class Fund(Base):
-    """Модель Фонд."""
-
-    __tablename__ = "funds"
-
-    name_organization: Mapped[str] = mapped_column(String, nullable=True)
-    fund_city: Mapped[str] = mapped_column(String, nullable=True)
-    fund_rating: Mapped[float] = mapped_column(Float, nullable=True)
-    fund_site: Mapped[str] = mapped_column(String, nullable=True)
-    yb_link: Mapped[str] = mapped_column(String, nullable=True)
-    vk_link: Mapped[str] = mapped_column(String, nullable=True)
-    fund_sections: Mapped[list["Category"]] = relationship(
-        "Category", secondary="funds_categories", back_populates="funds"
-    )
-
-    def __repr__(self):
-        return f"<Fund {self.name_organization}>"
+        return f"<Fund {self.fund_id} - Category {self.category_id}>"
 
 
 class User(Base):
@@ -91,7 +72,7 @@ class User(Base):
     categories: Mapped[list["Category"]] = relationship(
         "Category", secondary="users_categories", back_populates="users"
     )
-    unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship("UnsubscribeReason", back_populates="user")
+    unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship(back_populates="user")
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
@@ -120,13 +101,14 @@ class Task(ContentBase):
 
     title: Mapped[str]
     name_organization: Mapped[str] = mapped_column(String, nullable=True)
+    legal_address: Mapped[str] = mapped_column(String, nullable=True)
     fund_city: Mapped[str] = mapped_column(String, nullable=True)
     fund_rating: Mapped[float] = mapped_column(Float, nullable=True)
     fund_site: Mapped[str] = mapped_column(String, nullable=True)
     yb_link: Mapped[str] = mapped_column(String, nullable=True)
     vk_link: Mapped[str] = mapped_column(String, nullable=True)
     fund_sections: Mapped[list["Category"]] = relationship(
-        "Category", secondary="funds_categories", back_populates="fund_obj"
+        "Category", secondary="funds_categories", back_populates="funds"
     )
 
     deadline: Mapped[date] = mapped_column(nullable=True)
@@ -153,9 +135,7 @@ class Category(ContentBase):
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
 
-    funds: Mapped[list["Fund"]] = relationship("Fund", secondary="funds_categories", back_populates="fund_sections")
-
-    fund_obj: Mapped[list["Task"]] = relationship("Task", secondary="funds_categories", back_populates="fund_sections")
+    funds: Mapped[list["Task"]] = relationship("Task", secondary="funds_categories", back_populates="fund_sections")
 
     parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
     children: Mapped["Category"] = relationship("Category", backref=backref("parent", remote_side="Category.id"))
