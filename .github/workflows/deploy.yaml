@@ -122,6 +122,7 @@ jobs:
             LAST_COMMIT=${{ env.SHORT_SHA }}
             COMMIT_DATE=${{ env.COMMIT_DATE }}
             ACCESS_TOKEN_FOR_PROCHARITY=${{ secrets.ACCESS_TOKEN_FOR_PROCHARITY }}
+            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
             EOM
   start_application:
     name: Start application
