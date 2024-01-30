@@ -1,15 +1,7 @@
 from dependency_injector.wiring import Provide, inject
-from telegram import Update
+from telegram import ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
-from telegram.ext import (
-    Application,
-    CallbackQueryHandler,
-    ChatMember,
-    ChatMemberHandler,
-    ChatMemberUpdated,
-    CommandHandler,
-    ContextTypes,
-)
+from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands
 from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
@@ -90,19 +82,46 @@ async def confirm_chosen_categories(
     )
 
 
+def extract_status_change(chat_member_update: ChatMemberUpdated):
+    status_change = chat_member_update.difference().get("status")
+    old_is_member, new_is_member = chat_member_update.difference().get("is_member", (None, None))
+
+    if status_change is None:
+        return None
+
+    old_status, new_status = status_change
+    was_member = old_status in [
+        ChatMember.MEMBER,
+        ChatMember.OWNER,
+        ChatMember.ADMINISTRATOR,
+    ] or (old_status == ChatMember.BANNED and old_is_member is True)
+    is_member = new_status in [
+        ChatMember.MEMBER,
+        ChatMember.OWNER,
+        ChatMember.ADMINISTRATOR,
+    ] or (new_status == ChatMember.BANNED and new_is_member is True)
+
+    return was_member, is_member
+
+
 @logger_decor
 @inject
 async def on_chat_member_update(
-    update: ChatMemberUpdated,
+    update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    old_status, new_status = update.difference().get("status", (None, None))
+    result = extract_status_change(update.effective_user.id)
+
+    if result is None:
+        return
+
+    old_status, new_status = result
     if old_status == ChatMember.MEMBER and new_status == ChatMember.BANNED:
-        await user_service.user_banned(update.effective_user.id)
+        await user_service.user_banned(telegram_id=update.effective_user.id)
     elif old_status == ChatMember.BANNED and new_status == ChatMember.MEMBER:
-        await user_service.user_unbanned(update.effective_user.id)
+        await user_service.user_unbanned(telegram_id=update.effective_user.id)
 
 
 def registration_handlers(app: Application):
