@@ -2,6 +2,7 @@ from datetime import datetime
 
 import structlog
 
+from src.api.schemas.token_schemas import TokenCheckResponse
 from src.core.db.models import AdminTokenRequest
 from src.core.db.repository.admin_token_request import AdminTokenRequestRepository
 from src.core.exceptions.exceptions import InvalidInvitationToken
@@ -20,7 +21,7 @@ class AdminTokenRequestService:
         if not registration_record or registration_record.token_expiration_date < datetime.now():
             await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
             raise InvalidInvitationToken
-        return registration_record
+        return TokenCheckResponse(description="Токен подтвержден.")
 
     async def remove(self, instance: AdminTokenRequest) -> None:
         await self._repository.remove(instance)
