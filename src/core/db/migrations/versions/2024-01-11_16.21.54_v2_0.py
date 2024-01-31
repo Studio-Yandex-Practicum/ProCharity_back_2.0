@@ -216,7 +216,14 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.create_table("statistics")
+    op.create_table(
+        "statistics",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("telegram_id", sa.Integer(), nullable=True),
+        sa.Column("command", sa.String(length=100), nullable=True),
+        sa.Column("added_date", sa.TIMESTAMP(), nullable=True),
+        sa.PrimaryKeyConstraint("id"),
+    )
 
     # Admin Token Request
 
