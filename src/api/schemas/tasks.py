@@ -11,13 +11,17 @@ class TaskRequest(RequestBase):
 
     id: NonNegativeInt = Field(..., ge=1, example=1, description="Уникальный идентификатор задачи.")
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
-    name_organization: StrictStr = Field(..., example="My Fund", description="Название Фонда.")
-    legal_address: StrictStr = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
-    fund_city: StrictStr = Field(..., example="Fund City", description="Фактический адрес Фонда.")
-    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг Фонда.")
-    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Страница Фонда в сети интернет.")
-    yb_link: StrictStr = Field(..., example="https://youtubeexample.com", description="Страница Фонда в youtube.")
-    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
+    name_organization: StrictStr | None = Field(..., example="My Fund", description="Название Фонда.")
+    legal_address: StrictStr | None = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
+    fund_city: StrictStr | None = Field(..., example="Fund City", description="Фактический адрес Фонда.")
+    fund_rating: StrictFloat | None = Field(..., example=78.65, description="Рейтинг Фонда.")
+    fund_site: StrictStr | None = Field(
+        ..., example="https://fundexample.com", description="Страница Фонда в сети интернет."
+    )
+    yb_link: StrictStr | None = Field(
+        ..., example="https://youtubeexample.com", description="Страница Фонда в youtube."
+    )
+    vk_link: StrictStr | None = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
     fund_sections: list[NonNegativeInt] = Field(..., example=[1, 7], description="Сферы деятельности Фонда.")
     deadline: date = Field(..., format=DATE_FORMAT, example="23.11.2024", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
@@ -39,13 +43,17 @@ class TaskResponse(ResponseBase):
     """Класс модели ответа для Task."""
 
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
-    name_organization: StrictStr = Field(..., example="My Fund", description="Название Фонда.")
-    legal_address: StrictStr = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
-    fund_city: StrictStr = Field(..., example="Fund City", description="Фактический адрес Фонда.")
-    fund_rating: StrictFloat = Field(..., example=78.65, description="Рейтинг Фонда.")
-    fund_site: StrictStr = Field(..., example="https://fundexample.com", description="Страница Фонда в сети интернет.")
-    yb_link: StrictStr = Field(..., example="https://youtubeexample.com", description="Страница Фонда в youtube.")
-    vk_link: StrictStr = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
+    name_organization: StrictStr | None = Field(..., example="My Fund", description="Название Фонда.")
+    legal_address: StrictStr | None = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
+    fund_city: StrictStr | None = Field(..., example="Fund City", description="Фактический адрес Фонда.")
+    fund_rating: StrictFloat | None = Field(..., example=78.65, description="Рейтинг Фонда.")
+    fund_site: StrictStr | None = Field(
+        ..., example="https://fundexample.com", description="Страница Фонда в сети интернет."
+    )
+    yb_link: StrictStr | None = Field(
+        ..., example="https://youtubeexample.com", description="Страница Фонда в youtube."
+    )
+    vk_link: StrictStr | None = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
     fund_sections: list[NonNegativeInt] = Field(..., example=[1, 7], description="Сферы деятельности Фонда.")
     deadline: date = Field(..., format=DATE_FORMAT, example="23.11.2024", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
