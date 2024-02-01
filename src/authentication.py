@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import AsyncGenerator, Generic, Sequence, Tuple, Type
 
 import structlog
@@ -129,9 +128,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
     ) -> AdminUser:
         token = user_create.token
         registration_record = await admin_token_request_service.get_by_token(token)
-        if not registration_record or registration_record.token_expiration_date < datetime.now():
-            await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
-            raise InvalidInvitationToken
         del user_create.token
 
         email = registration_record.email
@@ -293,6 +289,19 @@ def get_register_router(
                             InvalidPassword.status_code: {
                                 "summary": "The entered password does not comply with the password policy.",
                                 "value": {"detail": InvalidPassword.detail},
+                            },
+                        }
+                    }
+                },
+            },
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
                             },
                         }
                     }
