@@ -23,7 +23,7 @@ async def start_command(
     settings: Settings = Provide[Container.settings],
 ):
     telegram_user = update.effective_user
-    ext_user, created = await ext_user_service.get_or_create_by_args(id_hash=context.args[0] if context.args else None)
+    ext_user, created = await ext_user_service.get_or_create(id_hash=context.args[0] if context.args else None)
     if created or ext_user is None:
         user = await user_service.register_user(
             telegram_id=telegram_user.id,
