@@ -164,7 +164,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         user: AdminUser,
         request: Request | None = None,
         response: Request | None = None,
-    ):
+    ) -> None:
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
