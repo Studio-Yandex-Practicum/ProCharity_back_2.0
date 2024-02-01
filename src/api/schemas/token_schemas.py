@@ -1,8 +1,5 @@
-from pydantic import BaseModel
+from src.api.schemas.base import ResponseBase
 
 
-class TokenCheckResponse(BaseModel):
+class TokenCheckResponse(ResponseBase):
     description: str
-
-    class Config:
-        from_attributes = True
