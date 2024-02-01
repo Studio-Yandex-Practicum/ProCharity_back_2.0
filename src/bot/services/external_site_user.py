@@ -8,7 +8,7 @@ class ExternalSiteUserService:
     def __init__(self, site_user_repository: ExternalSiteUserRepository):
         self._repository = site_user_repository
 
-    async def get_or_create_by_args(self, *args) -> tuple[ExternalSiteUser | None, bool]:
+    async def get_or_create(self, id_hash: str) -> tuple[ExternalSiteUser | None, bool]:
         """Возвращает пользователя (или None) по арументам."""
         if not args:
             return (False, None)
