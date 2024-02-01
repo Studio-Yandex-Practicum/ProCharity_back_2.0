@@ -16,7 +16,7 @@ class ExternalSiteUserRequest(RequestBase):
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
-            id=self.id,
+            external_id=self.id,
             id_hash=self.id_hash,
             email=self.email,
             first_name=self.first_name,

@@ -6,11 +6,10 @@ class ExternalSiteUserService:
     """Сервис бота для работы с моделью ExternalSiteUser."""
 
     def __init__(self, site_user_repository: ExternalSiteUserRepository):
-        self._site_user_repository = site_user_repository
+        self._repository = site_user_repository
 
-    async def get_ext_user_by_args(self, args) -> ExternalSiteUser | None:
+    async def get_or_create_by_args(self, *args) -> tuple[ExternalSiteUser | None, bool]:
         """Возвращает пользователя (или None) по арументам."""
-        if args:
-            id_hash = args[0]
-            return await self._site_user_repository.get_by_id_hash(id_hash)
-        return None
+        if not args:
+            return (False, None)
+        return await self._repository.get_or_create_by_id_hash(args[0])
