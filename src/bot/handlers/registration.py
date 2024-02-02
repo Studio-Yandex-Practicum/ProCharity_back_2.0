@@ -1,5 +1,5 @@
 from dependency_injector.wiring import Provide, inject
-from telegram import ChatMember, ChatMemberUpdated, Update
+from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler, CommandHandler, ContextTypes
 
@@ -82,28 +82,6 @@ async def confirm_chosen_categories(
     )
 
 
-def extract_status_change(chat_member_update: ChatMemberUpdated):
-    status_change = chat_member_update.difference().get("status")
-    old_is_member, new_is_member = chat_member_update.difference().get("is_member", (None, None))
-
-    if status_change is None:
-        return None
-
-    old_status, new_status = status_change
-    was_member = old_status in [
-        ChatMember.MEMBER,
-        ChatMember.OWNER,
-        ChatMember.ADMINISTRATOR,
-    ] or (old_status == ChatMember.BANNED and old_is_member is True)
-    is_member = new_status in [
-        ChatMember.MEMBER,
-        ChatMember.OWNER,
-        ChatMember.ADMINISTRATOR,
-    ] or (new_status == ChatMember.BANNED and new_is_member is True)
-
-    return was_member, is_member
-
-
 @logger_decor
 @inject
 async def on_chat_member_update(
@@ -112,16 +90,23 @@ async def on_chat_member_update(
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    result = extract_status_change(update.effective_user.id)
+    user = await user_service.get_by_telegram_id(update.effective_user.id)
 
-    if result is None:
-        return
+    if user is None:
+        return None
 
-    old_status, new_status = result
-    if old_status == ChatMember.MEMBER and new_status == ChatMember.BANNED:
-        await user_service.user_banned(telegram_id=update.effective_user.id)
-    elif old_status == ChatMember.BANNED and new_status == ChatMember.MEMBER:
-        await user_service.user_unbanned(telegram_id=update.effective_user.id)
+    if (
+        update.my_chat_member.new_chat_member.status == update.my_chat_member.new_chat_member.BANNED
+        and update.my_chat_member.old_chat_member.status == update.my_chat_member.old_chat_member.MEMBER
+    ):
+        return await user_service.bot_banned(user)
+    if (
+        update.my_chat_member.new_chat_member.status == update.my_chat_member.new_chat_member.MEMBER
+        and update.my_chat_member.old_chat_member.status == update.my_chat_member.old_chat_member.BANNED
+    ):
+        return await user_service.bot_unbanned(user)
+
+    return None
 
 
 def registration_handlers(app: Application):
