@@ -22,7 +22,7 @@ class TaskRequest(RequestBase):
         ..., example="https://youtubeexample.com", description="Страница Фонда в youtube."
     )
     vk_link: StrictStr | None = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
-    fund_sections: list[NonNegativeInt] = Field(..., example=[1, 7], description="Сферы деятельности Фонда.")
+    fund_sections: list[NonNegativeInt] | None = Field(None, example=[1, 7], description="Сферы деятельности Фонда.")
     deadline: date = Field(..., format=DATE_FORMAT, example="23.11.2024", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
         ..., example=1, description="ID дочерней категории, к которой относится задача."
@@ -54,7 +54,7 @@ class TaskResponse(ResponseBase):
         ..., example="https://youtubeexample.com", description="Страница Фонда в youtube."
     )
     vk_link: StrictStr | None = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
-    fund_sections: list[NonNegativeInt] = Field(..., example=[1, 7], description="Сферы деятельности Фонда.")
+    fund_sections: list[NonNegativeInt] | None = Field(None, example=[1, 7], description="Сферы деятельности Фонда.")
     deadline: date = Field(..., format=DATE_FORMAT, example="23.11.2024", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
         ..., example=1, description="ID дочерней категории, к которой относится задача."
