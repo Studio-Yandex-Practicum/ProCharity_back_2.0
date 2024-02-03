@@ -1,7 +1,8 @@
+from datetime import date
 from typing import AsyncGenerator, Generic, Sequence, Tuple, Type
 
 import structlog
-from dependency_injector.wiring import Provide
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.param_functions import Form
 from fastapi.responses import JSONResponse
@@ -26,6 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.api.constants import COOKIE_LIFETIME_SECONDS, JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
+from src.api.schemas import TokenCheckResponse
 from src.api.schemas.admin import CustomBearerResponse
 from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser
@@ -165,6 +167,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         request: Request | None = None,
         response: Request | None = None,
     ) -> None:
+        await self.user_db.update(user, {"last_login": date.today()})
+
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
@@ -315,6 +319,36 @@ def get_register_router(
         user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
     ):
         return await user_manager.create_with_token(user_create, safe=True, request=request)
+
+    @router.post(
+        "/token_checker",
+        status_code=status.HTTP_200_OK,
+        name="Checking invitation token.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
+                            },
+                        }
+                    }
+                },
+            },
+        },
+    )
+    @inject
+    async def check_token(
+        token: str,
+        admin_token_request_service: AdminTokenRequestService = Depends(
+            Provide[Container.api_services_container.admin_token_request_service]
+        ),
+    ):
+        await admin_token_request_service.get_by_token(token)
+        return TokenCheckResponse(description="Токен подтвержден.")
 
     return router
 
