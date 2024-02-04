@@ -31,8 +31,7 @@ class UserRepository(AbstractRepository):
         """Возвращает пользователя (или None) по external_user_id."""
         query = select(User).join(ExternalSiteUser).where(ExternalSiteUser.user_id == external_user_id)
 
-        result = await self._session.execute(query)
-        return result.scalar_one_or_none()
+        return await self._session.scalar(query)
 
     async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.
