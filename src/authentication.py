@@ -1,9 +1,9 @@
 import secrets
-from datetime import date, datetime
+from datetime import date
 from typing import AsyncGenerator, Generic, Sequence, Tuple, Type
 
 import structlog
-from dependency_injector.wiring import Provide
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.param_functions import Form
 from fastapi.responses import JSONResponse
@@ -28,6 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.api.constants import COOKIE_LIFETIME_SECONDS, JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
+from src.api.schemas import TokenCheckResponse
 from src.api.schemas.admin import CustomBearerResponse, InvitationCreate
 from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser
@@ -131,9 +132,6 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
     ) -> AdminUser:
         token = user_create.token
         registration_record = await admin_token_request_service.get_by_token(token)
-        if not registration_record or registration_record.token_expiration_date < datetime.now():
-            await log.ainfo(f'Registration: The invitation "{token}" not found or expired.')
-            raise InvalidInvitationToken
         del user_create.token
 
         email = registration_record.email
@@ -170,8 +168,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         user: AdminUser,
         request: Request | None = None,
         response: Request | None = None,
-    ):
+    ) -> None:
         await self.user_db.update(user, {"last_login": date.today()})
+
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
@@ -326,6 +325,36 @@ def get_register_router(
         except Exception as e:
             log.error(f"Error during user registration: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
+    @router.post(
+        "/token_checker",
+        status_code=status.HTTP_200_OK,
+        name="Checking invitation token.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
+                            },
+                        }
+                    }
+                },
+            },
+        },
+    )
+    @inject
+    async def check_token(
+        token: str,
+        admin_token_request_service: AdminTokenRequestService = Depends(
+            Provide[Container.api_services_container.admin_token_request_service]
+        ),
+    ):
+        await admin_token_request_service.get_by_token(token)
+        return TokenCheckResponse(description="Токен подтвержден.")
 
     return router
 
