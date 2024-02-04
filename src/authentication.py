@@ -1,3 +1,4 @@
+import secrets
 from datetime import date, datetime
 from typing import AsyncGenerator, Generic, Sequence, Tuple, Type
 
@@ -27,7 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.api.constants import COOKIE_LIFETIME_SECONDS, JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
-from src.api.schemas.admin import CustomBearerResponse
+from src.api.schemas.admin import CustomBearerResponse, InvitationCreate
 from src.api.services import AdminTokenRequestService
 from src.core.db.models import AdminUser
 from src.core.depends import Container
@@ -37,6 +38,7 @@ from src.core.exceptions.exceptions import (
     InvalidPassword,
     UserAlreadyExists,
 )
+from src.core.services.email import EmailProvider
 from src.settings import settings
 
 log = structlog.get_logger()
@@ -319,7 +321,11 @@ def get_register_router(
         user_create: user_create_schema,
         user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
     ):
-        return await user_manager.create_with_token(user_create, safe=True, request=request)
+        try:
+            return await user_manager.create_with_token(user_create, safe=True, request=request)
+        except Exception as e:
+            log.error(f"Error during user registration: {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
     return router
 
@@ -352,3 +358,79 @@ fastapi_users = CustomFastAPIUsers[AdminUser, int](
     get_user_manager,
     [auth_backend, auth_cookie_backend],
 )
+
+# /api/auth/invitation/ - begin
+invitation_router = APIRouter()
+
+
+async def generate_invitation_token() -> str:
+    invitation_token = secrets.token_urlsafe(32)
+    # token_expiration = datetime.utcnow() + timedelta(days=7)
+    return invitation_token
+
+
+async def send_invitation_email(email: str, token: str):
+    email_provider = EmailProvider()
+    await email_provider.__send_mail(
+        recipients=[email],
+        subject="Invitation",
+        body=f"Your invitation token is: {token}",
+        template_name=None,
+    )
+
+
+class InvitationManager(UserManager):
+    async def create_invitation(self, email: str) -> None:
+        admin_token_request_service = AdminTokenRequestService()
+        existing_user = await self.user_db.get_by_email(email)
+        if existing_user:
+            raise UserAlreadyExists("User with this e-mail is already registered.")
+
+        invitation_token = await generate_invitation_token()
+        await send_invitation_email(email, invitation_token)
+
+        try:
+            await admin_token_request_service.create(email, invitation_token)
+        except SQLAlchemyError as ex:
+            raise BadRequestException(f"Failed to create invitation token record in the database. Error: {str(ex)}")
+
+
+invitation_manager = InvitationManager(AdminUser)
+
+
+def get_invitation_manager(admin_db=Depends(get_admin_db)):
+    yield InvitationManager(admin_db)
+
+
+@invitation_router.post("/invitation", name="auth:invitation")
+async def send_invitation_email_route(
+    invitation_create: InvitationCreate,
+    invitation_manager: InvitationManager = Depends(get_invitation_manager),
+    email_provider: EmailProvider = Depends(Provide[Container.email_provider]),
+):
+    email = invitation_create.email
+
+    if not email_provider.is_valid_email(email):
+        raise BadRequestException("Invalid e-mail address.")
+
+    await invitation_manager.create_invitation(email)
+
+    return {"detail": "Invitation e-mail has been sent successfully."}
+
+
+async def create_invitation(email: str, invitation_manager: InvitationManager):
+    admin_token_request_service = AdminTokenRequestService()
+    existing_user = await invitation_manager.user_db.get_by_email(email)
+    if existing_user:
+        raise UserAlreadyExists("User with this e-mail is already registered.")
+
+    invitation_token = await generate_invitation_token()
+    await send_invitation_email(email, invitation_token)
+
+    try:
+        await admin_token_request_service.create(email, invitation_token)
+    except SQLAlchemyError as ex:
+        raise BadRequestException(f"Failed to create invitation token record in the database. Error: {str(ex)}")
+
+
+# /api/auth/invitation/ - end

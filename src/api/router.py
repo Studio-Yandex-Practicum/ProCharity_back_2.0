@@ -5,6 +5,7 @@ from src.api.endpoints import (
     analytic_router,
     category_router,
     health_check_router,
+    invitation_router,
     notification_router,
     site_user_router,
     task_router,
@@ -22,3 +23,4 @@ api_router.include_router(task_router, prefix="/tasks", tags=["Content"])
 api_router.include_router(telegram_webhook_router, prefix="/telegram", tags=["Telegram"])
 api_router.include_router(admin_user_router, prefix="/auth", tags=["AdminUser"])
 api_router.include_router(site_user_router, prefix="/auth", tags=["ExternalSiteUser"])
+api_router.include_router(invitation_router, prefix="/invitation")
