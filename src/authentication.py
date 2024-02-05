@@ -437,6 +437,13 @@ async def send_invitation_email_route(
     invitation_manager: InvitationManager = Depends(get_invitation_manager),
     email_provider: EmailProvider = Depends(Provide[Container.email_provider]),
 ):
+    """
+    Отправляет приглашение по электронной почте.
+
+    invitation_create: Данные для создания приглашения.
+    invitation_manager: Менеджер приглашений.
+    email_provider: Поставщик электронной почты.
+    """
     email = invitation_create.email
 
     if not email_provider.is_valid_email(email):
