@@ -4,11 +4,12 @@ from telegram import Update
 from src.core.exceptions.exceptions import UnauthorizedError, WebhookOnError
 from src.settings import settings
 
-telegram_webhook_router = APIRouter()
+telegram_webhook_router = APIRouter(redirect_slashes=False)
 
 
+@telegram_webhook_router.post(path="/webhook/", include_in_schema=False)
 @telegram_webhook_router.post(
-    "/webhook",
+    path="/webhook",
     description="Получить обновления telegram.",
 )
 async def get_telegram_bot_updates(request: Request) -> None:

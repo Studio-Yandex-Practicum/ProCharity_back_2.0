@@ -7,12 +7,13 @@ from src.api.schemas import InfoRate, MessageList, TelegramNotificationRequest, 
 from src.api.services.messages import TelegramNotificationService
 from src.core.depends import Container
 
-notification_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+notification_router = APIRouter(dependencies=[Depends(check_header_contains_token)], redirect_slashes=False)
 log = structlog.get_logger()
 
 
+@notification_router.post(path="/", include_in_schema=False)
 @notification_router.post(
-    "/",
+    path="",
     response_model=InfoRate,
     description="Сообщение для группы пользователей",
 )
@@ -30,6 +31,7 @@ async def send_telegram_notification(
     return rate
 
 
+@notification_router.post(path="/group/", include_in_schema=False)
 @notification_router.post(
     "/group",
     response_model=InfoRate,
@@ -51,8 +53,9 @@ async def send_messages_to_group_of_users(
     return rate
 
 
+@notification_router.post(path="/{telegram_id}/", include_in_schema=False)
 @notification_router.post(
-    "/{telegram_id}",
+    path="/{telegram_id}",
     response_model=InfoRate,
     description="Отправляет сообщение определенному пользователю.",
 )

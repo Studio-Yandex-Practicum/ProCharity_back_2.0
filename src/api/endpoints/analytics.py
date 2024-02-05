@@ -8,10 +8,11 @@ from src.api.services import HealthCheckService
 from src.api.services.analytics import AnalyticsService
 from src.core.depends import Container
 
-analytic_router = APIRouter()
+analytic_router = APIRouter(redirect_slashes=False)
 
 
-@analytic_router.get("/", description="Возращает статистику сервиса.")
+@analytic_router.get(path="/", include_in_schema=False)
+@analytic_router.get(path="", description="Возращает статистику сервиса.")
 @inject
 async def get_analytics(
     date_limit: date = Query(..., example="2023-10-11"),

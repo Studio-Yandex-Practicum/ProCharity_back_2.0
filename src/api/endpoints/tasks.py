@@ -10,10 +10,11 @@ from src.core.depends import Container
 from src.core.utils import display_tasks
 from src.settings import Settings
 
-task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+task_router = APIRouter(dependencies=[Depends(check_header_contains_token)], redirect_slashes=False)
 
 
-@task_router.post("/", description="Актуализирует список задач.")
+@task_router.post(path="/", include_in_schema=False)
+@task_router.post(path="", description="Актуализирует список задач.")
 @inject
 async def actualize_tasks(
     tasks: list[TaskRequest],
@@ -30,8 +31,9 @@ async def actualize_tasks(
         await telegram_notification_service.send_messages_to_subscribed_users(message, task.category_id)
 
 
+@task_router.get(path="/{user_id}/", include_in_schema=False)
 @task_router.get(
-    "/{user_id}",
+    path="/{user_id}",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
     description="Получает список всех задач из категорий на которые подписан юзер.",
@@ -44,8 +46,9 @@ async def get_tasks_for_user(
     return await task_service.get_tasks_for_user(user_id)
 
 
+@task_router.get(path="/", include_in_schema=False)
 @task_router.get(
-    "/",
+    path="",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
     description="Получает список всех задач.",
