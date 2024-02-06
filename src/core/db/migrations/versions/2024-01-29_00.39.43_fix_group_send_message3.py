@@ -37,10 +37,11 @@ def downgrade() -> None:
     op.add_column(
         "external_site_users", sa.Column("id_hash", sa.VARCHAR(length=256), autoincrement=False, nullable=False)
     )
-    op.drop_constraint(None, "external_site_users", type_="unique")
+    op.drop_constraint("external_site_users_email_key", "external_site_users", type_="unique")
     op.drop_index(op.f("ix_external_site_users_external_id_hash"), table_name="external_site_users")
     op.drop_index(op.f("ix_external_site_users_external_id"), table_name="external_site_users")
     op.drop_column("external_site_users", "external_id_hash")
     op.drop_column("external_site_users", "external_id")
     op.create_unique_constraint("admin_token_requests_email_key", "admin_token_requests", ["email"])
+
     # ### end Alembic commands ###
