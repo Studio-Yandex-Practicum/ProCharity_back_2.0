@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 
 from src.core.db.repository import (
+    AdminTokenRequestRepository,
     AdminUserRepository,
     CategoryRepository,
     ExternalSiteUserRepository,
@@ -36,5 +37,9 @@ class RepositoriesContainer(containers.DeclarativeContainer):
     )
     admin_repository = providers.Factory(
         AdminUserRepository,
+        session=data_base_connection.session,
+    )
+    admin_token_request_repository = providers.Factory(
+        AdminTokenRequestRepository,
         session=data_base_connection.session,
     )
