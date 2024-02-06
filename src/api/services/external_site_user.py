@@ -1,5 +1,3 @@
-# В файле service/external_site_user.py
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import ExternalSiteUserRequest
@@ -24,14 +22,14 @@ class ExternalSiteUserService:
         else:
             if site_user.id:
                 await self.register(site_user)
-            elif site_user.hash_id:
-                existing_hash_user = await self._repository.get_by_id_hash(site_user.hash_id)
+            elif site_user.external_hash_id:
+                existing_hash_user = await self._repository.get_by_id_hash(site_user.external_hash_id)
                 if existing_hash_user:
                     await self.update(site_user)
                 else:
                     await self.register(site_user)
             else:
-                raise ValueError("Не указаны обязательные поля 'id' или 'hash_id'.")
+                raise ValueError("Не указаны обязательные поля 'id' или 'external_hash_id'.")
 
     async def register(self, site_user_schema: ExternalSiteUserRequest) -> None:
         await self._repository.create(site_user_schema.to_orm())

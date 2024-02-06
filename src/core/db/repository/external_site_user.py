@@ -11,9 +11,11 @@ class ExternalSiteUserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, ExternalSiteUser)
 
-    async def get_by_id_hash(self, id_hash: str) -> ExternalSiteUser | None:
-        """Возвращает пользователя (или None) по id_hash."""
-        return await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
+    async def get_by_id_hash(self, external_id_hash: str) -> ExternalSiteUser | None:
+        """Возвращает пользователя (или None) по external_id_hash."""
+        return await self._session.scalar(
+            select(ExternalSiteUser).where(ExternalSiteUser.external_id_hash == external_id_hash)
+        )
 
     async def update_user_id_in_external_site_user(self, ext_user_id: int, user_id: int) -> None:
         """
