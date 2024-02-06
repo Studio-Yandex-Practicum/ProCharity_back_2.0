@@ -1,3 +1,4 @@
 [submodule "front"]
 	path = front
-	url = https://github.com/ProCharity/procharity-front
+	# TODO: Merge this branch and switch url back.
+	url = https://github.com/NiKuma0/procharity-front/tree/fix/redirect
