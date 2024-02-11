@@ -1,36 +1,49 @@
-from typing import AsyncGenerator, Generic, Optional, Sequence, Tuple, Type, Union
+from datetime import date
+from typing import AsyncGenerator, Generic, Sequence, Tuple, Type
 
 import structlog
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.param_functions import Form
 from fastapi.responses import JSONResponse
 from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
-from fastapi_users.authentication import AuthenticationBackend, Authenticator, BearerTransport, JWTStrategy, Strategy
+from fastapi_users.authentication import (
+    AuthenticationBackend,
+    Authenticator,
+    BearerTransport,
+    CookieTransport,
+    JWTStrategy,
+    Strategy,
+)
 from fastapi_users.authentication.transport import Transport
 from fastapi_users.manager import UserManagerDependency
 from fastapi_users.openapi import OpenAPIResponseType
-from fastapi_users.router import get_register_router
 from fastapi_users.router.common import ErrorCode, ErrorModel
-from fastapi_users.schemas import model_dump
 from fastapi_users.types import DependencyCallable
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
-from pydantic import BaseModel
+from pydantic import EmailStr
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from typing_extensions import Annotated
 
-from src.core.db.models import AdminUser, Base
+from src.api.constants import COOKIE_LIFETIME_SECONDS, JWT_LIFETIME_SECONDS, JWT_REFRESH_LIFETIME_SECONDS
+from src.api.schemas import TokenCheckResponse
+from src.api.schemas.admin import CustomBearerResponse
+from src.api.services import AdminTokenRequestService
+from src.core.db.models import AdminUser
+from src.core.depends import Container
+from src.core.exceptions.exceptions import (
+    BadRequestException,
+    InvalidInvitationToken,
+    InvalidPassword,
+    UserAlreadyExists,
+)
 from src.settings import settings
 
 log = structlog.get_logger()
 
 engine = create_async_engine(settings.database_url)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
-
-async def create_db_and_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -42,26 +55,13 @@ async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, AdminUser)
 
 
-class UserRead(schemas.BaseUser[int]):
-    pass
-
-
-class UserCreate(schemas.BaseUserCreate):
-    pass
-
-
-class CustomBearerResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-
-
 class CustomBearerTransport(BearerTransport):
     async def get_login_response(self, token: str, refresh_token: str) -> Response:
         bearer_response = CustomBearerResponse(
             access_token=token,
             refresh_token=refresh_token,
         )
-        return JSONResponse(model_dump(bearer_response))
+        return JSONResponse(bearer_response.model_dump())
 
 
 class AuthenticationBackendRefresh(AuthenticationBackend):
@@ -92,11 +92,11 @@ bearer_transport = CustomBearerTransport(tokenUrl="auth/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=3600)
+    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=JWT_LIFETIME_SECONDS)
 
 
 def get_refresh_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=7200)
+    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=JWT_REFRESH_LIFETIME_SECONDS)
 
 
 auth_backend = AuthenticationBackendRefresh(
@@ -106,15 +106,69 @@ auth_backend = AuthenticationBackendRefresh(
     get_refresh_strategy=get_refresh_jwt_strategy,
 )
 
+cookie_transport = CookieTransport(cookie_max_age=COOKIE_LIFETIME_SECONDS)
+
+
+def get_jwt_cookie_strategy() -> JWTStrategy:
+    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=COOKIE_LIFETIME_SECONDS)
+
+
+auth_cookie_backend = AuthenticationBackend(
+    name="auth_cookie_backend", transport=cookie_transport, get_strategy=get_jwt_cookie_strategy
+)
+
 
 class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
+    async def create_with_token(
+        self,
+        user_create: schemas.UC,
+        safe: bool = False,
+        request: Request | None = None,
+        admin_token_request_service: AdminTokenRequestService = Depends(
+            Provide[Container.api_services_container.admin_token_request_service]
+        ),
+    ) -> AdminUser:
+        token = user_create.token
+        registration_record = await admin_token_request_service.get_by_token(token)
+        del user_create.token
+
+        email = registration_record.email
+        existing_user = await self.user_db.get_by_email(email)
+        if existing_user is not None:
+            await log.ainfo(f"Registration: The user with the specified mailing address {email} is already registered.")
+            raise UserAlreadyExists
+
+        password = user_create.password
+        await self.validate_password(password, user_create)
+
+        user_dict = user_create.create_update_dict() if safe else user_create.create_update_dict_superuser()
+        password = user_dict.pop("password")
+        user_dict["hashed_password"] = self.password_helper.hash(password)
+        user_dict["email"] = email
+
+        try:
+            created_user = await self.user_db.create(user_dict)
+            await admin_token_request_service.remove(registration_record)
+        except SQLAlchemyError as ex:
+            await log.ainfo(f'Registration: Database commit error "{str(ex)}"')
+            raise BadRequestException(f"Bad request: {str(ex)}")
+
+        await self.on_after_register(created_user, request)
+        return JSONResponse(
+            content={"description": "Пользователь успешно зарегистрирован."}, status_code=status.HTTP_201_CREATED
+        )
+
+    async def on_after_register(self, user: AdminUser, request: Request | None = None) -> None:
+        await log.ainfo(f"Registration: User {user.email} is successfully registered.")
+
     async def on_after_login(
         self,
         user: AdminUser,
-        request: Optional[Request] = None,
-        response: Optional[Response] = None,
-    ):
-        self.user_db.last_login_update()
+        request: Request | None = None,
+        response: Request | None = None,
+    ) -> None:
+        await self.user_db.update(user, {"last_login": date.today()})
+
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
@@ -126,30 +180,12 @@ class OAuth2PasswordRequestForm:
     def __init__(
         self,
         *,
-        grant_type: Annotated[
-            Union[str, None],
-            Form(pattern="password"),
-        ] = None,
-        email: Annotated[
-            str,
-            Form(),
-        ],
-        password: Annotated[
-            str,
-            Form(),
-        ],
-        scope: Annotated[
-            str,
-            Form(),
-        ] = "",
-        client_id: Annotated[
-            Union[str, None],
-            Form(),
-        ] = None,
-        client_secret: Annotated[
-            Union[str, None],
-            Form(),
-        ] = None,
+        grant_type: str | None = Form(default=None, regex="password"),
+        email: EmailStr = Form(),
+        password: str = Form(),
+        scope: str = Form(default=""),
+        client_id: str | None = Form(default=None),
+        client_secret: str | None = Form(default=None),
     ):
         self.grant_type = grant_type
         self.username = email
@@ -232,6 +268,91 @@ def get_auth_router(
     return router
 
 
+def get_register_router(
+    get_user_manager: UserManagerDependency[models.UP, models.ID],
+    user_schema: Type[schemas.U],
+    user_create_schema: Type[schemas.UC],
+) -> APIRouter:
+    """Generate a router with the register route."""
+    router = APIRouter()
+
+    @router.post(
+        "/register",
+        status_code=status.HTTP_200_OK,
+        name="User Registration",
+        responses={
+            status.HTTP_400_BAD_REQUEST: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            UserAlreadyExists.status_code: {
+                                "summary": "The user with the specified mailing address email is already registered.",
+                                "value": {"detail": UserAlreadyExists.detail},
+                            },
+                            InvalidPassword.status_code: {
+                                "summary": "The entered password does not comply with the password policy.",
+                                "value": {"detail": InvalidPassword.detail},
+                            },
+                        }
+                    }
+                },
+            },
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
+                            },
+                        }
+                    }
+                },
+            },
+        },
+    )
+    async def register(
+        request: Request,
+        user_create: user_create_schema,
+        user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
+    ):
+        return await user_manager.create_with_token(user_create, safe=True, request=request)
+
+    @router.post(
+        "/token_checker",
+        status_code=status.HTTP_200_OK,
+        name="Checking invitation token.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorModel,
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            InvalidInvitationToken.status_code: {
+                                "summary": "The invitation token not found or expired.",
+                                "value": {"detail": InvalidInvitationToken.detail},
+                            },
+                        }
+                    }
+                },
+            },
+        },
+    )
+    @inject
+    async def check_token(
+        token: str,
+        admin_token_request_service: AdminTokenRequestService = Depends(
+            Provide[Container.api_services_container.admin_token_request_service]
+        ),
+    ):
+        await admin_token_request_service.get_by_token(token)
+        return TokenCheckResponse(description="Токен подтвержден.")
+
+    return router
+
+
 class CustomFastAPIUsers(Generic[models.UP, models.ID]):
     authenticator: Authenticator
 
@@ -258,5 +379,5 @@ class CustomFastAPIUsers(Generic[models.UP, models.ID]):
 
 fastapi_users = CustomFastAPIUsers[AdminUser, int](
     get_user_manager,
-    [auth_backend],
+    [auth_backend, auth_cookie_backend],
 )
