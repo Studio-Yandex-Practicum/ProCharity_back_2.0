@@ -3,7 +3,7 @@ name: Check app
 on:
   pull_request:
     branches:
-      - develop
+      - dev*
       - master
 
 env:
