@@ -32,7 +32,7 @@ async def start_command(
             last_name=telegram_user.last_name,
         )
         url_connect = get_connection_url(telegram_user.id)
-    else:
+    elif ext_user is not None:
         user = await user_service.register_user(
             telegram_id=telegram_user.id,
             username=telegram_user.username,
