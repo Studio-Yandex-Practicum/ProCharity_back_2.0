@@ -36,7 +36,7 @@ def upgrade() -> None:
     op.alter_column(
         "users", "external_signup_date", existing_type=postgresql.TIMESTAMP(), type_=sa.Date(), existing_nullable=True
     )
-    op.add_column(table_name="users", column=sa.Column("id", sa.Integer()))
+    op.add_column(table_name="users", column=sa.Column("id", sa.Integer(), autoincrement=True, primary_key=True))
     op.create_unique_constraint(constraint_name="users_telegram_id_key", table_name="users", columns=["telegram_id"])
     op.drop_constraint(constraint_name="users_categories_telegram_id_fkey", table_name="users_categories")
     op.drop_constraint(constraint_name="users_pkey", table_name="users")

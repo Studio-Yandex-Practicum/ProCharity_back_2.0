@@ -45,6 +45,8 @@ class User(Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
