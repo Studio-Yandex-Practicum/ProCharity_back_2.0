@@ -13,5 +13,5 @@ class ExternalSiteUserService:
     async def get_or_create(self, id_hash: Optional[str]) -> tuple[ExternalSiteUser | None, bool]:
         """Возвращает или создает пользователя (или None) по id_hash."""
         if id_hash is None:
-            return (False, None)
+            return (None, False)
         return await self._repository.get_or_create_by_id_hash(id_hash)
