@@ -2,6 +2,7 @@ from dependency_injector import containers, providers
 
 from src.api.services import (
     AdminService,
+    AdminTokenRequestService,
     AnalyticsService,
     CategoryService,
     ExternalSiteUserService,
@@ -50,4 +51,8 @@ class APIServicesContainer(containers.DeclarativeContainer):
         HealthCheckService,
         task_repository=repositories.task_repository,
         telegram_bot=applications.telegram_bot,
+    )
+    admin_token_request_service = providers.Factory(
+        AdminTokenRequestService,
+        admin_token_request_repository=repositories.admin_token_request_repository,
     )

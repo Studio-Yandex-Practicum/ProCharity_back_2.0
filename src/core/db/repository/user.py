@@ -38,6 +38,11 @@ class UserRepository(AbstractRepository):
             await self.update(user.id, user)
         return user
 
+    async def update_bot_banned_status(self, user: User, banned: bool) -> None:
+        """Обновляем статус User.banned на соответствующий."""
+        user.banned = banned
+        await self.update(user.id, user)
+
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
         user = await self._session.scalar(
