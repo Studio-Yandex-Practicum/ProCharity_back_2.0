@@ -38,10 +38,11 @@ class TelegramNotificationService:
 
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
-        category = await self._session.scalars(
+        qr = await self._session.scalars(
             select(Category).options(joinedload(Category.users)).where(Category.id == category_id)
         )
-        category = category.first()
+        if (category := qr.first()) is None:
+            return
         await self.telegram_notification.send_messages(message=notifications, users=category.users)
 
     def count_rate(self, respond: bool, msg: str, rate: InfoRate):
