@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import Field, NonNegativeInt, StrictFloat, StrictStr, field_validator
+from pydantic import Field, NonNegativeInt, RootModel, StrictFloat, StrictStr, field_validator
 
 from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
@@ -33,10 +33,17 @@ class TaskRequest(RequestBase):
     description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
 
     @field_validator("deadline", mode="before")
+    @classmethod
     def str_to_date(cls, v: object) -> object:
         if isinstance(v, str):
             return datetime.strptime(v, DATE_FORMAT_FOR_TASK_SCHEMA).date()
         return v
+
+
+class TasksRequest(RootModel[list[TaskRequest]]):
+    """Список задач."""
+
+    root: list[TaskRequest]
 
 
 class TaskResponse(ResponseBase):
