@@ -1,4 +1,5 @@
 import abc
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +13,7 @@ class ContentService(abc.ABC):
         self._repository: ContentRepository = repository
         self._session: AsyncSession = session
 
-    async def actualize_objects(self, objects: list[any], model_class: any) -> list[any]:
+    async def actualize_objects(self, objects: list[Any], model_class: Any) -> list[Any]:
         to_create, to_update = [], []
         ids = [obj.id for obj in objects]
         async with self._session as session:
@@ -30,5 +31,5 @@ class ContentService(abc.ABC):
             await session.commit()
             return [obj.id for obj in to_create]
 
-    async def get_all(self) -> list[any]:
+    async def get_all(self) -> list[Any]:
         return await self._repository.get_all()

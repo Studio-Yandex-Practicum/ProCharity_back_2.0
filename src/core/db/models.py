@@ -95,7 +95,7 @@ class Task(ContentBase):
     fund_site: Mapped[str] = mapped_column(String, nullable=True)
     yb_link: Mapped[str] = mapped_column(String, nullable=True)
     vk_link: Mapped[str] = mapped_column(String, nullable=True)
-    fund_sections: Mapped[list[int]] = mapped_column(ARRAY(BigInteger), nullable=True)
+    fund_sections: Mapped[str] = mapped_column(nullable=True)
 
     deadline: Mapped[date] = mapped_column(nullable=True)
 
