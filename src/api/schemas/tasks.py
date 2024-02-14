@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import Extra, Field, NonNegativeInt, StrictStr, field_validator
+from pydantic import Field, NonNegativeInt, StrictFloat, StrictStr, field_validator
 
 from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
@@ -11,16 +11,25 @@ class TaskRequest(RequestBase):
 
     id: NonNegativeInt = Field(..., ge=1, example=1, description="Уникальный идентификатор задачи.")
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
-    name_organization: StrictStr = Field(
-        ..., example="My Organization", description="Название организации, оставившей задачу."
+    name_organization: StrictStr | None = Field(..., example="My Fund", description="Название Фонда.")
+    legal_address: StrictStr | None = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
+    fund_city: StrictStr | None = Field(..., example="Fund City", description="Фактический адрес Фонда.")
+    fund_rating: StrictFloat | None = Field(..., example=78.65, description="Рейтинг Фонда.")
+    fund_site: StrictStr | None = Field(
+        ..., example="https://fundexample.com", description="Страница Фонда в сети интернет."
     )
-    deadline: date = Field(..., example="31.12.2025", description="Время, до которого нужно выполнить задачу.")
+    yb_link: StrictStr | None = Field(
+        ..., example="https://youtubeexample.com", description="Страница Фонда в youtube."
+    )
+    vk_link: StrictStr | None = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
+    fund_sections: list[NonNegativeInt] | None = Field(None, example=[1, 7], description="Сферы деятельности Фонда.")
+    deadline: date = Field(..., format=DATE_FORMAT, example="23.11.2024", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
         ..., example=1, description="ID дочерней категории, к которой относится задача."
     )
-    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
-    location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
-    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
+    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Количество бонусов за выполнение задачи.")
+    location: StrictStr = Field(..., example="Task Location", description="Место выполнения задачи.")
+    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на страницу задачи.")
     description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
 
     @field_validator("deadline", mode="before")
@@ -29,53 +38,29 @@ class TaskRequest(RequestBase):
             return datetime.strptime(v, DATE_FORMAT_FOR_TASK_SCHEMA).date()
         return v
 
-    class Config:
-        extra = Extra.ignore
-        json_schema_extra = {
-            "example": {
-                "id": 1,
-                "title": "Task Title",
-                "name_organization": "My Organization",
-                "deadline": "31.12.2025",
-                "category_id": 1,
-                "bonus": 5,
-                "location": "My Location",
-                "link": "https://example.com",
-                "description": "Task description",
-            }
-        }
-
 
 class TaskResponse(ResponseBase):
     """Класс модели ответа для Task."""
 
     title: StrictStr = Field(..., example="Task Title", description="Название задачи.")
-    name_organization: StrictStr = Field(
-        ..., example="My Organization", description="Название организации, оставившей задачу."
+    name_organization: StrictStr | None = Field(..., example="My Fund", description="Название Фонда.")
+    legal_address: StrictStr | None = Field(..., example="Fund Legal Adress", description="Юридический адрес Фонда.")
+    fund_city: StrictStr | None = Field(..., example="Fund City", description="Фактический адрес Фонда.")
+    fund_rating: StrictFloat | None = Field(..., example=78.65, description="Рейтинг Фонда.")
+    fund_site: StrictStr | None = Field(
+        ..., example="https://fundexample.com", description="Страница Фонда в сети интернет."
     )
-    deadline: date = Field(
-        ..., format=DATE_FORMAT, example="31-12-2025", description="Время, до которого нужно выполнить задачу."
+    yb_link: StrictStr | None = Field(
+        ..., example="https://youtubeexample.com", description="Страница Фонда в youtube."
     )
+    vk_link: StrictStr | None = Field(..., example="https://vkexample.com", description="Страница Фонда в VK.")
+    fund_sections: list[NonNegativeInt] | None = Field(None, example=[1, 7], description="Сферы деятельности Фонда.")
+    deadline: date = Field(..., format=DATE_FORMAT, example="23.11.2024", description="Дедлайн выполнения задачи.")
     category_id: NonNegativeInt = Field(
-        ..., example=1, description="Показывает, к какой дочерней категории относится задача."
+        ..., example=1, description="ID дочерней категории, к которой относится задача."
     )
-    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Величина бонуса за выполнение задачи.")
-    location: StrictStr = Field(..., example="My Location", description="Локация, в которой находится заказчик задачи.")
-    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на сайт, где размещена задача.")
+    bonus: NonNegativeInt = Field(..., ge=1, lt=10, example=5, description="Количество бонусов за выполнение задачи.")
+    location: StrictStr = Field(..., example="Task Location", description="Место выполнения задачи.")
+    link: StrictStr = Field(..., example="https://example.com", description="Ссылка на страницу задачи.")
     description: StrictStr = Field(None, example="Task description", description="Описание задачи.")
     is_archived: bool = Field(example=False, description="Статус задачи. Если True, то эта задача заархивирована.")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "title": "Task Title",
-                "name_organization": "My Organization",
-                "deadline": "31-12-2025",
-                "category_id": 1,
-                "bonus": 5,
-                "location": "My Location",
-                "link": "https://example.com",
-                "description": "Task description",
-                "is_archived": False,
-            }
-        }

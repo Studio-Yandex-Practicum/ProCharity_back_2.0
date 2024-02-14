@@ -1,15 +1,13 @@
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel, ConfigDict
 
 
 class ResponseBase(BaseModel):
     """Базовый класс для модели ответа."""
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class RequestBase(BaseModel):
     """Базовый класс для модели запроса."""
 
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(strict=False)
