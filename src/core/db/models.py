@@ -43,6 +43,7 @@ class UsersCategories(Base):
 
 class User(Base):
     """Модель пользователя."""
+
     __tablename__ = "users"
 
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
