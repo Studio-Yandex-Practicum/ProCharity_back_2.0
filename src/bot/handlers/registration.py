@@ -22,32 +22,33 @@ async def start_command(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     settings: Settings = Provide[Container.settings],
 ):
-    ext_user = await ext_user_service.get_ext_user_by_args(context.args)
-    if ext_user is not None:
-        await user_service.register_user(
-            telegram_id=update.effective_user.id,
-            username=update.effective_user.username,
+    telegram_user = update.effective_user
+    ext_user, created = await ext_user_service.get_or_create(id_hash=context.args[0] if context.args else None)
+    if created or ext_user is None:
+        user = await user_service.register_user(
+            telegram_id=telegram_user.id,
+            username=telegram_user.username,
+            first_name=telegram_user.first_name,
+            last_name=telegram_user.last_name,
+        )
+        url_connect = get_connection_url(telegram_user.id)
+    elif ext_user is not None:
+        user = await user_service.register_user(
+            telegram_id=telegram_user.id,
+            username=telegram_user.username,
             first_name=ext_user.first_name,
             last_name=ext_user.last_name,
             email=ext_user.email,
-            external_id=ext_user.id,
+            external_id=ext_user.external_id,
         )
-        await user_service.set_categories_to_user(update.effective_user.id, ext_user.specializations)
-        url_connect = get_connection_url(update.effective_user.id, ext_user.id)
-    else:
-        await user_service.register_user(
-            telegram_id=update.effective_user.id,
-            username=update.effective_user.username,
-            first_name=update.effective_user.first_name,
-            last_name=update.effective_user.last_name,
-        )
-        url_connect = get_connection_url(update.effective_user.id)
-    categories = await user_service.get_user_categories(update.effective_user.id)
+        await user_service.set_categories_to_user(telegram_user.id, ext_user.specializations)
+        url_connect = get_connection_url(telegram_user.id, ext_user.id)
+    categories = await user_service.get_user_categories(telegram_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
     keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start, url_for_connection=url_connect)
-    keyboard_feedback = await feedback_buttons(update.effective_user)
+    keyboard_feedback = await feedback_buttons(user)
     await context.bot.send_message(
-        chat_id=update.effective_user.id,
+        chat_id=telegram_user.id,
         text="Привет! 👋 \n\n",
         reply_markup=keyboard_feedback,
     )

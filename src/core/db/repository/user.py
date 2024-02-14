@@ -25,7 +25,7 @@ class UserRepository(AbstractRepository):
             return await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
         except PendingRollbackError as e:
             logger.info(e)
-            return None
+        return None
 
     async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
         """Обновляет данные пользователя, который уже был в базе.
