@@ -2,7 +2,7 @@ import abc
 from typing import Sequence, TypeVar
 
 from sqlalchemy import func, select, update
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DuplicateColumnError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.constants import DATE_FORMAT_FOR_STATISTICS
@@ -36,7 +36,7 @@ class AbstractRepository(abc.ABC):
         self._session.add(instance)
         try:
             await self._session.commit()
-        except IntegrityError as exc:
+        except DuplicateColumnError as exc:
             raise AlreadyExistsException(instance) from exc
 
         await self._session.refresh(instance)
