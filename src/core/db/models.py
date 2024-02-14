@@ -45,6 +45,8 @@ class User(Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
@@ -70,11 +72,12 @@ class ExternalSiteUser(Base):
     __tablename__ = "external_site_users"
 
     id_hash: Mapped[str] = mapped_column(String(256))
-    email: Mapped[str] = mapped_column(String(48), unique=True)
+    email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str] = mapped_column(nullable=True)
+    external_id: Mapped[int] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
