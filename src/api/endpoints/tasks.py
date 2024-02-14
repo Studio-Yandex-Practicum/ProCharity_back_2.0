@@ -22,7 +22,7 @@ async def actualize_tasks(
     ),
     help_procharity_url: str = Depends(Provide[Container.settings.provided.HELP_PROCHARITY_URL]),
 ) -> None:
-    new_tasks_ids = await task_service.actualize_objects(tasks, Task)
+    new_tasks_ids = await task_service.actualize_objects(tasks.root, Task)
     new_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids)
     for task in new_category_tasks:
         message = display_tasks(task, help_procharity_url)
