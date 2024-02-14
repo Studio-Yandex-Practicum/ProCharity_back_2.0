@@ -1,7 +1,7 @@
 import re
 
 from fastapi_users import schemas
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, EmailStr, Field, validator
 
 from src.api.constants import PASSWORD_POLICY
 from src.api.schemas.base import RequestBase
@@ -43,3 +43,14 @@ class UserRead(schemas.BaseUser[int]):
 class CustomBearerResponse(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class InvitationCreate(BaseModel):
+    email: EmailStr
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+            }
+        }

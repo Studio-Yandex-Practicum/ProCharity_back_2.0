@@ -6,6 +6,7 @@ from src.core.depends.bot_services import BotServicesContainer
 from src.core.depends.data_base_connection import DataBaseConnectionContainer
 from src.core.depends.jwt_services import JWTServicesContainer
 from src.core.depends.repositories import RepositoriesContainer
+from src.core.services.email import EmailProvider
 from src.settings import get_settings
 
 
@@ -26,3 +27,4 @@ class Container(containers.DeclarativeContainer):
     )
     bot_services_container = providers.Container(BotServicesContainer, repositories=repositories_container)
     jwt_services_container = providers.Container(JWTServicesContainer, settings=settings)
+    email_provider = providers.Singleton(EmailProvider)
