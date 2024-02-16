@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
-from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, BigInteger, Float, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
@@ -45,6 +45,7 @@ class User(Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
+
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
@@ -70,11 +71,12 @@ class ExternalSiteUser(Base):
     __tablename__ = "external_site_users"
 
     id_hash: Mapped[str] = mapped_column(String(256))
-    email: Mapped[str] = mapped_column(String(48), unique=True)
+    email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
     last_name: Mapped[str] = mapped_column(String(64), nullable=True)
     specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str] = mapped_column(nullable=True)
+    external_id: Mapped[int] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
@@ -84,8 +86,17 @@ class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
+
     title: Mapped[str]
-    name_organization: Mapped[str] = mapped_column(nullable=True)
+    name_organization: Mapped[str] = mapped_column(String, nullable=True)
+    legal_address: Mapped[str] = mapped_column(String, nullable=True)
+    fund_city: Mapped[str] = mapped_column(String, nullable=True)
+    fund_rating: Mapped[float] = mapped_column(Float, nullable=True)
+    fund_site: Mapped[str] = mapped_column(String, nullable=True)
+    yb_link: Mapped[str] = mapped_column(String, nullable=True)
+    vk_link: Mapped[str] = mapped_column(String, nullable=True)
+    fund_sections: Mapped[str] = mapped_column(nullable=True)
+
     deadline: Mapped[date] = mapped_column(nullable=True)
 
     category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
@@ -104,6 +115,7 @@ class Category(ContentBase):
     """Модель категорий."""
 
     __tablename__ = "categories"
+
     name: Mapped[str] = mapped_column(String(100))
 
     users: Mapped[list["User"]] = relationship("User", secondary="users_categories", back_populates="categories")
@@ -118,6 +130,8 @@ class Category(ContentBase):
 
 
 class AdminUser(SQLAlchemyBaseUserTable[int], Base):
+    """Модель Админа."""
+
     __tablename__ = "admin_users"
 
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
@@ -129,6 +143,8 @@ class AdminUser(SQLAlchemyBaseUserTable[int], Base):
 
 
 class AdminTokenRequest(Base):
+    """Модель запрос токера."""
+
     __tablename__ = "admin_token_requests"
 
     email: Mapped[str] = mapped_column(String(48))
@@ -140,6 +156,8 @@ class AdminTokenRequest(Base):
 
 
 class UnsubscribeReason(Base):
+    """Модель перечня обоснований отказа от подписки."""
+
     __tablename__ = "unsubscribe_reason"
 
     user_id: Mapped[int] = mapped_column(Integer(), ForeignKey("users.id"))
