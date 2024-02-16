@@ -7,7 +7,7 @@ from src.core.db.models import ExternalSiteUser
 class ExternalSiteUserRequest(RequestBase):
     """Класс модели запроса для ExternalSiteUser."""
 
-    id: int = Field(...)
+    user_id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
     first_name: str | None = Field(None, max_length=64)
     last_name: str | None = Field(None, max_length=64)
