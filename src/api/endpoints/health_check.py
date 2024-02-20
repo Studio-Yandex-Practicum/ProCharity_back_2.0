@@ -11,7 +11,7 @@ health_check_router = APIRouter(dependencies=[Depends(check_header_contains_toke
 
 
 @logger_decor
-@health_check_router.get("/", description="Проверяет соединение с БД, ботом и выводит информацию о последнем коммите.")
+@health_check_router.get("", description="Проверяет соединение с БД, ботом и выводит информацию о последнем коммите.")
 @inject
 async def get_health_check(
     health_check_service: HealthCheckService = Depends(Provide[Container.api_services_container.health_check_service]),

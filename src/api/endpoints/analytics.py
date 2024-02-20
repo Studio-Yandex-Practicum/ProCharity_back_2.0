@@ -17,7 +17,7 @@ analytic_router = APIRouter(
 )
 
 
-@analytic_router.get("/", description="Возращает статистику сервиса.")
+@analytic_router.get("", description="Возращает статистику сервиса.")
 @inject
 async def get_analytics(
     date_limit: date = Query(..., example="2023-10-11"),
