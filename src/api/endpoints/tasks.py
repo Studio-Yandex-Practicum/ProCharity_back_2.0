@@ -12,7 +12,7 @@ from src.core.utils import display_tasks
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
-@task_router.post("/", description="Актуализирует список задач.")
+@task_router.post("", description="Актуализирует список задач.")
 @inject
 async def actualize_tasks(
     tasks: TasksRequest,
@@ -44,7 +44,7 @@ async def get_tasks_for_user(
 
 
 @task_router.get(
-    "/",
+    "",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
     description="Получает список всех задач.",
