@@ -12,7 +12,7 @@ log = structlog.get_logger()
 
 
 @notification_router.post(
-    "/",
+    "",
     response_model=InfoRate,
     description="Сообщение для группы пользователей",
 )
