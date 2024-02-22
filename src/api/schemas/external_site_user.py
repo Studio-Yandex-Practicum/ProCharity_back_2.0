@@ -29,7 +29,7 @@ class ExternalSiteUserRequest(RequestBase):
         if not isinstance(value, str):
             return value
         try:
-            new_value = [int(value) for value in value.split(", ")]
+            new_value = [int(value) for value in value.split(",")]
             return new_value
         except ValueError:
             raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
