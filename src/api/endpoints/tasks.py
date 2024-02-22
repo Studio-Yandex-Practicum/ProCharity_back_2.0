@@ -12,7 +12,7 @@ from src.core.utils import display_tasks
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
-@task_router.post("", description="Актуализирует список задач.")
+@task_router.post("/", description="Актуализирует список задач.")
 @inject
 async def actualize_tasks(
     tasks: TasksRequest,
