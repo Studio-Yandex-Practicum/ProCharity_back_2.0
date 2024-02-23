@@ -34,7 +34,7 @@ class TelegramNotificationService:
 
     async def send_message_to_user(self, user_id: int, message: str) -> tuple[bool, str]:
         """Отправляет сообщение указанному по telegram_id пользователю"""
-        site_user = await self._session.get(ExternalSiteUser, user_id)
+        site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.external_id == user_id))
         if site_user is None:
             return False, "Пользователя не найден."
         if site_user.user is None:
