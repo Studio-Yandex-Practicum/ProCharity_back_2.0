@@ -17,10 +17,6 @@ depends_on = None
 
 
 def migrate_users_categories():
-    try:
-        from src.core.db.models import User, UsersCategories
-    except ImportError:
-        return
     users_categories = sa.table("users_categories", sa.column("telegram_id"), sa.column("user_id"))
     users = sa.table("users", sa.column("telegram_id"), sa.column("id"))
     (
@@ -66,20 +62,24 @@ def upgrade() -> None:
 
     # External Site User
 
+    op.drop_constraint("external_site_users_pkey", "external_site_users")
+    op.add_column(
+        "external_site_users",
+        sa.Column("id", sa.Integer(), nullable=False, autoincrement=True, primary_key=True, unique=True),
+    )
     op.alter_column(
         "external_site_users",
         "external_id",
-        new_column_name="id",
         type_=sa.Integer(),
-        autoincrement=True,
-        nullable=False,
+        nullable=True,
+        index=True,
     )
     op.alter_column(
         "external_site_users",
         "external_id_hash",
         new_column_name="id_hash",
         type_=sa.String(length=256),
-        nullable=False,
+        nullable=True,
     )
     op.alter_column(
         "external_site_users",
@@ -105,6 +105,7 @@ def upgrade() -> None:
         existing_nullable=True,
         postgresql_using="string_to_array(external_site_users.specializations, ',')::integer[]",
     )
+    op.alter_column("external_site_users", "email", existing_type=sa.VARCHAR(length=48), nullable=True)
 
     # Notification
 
@@ -213,6 +214,29 @@ def upgrade() -> None:
     op.drop_constraint("users_categories_telegram_id_fkey", "users_categories", type_="foreignkey")
     op.create_foreign_key(None, "users_categories", "users", ["user_id"], ["id"])
     op.drop_column("users_categories", "telegram_id")
+
+    # Some Queries for creating foreign keys.
+
+    ## Dumps
+    op.alter_column("users", "external_id", new_column_name="dump_id")
+    op.add_column("users", sa.Column("external_id", sa.Integer(), nullable=True))
+    op.create_foreign_key("users_external_id_fkey", "users", "external_site_users", ["external_id"], ["id"])
+
+    op.execute(
+        "INSERT INTO external_site_users (external_id) "
+        "SELECT users.dump_id "
+        "FROM users "
+        "WHERE (users.dump_id NOT IN (SELECT external_site_users.external_id "
+        "FROM external_site_users));"
+    )
+    op.execute(
+        "UPDATE users "
+        "SET external_id = subquery.ext_ref "
+        "FROM ("
+        "SELECT external_site_users.id as ext_ref, external_site_users.external_id as ext_id FROM external_site_users"
+        ") as subquery "
+        "WHERE users.external_id = subquery.ext_id;"
+    )
 
 
 def downgrade() -> None:
@@ -383,3 +407,16 @@ def downgrade() -> None:
     op.drop_column("users_categories", "updated_at")
     op.drop_column("users_categories", "created_at")
     op.drop_column("users_categories", "user_id")
+
+    # Some Queries for creating foreign keys.
+
+    op.execute(r"DELETE FROM external_site_users WHERE id_hash IS NULL")
+    op.execute(
+        r"UPDATE users "
+        r"SET external_id = subquery.ext_id "
+        r"FROM ("
+        r"SELECT external_site_users.id as ext_ref, external_site_users.external_id as ext_id FROM external_site_users"
+        r") as subquery "
+        r"WHERE users.external_id = subquery.ext_ref"
+    )
+    op.drop_constraint("users_external_id_fkey", "users", type_="foreignkey")
