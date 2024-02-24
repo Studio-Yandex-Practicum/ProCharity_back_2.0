@@ -11,7 +11,6 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.settings import Settings
 
 log = structlog.get_logger()
 
@@ -37,7 +36,7 @@ async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-    settings: Settings = Provide[Container.settings],
+    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
@@ -49,7 +48,7 @@ async def set_mailing(
     else:
         text = (
             "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-            f'<a href="{settings.PROCHARITY_URL}">ProCharity</a>.\n\n'
+            f'<a href="{procharity_url}">ProCharity</a>.\n\n'
             "Поделись, пожалуйста, почему ты решил отписаться?"
         )
         keyboard = get_no_mailing_keyboard()
@@ -88,7 +87,9 @@ async def reason_handler(
 @logger_decor
 @delete_previous_message
 async def about_project(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, settings: Settings = Provide[Container.settings]
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ya_praktikum_url: str = Provide[Container.settings.provided.YA_PRAKTIKUM_URL],
 ):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -97,7 +98,7 @@ async def about_project(
         "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
         "время и профессиональные навыки, позволяя решать задачи, "
         "которые трудно закрыть силами штатных сотрудников.\n\n"
-        f'Сделано студентами <a href="{settings.YA_PRAKTIKUM_URL}">Яндекс.Практикума.</a>',
+        f'Сделано студентами <a href="{ya_praktikum_url}">Яндекс.Практикума.</a>',
         reply_markup=await get_back_menu(),
         parse_mode=ParseMode.HTML,
         disable_web_page_preview=True,
