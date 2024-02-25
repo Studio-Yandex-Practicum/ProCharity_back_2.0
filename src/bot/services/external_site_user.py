@@ -1,5 +1,3 @@
-from typing import Optional
-
 from src.core.db.models import ExternalSiteUser
 from src.core.db.repository.external_site_user import ExternalSiteUserRepository
 
@@ -10,7 +8,7 @@ class ExternalSiteUserService:
     def __init__(self, site_user_repository: ExternalSiteUserRepository):
         self._repository = site_user_repository
 
-    async def get_or_create(self, id_hash: Optional[str]) -> tuple[ExternalSiteUser | None, bool]:
+    async def get_or_create(self, id_hash: str | None) -> tuple[ExternalSiteUser | None, bool]:
         """Возвращает или создает пользователя (или None) по id_hash."""
         if id_hash is None:
             return (None, False)

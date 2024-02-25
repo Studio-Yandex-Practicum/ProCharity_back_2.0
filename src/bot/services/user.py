@@ -1,5 +1,5 @@
 from src.core.db.models import User, UsersCategories
-from src.core.db.repository.user import UserRepository
+from src.core.db.repository import UserRepository
 
 
 class UserService:
@@ -20,23 +20,23 @@ class UserService:
         Если пользователь найден, обновляет имя и флаг "заблокирован".
         """
         user = await self._user_repository.get_by_telegram_id(telegram_id)
-        if user is not None:
-            return await self._user_repository.restore_existing_user(
-                user=user,
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
+        if user is None:
+            return await self._user_repository.create(
+                User(
+                    telegram_id=telegram_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    external_id=external_id,
+                )
             )
-        return await self._user_repository.create(
-            User(
-                telegram_id=telegram_id,
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                external_id=external_id,
-            )
-        )
+
+        user.username = username
+        user.first_name = first_name
+        user.last_name = last_name
+        user.external_id = external_id
+        return await self._user_repository.update(user.id, user)
 
     async def bot_banned(self, user: User) -> None:
         """Обновляет статус User.banned на соответствующий."""
