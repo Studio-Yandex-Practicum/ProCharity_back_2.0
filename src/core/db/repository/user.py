@@ -1,9 +1,8 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.exc import PendingRollbackError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from structlog import get_logger
 
 from src.core.db.models import Category, User, UsersCategories
@@ -57,21 +56,15 @@ class UserRepository(AbstractRepository):
         user.banned = banned
         await self.update(user.id, user)
 
-    async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
+    @auto_commit
+    async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
-        user = await self._session.scalar(
-            select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
+        await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
+        await self._session.execute(
+            insert(UsersCategories).values(
+                [{"user_id": user_id, "category_id": category_id} for category_id in categories_ids]
+            )
         )
-
-        categories = (
-            (await self._session.scalars(select(Category).where(Category.id.in_(categories_ids)))).all()
-            if categories_ids
-            else []
-        )
-
-        user.categories = categories
-        if user:
-            await self.update(user.id, user)
 
     @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:
