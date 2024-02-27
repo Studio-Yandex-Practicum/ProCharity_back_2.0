@@ -50,7 +50,7 @@ def upgrade():
         sa.Column("token", sa.String(length=128), nullable=False),
         sa.Column("token_expiration_date", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("email"),
+        sa.UniqueConstraint("email", name="registers_email_key"),
     )
     op.create_table(
         "statistics",
