@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload
 from telegram.ext import Application
 
 from src.api.schemas import ErrorsSending, InfoRate
-from src.core.db.models import Category, User
+from src.core.db.models import Category, ExternalSiteUser, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramNotification
 
@@ -32,9 +32,14 @@ class TelegramNotificationService:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
-    async def send_message_to_user(self, telegram_id, notifications):
+    async def send_message_to_user(self, user_id: int, message: str) -> tuple[bool, str]:
         """Отправляет сообщение указанному по telegram_id пользователю"""
-        return await self.telegram_notification.send_message(user_id=telegram_id, message=notifications.message)
+        site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.external_id == user_id))
+        if site_user is None:
+            return False, "Пользователя не найден."
+        if site_user.user is None:
+            return False, "Телеграм пользователя не найден."
+        return await self.telegram_notification.send_message(user_id=site_user.user.telegram_id, message=message)
 
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
