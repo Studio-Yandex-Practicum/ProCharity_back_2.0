@@ -6,12 +6,18 @@ from fastapi import APIRouter, Depends, Query
 from src.api.schemas import ActiveTasks, AllUsersStatistic, Analytic, DBStatus, ReasonCancelingStatistics
 from src.api.services import HealthCheckService
 from src.api.services.analytics import AnalyticsService
+from src.authentication import fastapi_users
 from src.core.depends import Container
+from src.settings import settings
 
-analytic_router = APIRouter()
+analytic_router = APIRouter(
+    dependencies=[
+        Depends(fastapi_users.current_user(optional=settings.DEBUG)),
+    ]
+)
 
 
-@analytic_router.get("/", description="Возращает статистику сервиса.")
+@analytic_router.get("", description="Возращает статистику сервиса.")
 @inject
 async def get_analytics(
     date_limit: date = Query(..., example="2023-10-11"),

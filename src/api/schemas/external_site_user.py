@@ -7,7 +7,7 @@ from src.core.db.models import ExternalSiteUser
 class ExternalSiteUserRequest(RequestBase):
     """Класс модели запроса для ExternalSiteUser."""
 
-    id: int = Field(...)
+    user_id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
     first_name: str | None = Field(None, max_length=64)
     last_name: str | None = Field(None, max_length=64)
@@ -16,7 +16,7 @@ class ExternalSiteUserRequest(RequestBase):
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
-            id=self.id,
+            external_id=self.user_id,
             id_hash=self.id_hash,
             email=self.email,
             first_name=self.first_name,
@@ -29,7 +29,9 @@ class ExternalSiteUserRequest(RequestBase):
         if not isinstance(value, str):
             return value
         try:
-            new_value = [int(value) for value in value.split(", ")]
+            new_value = [int(value) for value in value.replace(" ", "").split(",")]
             return new_value
-        except ValueError:
-            raise ValueError("Для передачи строки с числами в поле specializations " 'используйте формат: "1, 2, 3" ')
+        except ValueError as exc:
+            raise ValueError(
+                'Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3"'
+            ) from exc

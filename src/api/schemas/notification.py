@@ -1,6 +1,6 @@
 import urllib
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
 
 from src.api.schemas.base import RequestBase
 from src.core.enums import TelegramNotificationUsersGroups
@@ -23,14 +23,7 @@ class TelegramNotificationRequest(RequestBase):
     сообщения определенному пользователю.
     """
 
-    message: str = Field(..., min_length=2)
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "message": "Type here your message for user",
-            }
-        }
+    message: str = Field(..., min_length=1)
 
 
 class TelegramNotificationUsersRequest(TelegramNotificationRequest):
@@ -39,32 +32,13 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
 
     mode: TelegramNotificationUsersGroups
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "message": "Type here your message for user",
-                "mode": "all",
-            }
-        }
-
 
 class Message(TelegramNotificationRequest):
-    telegram_id: int
+    user_id: int
 
 
 class MessageList(RequestBase):
     messages: list[Message]
-
-    class Config:
-        extra = Extra.forbid
-        json_schema_extra = {
-            "example": {
-                "messages": [
-                    {"telegram_id": 000000000, "message": "hi there"},
-                    {"telegram_id": 000000000, "message": "hi there"},
-                ]
-            }
-        }
 
 
 class ErrorsSending(BaseModel):

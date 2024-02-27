@@ -1,3 +1,4 @@
 [submodule "front"]
 	path = front
 	url = https://github.com/ProCharity/procharity-front
+	branch = main

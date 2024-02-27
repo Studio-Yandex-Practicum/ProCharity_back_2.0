@@ -22,9 +22,6 @@ def upgrade() -> None:
     # User
 
     op.add_column(
-        "users", sa.Column("id", sa.Integer(), autoincrement=True, nullable=False, primary_key=True, unique=True)
-    )
-    op.add_column(
         "users", sa.Column("updated_at", sa.Date(), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False)
     )
     op.alter_column("users", "has_mailing", existing_type=sa.BOOLEAN(), nullable=False)
@@ -39,7 +36,18 @@ def upgrade() -> None:
     op.alter_column(
         "users", "external_signup_date", existing_type=postgresql.TIMESTAMP(), type_=sa.Date(), existing_nullable=True
     )
-    op.create_unique_constraint("users_telegram_id_unique", "users", ["telegram_id"])
+    op.add_column(table_name="users", column=sa.Column("id", sa.Integer(), autoincrement=True, primary_key=True))
+    op.create_unique_constraint(constraint_name="users_telegram_id_key", table_name="users", columns=["telegram_id"])
+    op.drop_constraint(constraint_name="users_categories_telegram_id_fkey", table_name="users_categories")
+    op.drop_constraint(constraint_name="users_pkey", table_name="users")
+    op.create_primary_key(constraint_name="users_pkey", table_name="users", columns=["id"])
+    op.create_foreign_key(
+        constraint_name="users_categories_telegram_id_fkey",
+        source_table="users_categories",
+        referent_table="users",
+        local_cols=["telegram_id"],
+        remote_cols=["telegram_id"],
+    )
 
     # Admin User
 
@@ -73,9 +81,19 @@ def downgrade() -> None:
 
     # User
 
+    op.drop_constraint(constraint_name="users_categories_telegram_id_fkey", table_name="users_categories")
+    op.drop_constraint(constraint_name="users_pkey", table_name="users")
+    op.create_primary_key(constraint_name="users_pkey", table_name="users", columns=["telegram_id"])
+    op.drop_constraint(constraint_name="users_telegram_id_key", table_name="users")
+    op.create_foreign_key(
+        constraint_name="users_categories_telegram_id_fkey",
+        source_table="users_categories",
+        referent_table="users",
+        local_cols=["telegram_id"],
+        remote_cols=["telegram_id"],
+    )
     op.drop_column("users", "id")
     op.drop_column("users", "updated_at")
-
     op.alter_column("users", "has_mailing", existing_type=sa.Boolean(), nullable=False)
     op.alter_column(
         "users",
@@ -85,11 +103,9 @@ def downgrade() -> None:
         autoincrement=False,
         nullable=False,
     )
-
     op.alter_column(
         "users", "external_signup_date", existing_type=sa.Date(), type_=postgresql.TIMESTAMP(), existing_nullable=True
     )
-    op.drop_constraint("users_telegram_id_unique", "users", type_="unique")
 
     # Admin User
 

@@ -25,18 +25,37 @@ class UserRepository(AbstractRepository):
             return await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
         except PendingRollbackError as e:
             logger.info(e)
-            return None
+        return None
 
-    async def restore_existing_user(self, user: User, username: str, first_name: str, last_name: str) -> User:
+    async def restore_existing_user(
+        self, user: User, username: str, first_name: str, last_name: str, external_id: int | None
+    ) -> User:
         """Обновляет данные пользователя, который уже был в базе.
 
         Если ранее существовавший юзер делает /start в боте, то проверяются/обновляются его username, first_name,
         last_name и сбрасывается флаг "banned" - признак, что бот у него был заблокирован.
         """
-        if user.username != username or user.first_name != first_name or user.last_name != last_name or user.banned:
-            user.username, user.first_name, user.last_name, user.banned = username, first_name, last_name, False
+        if (
+            user.username != username
+            or user.first_name != first_name
+            or user.last_name != last_name
+            or user.banned
+            or user.external_id != external_id
+        ):
+            user.username, user.first_name, user.last_name, user.banned, external_id = (
+                username,
+                first_name,
+                last_name,
+                False,
+                external_id or user.external_id,
+            )
             await self.update(user.id, user)
         return user
+
+    async def update_bot_banned_status(self, user: User, banned: bool) -> None:
+        """Обновляем статус User.banned на соответствующий."""
+        user.banned = banned
+        await self.update(user.id, user)
 
     async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""

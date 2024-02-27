@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
@@ -45,20 +45,21 @@ class User(Base):
     """Модель пользователя."""
 
     __tablename__ = "users"
+
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
-    username: Mapped[str] = mapped_column(String(32), unique=True, nullable=True)
-    email: Mapped[str] = mapped_column(String(48), unique=True, nullable=True)
-    external_id: Mapped[int] = mapped_column(unique=True, nullable=True)
-    first_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(64), nullable=True)
+    username: Mapped[str] = mapped_column(String(256), unique=True, nullable=True)
+    email: Mapped[str] = mapped_column(String(256), nullable=True)
+    first_name: Mapped[str] = mapped_column(String(256), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(256), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
     external_signup_date: Mapped[date] = mapped_column(nullable=True)
     banned: Mapped[bool] = mapped_column(server_default=expression.false())
 
-    categories: Mapped[list["Category"]] = relationship(
-        "Category", secondary="users_categories", back_populates="users"
-    )
+    categories: Mapped[list["Category"]] = relationship(secondary="users_categories", back_populates="users")
     unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship(back_populates="user")
+
+    external_id: Mapped[int] = mapped_column(ForeignKey("external_site_users.id"), nullable=True)
+    external_user: Mapped["ExternalSiteUser"] = relationship(back_populates="user")
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
@@ -69,12 +70,15 @@ class ExternalSiteUser(Base):
 
     __tablename__ = "external_site_users"
 
-    id_hash: Mapped[str] = mapped_column(String(256))
-    email: Mapped[str] = mapped_column(String(48), unique=True)
-    first_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(64), nullable=True)
-    specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True)
-    source: Mapped[str] = mapped_column(nullable=True)
+    id_hash: Mapped[str] = mapped_column(String(256), nullable=True)
+    external_id: Mapped[int | None] = mapped_column(nullable=True, index=True)
+    email: Mapped[str | None] = mapped_column(String(256), unique=True, nullable=True)
+    first_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    last_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    specializations: Mapped[list[int] | None] = mapped_column(ARRAY(Integer), nullable=True)
+    source: Mapped[str | None] = mapped_column(nullable=True)
+
+    user: Mapped["User | None"] = relationship(back_populates="external_user", lazy="joined")
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
@@ -84,11 +88,20 @@ class Task(ContentBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
+
     title: Mapped[str]
     name_organization: Mapped[str] = mapped_column(nullable=True)
+    legal_address: Mapped[str] = mapped_column(nullable=True)
+    fund_city: Mapped[str] = mapped_column(nullable=True)
+    fund_rating: Mapped[float] = mapped_column(nullable=True)
+    fund_site: Mapped[str] = mapped_column(nullable=True)
+    yb_link: Mapped[str] = mapped_column(nullable=True)
+    vk_link: Mapped[str] = mapped_column(nullable=True)
+    fund_sections: Mapped[str] = mapped_column(nullable=True)
+
     deadline: Mapped[date] = mapped_column(nullable=True)
 
-    category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"), nullable=True)
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category | None"] = relationship(back_populates="tasks")
 
     bonus: Mapped[int]
@@ -104,20 +117,20 @@ class Category(ContentBase):
     """Модель категорий."""
 
     __tablename__ = "categories"
-    name: Mapped[str] = mapped_column(String(100))
 
-    users: Mapped[list["User"]] = relationship("User", secondary="users_categories", back_populates="categories")
-
+    name: Mapped[str] = mapped_column(String(256))
+    users: Mapped[list["User"]] = relationship(secondary="users_categories", back_populates="categories")
     tasks: Mapped[list["Task"]] = relationship(back_populates="category")
-
-    parent_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=True)
-    children: Mapped["Category"] = relationship("Category", backref=backref("parent", remote_side="Category.id"))
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"))
+    children: Mapped["Category"] = relationship(backref=backref("parent", remote_side="Category.id"))
 
     def __repr__(self):
         return f"<Category {self.name}>"
 
 
 class AdminUser(SQLAlchemyBaseUserTable[int], Base):
+    """Модель Админа."""
+
     __tablename__ = "admin_users"
 
     first_name: Mapped[str] = mapped_column(String(64), nullable=True)
@@ -129,17 +142,21 @@ class AdminUser(SQLAlchemyBaseUserTable[int], Base):
 
 
 class AdminTokenRequest(Base):
+    """Модель запрос токера."""
+
     __tablename__ = "admin_token_requests"
 
     email: Mapped[str] = mapped_column(String(48))
     token: Mapped[str] = mapped_column(String(128))
-    token_expiration_date: Mapped[date]
+    token_expiration_date: Mapped[datetime]
 
     def __repr__(self):
         return f"<Register {self.email}>"
 
 
 class UnsubscribeReason(Base):
+    """Модель перечня обоснований отказа от подписки."""
+
     __tablename__ = "unsubscribe_reason"
 
     user_id: Mapped[int] = mapped_column(Integer(), ForeignKey("users.id"))
