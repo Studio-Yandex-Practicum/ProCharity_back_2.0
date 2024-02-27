@@ -7,7 +7,7 @@ from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
 from src.core.db.models import Category, User
 from src.core.depends import Container
-from src.settings import Settings, settings
+from src.settings import settings
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
@@ -101,11 +101,11 @@ async def get_back_menu() -> InlineKeyboardMarkup:
 async def get_start_keyboard(
     callback_data_on_start: str,
     url_for_connection: str,
-    settings: Settings = Provide[Container.settings],
+    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
 ) -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Начнём", callback_data=callback_data_on_start)],
-        [InlineKeyboardButton("Перейти на сайт ProCharity", url=settings.PROCHARITY_URL)],
+        [InlineKeyboardButton("Перейти на сайт ProCharity", url=procharity_url)],
         [InlineKeyboardButton("Связать аккаунт с ботом", url=url_for_connection)],
     ]
     return InlineKeyboardMarkup(keyboard)

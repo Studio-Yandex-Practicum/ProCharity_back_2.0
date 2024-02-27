@@ -10,7 +10,6 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.settings import Settings
 
 
 @logger_decor
@@ -20,7 +19,7 @@ async def start_command(
     context: ContextTypes.DEFAULT_TYPE,
     ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-    settings: Settings = Provide[Container.settings],
+    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
 ):
     telegram_user = update.effective_user
     ext_user, created = await ext_user_service.get_or_create(
@@ -57,7 +56,7 @@ async def start_command(
     )
     await context.bot.send_message(
         chat_id=update.effective_user.id,
-        text=f'Я бот платформы интеллектуального волонтерства <a href="{settings.PROCHARITY_URL}">ProCharity</a>. '
+        text=f'Я бот платформы интеллектуального волонтерства <a href="{procharity_url}">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
