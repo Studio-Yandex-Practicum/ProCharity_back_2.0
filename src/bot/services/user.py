@@ -46,9 +46,9 @@ class UserService:
         """Обновляет статус User.unbanned на соответствующий."""
         await self._user_repository.update_bot_banned_status(user, banned=False)
 
-    async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> None:
+    async def set_categories_to_user(self, user: User, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
-        await self._user_repository.set_categories_to_user(user_id, categories_ids)
+        await self._user_repository.set_categories_to_user(user, categories_ids)
 
     async def add_category_to_user(self, telegram_id: int, category_id: int) -> None:
         """Добавляет пользователю указанную категорию"""
