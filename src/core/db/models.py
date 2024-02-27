@@ -46,7 +46,7 @@ class User(Base):
 
     __tablename__ = "users"
 
-    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     username: Mapped[str] = mapped_column(String(256), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(256), nullable=True)
     first_name: Mapped[str] = mapped_column(String(256), nullable=True)
@@ -72,7 +72,7 @@ class ExternalSiteUser(Base):
 
     id_hash: Mapped[str] = mapped_column(String(256), nullable=True)
     external_id: Mapped[int | None] = mapped_column(nullable=True, index=True)
-    email: Mapped[str | None] = mapped_column(String(256), unique=True, nullable=True)
+    email: Mapped[str | None] = mapped_column(String(256), nullable=True)
     first_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     specializations: Mapped[list[int] | None] = mapped_column(ARRAY(Integer), nullable=True)

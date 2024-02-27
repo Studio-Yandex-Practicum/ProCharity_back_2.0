@@ -74,6 +74,7 @@ def upgrade() -> None:
     op.drop_constraint("admin_users_email_key", "admin_users", type_="unique")
     op.create_index(op.f("ix_admin_users_email"), "admin_users", ["email"], unique=True)
     op.drop_column("admin_users", "last_logon")
+    op.drop_constraint("external_site_users_pkey", "external_site_users")
 
 
 def downgrade() -> None:
