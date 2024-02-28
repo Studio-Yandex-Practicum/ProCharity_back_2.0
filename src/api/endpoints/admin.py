@@ -10,6 +10,5 @@ admin_user_router.include_router(fastapi_users.get_auth_router(auth_backend))
 admin_user_router.include_router(fastapi_users.get_register_router(UserRead, UserCreate))
 admin_user_router.include_router(
     fastapi_users.get_auth_router(auth_cookie_backend),
-    prefix="/auth/cookies",
-    tags=["Admin Login Logout By Cookies"],
+    prefix="/cookies",
 )
