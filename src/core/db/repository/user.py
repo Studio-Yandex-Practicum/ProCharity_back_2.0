@@ -69,7 +69,7 @@ class UserRepository(AbstractRepository):
                 await transaction.commit()
                 return user_categories.all()
         except PendingRollbackError as e:
-            logger.error(e)
+            await logger.aerror(e)
 
     @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:
