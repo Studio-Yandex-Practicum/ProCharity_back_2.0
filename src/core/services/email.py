@@ -1,4 +1,6 @@
 import contextlib
+import uuid
+from datetime import datetime, timedelta
 from typing import Any, Generator
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
@@ -6,6 +8,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.db import get_session
+from src.core.db.models import AdminTokenRequest
 from src.core.db.repository.user import UserRepository
 from src.core.exceptions import exceptions
 from src.settings import settings
@@ -31,6 +34,7 @@ class EmailProvider:
             MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
             USE_CREDENTIALS=settings.USE_CREDENTIALS,
             VALIDATE_CERTS=settings.VALIDATE_CERTS,
+            TEMPLATE_FOLDER=settings.EMAIL_TEMPLATE_DIRECTORY,
         )
         self.fastmail = FastMail(conf)
         self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
@@ -64,7 +68,13 @@ class EmailProvider:
             raise exceptions.EmailSendError(email_obj.recipients, exc)
 
     async def send_question_feedback(self, telegram_id: int, message: str, email: EmailStr | list[EmailStr]) -> None:
-        """Отправляет email на почтовый ящик администратора с отзывом/вопросом."""
+        """Отправляет email на почтовый ящик администратора с отзывом/вопросом.
+        Аргументы:
+            telegram_id (int): telegram_id волонтера
+            message (str): текст сообщения
+            name (str): имя волонтера
+            email (EmailStr | list[EmailStr]): email получателя
+        """
         if isinstance(email, str):
             recipients = [email]
         elif isinstance(email, list):
@@ -82,4 +92,71 @@ class EmailProvider:
             ),
             body=message,
             template_name=None,
+        )
+
+    async def send_question(
+        self, id: int, telegram_id: int, name: str, message: str, email: EmailStr | list[EmailStr]
+    ) -> None:
+        """Отправляет указанным адресатам вопросы от волонтера.
+        Аргументы:
+            id (int): id волонтера
+            telegram_id (int): telegram_id волонтера
+            name (str): name волонтера
+            message (str): текст вопроса
+            email (EmailStr | list[EmailStr]): email получателя
+        """
+        template_body = {"id": id, "telegram_id": telegram_id, "name": name, "message": message}
+        recipients = [email]
+        email_obj = EmailSchema(recipients=recipients, template_body=template_body)
+        await self.__send_mail(email_obj, subject="Вопрос от волонтера'", template_name="send_question.html", body=None)
+
+    async def create_link_with_token(self, email: EmailStr | list[EmailStr], path: str) -> dict:
+        """Создает ссылку с токеном для отправки
+        пригласительной ссылки или сброса пароля.
+        Аргументы:
+            email (EmailStr | list[EmailStr]): email получателя
+            path (str): маршрут ссылки
+        """
+        token_expiration = settings.TOKEN_EXPIRATION
+        token_expiration_date = datetime.now() + timedelta(hours=token_expiration)
+        token = str(uuid.uuid4())
+
+        record = AdminTokenRequest.query.filter_by(email=email).first()
+        async with self._sessionmaker() as session:
+            if record:
+                record.token = token
+                record.token_expiration_date = token_expiration_date
+                session.commit()
+            else:
+                user = AdminTokenRequest(email=email, token=token, token_expiration_date=token_expiration_date)
+                session.add(user)
+                session.commit()
+            template_body = {"link": f"{settings.HOST_NAME}/#/{path}/{token}", "expiration": token_expiration}
+            return template_body
+
+    async def send_invitation_link(self, email: str) -> None:
+        """Отправляет указанным адресатам ссылку для регистрации в проекте.
+        Аргументы:
+            email (str): email получателя
+        """
+        template_body = self.create_link_with_token(email, "invitation_link")
+        recipients = [email]
+        email_obj = EmailSchema(recipients=recipients, template_body=template_body)
+        await self.__send_mail(
+            email_obj, subject="Приглашение в проект 'ProCharity'", template_name="invitation_email.html", body=None
+        )
+
+    async def send_restore_password_link(self, email: str) -> None:
+        """Отправляет email на почтовый ящик со ссылкой на сброс пароля.
+        Аргументы:
+            email (str): email получателя
+        """
+        template_body = self.create_link_with_token(email, "reset_password")
+        recipients = [email]
+        email_obj = EmailSchema(recipients=recipients, template_body=template_body)
+        await self.__send_mail(
+            email_obj,
+            subject="Восстановленный пароль от учетной записи в проекте 'ProCharity'",
+            template_name="password_reset.html",
+            body=None,
         )
