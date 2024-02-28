@@ -56,19 +56,20 @@ class UserRepository(AbstractRepository):
         user.banned = banned
         await self.update(user.id, user)
 
-    @auto_commit
     async def set_categories_to_user(self, user: User, categories_ids: list[int]) -> Sequence[UsersCategories]:
         """Присваивает пользователю список категорий."""
         try:
-            await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user.id))
-            user_categories = await self._session.execute(
-                insert(UsersCategories)
-                .values([{"user_id": user.id, "category_id": category_id} for category_id in categories_ids])
-                .returning(UsersCategories)
-            )
-            return user_categories.all()
+            async with self._session.begin() as transaction:
+                await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user.id))
+                user_categories = await self._session.execute(
+                    insert(UsersCategories)
+                    .values([{"user_id": user.id, "category_id": category_id} for category_id in categories_ids])
+                    .returning(UsersCategories)
+                )
+                await transaction.commit()
+                return user_categories.all()
         except PendingRollbackError as e:
-            logger.info(e)
+            await logger.error(e)
 
     @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:
