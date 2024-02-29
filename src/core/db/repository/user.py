@@ -66,6 +66,7 @@ class UserRepository(AbstractRepository):
                 .returning(UsersCategories)
             )
             await transaction.commit()
+            await logger.ainfo("Изменены категории у пользователя")
         return user_categories.all()
 
     @auto_commit
