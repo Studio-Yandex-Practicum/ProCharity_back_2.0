@@ -43,7 +43,7 @@ async def start_command(
             email=ext_user.email,
             external_id=ext_user.id if ext_user is not None else None,
         )
-        await user_service.set_categories_to_user(user, ext_user.specializations)
+        await user_service.set_categories_to_user(user.id, ext_user.specializations)
         url_connect = get_connection_url(telegram_user.id, ext_user.id)
     categories = await user_service.get_user_categories(telegram_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
