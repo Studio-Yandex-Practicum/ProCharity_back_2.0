@@ -1,6 +1,4 @@
 import contextlib
-import uuid
-from datetime import datetime, timedelta
 from typing import Any, Generator
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
@@ -8,7 +6,6 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.db import get_session
-from src.core.db.models import AdminTokenRequest
 from src.core.db.repository.user import UserRepository
 from src.core.exceptions import exceptions
 from src.settings import settings
@@ -47,10 +44,9 @@ class EmailProvider:
         body: str | None,
     ) -> None:
         """Базовый метод отправки сообщения на электронную почту.
-        Аргументы:
-            recipients (list[EmailStr]): список email получателей
+        Args:
+            email_obj (EmailSchema): объект письма
             subject (str): тема сообщения
-            template_body (dict[str, Any]): значения переменных для шаблона сообщения
             template_name (str): название шаблона для сообщения
             body (str): тело электронного письма
         """
@@ -69,10 +65,9 @@ class EmailProvider:
 
     async def send_question_feedback(self, telegram_id: int, message: str, email: EmailStr | list[EmailStr]) -> None:
         """Отправляет email на почтовый ящик администратора с отзывом/вопросом.
-        Аргументы:
+        Args:
             telegram_id (int): telegram_id волонтера
             message (str): текст сообщения
-            name (str): имя волонтера
             email (EmailStr | list[EmailStr]): email получателя
         """
         if isinstance(email, str):
@@ -98,7 +93,7 @@ class EmailProvider:
         self, id: int, telegram_id: int, name: str, message: str, email: EmailStr | list[EmailStr]
     ) -> None:
         """Отправляет указанным адресатам вопросы от волонтера.
-        Аргументы:
+        Args:
             id (int): id волонтера
             telegram_id (int): telegram_id волонтера
             name (str): name волонтера
@@ -110,48 +105,37 @@ class EmailProvider:
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
         await self.__send_mail(email_obj, subject="Вопрос от волонтера'", template_name="send_question.html", body=None)
 
-    async def create_link_with_token(self, email: EmailStr | list[EmailStr], path: str) -> dict:
-        """Создает ссылку с токеном для отправки
+    async def create_temp_body(self, path: str, token: str) -> dict:
+        """Создает тело шаблона со ссылкой с токеном для отправки
         пригласительной ссылки или сброса пароля.
-        Аргументы:
-            email (EmailStr | list[EmailStr]): email получателя
+        Args:
             path (str): маршрут ссылки
+            token (str): секретный токен
         """
         token_expiration = settings.TOKEN_EXPIRATION
-        token_expiration_date = datetime.now() + timedelta(hours=token_expiration)
-        token = str(uuid.uuid4())
+        template_body = {"link": f"{settings.HOST_NAME}/#/{path}/{token}", "expiration": token_expiration}
+        return template_body
 
-        record = AdminTokenRequest.query.filter_by(email=email).first()
-        async with self._sessionmaker() as session:
-            if record:
-                record.token = token
-                record.token_expiration_date = token_expiration_date
-                session.commit()
-            else:
-                user = AdminTokenRequest(email=email, token=token, token_expiration_date=token_expiration_date)
-                session.add(user)
-                session.commit()
-            template_body = {"link": f"{settings.HOST_NAME}/#/{path}/{token}", "expiration": token_expiration}
-            return template_body
-
-    async def send_invitation_link(self, email: str) -> None:
+    async def send_invitation_link(self, email: str, token: str) -> None:
         """Отправляет указанным адресатам ссылку для регистрации в проекте.
-        Аргументы:
+        Args:
             email (str): email получателя
+            token (str): секретный токен
         """
-        template_body = self.create_link_with_token(email, "invitation_link")
+        template_body = self.create_temp_body("invitation_link", token)
         recipients = [email]
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
         await self.__send_mail(
             email_obj, subject="Приглашение в проект 'ProCharity'", template_name="invitation_email.html", body=None
         )
 
-    async def send_restore_password_link(self, email: str) -> None:
+    async def send_restore_password_link(self, email: str, token: str) -> None:
         """Отправляет email на почтовый ящик со ссылкой на сброс пароля.
-        Аргументы:
+        Args:
             email (str): email получателя
+            token (str): секретный токен
         """
-        template_body = self.create_link_with_token(email, "reset_password")
+        template_body = self.create_temp_body("reset_password", token)
         recipients = [email]
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
         await self.__send_mail(
