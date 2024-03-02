@@ -232,11 +232,9 @@ def upgrade() -> None:
     )
     op.execute(
         "UPDATE users "
-        "SET external_id = subquery.ext_ref "
-        "FROM ("
-        "SELECT external_site_users.id as ext_ref, external_site_users.external_id as ext_id FROM external_site_users"
-        ") as subquery "
-        "WHERE users.external_id = subquery.ext_id;"
+        "SET external_id = external_site_users.id "
+        "FROM external_site_users "
+        "WHERE users.dump_id = external_site_users.external_id "
     )
 
 
