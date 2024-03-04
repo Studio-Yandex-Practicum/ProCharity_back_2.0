@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 
 from dependency_injector.wiring import Provide
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
@@ -19,8 +19,6 @@ SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на з�
 PERSONAL_ACCOUNT_BUTTON = [
     InlineKeyboardButton("🚪 Перейти в личный кабинет", url="https://procharity.ru/volunteers/settings/")
 ]
-SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ошибку"
-QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -89,15 +87,6 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
             FeedbackFormQueryParams(name=user.first_name, surname=user.last_name, email=email).as_url_query(),
         )
     )
-
-
-async def feedback_buttons(user: User) -> ReplyKeyboardMarkup:
-    web_app = get_feedback_web_app_info(user)
-    keyboard = [
-        [KeyboardButton(QUESTION_BUTTON_TITLE, web_app=web_app)],
-        [KeyboardButton(SUGGESTION_BUTTON_TITLE, web_app=web_app)],
-    ]
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 
 async def get_back_menu() -> InlineKeyboardMarkup:
