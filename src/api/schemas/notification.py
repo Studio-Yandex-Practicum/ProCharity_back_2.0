@@ -34,7 +34,7 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
 
 
 class Message(TelegramNotificationRequest):
-    user_id: int
+    id_hash: str
 
 
 class MessageList(RequestBase):

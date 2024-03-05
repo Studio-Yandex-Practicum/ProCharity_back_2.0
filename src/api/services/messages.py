@@ -32,9 +32,9 @@ class TelegramNotificationService:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
-    async def send_message_to_user(self, user_id: int, message: str) -> tuple[bool, str]:
+    async def send_message_to_user(self, id_hash: str, message: str) -> tuple[bool, str]:
         """Отправляет сообщение указанному по telegram_id пользователю"""
-        site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.external_id == user_id))
+        site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
         if site_user is None:
             return False, "Пользователя не найден."
         if site_user.user is None:
