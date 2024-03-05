@@ -26,8 +26,23 @@ async def start_command(
         id_hash=context.args[0] if context.args and len(context.args) == 1 else None
     )
     if created or ext_user is None:
+        await user_service.register_user(
+            telegram_id=telegram_user.id,
+            username=telegram_user.username,
+            first_name=telegram_user.first_name,
+            last_name=telegram_user.last_name,
+            external_id=ext_user.id if ext_user is not None else None,
+        )
         url_connect = get_connection_url(telegram_user.id)
     elif ext_user is not None:
+        await user_service.register_user(
+            telegram_id=telegram_user.id,
+            username=telegram_user.username,
+            first_name=ext_user.first_name,
+            last_name=ext_user.last_name,
+            email=ext_user.email,
+            external_id=ext_user.id if ext_user is not None else None,
+        )
         await user_service.set_categories_to_user(telegram_user.id, ext_user.specializations)
         url_connect = get_connection_url(telegram_user.id, ext_user.id)
     categories = await user_service.get_user_categories(telegram_user.id)
