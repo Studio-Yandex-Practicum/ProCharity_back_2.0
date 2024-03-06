@@ -1,13 +1,7 @@
-from urllib.parse import urljoin
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from dependency_injector.wiring import Provide
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
-
-from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
 from src.core.db.models import Category, User
-from src.core.depends import Container
-from src.settings import settings
 
 MENU_KEYBOARD = [
     [InlineKeyboardButton("🔎 Посмотреть открытые задания", callback_data=callback_data.VIEW_TASKS)],
@@ -20,8 +14,7 @@ UNSUBSCRIBE_BUTTON = [
 SUBSCRIBE_BUTTON = [
     InlineKeyboardButton("▶️ Включить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
 ]
-SUGGESTION_BUTTON_TITLE = "✉️ Отправить предложение/ошибку"
-QUESTION_BUTTON_TITLE = "❓ Задать вопрос"
+OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
 
 
 async def get_checked_categories_keyboard(
@@ -75,46 +68,23 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def feedback_buttons(user: User) -> ReplyKeyboardMarkup:
-    if hasattr(user, "email"):
-        email = user.email
-    else:
-        email = None
-    web_app = WebAppInfo(
-        url=urljoin(
-            settings.feedback_form_template_url,
-            FeedbackFormQueryParams(name=user.first_name, surname=user.last_name, email=email).as_url_query(),
-        )
-    )
-    keyboard = [
-        [KeyboardButton(QUESTION_BUTTON_TITLE, web_app=web_app)],
-        [KeyboardButton(SUGGESTION_BUTTON_TITLE, web_app=web_app)],
-    ]
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-
-
 async def get_back_menu() -> InlineKeyboardMarkup:
     keyboard = [[InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]]
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_keyboard(
-    callback_data_on_start: str,
-    url_for_connection: str,
-    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
-) -> InlineKeyboardMarkup:
+async def get_start_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Начнём", callback_data=callback_data_on_start)],
-        [InlineKeyboardButton("Перейти на сайт ProCharity", url=procharity_url)],
-        [InlineKeyboardButton("Связать аккаунт с ботом", url=url_for_connection)],
+        [InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)],
+        OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
 async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Посмотреть открытые задачи", callback_data=callback_data.VIEW_TASKS)],
-        [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)],
+        [InlineKeyboardButton("Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)],
+        OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -122,15 +92,7 @@ async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
 async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
-        [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-def get_confirm_keyboard() -> InlineKeyboardMarkup:
-    keyboard = [
-        [InlineKeyboardButton("Да", callback_data=callback_data.CONFIRM_CATEGORIES)],
-        [InlineKeyboardButton("Нет, хочу изменить", callback_data=callback_data.CHANGE_CATEGORY)],
+        OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
