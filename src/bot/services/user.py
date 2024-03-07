@@ -1,4 +1,5 @@
-from src.core.db.models import User, UsersCategories
+from src.bot.services.external_site_user import ExternalSiteUserService
+from src.core.db.models import ExternalSiteUser, User, UsersCategories
 from src.core.db.repository import UserRepository
 
 
@@ -109,3 +110,19 @@ class UserService:
         """Оборачивает одноименную функцию из UserRepository."""
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         return user
+
+    async def determine_ext_user(
+        self,
+        id_hash: str | None,
+        telegram_id: int,
+        ext_user_service: ExternalSiteUserService,
+    ) -> ExternalSiteUser | None:
+        """Возвращает пользователя внешнего сайта или None, соответствующего заданному
+        id_hash или, если по id_hash ничего не найдено, telegram_id.
+        """
+        if id_hash is not None:
+            return await ext_user_service.get_by_id_hash(id_hash)
+
+        user = await self.get_by_telegram_id(telegram_id)
+        if user and user.external_id is not None:
+            return await ext_user_service.get_by_id(user.external_id)
