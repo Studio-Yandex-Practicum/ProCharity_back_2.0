@@ -109,3 +109,8 @@ class UserService:
         """Оборачивает одноименную функцию из UserRepository."""
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         return user
+
+    async def get_by_user_id(self, user_id: int) -> User:
+        """Возвращает пользователя (или None) по user_id."""
+        user = await self._user_repository.get_by_user_id(user_id)
+        return user
