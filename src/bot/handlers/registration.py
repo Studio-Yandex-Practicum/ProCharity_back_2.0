@@ -4,7 +4,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands
-from src.bot.keyboards import feedback_buttons, get_confirm_keyboard, get_start_keyboard
+from src.bot.keyboards import get_confirm_keyboard, get_start_keyboard
 from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_connection_url
@@ -26,7 +26,7 @@ async def start_command(
         id_hash=context.args[0] if context.args and len(context.args) == 1 else None
     )
     if created or ext_user is None:
-        user = await user_service.register_user(
+        await user_service.register_user(
             telegram_id=telegram_user.id,
             username=telegram_user.username,
             first_name=telegram_user.first_name,
@@ -48,15 +48,10 @@ async def start_command(
     categories = await user_service.get_user_categories(telegram_user.id)
     callback_data_on_start = commands.GREETING_REGISTERED_USER if categories else callback_data.CHANGE_CATEGORY
     keyboard = await get_start_keyboard(callback_data_on_start=callback_data_on_start, url_for_connection=url_connect)
-    keyboard_feedback = await feedback_buttons(user)
     await context.bot.send_message(
         chat_id=telegram_user.id,
-        text="Привет! 👋 \n\n",
-        reply_markup=keyboard_feedback,
-    )
-    await context.bot.send_message(
-        chat_id=update.effective_user.id,
-        text=f'Я бот платформы интеллектуального волонтерства <a href="{procharity_url}">ProCharity</a>. '
+        text="Привет! 👋 \n"
+        f'Я бот платформы интеллектуального волонтерства <a href="{procharity_url}">ProCharity</a>. '
         "Буду держать тебя в курсе новых задач и помогу "
         "оперативно связаться с командой поддержки.\n\n",
         reply_markup=keyboard,
