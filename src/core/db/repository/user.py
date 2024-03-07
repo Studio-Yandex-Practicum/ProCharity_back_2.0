@@ -21,11 +21,7 @@ class UserRepository(AbstractRepository):
     @auto_commit
     async def get_by_user_id(self, user_id: int) -> User | None:
         """Возвращает пользователя (или None) по user_id."""
-        try:
-            return await self._session.scalar(select(User).where(User.id == user_id))
-        except PendingRollbackError as e:
-            logger.info(e)
-        return None
+        return await self._session.scalar(select(User).where(User.id == user_id))
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Возвращает пользователя (или None) по telegram_id."""
