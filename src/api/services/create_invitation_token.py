@@ -11,7 +11,7 @@ from src.core.db.models import AdminTokenRequest
 from src.settings import settings
 
 
-async def create_token(
+async def create_invitation_token(
     email: EmailStr | list[EmailStr], sessionmaker: Generator[AsyncSession, None, None] = get_session
 ) -> str:
     """Создает токен для отправки пригласительной ссылки или сброса пароля.
@@ -29,9 +29,9 @@ async def create_token(
         if record:
             record.token = token
             record.token_expiration_date = token_expiration_date
-            session.commit()
+            await session.commit()
         else:
             user = AdminTokenRequest(email=email, token=token, token_expiration_date=token_expiration_date)
-            session.add(user)
-            session.commit()
+            await session.add(user)
+            await session.commit()
         return token

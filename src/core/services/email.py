@@ -105,7 +105,8 @@ class EmailProvider:
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
         await self.__send_mail(email_obj, subject="Вопрос от волонтера'", template_name="send_question.html", body=None)
 
-    async def create_temp_body(self, path: str, token: str) -> dict:
+    @staticmethod
+    async def create_temp_body(path: str, token: str) -> dict:
         """Создает тело шаблона со ссылкой с токеном для отправки
         пригласительной ссылки или сброса пароля.
         Args:
