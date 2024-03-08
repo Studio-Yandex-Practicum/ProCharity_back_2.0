@@ -120,7 +120,8 @@ class UserService:
         id_hash или, если по id_hash ничего не найдено, telegram_id.
         """
         if id_hash is not None:
-            return await self._ext_user_repository.get_by_id_hash(id_hash)
+            ext_site_user, _ = await self._ext_user_repository.get_or_create_by_id_hash(id_hash)
+            return ext_site_user
 
         user = await self.get_by_telegram_id(telegram_id)
         if user and user.external_id is not None:
