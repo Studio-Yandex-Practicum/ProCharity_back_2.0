@@ -15,12 +15,11 @@ from src.core.logging.utils import logger_decor
 async def start_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     telegram_user = update.effective_user
     ext_user = await user_service.determine_ext_user(
-        context.args[0] if len(context.args) == 1 else None, telegram_user.id, ext_user_service
+        context.args[0] if len(context.args) == 1 else None, telegram_user.id
     )
     if not ext_user:
         return
