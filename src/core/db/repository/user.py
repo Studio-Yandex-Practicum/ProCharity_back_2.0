@@ -18,6 +18,11 @@ class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
 
+    @auto_commit
+    async def get_by_user_id(self, user_id: int) -> User | None:
+        """Возвращает пользователя (или None) по user_id."""
+        return await self._session.scalar(select(User).where(User.id == user_id))
+
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Возвращает пользователя (или None) по telegram_id."""
         try:
