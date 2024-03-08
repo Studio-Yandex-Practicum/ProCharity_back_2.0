@@ -53,8 +53,8 @@ async def confirm_categories_callback(
         )
     else:
         await query.message.edit_text(
-            text="Отлично! Теперь я буду присылать тебе уведомления о новых "
-            f"заданиях в категориях: *{', '.join(categories.values())}*.\n\n",
+            text="Теперь я буду присылать тебе уведомления о новых "
+            f"заданиях в следующих категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=await get_open_tasks_and_menu_keyboard(),
         )
