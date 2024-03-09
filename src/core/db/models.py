@@ -47,18 +47,18 @@ class User(Base):
     __tablename__ = "users"
 
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
-    username: Mapped[str] = mapped_column(String(256), unique=True, nullable=True)
+    username: Mapped[str | None] = mapped_column(String(256), unique=True, nullable=True)
     email: Mapped[str] = mapped_column(String(256), nullable=True)
-    first_name: Mapped[str] = mapped_column(String(256), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(256), nullable=True)
+    first_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    last_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
-    external_signup_date: Mapped[date] = mapped_column(nullable=True)
+    external_signup_date: Mapped[date | None] = mapped_column(nullable=True)
     banned: Mapped[bool] = mapped_column(server_default=expression.false())
 
     categories: Mapped[list["Category"]] = relationship(secondary="users_categories", back_populates="users")
     unsubscribe_reason: Mapped["UnsubscribeReason"] = relationship(back_populates="user")
 
-    external_id: Mapped[int] = mapped_column(ForeignKey("external_site_users.id"), nullable=True)
+    external_id: Mapped[int | None] = mapped_column(ForeignKey("external_site_users.id"), nullable=True)
     external_user: Mapped["ExternalSiteUser"] = relationship(back_populates="user")
 
     def __repr__(self):

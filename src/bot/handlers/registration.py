@@ -1,10 +1,11 @@
+from typing import Never
+
 from dependency_injector.wiring import Provide, inject
 from telegram import Update
 from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import commands
 from src.bot.keyboards import get_start_keyboard
-from src.bot.services.external_site_user import ExternalSiteUserService
 from src.bot.services.user import UserService
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
@@ -17,22 +18,23 @@ async def start_command(
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    telegram_user = update.effective_user
-    ext_user = await user_service.determine_ext_user(
-        context.args[0] if len(context.args) == 1 else None, telegram_user.id
-    )
-    if not ext_user:
-        return
+    telegram_user = update.effective_user or Never
+    if not context.args or len(context.args) != 1:
+        return await context.bot.send_message(
+            chat_id=telegram_user.id,
+            text="Чтобы использовать бот, зарегистрируйтесь на сайте.",
+        )
 
-    user = await user_service.register_user(
+    id_hash = context.args[0]
+
+    await user_service.register_or_update_user(
         telegram_id=telegram_user.id,
+        id_hash=id_hash,
+        first_name=telegram_user.first_name,
+        last_name=telegram_user.last_name,
         username=telegram_user.username,
-        first_name=ext_user.first_name,
-        last_name=ext_user.last_name,
-        email=ext_user.email,
-        external_id=ext_user.id,
     )
-    await user_service.set_categories_to_user(user.id, ext_user.specializations)
+
     keyboard = await get_start_keyboard()
     await context.bot.send_message(
         chat_id=telegram_user.id,
@@ -47,8 +49,6 @@ async def start_command(
 @inject
 async def on_chat_member_update(
     update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    ext_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     user = await user_service.get_by_telegram_id(update.effective_user.id)
