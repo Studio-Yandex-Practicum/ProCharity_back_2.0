@@ -81,7 +81,7 @@ class Settings(BaseSettings):
     EMAIL_ADMIN: EmailStr
 
     # Время жизни токена
-    TOKEN_EXPIRATION: int = 24
+    TOKEN_EXPIRATION: int = 60 * 60 * 24
 
     # Настройки получения коммитов
     LAST_COMMIT: str = ""
