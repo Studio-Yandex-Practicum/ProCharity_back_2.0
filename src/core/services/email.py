@@ -96,9 +96,9 @@ class EmailProvider:
         Args:
             id (int): id волонтера
             telegram_id (int): telegram_id волонтера
-            name (str): name волонтера
-            message (str): текст вопроса
-            email (EmailStr | list[EmailStr]): email получателя
+            name (str): Имя волонтера
+            message (str): Текст вопроса
+            email (EmailStr | list[EmailStr]): email получателя/получателей
         """
         template_body = {"id": id, "telegram_id": telegram_id, "name": name, "message": message}
         recipients = [email]
