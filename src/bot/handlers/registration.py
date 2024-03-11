@@ -19,21 +19,26 @@ async def start_command(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     telegram_user = update.effective_user or Never
-    if not context.args or len(context.args) != 1:
-        return await context.bot.send_message(
-            chat_id=telegram_user.id,
-            text="Чтобы использовать бот, зарегистрируйтесь на сайте.",
-        )
+    id_hash = context.args[0] if context.args and len(context.args) == 1 else None
 
-    id_hash = context.args[0]
-
-    await user_service.register_or_update_user(
+    user = await user_service.register_or_update_user(
         telegram_id=telegram_user.id,
         id_hash=id_hash,
         first_name=telegram_user.first_name,
         last_name=telegram_user.last_name,
         username=telegram_user.username,
     )
+
+    if user is None:
+        return await context.bot.send_message(
+            chat_id=telegram_user.id,
+            text=(
+                "<b>Добро пожаловать на ProCharity!</b>\n\n"
+                "Чтобы получить доступ к боту, "
+                "авторизуйтесь или зарегистрируйтесь на платформе."
+            ),
+            parse_mode="HTML",
+        )
 
     keyboard = await get_start_keyboard()
     await context.bot.send_message(
@@ -51,19 +56,21 @@ async def on_chat_member_update(
     update: Update,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    user = await user_service.get_by_telegram_id(update.effective_user.id)
+    my_chat_member = update.my_chat_member or Never
+    effective_user = update.effective_user or Never
+    user = await user_service.get_by_telegram_id(effective_user.id)
 
     if user is None:
         return None
 
     if (
-        update.my_chat_member.new_chat_member.status == update.my_chat_member.new_chat_member.BANNED
-        and update.my_chat_member.old_chat_member.status == update.my_chat_member.old_chat_member.MEMBER
+        my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED
+        and my_chat_member.old_chat_member.status == my_chat_member.old_chat_member.MEMBER
     ):
         return await user_service.bot_banned(user)
     if (
-        update.my_chat_member.new_chat_member.status == update.my_chat_member.new_chat_member.MEMBER
-        and update.my_chat_member.old_chat_member.status == update.my_chat_member.old_chat_member.BANNED
+        my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER
+        and my_chat_member.old_chat_member.status == my_chat_member.old_chat_member.BANNED
     ):
         return await user_service.bot_unbanned(user)
 

@@ -41,12 +41,14 @@ class UserService:
     async def register_or_update_user(
         self,
         telegram_id: int,
-        id_hash: str,
+        id_hash: str | None,
         first_name: str,
         last_name: str | None = None,
         username: str | None = None,
-    ) -> User:
-        ext_site_user, _ = await self._ext_user_repository.get_or_create_by_id_hash(id_hash)
+    ) -> User | None:
+        if not id_hash or (ext_site_user := await self._ext_user_repository.get_by_id_hash(id_hash)) is None:
+            return await self._user_repository.get_by_telegram_id(telegram_id)
+
         user = await self._register_or_update_user(
             telegram_id=telegram_id,
             external_id=ext_site_user.id,
