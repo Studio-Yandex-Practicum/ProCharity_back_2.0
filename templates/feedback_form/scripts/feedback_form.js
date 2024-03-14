@@ -43,23 +43,35 @@ const validationConfig = {
 const disabledTgButtonColor = '#9e9e9e';
 const disabledTgButtonTextColor = '#eceff1';
 
-const setValid = (element, errElement) => {
+const setValid = (element, errElement, tgMainButton, { button_color, button_text_color }) => {
   element.classList.remove('invalid');
   errElement.textContent = '';
+
+  tgMainButton.setParams({
+    is_active: true,
+    color: button_color,
+    text_color: button_text_color,
+  });
 };
 
-const setInvalid = (element, errElement, errMsg) => {
+const setInvalid = (element, errElement, errMsg, tgMainButton, { button_color, button_text_color }) => {
   element.classList.add('invalid');
   errElement.textContent = errMsg;
+
+  tgMainButton.setParams({
+    is_active: false,
+    color: button_color,
+    text_color: button_text_color,
+  });
 };
 
-const checkInputValidity = (element, errElement, validators) => {
+const checkInputValidity = (element, errElement, validators, button, colors) => {
   let value = element.value;
   let errors = new Array(validators.length)
   let isValid = true
 
   for (const property in validators) {
-    const{ func, errMsg } = validators[property]
+    const { func, errMsg } = validators[property]
     if (func(value)) {
       continue
     }
@@ -67,17 +79,16 @@ const checkInputValidity = (element, errElement, validators) => {
     errors.push(errMsg);
   }
   if (isValid) {
-    setValid(element, errElement)
-  } else {
-    setInvalid(element, errElement, errors.join("\n"))
+    return setValid(element, errElement, button, colors.valid);
   }
+  return setInvalid(element, errElement, errors.join("\n"), button, colors.invalid);
 };
 
-const activateButton = (tgMainButton) => {
+const activateButton = (tgMainButton, color, text_color) => {
   tgMainButton.setParams({
     is_active: true,
-    color: defaultButtonColor,
-    text_color: defaultButtonTextColor,
+    color: color,
+    text_color: text_color,
   });
 
 }
@@ -101,14 +112,17 @@ const toggleSubmitState = (
   );
 
   if (isValidationError) {
-    return deactivateButton(tgMainButton)
-  } else {
-    tgMainButton.setParams({
-      is_active: true,
-      color: defaultButtonColor,
-      text_color: defaultButtonTextColor,
+    return tgMainButton.setParams({
+      is_active: false,
+      color: disabledTgButtonColor,
+      text_color: disabledTgButtonTextColor,
     });
   }
+  return tgMainButton.setParams({
+    is_active: true,
+    color: defaultButtonColor,
+    text_color: defaultButtonTextColor,
+  });
 };
 
 const setValidation = (
@@ -117,23 +131,25 @@ const setValidation = (
   defaultButtonColor,
   defaultButtonTextColor
 ) => {
-  toggleSubmitState(
-    inputs,
-    tgMainButton,
-    defaultButtonColor,
-    defaultButtonTextColor
-  );
-
   inputs.forEach((input) => {
     const validators = validationConfig[input.name];
     const errElement = document.querySelector(`.helper-text.${input.name}`);
     const check = () => {
-      checkInputValidity(input, errElement, validators);
-      toggleSubmitState(
-        inputs,
+      checkInputValidity(
+        input,
+        errElement,
+        validators,
         tgMainButton,
-        defaultButtonColor,
-        defaultButtonTextColor
+        {
+          valid: {
+            button_color: defaultButtonColor,
+            button_text_color: defaultButtonTextColor,
+          },
+          invalid: {
+            button_color: disabledTgButtonColor,
+            button_text_color: disabledTgButtonTextColor,
+          },
+        }
       );
     };
 
