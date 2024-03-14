@@ -142,7 +142,7 @@ class AdminUser(SQLAlchemyBaseUserTable[int], Base):
 
 
 class AdminTokenRequest(Base):
-    """Модель запрос токера."""
+    """Модель запрос токена."""
 
     __tablename__ = "admin_token_requests"
 
