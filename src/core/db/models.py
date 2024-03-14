@@ -48,7 +48,7 @@ class User(Base):
 
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     username: Mapped[str | None] = mapped_column(String(256), unique=True, nullable=True)
-    email: Mapped[str] = mapped_column(String(256), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(256), nullable=True)
     first_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     has_mailing: Mapped[bool] = mapped_column(default=False)
@@ -60,6 +60,12 @@ class User(Base):
 
     external_id: Mapped[int | None] = mapped_column(ForeignKey("external_site_users.id"), nullable=True)
     external_user: Mapped["ExternalSiteUser"] = relationship(back_populates="user")
+
+    @property
+    def telegram_link(self) -> str | None:
+        base_url = "https://t.me/"
+        if self.username:
+            return base_url + self.username
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"

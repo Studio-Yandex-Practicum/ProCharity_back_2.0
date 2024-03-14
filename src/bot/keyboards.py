@@ -76,14 +76,16 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
 
 
 def get_feedback_web_app_info(user: User) -> WebAppInfo:
-    if hasattr(user, "email"):
-        email = user.email
-    else:
-        email = None
     return WebAppInfo(
         url=urljoin(
             settings.feedback_form_template_url,
-            FeedbackFormQueryParams(name=user.first_name, surname=user.last_name, email=email).as_url_query(),
+            FeedbackFormQueryParams(
+                external_id=user.external_user.external_id,
+                telegram_link=user.telegram_link,
+                name=user.first_name,
+                surname=user.last_name,
+                email=getattr(user, "email", None),
+            ).as_url_query(),
         )
     )
 

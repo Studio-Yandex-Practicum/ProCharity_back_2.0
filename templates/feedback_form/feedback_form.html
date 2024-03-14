@@ -43,19 +43,33 @@
           <label for="name">Ваше имя *</label>
           <span class="helper-text name"></span>
         </div>
+        <div>
+          <input
+            id="telegram_link"
+            name="telegram_link"
+            type="hidden"
+            class="validate"
+          />
+          <input
+            id="external_id"
+            name="external_id"
+            type="hidden"
+            class="validate"
+          />
+        </div>
         <div class="input-field col s12">
           <input
-            id="feedback"
-            name="feedback"
+            id="message"
+            name="message"
             type="text"
             class="validate"
             minlength="10"
             maxlength="500"
           />
-          <label for="feedback"
+          <label for="message"
             >Будем рады ответить, напишите свой вопрос*</label
           >
-          <span class="helper-text feedback"></span>
+          <span class="helper-text message"></span>
         </div>
         <label>
           <input id="checkbox" type="checkbox" class="filled-in feedback_checkbox" />
