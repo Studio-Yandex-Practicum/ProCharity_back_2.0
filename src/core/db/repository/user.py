@@ -1,9 +1,8 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.exc import PendingRollbackError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from structlog import get_logger
 
 from src.core.db.models import Category, User, UsersCategories
@@ -18,6 +17,11 @@ class UserRepository(AbstractRepository):
 
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
+
+    @auto_commit
+    async def get_by_user_id(self, user_id: int) -> User | None:
+        """Возвращает пользователя (или None) по user_id."""
+        return await self._session.scalar(select(User).where(User.id == user_id))
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Возвращает пользователя (или None) по telegram_id."""
@@ -57,21 +61,18 @@ class UserRepository(AbstractRepository):
         user.banned = banned
         await self.update(user.id, user)
 
-    async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
+    async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> Sequence[UsersCategories]:
         """Присваивает пользователю список категорий."""
-        user = await self._session.scalar(
-            select(User).options(selectinload(User.categories)).where(User.telegram_id == telegram_id)
-        )
-
-        categories = (
-            (await self._session.scalars(select(Category).where(Category.id.in_(categories_ids)))).all()
-            if categories_ids
-            else []
-        )
-
-        user.categories = categories
-        if user:
-            await self.update(user.id, user)
+        async with self._session.begin() as transaction:
+            await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
+            user_categories = await self._session.execute(
+                insert(UsersCategories)
+                .values([{"user_id": user_id, "category_id": category_id} for category_id in categories_ids])
+                .returning(UsersCategories)
+            )
+            await transaction.commit()
+            await logger.ainfo("Изменены категории у пользователя")
+        return user_categories.all()
 
     @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:

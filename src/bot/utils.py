@@ -6,7 +6,6 @@ from dependency_injector.wiring import Provide
 from telegram import Update
 
 from src.core.depends import Container
-from src.settings import Settings
 
 ReturnType = TypeVar("ReturnType")
 ParameterTypes = ParamSpec("ParameterTypes")
@@ -31,10 +30,10 @@ def delete_previous_message(
 def get_connection_url(
     telegram_id: int,
     external_id: int = None,
-    settings: Settings = Provide[Container.settings],
+    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
 ) -> str:
     """Получение ссылки для связи аккаунта с ботом по external_id и telegram_id.
     В случае отсутствия external_id возвращает ссылку на страницу авторизации"""
     if external_id:
-        return f"{settings.PROCHARITY_URL}auth/bot_procharity.php?user_id={external_id}&telegram_id={telegram_id}"
-    return f"{settings.PROCHARITY_URL}auth/"
+        return f"{procharity_url}auth/bot_procharity.php?user_id={external_id}&telegram_id={telegram_id}"
+    return f"{procharity_url}auth/"
