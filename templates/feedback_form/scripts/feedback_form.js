@@ -207,7 +207,7 @@ const handleSubmit = async (inputs, tg) => {
 
   var header = new Headers([["Content-Type", "application/json"]]);
 
-  return await fetch("/api/feedback", { method: "POST", body: JSON.stringify(data), headers: header }).then((res) => {
+  return await fetch("/api/v1/feedback", { method: "POST", body: JSON.stringify(data), headers: header }).then((res) => {
     if (res.ok) {
       return tg.close()
     }
