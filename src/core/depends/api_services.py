@@ -18,12 +18,15 @@ class APIServicesContainer(containers.DeclarativeContainer):
     repositories = providers.DependenciesContainer()
     data_base_connection = providers.DependenciesContainer()
     applications = providers.DependenciesContainer()
+    telegram_notification = providers.Dependency()
+
     admin_service = providers.Factory(
         AdminService,
         admin_repository=repositories.admin_repository,
     )
     site_user_service = providers.Factory(
         ExternalSiteUserService,
+        user_repository=repositories.user_repository,
         site_user_repository=repositories.site_user_repository,
         session=data_base_connection.session,
     )
@@ -38,9 +41,7 @@ class APIServicesContainer(containers.DeclarativeContainer):
         session=data_base_connection.session,
     )
     message_service = providers.Factory(
-        TelegramNotificationService,
-        telegram_bot=applications.telegram_bot,
-        session=data_base_connection.session,
+        TelegramNotificationService, session=data_base_connection.session, telegram_notification=telegram_notification
     )
     analytic_service = providers.Factory(
         AnalyticsService,

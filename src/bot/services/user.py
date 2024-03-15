@@ -1,19 +1,20 @@
 from src.core.db.models import User, UsersCategories
-from src.core.db.repository import UserRepository
+from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 
 
 class UserService:
-    def __init__(self, user_repository: UserRepository) -> None:
+    def __init__(self, user_repository: UserRepository, ext_user_repository: ExternalSiteUserRepository) -> None:
         self._user_repository = user_repository
+        self._ext_user_repository = ext_user_repository
 
-    async def register_user(
+    async def _register_or_update_user(
         self,
         telegram_id: int,
-        username: str = "",
-        first_name: str = "",
-        last_name: str = "",
+        external_id: int,
+        first_name: str,
+        last_name: str | None = None,
+        username: str | None = None,
         email: str | None = None,
-        external_id: int | None = None,
     ) -> User:
         """Регистрирует нового пользователя по telegram_id.
 
@@ -31,12 +32,34 @@ class UserService:
                     external_id=external_id,
                 )
             )
-
         user.username = username
         user.first_name = first_name
         user.last_name = last_name
         user.external_id = external_id
         return await self._user_repository.update(user.id, user)
+
+    async def register_or_update_user(
+        self,
+        telegram_id: int,
+        id_hash: str | None,
+        first_name: str,
+        last_name: str | None = None,
+        username: str | None = None,
+    ) -> User | None:
+        if not id_hash or (ext_site_user := await self._ext_user_repository.get_by_id_hash(id_hash)) is None:
+            return await self._user_repository.get_by_telegram_id(telegram_id)
+
+        user = await self._register_or_update_user(
+            telegram_id=telegram_id,
+            external_id=ext_site_user.id,
+            first_name=ext_site_user.first_name or first_name,
+            last_name=ext_site_user.last_name or last_name,
+            username=username,
+            email=ext_site_user.email,
+        )
+        if ext_site_user.specializations:
+            await self.set_categories_to_user(user.id, ext_site_user.specializations)
+        return user
 
     async def bot_banned(self, user: User) -> None:
         """Обновляет статус User.banned на соответствующий."""
@@ -46,9 +69,9 @@ class UserService:
         """Обновляет статус User.unbanned на соответствующий."""
         await self._user_repository.update_bot_banned_status(user, banned=False)
 
-    async def set_categories_to_user(self, telegram_id: int, categories_ids: list[int]) -> None:
+    async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> None:
         """Присваивает пользователю список категорий."""
-        await self._user_repository.set_categories_to_user(telegram_id, categories_ids)
+        await self._user_repository.set_categories_to_user(user_id, categories_ids)
 
     async def add_category_to_user(self, telegram_id: int, category_id: int) -> None:
         """Добавляет пользователю указанную категорию"""
@@ -108,4 +131,9 @@ class UserService:
     async def get_by_telegram_id(self, telegram_id: int) -> User:
         """Оборачивает одноименную функцию из UserRepository."""
         user = await self._user_repository.get_by_telegram_id(telegram_id)
+        return user
+
+    async def get_by_user_id(self, user_id: int) -> User:
+        """Возвращает пользователя (или None) по user_id."""
+        user = await self._user_repository.get_by_user_id(user_id)
         return user

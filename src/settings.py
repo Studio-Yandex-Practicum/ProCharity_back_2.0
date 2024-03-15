@@ -74,8 +74,14 @@ class Settings(BaseSettings):
     USE_CREDENTIALS: bool = True
     VALIDATE_CERTS: bool = True
 
+    # Директория с шаблонами электронной почты
+    EMAIL_TEMPLATE_DIRECTORY: Path = BASE_DIR / "templates" / "email"
+
     # Адреса электронной почты администраторов
     EMAIL_ADMIN: EmailStr
+
+    # Время жизни токена
+    TOKEN_EXPIRATION: int = 60 * 60 * 24
 
     # Настройки получения коммитов
     LAST_COMMIT: str = ""

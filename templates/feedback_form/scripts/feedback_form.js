@@ -1,131 +1,105 @@
+// Validation Functions
+const required = (v) => {return new Boolean(v)}
+const needToBePattern = (pattern) => {return (v) => {return v.match(pattern)}}
+const dontNeedToBePattern = (pattern) => {return (v) => {return !v.match(pattern)}}
+const hasMinLength = (minlength) => {return (v) => {return v.length > minlength}}
+const hasMaxLength = (maxlength) => {return (v) => {return v.length < maxlength}}
+
+// Patterns
+const capsPattern = /[А-ЯЁ]{2,}/g;
+const dashPattern = /( -)|(- )|(^-)|(-$)/g;
+const nameSurnamePattern = /^[A-Za-zА-Яа-я]*([-][A-Za-zА-Яа-я]+)*$/g;
+const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+
 // validation settings and check actions
 const validationConfig = {
-  name: {
-    isCapitalize: true,
-  },
-  surname: {
-    isCapitalize: true,
-  },
-  email: {
-    isCapitalize: false,
-  },
-  feedback: {
-    isCapitalize: false,
-  },
-};
-
-const errMsg = {
-  name: {
-    required: 'Пожалуйста, укажите имя',
-    min: 'Введите не менее 2 символов',
-    max: 'Допускается ввод не более 100 символов',
-    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
-    dashPattern: 'Убедитесь, что дефис находится в нужном месте',
-    nameSurnamePattern: 'Доступно использование только кириллицы, латиницы и "-"',
-  },
-  surname: {
-    required: 'Пожалуйста, укажите фамилию',
-    min: 'Введите не менее 2 символов',
-    max: 'Допускается ввод не более 100 символов',
-    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
-    dashPattern: 'Убедитесь, что дефис находится в нужном месте',
-    nameSurnamePattern: 'Доступно использование только кириллицы, латиницы и "-"',
-  },
-  email: {
-    required: 'Пожалуйста, укажите ваш email',
-    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
-    emailPattern:
-      'Неверный формат адреса email. Используйте только латиницу, "-", "@" и "_"',
-  },
-  feedback: {
-    required: 'Пожалуйста, напишите ваш отзыв',
-    min: 'Введите не менее 10 символов',
-    max: 'Допускается ввод не более 500 символов',
-    capsPattern: 'Убедитесь, что y Bac выключен CAPS LOCK',
-    feedbackPattern:
-      'Доступно использование только кириллицы, латиницы и символов: "-", "_", ".", "," и "!"',
-  },
+  name: [
+    {func: required, errMsg: 'Пожалуйста, укажите имя'},
+    {func: needToBePattern(nameSurnamePattern), errMsg: 'Доступно использование только кириллицы, латиницы и "-"'},
+    {func: dontNeedToBePattern(dashPattern), errMsg: 'Убедитесь, что дефис находится в нужном месте'},
+    {func: dontNeedToBePattern(capsPattern), errMsg: 'Убедитесь, что y Bac выключен CAPS LOCK'},
+    {func: hasMinLength(1), errMsg: 'Введите не менее 2 символов'},
+    {func: hasMaxLength(100), errMsg: 'Допускается ввод не более 100 символов'},
+  ],
+  surname: [
+    {func: needToBePattern(nameSurnamePattern), errMsg: 'Доступно использование только кириллицы, латиницы и "-"'},
+    {func: dontNeedToBePattern(dashPattern), errMsg: 'Убедитесь, что дефис находится в нужном месте'},
+    {func: dontNeedToBePattern(capsPattern), errMsg: 'Убедитесь, что y Bac выключен CAPS LOCK'},
+    {func: hasMinLength(1), errMsg: 'Введите не менее 2 символов'},
+    {func: hasMaxLength(100), errMsg: 'Допускается ввод не более 100 символов'},
+  ],
+  email: [
+    {func: needToBePattern(emailPattern), errMsg: 'Неверный формат адреса email. Используйте только латиницу, "-", "@" и "_"'},
+    {func: hasMaxLength(100), errMsg: 'Допускается ввод не более 100 символов'},
+  ],
+  message: [
+    {func: hasMinLength(1), errMsg: 'Введите не менее 2 символов'},
+    {func: hasMaxLength(2500), errMsg: 'Допускается ввод не более 2500 символов'},
+  ],
+  telegram_link: [],
+  external_id: [],
 };
 
 const disabledTgButtonColor = '#9e9e9e';
 const disabledTgButtonTextColor = '#eceff1';
 
-const setValid = (element, errElement) => {
+const setValid = (element, errElement, tgMainButton, { button_color, button_text_color }) => {
   element.classList.remove('invalid');
   errElement.textContent = '';
+
+  tgMainButton.setParams({
+    is_active: true,
+    color: button_color,
+    text_color: button_text_color,
+  });
 };
 
-const setInvalid = (element, errElement, errName) => {
+const setInvalid = (element, errElement, errMsg, tgMainButton, { button_color, button_text_color }) => {
   element.classList.add('invalid');
-  errElement.textContent = errMsg[element.name][errName];
+  errElement.textContent = errMsg;
+
+  tgMainButton.setParams({
+    is_active: false,
+    color: button_color,
+    text_color: button_text_color,
+  });
 };
 
-const checkInputValidity = (element, errElement, pattern, isCapitalize) => {
-  let newValue = element.value;
-  const minlength = element.getAttribute('minlength');
-  const maxlength = element.getAttribute('maxlength');
-  const capsPattern = /[А-ЯЁ]{2,}/g;
-  const dashPattern = /( -)|(- )|(^-)|(-$)/g;
-  const phonePattern = /^\+7 [3489]\d{2} \d{3}-\d{2}-\d{2}$/;
-  const nameSurnamePattern = /^[А-ЯЁA-Z][а-яёa-z]*([-][А-ЯЁA-Z][а-яёa-z]+)*$/g;
-  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
-  const feedbackPattern = /[А-ЯЁа-яёa-zA-Z0-9._!@/-]/g;
+const checkInputValidity = (element, errElement, validators, button, colors) => {
+  let value = element.value;
+  let errors = new Array(validators.length)
+  let isValid = true
 
-  if (pattern) {
-    newValue = newValue.trimStart().replace(pattern, '');
+  for (const property in validators) {
+    const { func, errMsg } = validators[property]
+    if (func(value)) {
+      continue
+    }
+    isValid = false;
+    errors.push(errMsg);
   }
-
-  // convert phone number to international format: +7 DEF XXX-XX-XX
-  if (newValue && element.name === 'phone_number') {
-    newValue = newValue
-      .replace(/^(?:7|8)?(\d{0,3})?(\d{0,3})(\d{0,2})(\d*)$/, '+7 $1 $2-$3-$4')
-      .replace(/\D(?!\d)/g, ''); // remove trailing hyphens (non-digit not followed by a digit)
+  if (isValid) {
+    return setValid(element, errElement, button, colors.valid);
   }
-
-  if (isCapitalize && newValue) {
-    newValue = newValue
-      .split('-')
-      .map((word) =>
-        word
-          ? word.replace(
-              /^(?!на)[а-яё]{2}/,
-              (letter) => letter[0].toUpperCase() + letter.slice(1)
-            )
-          : ''
-      )
-      .join('-')
-      .split(' ')
-      .map((word) => (word ? word[0].toUpperCase() + word.slice(1) : ''))
-      .join(' ');
-  }
-
-  if (!newValue) {
-    setInvalid(element, errElement, 'required');
-  } else if (minlength && newValue.length < minlength) {
-    setInvalid(element, errElement, 'min');
-  } else if (maxlength && newValue.length > maxlength) {
-    setInvalid(element, errElement, 'max');
-  } else if (newValue.match(capsPattern)) {
-    setInvalid(element, errElement, 'capsPattern');
-  } else if (newValue.match(dashPattern)) {
-    setInvalid(element, errElement, 'dashPattern');
-  } else if (element.name === 'phone_number' && !newValue.match(phonePattern)) {
-    setInvalid(element, errElement, 'phonePattern');
-  } else if (
-    (element.name === 'name' || element.name === 'surname') &&
-    !newValue.match(nameSurnamePattern)
-  ) {
-    setInvalid(element, errElement, 'nameSurnamePattern');
-  } else if (element.name === 'email' && !newValue.match(emailPattern)) {
-    setInvalid(element, errElement, 'emailPattern');
-  } else if (element.name === 'feedback' && !newValue.match(feedbackPattern)) {
-    setInvalid(element, errElement, 'feedbackPattern');
-  } else {
-    setValid(element, errElement);
-  }
-
-  element.value = newValue;
+  return setInvalid(element, errElement, errors.join("\n"), button, colors.invalid);
 };
+
+const activateButton = (tgMainButton, color, text_color) => {
+  tgMainButton.setParams({
+    is_active: true,
+    color: color,
+    text_color: text_color,
+  });
+
+}
+
+const deactivateButton = (tgMainButton) => {
+  tgMainButton.setParams({
+    is_active: false,
+    color: disabledTgButtonColor,
+    text_color: disabledTgButtonTextColor,
+  });
+}
 
 const toggleSubmitState = (
   inputs,
@@ -138,18 +112,17 @@ const toggleSubmitState = (
   );
 
   if (isValidationError) {
-    tgMainButton.setParams({
+    return tgMainButton.setParams({
       is_active: false,
       color: disabledTgButtonColor,
       text_color: disabledTgButtonTextColor,
     });
-  } else {
-    tgMainButton.setParams({
-      is_active: true,
-      color: defaultButtonColor,
-      text_color: defaultButtonTextColor,
-    });
   }
+  return tgMainButton.setParams({
+    is_active: true,
+    color: defaultButtonColor,
+    text_color: defaultButtonTextColor,
+  });
 };
 
 const setValidation = (
@@ -158,25 +131,25 @@ const setValidation = (
   defaultButtonColor,
   defaultButtonTextColor
 ) => {
-  toggleSubmitState(
-    inputs,
-    tgMainButton,
-    defaultButtonColor,
-    defaultButtonTextColor
-  );
-
   inputs.forEach((input) => {
-    const { pattern, isCapitalize } = validationConfig[input.name];
-
+    const validators = validationConfig[input.name];
     const errElement = document.querySelector(`.helper-text.${input.name}`);
-
     const check = () => {
-      checkInputValidity(input, errElement, pattern, isCapitalize);
-      toggleSubmitState(
-        inputs,
+      checkInputValidity(
+        input,
+        errElement,
+        validators,
         tgMainButton,
-        defaultButtonColor,
-        defaultButtonTextColor
+        {
+          valid: {
+            button_color: defaultButtonColor,
+            button_text_color: defaultButtonTextColor,
+          },
+          invalid: {
+            button_color: disabledTgButtonColor,
+            button_text_color: disabledTgButtonTextColor,
+          },
+        }
       );
     };
 
@@ -191,12 +164,21 @@ const params = new Proxy(new URLSearchParams(window.location.search), {
   get: (searchParams, prop) => searchParams.get(prop),
 });
 
-if (params.surname) {
+if (params.name) {
   document.getElementById('name').value = params.name;
+};
+if (params.surname) {
   document.getElementById('surname').value = params.surname;
+};
+if (params.email) {
   document.getElementById('email').value = params.email;
-  document.getElementById('feedback').value = params.feedback;
-}
+};
+if (params.telegram_link) {
+  document.getElementById('telegram_link').value = params.telegram_link;
+};
+if (params.external_id) {
+  document.getElementById('external_id').value = params.external_id;
+};
 
 if (params.update) {
   var formText = `Рады снова видеть Вас в нашем проекте.<br>
@@ -215,7 +197,7 @@ const showTgButton = (tgMainButton) => {
 };
 
 // send data to server
-const handleSubmit = (inputs, tg) => {
+const handleSubmit = async (inputs, tg) => {
   tg.MainButton.disable();
 
   const data = Array.from(inputs).reduce((data, input) => {
@@ -223,12 +205,22 @@ const handleSubmit = (inputs, tg) => {
     return data;
   }, {});
 
-  tg.sendData(JSON.stringify(data));
-  tg.close();
+  var header = new Headers([["Content-Type", "application/json"]]);
+
+  return await fetch("/api/v1/feedback", { method: "POST", body: JSON.stringify(data), headers: header }).then((res) => {
+    if (res.ok) {
+      return tg.close()
+    }
+    res.json().then((data) => {
+      if (data == null) {
+        return alert(`Server response with status ${res.status()}!`)
+      }
+      return alert(data)
+    })
+  })
 };
 
-// content loaded, main actions
-document.addEventListener('DOMContentLoaded', function () {
+function validate () {
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
@@ -246,9 +238,13 @@ document.addEventListener('DOMContentLoaded', function () {
     defaultButtonTextColor
   );
 
-  tgMainButton.onClick(() => handleSubmit(inputElements, tg));
+  tgMainButton.onClick(async () => await handleSubmit(inputElements, tg));
   showTgButton(tgMainButton);
-});
+}
+
+// content loaded, main actions
+document.addEventListener('DOMContentLoaded', validate);
+validate();
 
 document.addEventListener('DOMContentLoaded', function () {
   const checkbox = document.querySelector('#checkbox');

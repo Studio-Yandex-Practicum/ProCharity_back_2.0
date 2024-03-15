@@ -3,6 +3,7 @@ from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCanceling
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
 from .external_site_user import ExternalSiteUser, ExternalSiteUserRequest
+from .feedback import FeedbackSchema
 from .health_check import BotStatus, CommitStatus, DBStatus, HealthCheck
 from .notification import (
     ErrorsSending,
@@ -45,4 +46,5 @@ __all__ = (
     "TaskResponse",
     "TasksRequest",
     "TokenCheckResponse",
+    "FeedbackSchema",
 )

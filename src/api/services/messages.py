@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from telegram.ext import Application
 
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, ExternalSiteUser, User
@@ -15,11 +14,11 @@ class TelegramNotificationService:
 
     def __init__(
         self,
-        telegram_bot: Application,
         session: AsyncSession,
+        telegram_notification: TelegramNotification,
     ) -> None:
         self._session = session
-        self.telegram_notification = TelegramNotification(telegram_bot)
+        self.telegram_notification = telegram_notification
 
     async def send_messages_to_group_of_users(self, notifications):
         """Отправляет сообщение указанной группе пользователей"""
@@ -32,9 +31,9 @@ class TelegramNotificationService:
                 users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
-    async def send_message_to_user(self, user_id: int, message: str) -> tuple[bool, str]:
+    async def send_message_to_user(self, id_hash: str, message: str) -> tuple[bool, str]:
         """Отправляет сообщение указанному по telegram_id пользователю"""
-        site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.external_id == user_id))
+        site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
         if site_user is None:
             return False, "Пользователя не найден."
         if site_user.user is None:
