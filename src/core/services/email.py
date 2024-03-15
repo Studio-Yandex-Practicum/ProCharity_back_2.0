@@ -93,7 +93,7 @@ class EmailProvider:
         telegram_link: str | None,
         name: str,
         to_email: EmailStr,
-        external_id: int | None = None,
+        external_id: str | None = None,
         from_email: EmailStr | None = None,
         message: str = "",
     ) -> None:

@@ -80,7 +80,7 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
         url=urljoin(
             settings.feedback_form_template_url,
             FeedbackFormQueryParams(
-                external_id=user.external_user.external_id,
+                external_id=user.external_user.external_id if user.external_user else None,
                 telegram_link=user.telegram_link,
                 name=user.first_name,
                 surname=user.last_name,
