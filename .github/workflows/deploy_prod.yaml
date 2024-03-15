@@ -16,5 +16,6 @@ jobs:
       environment: deploy-prod
       label: prod
       deploy_path: /PROCHARITY
+      compose_file: ./infra/docker-compose.prod.yml
 
     secrets: inherit
