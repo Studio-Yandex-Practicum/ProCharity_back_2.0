@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from telegram.ext import Application
 
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, ExternalSiteUser, User
@@ -15,11 +14,11 @@ class TelegramNotificationService:
 
     def __init__(
         self,
-        telegram_bot: Application,
         session: AsyncSession,
+        telegram_notification: TelegramNotification,
     ) -> None:
         self._session = session
-        self.telegram_notification = TelegramNotification(telegram_bot)
+        self.telegram_notification = telegram_notification
 
     async def send_messages_to_group_of_users(self, notifications):
         """Отправляет сообщение указанной группе пользователей"""

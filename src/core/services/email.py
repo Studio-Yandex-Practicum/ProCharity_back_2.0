@@ -1,14 +1,12 @@
-import contextlib
-from typing import Any, Generator
+from typing import Any
 
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from src.core.db.db import get_session
 from src.core.db.repository.user import UserRepository
 from src.core.exceptions import exceptions
-from src.settings import settings
+from src.settings import Settings
 
 
 class EmailSchema(BaseModel):
@@ -19,7 +17,7 @@ class EmailSchema(BaseModel):
 class EmailProvider:
     """Класс для отправки электронных писем."""
 
-    def __init__(self, sessionmaker: Generator[AsyncSession, None, None] = get_session):
+    def __init__(self, sessionmaker: async_sessionmaker, settings: Settings):
         conf = ConnectionConfig(
             MAIL_USERNAME=settings.MAIL_LOGIN,
             MAIL_PASSWORD=settings.MAIL_PASSWORD,
@@ -34,7 +32,8 @@ class EmailProvider:
             TEMPLATE_FOLDER=settings.EMAIL_TEMPLATE_DIRECTORY,
         )
         self.fastmail = FastMail(conf)
-        self._sessionmaker = contextlib.asynccontextmanager(sessionmaker)
+        self._sessionmaker = sessionmaker
+        self._settings = settings
 
     async def __send_mail(
         self,
@@ -90,7 +89,13 @@ class EmailProvider:
         )
 
     async def send_question(
-        self, id: int, telegram_id: int, name: str, message: str, email: EmailStr | list[EmailStr]
+        self,
+        telegram_link: str | None,
+        name: str,
+        to_email: EmailStr,
+        external_id: str | None = None,
+        from_email: EmailStr | None = None,
+        message: str = "",
     ) -> None:
         """Отправляет указанным адресатам вопросы от волонтера.
         Args:
@@ -100,21 +105,29 @@ class EmailProvider:
             message (str): Текст вопроса
             email (EmailStr | list[EmailStr]): email получателя/получателей
         """
-        template_body = {"id": id, "telegram_id": telegram_id, "name": name, "message": message}
-        recipients = [email]
+        template_body = {
+            "id": external_id,
+            "telegram_link": telegram_link,
+            "name": name,
+            "message": message,
+            "email": from_email,
+        }
+        recipients = [to_email]
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
         await self.__send_mail(email_obj, subject="Вопрос от волонтера'", template_name="send_question.html", body=None)
 
-    @staticmethod
-    async def create_temp_body(path: str, token: str) -> dict:
+    async def create_temp_body(self, path: str, token: str) -> dict:
         """Создает тело шаблона со ссылкой с токеном для отправки
         пригласительной ссылки или сброса пароля.
         Args:
             path (str): маршрут ссылки
             token (str): секретный токен
         """
-        token_expiration = settings.TOKEN_EXPIRATION
-        template_body = {"link": f"{settings.HOST_NAME}/#/{path}/{token}", "expiration": token_expiration}
+        token_expiration = self._settings.TOKEN_EXPIRATION
+        template_body = {
+            "link": f"{self._settings.APPLICATION_URL}/admin/#/{path}/{token}",
+            "expiration": token_expiration,
+        }
         return template_body
 
     async def send_invitation_link(self, email: str, token: str) -> None:
