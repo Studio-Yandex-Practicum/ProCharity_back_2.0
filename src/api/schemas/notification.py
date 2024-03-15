@@ -16,7 +16,7 @@ class FeedbackFormQueryParams(BaseModel):
     email: str | None
 
     def as_url_query(self):
-        return f"?{urllib.parse.urlencode(self.model_dump())}"
+        return f"?{urllib.parse.urlencode(self.model_dump(exclude_none=True))}"
 
 
 class TelegramNotificationRequest(RequestBase):
