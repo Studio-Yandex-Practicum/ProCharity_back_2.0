@@ -18,4 +18,5 @@ jobs:
     with:
       environment: deploy
       label: stage
+      compose_file: ./infra/docker-compose.swag.yml
     secrets: inherit
