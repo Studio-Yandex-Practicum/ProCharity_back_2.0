@@ -193,11 +193,15 @@ document.getElementById('formtitle').innerHTML = formText;
 
 const showTgButton = (tgMainButton) => {
   tgMainButton.setText(buttonText);
+  tgMainButton.disable();
   tgMainButton.show();
 };
 
 // send data to server
 const handleSubmit = async (inputs, tg) => {
+  if (!tg.MainButton.is_active) {
+    return
+  }
   tg.MainButton.disable();
 
   const data = Array.from(inputs).reduce((data, input) => {
@@ -207,7 +211,7 @@ const handleSubmit = async (inputs, tg) => {
 
   var header = new Headers([["Content-Type", "application/json"]]);
 
-  return await fetch("/api/v1/feedback", { method: "POST", body: JSON.stringify(data), headers: header }).then((res) => {
+  await fetch("/api/v1/feedback", { method: "POST", body: JSON.stringify(data), headers: header }).then((res) => {
     if (res.ok) {
       return tg.close()
     }
