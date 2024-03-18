@@ -22,6 +22,11 @@ on:
         required: false
         type: string
         default: /procharity2/full
+      compose_file:
+        description: "Path to the docker compose file"
+        required: true
+        type: string
+        default: ./infra/docker-compose.yml
 
 
 env:
@@ -87,7 +92,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "infra/docker-compose.swag.yml, infra/nginx/*.conf"
+          source: "${{ inputs.compose_file }}, infra/nginx/*.conf"
           target: ${{ env.DEPLOY_PATH }}
       - name: Get SHORT_SHA
         run: echo "SHORT_SHA=`echo ${{ github.sha }} | cut -c1-8`" >> $GITHUB_ENV
@@ -101,7 +106,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
-            mv infra/docker-compose.swag.yml infra/docker-compose.yaml
+            mv ${{ inputs.compose_file }} infra/docker-compose.yaml
             rm -f .env
             cat > .env <<- EOM
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}

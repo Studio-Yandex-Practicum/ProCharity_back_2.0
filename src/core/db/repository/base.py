@@ -4,11 +4,13 @@ from typing import Sequence, TypeVar
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import DuplicateColumnError
 from sqlalchemy.ext.asyncio import AsyncSession
+from structlog import get_logger
 
 from src.api.constants import DATE_FORMAT_FOR_STATISTICS
 from src.core.exceptions import AlreadyExistsException, NotFoundException
 from src.core.utils import auto_commit
 
+logger = get_logger()
 DatabaseModel = TypeVar("DatabaseModel")
 DATE_TIME_FORMAT_LAST_UPDATE = "YYYY-MM-DD HH24:MI:SS"
 
@@ -45,7 +47,11 @@ class AbstractRepository(abc.ABC):
     async def remove(self, instance: DatabaseModel) -> None:
         """Удаляет объект модели из базы данных."""
         await self._session.delete(instance)
-        await self._session.commit()
+        try:
+            await self._session.commit()
+        except Exception as e:
+            logger.error(e)
+            await self._session.rollback()
 
     @auto_commit
     async def update(self, _id: int, instance: DatabaseModel) -> DatabaseModel:
