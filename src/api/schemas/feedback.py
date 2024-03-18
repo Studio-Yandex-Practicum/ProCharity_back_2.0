@@ -6,7 +6,7 @@ class FeedbackSchema(BaseModel):
 
     telegram_link: str | None
     external_id: str | None
-    surname: str
+    surname: str | None
     name: str
     email: str
     message: str

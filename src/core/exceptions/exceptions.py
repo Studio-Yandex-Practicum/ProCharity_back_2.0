@@ -18,9 +18,13 @@ class ApplicationException(HTTPException):
 
 
 class NotFoundException(ApplicationException):
-    def __init__(self, object_name: str, object_id: int):
+    def __init__(self, object_name: str, object_id: int | None = None, **object_kwargs):
         self.status_code = HTTPStatus.NOT_FOUND
-        self.detail = f"Объект {object_name} с id: {object_id} не найден"
+        if object_id is not None:
+            self.detail = f"Объект {object_name} с id: {object_id} не найден"
+        else:
+            object_kwargs_str = ", ".join(map(lambda k, v: f"{k}={v}"))
+            self.detail = f"Объект {object_name} ({object_kwargs_str}) не найден"
 
 
 class AlreadyExistsException(ApplicationException):

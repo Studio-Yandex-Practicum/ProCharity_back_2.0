@@ -1,10 +1,20 @@
 import sys
 from functools import wraps
+from typing import Protocol
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from structlog import get_logger
 
 from src.core.db.models import Task
 from src.settings import settings
 
+logger = get_logger()
+
 TASK_DEADLINE_FORMAT = "%d.%m.%y"
+
+
+class RepositoryProtocol(Protocol):
+    _session: AsyncSession
 
 
 def display_tasks(task: Task, url: str) -> str:
@@ -35,10 +45,14 @@ def display_task_verbosely(task: Task, url: str) -> str:
 
 def auto_commit(func):
     @wraps(func)
-    async def auto_commit_wraps(self, *args, commit=True):
+    async def auto_commit_wraps(self: RepositoryProtocol, *args, commit=True):
         result = await func(self, *args)
         if commit:
-            await self._session.commit()
+            try:
+                await self._session.commit()
+            except Exception as e:
+                logger.error(e)
+                await self._session.rollback()
         return result
 
     return auto_commit_wraps

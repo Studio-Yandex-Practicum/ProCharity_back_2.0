@@ -4,13 +4,12 @@ from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from src.core.db.repository.user import UserRepository
-from src.core.exceptions import exceptions
+from src.core.exceptions import EmailSendError
 from src.settings import Settings
 
 
 class EmailSchema(BaseModel):
-    recipients: EmailStr | list[EmailStr]
+    recipients: list[EmailStr]
     template_body: dict[str, Any] | None
 
 
@@ -60,33 +59,7 @@ class EmailProvider:
         try:
             await self.fastmail.send_message(message, template_name)
         except Exception as exc:
-            raise exceptions.EmailSendError(email_obj.recipients, exc)
-
-    async def send_question_feedback(self, telegram_id: int, message: str, email: EmailStr | list[EmailStr]) -> None:
-        """Отправляет email на почтовый ящик администратора с отзывом/вопросом.
-        Args:
-            telegram_id (int): telegram_id волонтера
-            message (str): текст сообщения
-            email (EmailStr | list[EmailStr]): email получателя
-        """
-        if isinstance(email, str):
-            recipients = [email]
-        elif isinstance(email, list):
-            recipients = email
-        else:
-            raise ValueError("Invalid email format")
-        email_obj = EmailSchema(recipients=recipients, template_body=None)
-        async with self._sessionmaker() as session:
-            user_repository = UserRepository(session)
-            user = await user_repository.get_by_telegram_id(telegram_id)
-        await self.__send_mail(
-            email_obj,
-            subject=(
-                f"Сообщение от пользователя {user.first_name} ({user.email or 'пользователь не указал свой email'})"
-            ),
-            body=message,
-            template_name=None,
-        )
+            raise EmailSendError(email_obj.recipients, exc) from exc
 
     async def send_question(
         self,

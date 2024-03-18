@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 
 from sqlalchemy import delete, insert, orm, select
-from sqlalchemy.exc import PendingRollbackError
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
@@ -25,13 +24,9 @@ class UserRepository(AbstractRepository):
 
     async def get_by_telegram_id(self, telegram_id: int) -> User | None:
         """Возвращает пользователя (или None) по telegram_id."""
-        try:
-            return await self._session.scalar(
-                select(User).options(orm.selectinload(User.external_user)).where(User.telegram_id == telegram_id)
-            )
-        except PendingRollbackError as e:
-            logger.info(e)
-        return None
+        return await self._session.scalar(
+            select(User).options(orm.selectinload(User.external_user)).where(User.telegram_id == telegram_id)
+        )
 
     async def restore_existing_user(
         self, user: User, username: str, first_name: str, last_name: str, external_id: int | None

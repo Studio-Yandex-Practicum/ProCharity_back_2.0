@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Never
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
@@ -66,6 +67,14 @@ class User(Base):
         base_url = "https://t.me/"
         if self.username:
             return base_url + self.username
+
+    @property
+    def full_name(self) -> str:
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        if self.first_name or self.last_name or self.username:
+            return self.first_name or self.last_name or self.username or Never
+        return "Имя не известно"
 
     def __repr__(self):
         return f"<User {self.telegram_id}>"
