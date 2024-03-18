@@ -199,7 +199,7 @@ const showTgButton = (tgMainButton) => {
 
 // send data to server
 const handleSubmit = async (inputs, tg) => {
-  if (!tg.MainButton.is_active) {
+  if (!tg.MainButton.isActive) {
     return
   }
   tg.MainButton.disable();
