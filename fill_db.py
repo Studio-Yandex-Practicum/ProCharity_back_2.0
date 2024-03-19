@@ -241,9 +241,11 @@ async def filling_user_and_external_site_user_in_db(
 ) -> None:
     """Filling the database with test data: Users, ExternalSiteUser."""
     user_fake = Faker(locale="ru_RU")
+    external_id_fake = Faker()
     days_period = 90
-    for external_id in range(1, USERS_TABLE_ROWS + 1):
+    for id in range(1, USERS_TABLE_ROWS + 1):
         email = choice([None, user_fake.unique.email()])
+        external_id = choice([None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
         specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3))
         user = User(
@@ -254,7 +256,7 @@ async def filling_user_and_external_site_user_in_db(
             first_name=user_fake.first_name(),
             last_name=user_fake.last_name(),
             has_mailing=False if email is None else True,
-            external_signup_date=created_at,
+            external_signup_date=None if external_id is None else created_at,
             banned=user_fake.boolean(),
             created_at=created_at,
         )
