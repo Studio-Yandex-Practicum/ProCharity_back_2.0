@@ -247,7 +247,7 @@ async def filling_user_and_external_site_user_in_db(
         email = choice([None, user_fake.unique.email()])
         external_id = choice([None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
-        specializations = sample(CATEGORIES_FILL_DATA, k=3)
+        specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3))
         user = User(
             telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
             username=user_fake.unique.user_name(),
