@@ -46,7 +46,6 @@ services:
       - TZ=Europe/Moscow
       - URL=${APPLICATION_URL}
       - VALIDATION=http
-      - CERTPROVIDER=zerossl
       - EMAIL=yandex-practicum@yandex.ru
     env_file:
       - ../.env
