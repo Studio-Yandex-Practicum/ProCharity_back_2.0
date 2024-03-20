@@ -27,11 +27,11 @@ class TaskRequest(RequestBase):
     category_id: NonNegativeInt | None = Field(
         None, examples=[1], description="ID дочерней категории, к которой относится задача."
     )
-    bonus: NonNegativeInt = Field(
-        ..., ge=1, lt=10, examples=[5], description="Количество бонусов за выполнение задачи."
+    bonus: NonNegativeInt | None = Field(
+        None, ge=1, lt=11, examples=[5], description="Количество бонусов за выполнение задачи."
     )
-    location: str = Field(..., examples=["Task Location"], description="Место выполнения задачи.")
-    link: str = Field(..., examples=["https://examples.com"], description="Ссылка на страницу задачи.")
+    location: str | None = Field(None, examples=["Task Location"], description="Место выполнения задачи.")
+    link: str | None = Field(None, examples=["https://examples.com"], description="Ссылка на страницу задачи.")
     description: str | None = Field(None, examples=["Task description"], description="Описание задачи.")
 
     @field_validator("deadline", mode="before")
