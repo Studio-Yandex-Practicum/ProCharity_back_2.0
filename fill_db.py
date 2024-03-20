@@ -260,15 +260,17 @@ async def filling_user_and_external_site_user_in_db(
             banned=user_fake.boolean(),
             created_at=created_at,
         )
-        external_user = ExternalSiteUser(
-            external_id=external_id,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            email=email,
-            specializations=specializations,
-            user=user,
-        )
-        session.add(user, external_user)
+        if user.external_id is not None:
+            external_user = ExternalSiteUser(
+                external_id=external_id,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                email=email,
+                specializations=specializations,
+                user=user,
+            )
+            session.add(external_user)
+        session.add(user)
     await session.commit()
 
 
