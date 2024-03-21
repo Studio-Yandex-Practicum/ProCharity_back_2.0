@@ -1,4 +1,4 @@
-from src.core.db.models import User, UsersCategories
+from src.core.db.models import ExternalSiteUser, User, UsersCategories
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 
 
@@ -18,7 +18,7 @@ class UserService:
     ) -> User:
         """Регистрирует нового пользователя по telegram_id.
 
-        Если пользователь найден, обновляет имя и флаг "заблокирован".
+        Если пользователь найден, обновляет его данные.
         """
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         if user is None:
@@ -40,21 +40,18 @@ class UserService:
 
     async def register_or_update_user(
         self,
-        telegram_id: int,
-        id_hash: str | None,
-        first_name: str,
-        last_name: str | None = None,
-        username: str | None = None,
-    ) -> User | None:
-        if not id_hash or (ext_site_user := await self._ext_user_repository.get_by_id_hash(id_hash)) is None:
-            return await self._user_repository.get_by_telegram_id(telegram_id)
-
+        ext_site_user: ExternalSiteUser,
+        telegram_user,
+    ) -> User:
+        """Регистрирует нового пользователя, а если он уже есть,
+        то обновляет его данные.
+        """
         user = await self._register_or_update_user(
-            telegram_id=telegram_id,
+            telegram_id=telegram_user.id,
             external_id=ext_site_user.id,
-            first_name=ext_site_user.first_name or first_name,
-            last_name=ext_site_user.last_name or last_name,
-            username=username,
+            first_name=ext_site_user.first_name or telegram_user.first_name,
+            last_name=ext_site_user.last_name or telegram_user.last_name,
+            username=telegram_user.username,
             email=ext_site_user.email,
         )
         if ext_site_user.specializations:
