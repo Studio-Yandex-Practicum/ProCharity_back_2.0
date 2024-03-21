@@ -12,7 +12,7 @@ ParameterTypes = ParamSpec("ParameterTypes")
 
 class FuncT(Protocol[ParameterTypes, ReturnType]):
     async def __call__(self, update: Update, *args: ParameterTypes.args, **kw: ParameterTypes.kwargs) -> ReturnType:
-        ...
+        pass
 
 
 def delete_previous_message(coroutine: FuncT[ParameterTypes, ReturnType]) -> FuncT[ParameterTypes, ReturnType]:

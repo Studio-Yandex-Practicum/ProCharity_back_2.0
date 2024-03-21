@@ -8,7 +8,10 @@ from src.core.db.models import Category, User
 from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
-CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)]
+VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
+CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
+ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.ALL_RIGHT_CATEGORIES)]
+
 ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
 UNSUBSCRIBE_BUTTON = [
     InlineKeyboardButton("⏹️ Отменить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
@@ -48,6 +51,11 @@ async def get_checked_categories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
+async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [[*ALL_RIGHT_CATEGORY_BUTTON, *CHANGE_CATEGORY_BUTTON]]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_subcategories_keyboard(
     parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = {}
 ) -> InlineKeyboardMarkup:
@@ -69,7 +77,7 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
         VIEW_TASKS_BUTTON,
         get_support_service_button(user),
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
-        CHANGE_CATEGORY_BUTTON,
+        VIEW_CATEGORIES_BUTTON,
         PERSONAL_ACCOUNT_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
