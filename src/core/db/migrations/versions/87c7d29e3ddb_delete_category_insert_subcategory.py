@@ -5,6 +5,7 @@ Revises: 52647dd43d55
 Create Date: 2022-10-22 13:27:10.144666
 
 """
+
 from sqlalchemy import select
 
 # from app.database import db_session
