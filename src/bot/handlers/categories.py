@@ -11,7 +11,7 @@ from src.bot.keyboards import (
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
-from src.bot.utils import delete_previous_message
+from src.bot.utils import delete_previous_message, get_marked_list
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 
@@ -53,8 +53,12 @@ async def confirm_categories_callback(
         )
     else:
         await query.message.edit_text(
-            text="Теперь я буду присылать тебе уведомления о новых "
-            f"заданиях в следующих категориях: *{', '.join(categories.values())}*.\n\n",
+            text=(
+                "*Отлично!*\n\n"
+                "Теперь сюда будут приходить уведомления о новых заданиях "
+                "в следующих категориях:\n\n{}\n\n"
+                "А пока можешь посмотреть актуальные задания.".format(get_marked_list(categories.values(), "🎓 "))
+            ),
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=await get_open_tasks_and_menu_keyboard(),
         )

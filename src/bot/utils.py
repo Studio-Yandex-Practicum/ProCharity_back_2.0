@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import ParamSpec, Protocol, TypeVar
+from typing import Iterable, ParamSpec, Protocol, TypeVar
 
 from dependency_injector.wiring import Provide
 from telegram import Update
@@ -40,3 +40,8 @@ def get_connection_url(
     if external_id:
         return f"{procharity_url}auth/bot_procharity.php?user_id={external_id}&telegram_id={telegram_id}"
     return f"{procharity_url}auth/"
+
+
+def get_marked_list(items: Iterable[str], marker: str) -> str:
+    """Получение маркированного списка элементов items с маркером marker."""
+    return "\n".join(marker + item for item in items)
