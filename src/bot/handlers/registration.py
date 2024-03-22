@@ -5,51 +5,34 @@ from telegram import Update
 from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import commands
-from src.bot.keyboards import get_start_keyboard, get_unregistered_user_keyboard
-from src.bot.services import ExternalSiteUserService, UserService
+from src.bot.keyboards import get_start_keyboard
+from src.bot.services import UserService
+from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 
+from .decorators import registered_user_required
+
 
 @logger_decor
+@registered_user_required
 @inject
 async def start_command(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-    ext_site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
 ):
     telegram_user = update.effective_user
-    id_hash = context.args[0] if len(context.args) == 1 else None
-    ext_site_user = (
-        await ext_site_user_service.get_by_id_hash(id_hash)
-        if id_hash
-        else await ext_site_user_service.get_by_telegram_id(telegram_user.id)
+    await user_service.register_or_update_user(ext_site_user, telegram_user)
+    keyboard = await get_start_keyboard()
+    await context.bot.send_message(
+        chat_id=telegram_user.id,
+        text="Авторизация прошла успешно!\n\n"
+        "Теперь оповещения будут приходить сюда. "
+        "Изменить настройку уведомлений можно в личном кабинете.\n\n",
+        reply_markup=keyboard,
     )
-
-    if ext_site_user:
-        await user_service.register_or_update_user(ext_site_user, telegram_user)
-        keyboard = await get_start_keyboard()
-        await context.bot.send_message(
-            chat_id=telegram_user.id,
-            text="Авторизация прошла успешно!\n\n"
-            "Теперь оповещения будут приходить сюда. "
-            "Изменить настройку уведомлений можно в личном кабинете.\n\n",
-            reply_markup=keyboard,
-        )
-
-    else:
-        keyboard = await get_unregistered_user_keyboard()
-        await context.bot.send_message(
-            chat_id=telegram_user.id,
-            text=(
-                "<b>Добро пожаловать на ProCharity!</b>\n\n"
-                "Чтобы получить доступ к боту, "
-                "авторизуйтесь или зарегистрируйтесь на платформе."
-            ),
-            parse_mode="HTML",
-            reply_markup=keyboard,
-        )
 
 
 @logger_decor
