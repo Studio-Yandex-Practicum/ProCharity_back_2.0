@@ -60,6 +60,7 @@ class UserRepository(AbstractRepository):
 
     async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> Sequence[UsersCategories]:
         """Присваивает пользователю список категорий."""
+        await self._session.commit()
         async with self._session.begin() as transaction:
             await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
             user_categories = await self._session.execute(
