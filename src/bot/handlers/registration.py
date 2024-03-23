@@ -22,15 +22,18 @@ async def start_command(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
 ):
     telegram_user = update.effective_user
     await user_service.register_or_update_user(ext_site_user, telegram_user)
     keyboard = await get_start_keyboard()
     await context.bot.send_message(
         chat_id=telegram_user.id,
-        text="Авторизация прошла успешно!\n\n"
+        text="<b>Авторизация прошла успешно!</b>\n\n"
         "Теперь оповещения будут приходить сюда. "
-        "Изменить настройку уведомлений можно в личном кабинете.\n\n",
+        f'Изменить настройку уведомлений можно в <a href="{volunteer_auth_url}">личном кабинете</a>.\n\n'
+        "Навигация по боту запускается командой /menu.",
+        parse_mode="HTML",
         reply_markup=keyboard,
     )
 
