@@ -3,9 +3,11 @@ from typing import Any
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import async_sessionmaker
+from structlog import get_logger
 
-from src.core.exceptions import EmailSendError
 from src.settings import Settings
+
+logger = get_logger()
 
 
 class EmailSchema(BaseModel):
@@ -39,7 +41,7 @@ class EmailProvider:
         email_obj: EmailSchema,
         subject: str,
         template_name: str | None,
-        body: str | None,
+        body: str | None = None,
     ) -> None:
         """Базовый метод отправки сообщения на электронную почту.
         Args:
@@ -56,10 +58,7 @@ class EmailProvider:
             subtype=MessageType.html,
         )
 
-        try:
-            await self.fastmail.send_message(message, template_name)
-        except Exception as exc:
-            raise EmailSendError(email_obj.recipients, exc) from exc
+        await self.fastmail.send_message(message, template_name)
 
     async def send_question(
         self,
@@ -87,7 +86,12 @@ class EmailProvider:
         }
         recipients = [to_email]
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
-        await self.__send_mail(email_obj, subject="Вопрос от волонтера'", template_name="send_question.html", body=None)
+        try:
+            await self.__send_mail(
+                email_obj, subject="Вопрос от волонтера'", template_name="send_question.html", body=None
+            )
+        except Exception as e:
+            logger.exception(e)
 
     async def create_temp_body(self, path: str, token: str) -> dict:
         """Создает тело шаблона со ссылкой с токеном для отправки

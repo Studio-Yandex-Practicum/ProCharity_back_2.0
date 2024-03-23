@@ -1,6 +1,5 @@
-from collections.abc import Awaitable, Callable
 from functools import wraps
-from typing import ParamSpec, TypeVar
+from typing import ParamSpec, Protocol, TypeVar
 
 from dependency_injector.wiring import Provide
 from telegram import Update
@@ -11,9 +10,12 @@ ReturnType = TypeVar("ReturnType")
 ParameterTypes = ParamSpec("ParameterTypes")
 
 
-def delete_previous_message(
-    coroutine: Callable[ParameterTypes, Awaitable[ReturnType]]
-) -> Callable[ParameterTypes, Awaitable[ReturnType]]:
+class FuncT(Protocol[ParameterTypes, ReturnType]):
+    async def __call__(self, update: Update, *args: ParameterTypes.args, **kw: ParameterTypes.kwargs) -> ReturnType:
+        ...
+
+
+def delete_previous_message(coroutine: FuncT[ParameterTypes, ReturnType]) -> FuncT[ParameterTypes, ReturnType]:
     """Декоратор для функций, отправляющих новые сообщения с inline-кнопками.
     После выполнения оборачиваемой функции удаляет сообщение с inline-кнопкой,
     нажатие на которую повлекло вызов оборачиваемой функции."""
@@ -21,7 +23,8 @@ def delete_previous_message(
     @wraps(coroutine)
     async def wrapper(update: Update, *args: ParameterTypes.args, **kwargs: ParameterTypes.kwargs) -> ReturnType:
         result = await coroutine(update, *args, **kwargs)
-        await update.callback_query.message.delete()
+        if update.callback_query is not None and update.callback_query.message is not None:
+            await update.callback_query.message.delete()
         return result
 
     return wrapper
@@ -29,7 +32,7 @@ def delete_previous_message(
 
 def get_connection_url(
     telegram_id: int,
-    external_id: int = None,
+    external_id: int | None = None,
     procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
 ) -> str:
     """Получение ссылки для связи аккаунта с ботом по external_id и telegram_id.

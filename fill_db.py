@@ -2,16 +2,17 @@ import asyncio
 import string
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from random import choice, choices, randint
+from random import choice, choices, randint, sample
 
 from faker import Faker
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.core.db import get_session
-from src.core.db.models import Category, Task, UnsubscribeReason, User
+from src.core.db.models import Category, ExternalSiteUser, Task, UnsubscribeReason, User
 
 CHARACTERS = string.ascii_uppercase + string.digits
+CATEGORIES_FILL_DATA = []
 
 CATEGORIES_TEST_DATA = [
     {"id": "1", "name": "Дизайн и верстка"},
@@ -204,6 +205,8 @@ async def filling_subcategory_in_db(
                 parent_id=parent_id,
                 id=int(str(subcategory["id"]) + str(parent_id)),
             )
+            if not subcategory_obj.is_archived:
+                CATEGORIES_FILL_DATA.append(subcategory_obj.id)
             session.add(subcategory_obj)
     await session.commit()
 
@@ -233,13 +236,10 @@ async def filling_task_in_db(
             await session.commit()
 
 
-async def filling_user_in_db(
+async def filling_user_and_external_site_user_in_db(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
-    """Filling the database with test data: Users.
-    The fields telegram_id, username, email, external_id, first_name,
-    last_name, has_mailing, external_signup_date, banned.
-    """
+    """Filling the database with test data: Users, ExternalSiteUser."""
     user_fake = Faker(locale="ru_RU")
     external_id_fake = Faker()
     days_period = 90
@@ -247,6 +247,7 @@ async def filling_user_in_db(
         email = choice([None, user_fake.unique.email()])
         external_id = choice([None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
+        specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3))
         user = User(
             telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
             username=user_fake.unique.user_name(),
@@ -259,6 +260,16 @@ async def filling_user_in_db(
             banned=user_fake.boolean(),
             created_at=created_at,
         )
+        if user.external_id is not None:
+            external_user = ExternalSiteUser(
+                external_id=external_id,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                email=email,
+                specializations=specializations,
+                user=user,
+            )
+            session.add(external_user)
         session.add(user)
     await session.commit()
 
@@ -285,9 +296,13 @@ async def filling_unsubscribe_reason_in_db(
 async def delete_all_data(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
-    """The function deletes data from the tables Category, Tasks."""
+    """The function deletes data."""
     await session.execute(
-        text("""TRUNCATE TABLE tasks, categories, unsubscribe_reason, users RESTART IDENTITY CASCADE""")
+        text(
+            """TRUNCATE TABLE
+            tasks, categories, unsubscribe_reason, users, external_site_users
+            RESTART IDENTITY CASCADE"""
+        )
     )
     await session.commit()
 
@@ -299,7 +314,7 @@ async def run():
         await filling_category_in_db(session)
         await filling_subcategory_in_db(session)
         await filling_task_in_db(session)
-        await filling_user_in_db(session)
+        await filling_user_and_external_site_user_in_db(session)
         await filling_unsubscribe_reason_in_db(session)
         print("Тестовые данные загружены в БД.")
 
