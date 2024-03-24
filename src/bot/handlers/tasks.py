@@ -3,31 +3,13 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
-from src.bot.constants import callback_data, patterns
+from src.bot.constants import callback_data
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.core.utils import display_task, display_task_verbosely
-
-
-@logger_decor
-async def task_details_callback(
-    update: Update,
-    context: CallbackContext,
-    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
-    help_procharity_url: str = Provide[Container.settings.provided.HELP_PROCHARITY_URL],
-):
-    query = update.callback_query
-    task_id = int(context.match.group(1))
-    task = await task_service.get_task_by_id(task_id)
-    detailed_text = display_task_verbosely(task, help_procharity_url)
-    await query.message.edit_text(
-        detailed_text,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
+from src.core.utils import display_task
 
 
 @logger_decor
@@ -78,4 +60,3 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
 
 def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
-    app.add_handler(CallbackQueryHandler(task_details_callback, pattern=patterns.TASK_DETAILS))

@@ -29,19 +29,6 @@ def display_task(task: Task, url: str) -> str:
     )
 
 
-def display_task_verbosely(task: Task, url: str) -> str:
-    deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT) if task.deadline is not None else "Не указан."
-    bonus_link = f"{url}article/10053"
-    return (
-        f"<b>{task.title}\n\n</b>"
-        f"От фонда: {task.name_organization}, {task.location}\n\n"
-        f"Бонусы: <a href='{bonus_link}'>{task.bonus * '💎'}</a>\n"
-        f"Категория: {task.category.name if task.category is not None else 'Не указана.'}\n"
-        f"Срок: {deadline}\n\n"
-        f"{task.description}"
-    )
-
-
 def auto_commit(func):
     @wraps(func)
     async def auto_commit_wraps(self: RepositoryProtocol, *args, commit=True):
