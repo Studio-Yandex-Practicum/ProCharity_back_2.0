@@ -1,15 +1,15 @@
 from dependency_injector.wiring import Provide
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_back_menu, view_more_tasks_keyboard
+from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.core.utils import display_task_verbosely, display_tasks
+from src.core.utils import display_task, display_task_verbosely
 
 
 @logger_decor
@@ -47,15 +47,13 @@ async def view_task_callback(
     )
 
     for task in tasks_to_show:
-        message = display_tasks(task, help_procharity_url)
-        inline_keyboard = [[InlineKeyboardButton("ℹ️ Подробнее", callback_data=f"task_details_{task.id}")]]
-        reply_markup = InlineKeyboardMarkup(inline_keyboard)
+        message = display_task(task, help_procharity_url)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
-            reply_markup=reply_markup,
+            reply_markup=get_task_info_keyboard(task),
         )
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
     await show_next_tasks(update, context, page_number, remaining_tasks)
