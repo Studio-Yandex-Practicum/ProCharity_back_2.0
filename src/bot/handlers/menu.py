@@ -5,7 +5,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands, enum, patterns
-from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard
+from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard, service_keyboard
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
@@ -105,9 +105,30 @@ async def about_project(
     )
 
 
+@logger_decor
+@delete_previous_message
+async def service_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    base_url: str = Provide[Container.settings.provided.BRAIN_BASE],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+):
+    """Отправляет сервис меню."""
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Мы на связи с 10.00 до 19.00 в будние дни по любым вопросам."
+        " Смело пиши нам! А пока мы изучаем твой запрос, можешь ознакомиться с"
+        " популярными вопросами и ответами на них в нашей"
+        f'<a href="{base_url}"> базе знаний.</a>',
+        reply_markup=await service_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
+        parse_mode=ParseMode.HTML,
+    )
+
+
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
+    app.add_handler(CallbackQueryHandler(service_callback, pattern=callback_data.SERVICE))
