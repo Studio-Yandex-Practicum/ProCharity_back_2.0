@@ -37,12 +37,12 @@ async def categories_callback(
     )
 
 
-async def view_categories_callback(
+async def view_old_categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    """Выводит список выбранных волонтером категорий."""
+    """Выводит список выбранных волонтером категорий перед их изменением."""
     query = update.callback_query
     telegram_id = update.effective_user.id
 
@@ -96,7 +96,7 @@ async def all_right_categories_callback(
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
+    """Отображает список текущих выбранных категорий (без изменения)."""
     query = update.callback_query
     telegram_id = update.effective_user.id
 
@@ -117,8 +117,6 @@ async def all_right_categories_callback(
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=await get_open_tasks_and_menu_keyboard(),
         )
-        # стоит ли опять проверять mailing если мы ничего не меняли?
-        # await user_service.check_and_set_has_mailing_atribute(telegram_id)
 
 
 @logger_decor
@@ -194,7 +192,7 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(subcategories_callback, pattern=patterns.SUBCATEGORIES))
     app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     app.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
-    app.add_handler(CallbackQueryHandler(view_categories_callback, pattern=callback_data.VIEW_CATEGORIES))
+    app.add_handler(CallbackQueryHandler(view_old_categories_callback, pattern=callback_data.VIEW_CATEGORIES))
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.CHANGE_CATEGORY))
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.GET_CATEGORIES))
     app.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES))
