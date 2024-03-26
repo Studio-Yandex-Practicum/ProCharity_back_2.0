@@ -92,7 +92,7 @@ class Settings(BaseSettings):
     PROCHARITY_URL: Url = "https://procharity.ru"
     YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
-    BRAIN_BASE: Url = "https://help.procharity.ru/category/1876"
+    FAQ_VOLUNTEER_URL: Url = "https://help.procharity.ru/category/1876"
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
     def check_last_slash_url(cls, v) -> str:

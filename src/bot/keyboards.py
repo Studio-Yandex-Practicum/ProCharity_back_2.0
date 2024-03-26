@@ -19,7 +19,7 @@ PERSONAL_ACCOUNT_BUTTON = [
 ]
 OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
 
-SERVICE_BUTTON = [InlineKeyboardButton(text="Служба поддержки", callback_data=callback_data.SERVICE)]
+SERVICE_BUTTON = [InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SERVICE)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -96,7 +96,7 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
                 surname=user.last_name,
                 email=getattr(user, "email", None),
             ).as_url_query(),
-        ),
+        )
     )
 
 

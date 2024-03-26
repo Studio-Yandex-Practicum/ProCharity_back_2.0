@@ -110,16 +110,18 @@ async def about_project(
 async def service_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    base_url: str = Provide[Container.settings.provided.BRAIN_BASE],
+    url: str = Provide[Container.settings.provided.FAQ_VOLUNTEER_URL],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Отправляет сервис меню."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Мы на связи с 10.00 до 19.00 в будние дни по любым вопросам."
-        " Смело пиши нам! А пока мы изучаем твой запрос, можешь ознакомиться с"
-        " популярными вопросами и ответами на них в нашей"
-        f'<a href="{base_url}"> базе знаний.</a>',
+        text="Мы на связи с 10.00 до 19.00"
+        "в будние дни по любым вопросам. Смело пиши нам!\n"
+        "\n"
+        "А пока мы изучаем твой запрос, можешь ознакомиться с"
+        "популярными вопросами и ответами на них в нашей"
+        f'<a href="{url}"> базе знаний.</a>',
         reply_markup=await service_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
         parse_mode=ParseMode.HTML,
     )
