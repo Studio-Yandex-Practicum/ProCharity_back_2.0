@@ -31,4 +31,5 @@ class AdminTokenRequestRepository(AbstractRepository):
 
     async def remove(self, instance: AdminTokenRequest) -> None:
         """Удаляет объект из БД."""
-        await self._delete(instance)
+        await self._session.delete(instance)
+        await self._session.commit()
