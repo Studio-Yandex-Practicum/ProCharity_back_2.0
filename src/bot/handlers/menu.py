@@ -1,3 +1,5 @@
+import asyncio
+
 import structlog
 from dependency_injector.wiring import Provide
 from telegram import Update
@@ -11,6 +13,7 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.services.email import EmailProvider
 
 log = structlog.get_logger()
 
@@ -69,10 +72,19 @@ async def reason_handler(
     unsubscribe_reason_service: UnsubscribeReasonService = Provide[
         Container.bot_services_container.unsubscribe_reason_service
     ],
+    email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
+    email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
 ):
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
     await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
+    background_task = email_provider.unsubscribe_notification(
+        user_name=update.effective_user.username,
+        user_id=update.effective_user.id,
+        reason=reason,
+        to_email=email_admin,
+    )
+    asyncio.create_task(background_task)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
         f"рассылки по причине: {reason}"

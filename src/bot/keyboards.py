@@ -10,9 +10,7 @@ from src.settings import settings
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)]
 ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
-UNSUBSCRIBE_BUTTON = [
-    InlineKeyboardButton("⏹️ Отменить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
-]
+UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
     InlineKeyboardButton("🚪 Перейти в личный кабинет", url="https://procharity.ru/volunteers/settings/")
