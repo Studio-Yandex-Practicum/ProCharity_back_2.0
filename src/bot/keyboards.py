@@ -15,7 +15,7 @@ UNSUBSCRIBE_BUTTON = [
 ]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
-    InlineKeyboardButton("🚪 Перейти в личный кабинет", url="https://procharity.ru/volunteers/settings/")
+    InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
 ]
 OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
 
