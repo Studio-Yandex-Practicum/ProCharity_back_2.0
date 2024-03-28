@@ -2,6 +2,7 @@ from functools import wraps
 
 from dependency_injector.wiring import Provide, inject
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from src.bot.keyboards import get_unregistered_user_keyboard
@@ -39,7 +40,7 @@ def registered_user_required(handler):
                     "Чтобы получить доступ к боту, "
                     "авторизуйтесь или зарегистрируйтесь на платформе."
                 ),
-                parse_mode="HTML",
+                parse_mode=ParseMode.HTML,
                 reply_markup=keyboard,
             )
 

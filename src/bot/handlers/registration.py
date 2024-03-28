@@ -2,6 +2,7 @@ from typing import Never
 
 from dependency_injector.wiring import Provide, inject
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import commands
@@ -33,8 +34,9 @@ async def start_command(
         "Теперь оповещения будут приходить сюда. "
         f'Изменить настройку уведомлений можно в <a href="{volunteer_auth_url}">личном кабинете</a>.\n\n'
         "Навигация по боту запускается командой /menu.",
-        parse_mode="HTML",
+        parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
+        disable_web_page_preview=True,
     )
 
 
