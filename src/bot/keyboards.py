@@ -1,10 +1,12 @@
 from urllib.parse import urljoin
 
+from dependency_injector.wiring import Provide
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
 from src.core.db.models import Category, User
+from src.core.depends import Container
 from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
@@ -17,10 +19,16 @@ UNSUBSCRIBE_BUTTON = [
     InlineKeyboardButton("⏹️ Отменить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
 ]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
-PERSONAL_ACCOUNT_BUTTON = [
-    InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
-]
 OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
+
+
+def get_personal_account_button(
+    registered: bool,
+    registration_url: str = Provide[Container.settings.provided.procharity_registration_url],
+    volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+) -> list[InlineKeyboardButton]:
+    url = volunteer_auth_url if registered else registration_url
+    return [InlineKeyboardButton("🚪 Перейти в личный кабинет", url=url)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -78,9 +86,13 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
         get_support_service_button(user),
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
         VIEW_CATEGORIES_BUTTON,
-        PERSONAL_ACCOUNT_BUTTON,
+        get_personal_account_button(registered=True),
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+async def get_unregistered_user_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([get_personal_account_button(registered=False)])
 
 
 def get_feedback_web_app_info(user: User) -> WebAppInfo:

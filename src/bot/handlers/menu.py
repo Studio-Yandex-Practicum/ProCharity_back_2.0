@@ -9,24 +9,28 @@ from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_k
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
+from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+
+from .decorators import registered_user_required
 
 log = structlog.get_logger()
 
 
 @logger_decor
+@registered_user_required
 @delete_previous_message
 async def menu_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    ext_site_user: ExternalSiteUser,
 ):
     """Возвращает в меню."""
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
+        reply_markup=await get_menu_keyboard(ext_site_user.user),
     )
 
 

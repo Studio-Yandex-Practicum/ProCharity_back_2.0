@@ -135,6 +135,16 @@ class Settings(BaseSettings):
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
         return urljoin(self.static_url, "feedback_form/feedback_form.html")
 
+    @property
+    def procharity_registration_url(self) -> str:
+        """Получить url-ссылку на страницу регистрации."""
+        return urljoin(self.PROCHARITY_URL, "registration/")
+
+    @property
+    def procharity_volunteer_auth_url(self) -> str:
+        """Получить url-ссылку на страницу авторизации волонтёра."""
+        return urljoin(self.PROCHARITY_URL, "volunteers/settings/")
+
 
 @lru_cache()
 def get_settings():
