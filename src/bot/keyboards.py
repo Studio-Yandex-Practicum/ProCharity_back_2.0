@@ -21,6 +21,7 @@ PERSONAL_ACCOUNT_BUTTON = [
     InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
 ]
 OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
+RETURN_MENU_BUTTON = [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -99,7 +100,9 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
 
 
 async def get_back_menu() -> InlineKeyboardMarkup:
-    keyboard = [[InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]]
+    keyboard = [
+        RETURN_MENU_BUTTON,
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -123,6 +126,14 @@ async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
         OPEN_MENU_BUTTON,
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_mailing_back_menu_and_tasks_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        VIEW_TASKS_BUTTON,
+        RETURN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
