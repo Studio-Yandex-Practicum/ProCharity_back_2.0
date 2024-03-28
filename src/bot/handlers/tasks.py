@@ -46,6 +46,20 @@ async def view_task_callback(
         telegram_id,
     )
 
+    # Filter out tasks that have already been shown
+    shown_tasks = context.user_data.get("shown_tasks", set())
+    tasks_to_show = [task for task in tasks_to_show if task.id not in shown_tasks]
+
+    if not tasks_to_show:
+        text = "Актуальных заданий по твоим компетенциям на сегодня нет."
+        keyboard = await get_back_menu()
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=text,
+            reply_markup=keyboard,
+        )
+        return
+
     for task in tasks_to_show:
         message = display_tasks(task, help_procharity_url)
         inline_keyboard = [[InlineKeyboardButton("ℹ️ Подробнее", callback_data=f"task_details_{task.id}")]]
@@ -57,6 +71,10 @@ async def view_task_callback(
             disable_web_page_preview=True,
             reply_markup=reply_markup,
         )
+        shown_tasks.add(task.id)
+
+    context.user_data["shown_tasks"] = shown_tasks
+
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
     await show_next_tasks(update, context, page_number, remaining_tasks)
 
