@@ -228,7 +228,7 @@ async def filling_task_in_db(
                     title=title,
                     bonus=randint(1, 4) + randint(1, 4),
                     location=f"{choice(TEST_LOCATION)}",
-                    link=f"http://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
+                    link=f"https://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
                     description=f"Описание {title}",
                     is_archived=choice([True, False]),
                 )
