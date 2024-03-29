@@ -82,6 +82,11 @@ LOGGING_DICTCONFIG = {
             "level": settings.LOG_LEVEL,
             "propagate": True,
         },
+        "passlib": {
+            "handlers": ["default", "file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
     },
 }
 
