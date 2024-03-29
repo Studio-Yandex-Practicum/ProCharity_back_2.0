@@ -22,6 +22,10 @@ PERSONAL_ACCOUNT_BUTTON = [
 ]
 OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
 
+SUPPORT_SERVICE_BUTTON = [
+    InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
+]
+
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
     return [InlineKeyboardButton("✍ Написать в службу поддержки", web_app=get_feedback_web_app_info(user))]
@@ -72,10 +76,18 @@ async def get_subcategories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
+async def support_service_keyboard(user: User) -> InlineKeyboardMarkup:
+    keyboard = [
+        get_support_service_button(user),
+        [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
         VIEW_TASKS_BUTTON,
-        get_support_service_button(user),
+        SUPPORT_SERVICE_BUTTON,
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
         VIEW_CATEGORIES_BUTTON,
         PERSONAL_ACCOUNT_BUTTON,
