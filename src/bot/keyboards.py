@@ -8,17 +8,24 @@ from src.core.db.models import Category, Task, User
 from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
+VIEW_CURRENT_TASKS_BUTTON = [
+    InlineKeyboardButton("Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)
+]
 VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
 ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.ALL_RIGHT_CATEGORIES)]
-
 ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
 UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
     InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
 ]
-OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
+OPEN_MENU_BUTTON = [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
+RETURN_MENU_BUTTON = [InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU)]
+CHECK_CATEGORIES_BUTTON = [
+    InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
+]
+SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
 
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
@@ -109,21 +116,23 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
 
 
 async def get_back_menu() -> InlineKeyboardMarkup:
-    keyboard = [[InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]]
+    keyboard = [
+        RETURN_MENU_BUTTON,
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
 async def get_start_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)],
+        CHECK_CATEGORIES_BUTTON,
         OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
+async def get_tasks_and_open_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)],
+        VIEW_CURRENT_TASKS_BUTTON,
         OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -131,8 +140,16 @@ async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
 
 async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
+        SHOW_MORE_TASKS_BUTTON,
         OPEN_MENU_BUTTON,
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        VIEW_TASKS_BUTTON,
+        RETURN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
