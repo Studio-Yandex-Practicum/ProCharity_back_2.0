@@ -104,7 +104,7 @@ async def all_right_categories_callback(
     if not categories:
         await query.message.edit_text(
             text="Категории не выбраны.",
-            reply_markup=await get_open_tasks_and_menu_keyboard(),
+            reply_markup=await get_tasks_and_open_menu_keyboard(),
         )
     else:
         await query.message.edit_text(
@@ -115,7 +115,7 @@ async def all_right_categories_callback(
                 "А пока можешь посмотреть актуальные задания.".format(get_marked_list(categories.values(), "🎓 "))
             ),
             parse_mode=ParseMode.MARKDOWN,
-            reply_markup=await get_open_tasks_and_menu_keyboard(),
+            reply_markup=await get_tasks_and_open_menu_keyboard(),
         )
 
 
