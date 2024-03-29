@@ -14,7 +14,6 @@ from src.bot.keyboards import (
     get_tasks_and_back_menu_keyboard,
     support_service_keyboard,
 )
-
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
