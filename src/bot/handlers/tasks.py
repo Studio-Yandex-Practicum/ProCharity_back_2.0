@@ -68,7 +68,7 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
         context.user_data["page_number"] = page_number + 1
         keyboard = await view_more_tasks_keyboard()
     else:
-        text = "Заданий больше нет."
+        text = "Ты просмотрел все актуальные задания на сегодня."
         keyboard = await get_back_menu()
 
     await context.bot.send_message(
