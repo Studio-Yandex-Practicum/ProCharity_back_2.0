@@ -92,7 +92,6 @@ class Settings(BaseSettings):
     PROCHARITY_URL: Url = "https://procharity.ru"
     YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
-    FAQ_VOLUNTEER_URL: Url = "https://help.procharity.ru/"
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
     def check_last_slash_url(cls, v) -> str:
@@ -137,9 +136,9 @@ class Settings(BaseSettings):
         return urljoin(self.static_url, "feedback_form/feedback_form.html")
 
     @property
-    def procharity_support_service(self) -> str:
+    def procharity_faq_volunteer_url(self) -> str:
         """Получить url-ссылку на страницу базы знаний."""
-        return urljoin(self.FAQ_VOLUNTEER_URL, "category/1876")
+        return urljoin(self.HELP_PROCHARITY_URL, "category/1876")
 
 
 @lru_cache()

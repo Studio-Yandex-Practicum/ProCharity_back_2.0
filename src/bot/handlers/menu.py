@@ -5,7 +5,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import callback_data, commands, enum, patterns
-from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard, service_keyboard
+from src.bot.keyboards import get_back_menu, get_menu_keyboard, get_no_mailing_keyboard, support_service_keyboard
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message
@@ -107,10 +107,10 @@ async def about_project(
 
 @logger_decor
 @delete_previous_message
-async def service_callback(
+async def support_service_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    url: str = Provide[Container.settings.provided.procharity_support_service],
+    url: str = Provide[Container.settings.provided.procharity_faq_volunteer_url],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Отправляет сервис меню."""
@@ -122,7 +122,7 @@ async def service_callback(
         "А пока мы изучаем твой запрос, можешь ознакомиться с"
         "популярными вопросами и ответами на них в нашей"
         f'<a href="{url}"> базе знаний.</a>',
-        reply_markup=await service_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
+        reply_markup=await support_service_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
         parse_mode=ParseMode.HTML,
     )
 
@@ -133,4 +133,4 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
-    app.add_handler(CallbackQueryHandler(service_callback, pattern=callback_data.SUPPORT_SERVICE))
+    app.add_handler(CallbackQueryHandler(support_service_callback, pattern=callback_data.SUPPORT_SERVICE))
