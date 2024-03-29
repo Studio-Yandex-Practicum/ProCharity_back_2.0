@@ -15,9 +15,7 @@ VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компе
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
 ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.ALL_RIGHT_CATEGORIES)]
 ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
-UNSUBSCRIBE_BUTTON = [
-    InlineKeyboardButton("⏹️ Отменить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
-]
+UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
     InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
@@ -28,6 +26,10 @@ CHECK_CATEGORIES_BUTTON = [
     InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
 ]
 SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
+
+SUPPORT_SERVICE_BUTTON = [
+    InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
+]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -79,10 +81,18 @@ async def get_subcategories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
+async def support_service_keyboard(user: User) -> InlineKeyboardMarkup:
+    keyboard = [
+        get_support_service_button(user),
+        [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
         VIEW_TASKS_BUTTON,
-        get_support_service_button(user),
+        SUPPORT_SERVICE_BUTTON,
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
         VIEW_CATEGORIES_BUTTON,
         PERSONAL_ACCOUNT_BUTTON,

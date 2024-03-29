@@ -135,3 +135,28 @@ class EmailProvider:
             template_name="password_reset.html",
             body=None,
         )
+
+    async def unsubscribe_notification(
+        self, user_name: str, user_id: str, reason: str, to_email: EmailStr | list[EmailStr]
+    ) -> None:
+        """Отправляет уведомление с причиной отписки пользователя.
+
+        Args:
+            user_name (str): Имя пользователя.
+            user_id (str): Идентификатор пользователя.
+            reason (str): Указанная причина отписки.
+            to_email (EmailStr | list[EmailStr]): email получателя/получателей
+        """
+        template_body = {"user_name": user_name, "user_id": user_id, "reason": reason}
+        recipients = [to_email]
+        email_obj = EmailSchema(recipients=recipients, template_body=template_body)
+        try:
+            await self.__send_mail(
+                email_obj,
+                subject="Уведомление об отписке пользователя",
+                template_name="unsubscribe_notification.html",
+                body=None,
+            )
+            logger.info(f"Уведомление об отписке {user_name} отправлено на {to_email}")
+        except Exception as e:
+            logger.exception(e)
