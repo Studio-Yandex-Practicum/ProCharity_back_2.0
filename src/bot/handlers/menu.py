@@ -7,9 +7,9 @@ from telegram.ext import Application, CallbackQueryHandler, CommandHandler, Cont
 from src.bot.constants import callback_data, commands, enum, patterns
 from src.bot.keyboards import (
     get_back_menu,
-    get_mailing_back_menu_and_tasks_keyboard,
     get_menu_keyboard,
     get_no_mailing_keyboard,
+    get_tasks_and_back_menu_keyboard,
 )
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
@@ -48,7 +48,7 @@ async def set_mailing(
     has_mailing = await user_service.set_mailing(telegram_id)
     if has_mailing:
         text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
-        keyboard = await get_mailing_back_menu_and_tasks_keyboard()
+        keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
     else:
         text = (

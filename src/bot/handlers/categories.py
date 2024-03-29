@@ -6,8 +6,8 @@ from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import (
     get_checked_categories_keyboard,
-    get_open_tasks_and_menu_keyboard,
     get_subcategories_keyboard,
+    get_tasks_and_open_menu_keyboard,
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
@@ -49,14 +49,14 @@ async def confirm_categories_callback(
     if not categories:
         await query.message.edit_text(
             text="Категории не выбраны.",
-            reply_markup=await get_open_tasks_and_menu_keyboard(),
+            reply_markup=await get_tasks_and_open_menu_keyboard(),
         )
     else:
         await query.message.edit_text(
             text="Теперь я буду присылать тебе уведомления о новых "
             f"заданиях в следующих категориях: *{', '.join(categories.values())}*.\n\n",
             parse_mode=ParseMode.MARKDOWN,
-            reply_markup=await get_open_tasks_and_menu_keyboard(),
+            reply_markup=await get_tasks_and_open_menu_keyboard(),
         )
         await user_service.check_and_set_has_mailing_atribute(telegram_id)
 

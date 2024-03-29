@@ -106,7 +106,7 @@ async def get_start_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
+async def get_tasks_and_open_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         [InlineKeyboardButton("Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)],
         OPEN_MENU_BUTTON,
@@ -122,7 +122,7 @@ async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_mailing_back_menu_and_tasks_keyboard() -> InlineKeyboardMarkup:
+async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
         VIEW_TASKS_BUTTON,
         RETURN_MENU_BUTTON,
