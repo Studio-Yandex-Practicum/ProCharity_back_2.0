@@ -28,8 +28,3 @@ class AdminTokenRequestRepository(AbstractRepository):
             user = AdminTokenRequest(email=email, token=token, token_expiration_date=token_expiration_date)
             await self.session.add(user)
             await self.session.commit()
-
-    async def remove(self, instance: AdminTokenRequest) -> None:
-        """Удаляет объект из БД."""
-        await self._session.delete(instance)
-        await self._session.commit()
