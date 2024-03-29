@@ -17,14 +17,13 @@ class RepositoryProtocol(Protocol):
     _session: AsyncSession
 
 
-def display_task(task: Task, url: str) -> str:
-    deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT) if task.deadline is not None else "Не указан."
-    bonus_link = f"{url}article/6646"
+def display_task(task: Task, bonus_info_url: str) -> str:
+    deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT) if task.deadline else "Не указан."
     return (
         f"<b>Фонд:</b> {task.name_organization}\n\n"
-        f"<b>Категория:</b> {task.category.name if task.category is not None else 'Не указана.'}\n\n"
+        f"<b>Категория:</b> {task.category.name if task.category else 'Не указана.'}\n\n"
         f"<b>Срок:</b> {deadline}\n\n"
-        f"<b>Бонусы:</b> <a href='{bonus_link}'>{task.bonus * '💎'}</a>\n\n"
+        f"<a href='{bonus_info_url}'><b>Бонусы:</b></a> {str(task.bonus)} * 💎\n\n"
         f"<b>{task.title}\n\n</b>"
     )
 

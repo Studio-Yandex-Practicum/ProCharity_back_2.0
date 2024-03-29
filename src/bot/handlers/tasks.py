@@ -19,7 +19,7 @@ async def view_task_callback(
     context: CallbackContext,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
-    help_procharity_url: str = Provide[Container.settings.provided.HELP_PROCHARITY_URL],
+    bonus_info_url: str = Provide[Container.settings.provided.procharity_bonus_info_url],
 ):
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
@@ -29,7 +29,7 @@ async def view_task_callback(
     )
 
     for task in tasks_to_show:
-        message = display_task(task, help_procharity_url)
+        message = display_task(task, bonus_info_url)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,

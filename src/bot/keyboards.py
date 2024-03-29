@@ -144,10 +144,11 @@ def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
 
 
 def get_task_web_app_info(task: Task) -> WebAppInfo:
+    """WebApp для отображения подробной информации о задании и фонде"""
     return WebAppInfo(url=task.link)
 
 
 def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
-    """Кнопка для отображения подробной информации о задании и фонде"""
-    keyboard = [[InlineKeyboardButton("ℹ️ Посмотреть описание", web_app=get_task_web_app_info(task))]]
+    """Клавиатура с кнопкой для отображения подробной информации о задании и фонде"""
+    keyboard = [[InlineKeyboardButton("ℹ️ Посмотреть задание", web_app=get_task_web_app_info(task))]]
     return InlineKeyboardMarkup(keyboard)
