@@ -110,7 +110,7 @@ async def about_project(
 async def service_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    url: str = Provide[Container.settings.provided.FAQ_VOLUNTEER_URL],
+    url: str = Provide[Container.settings.provided.procharity_support_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Отправляет сервис меню."""
@@ -133,4 +133,4 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
-    app.add_handler(CallbackQueryHandler(service_callback, pattern=callback_data.SERVICE))
+    app.add_handler(CallbackQueryHandler(service_callback, pattern=callback_data.SUPPORT_SERVICE))
