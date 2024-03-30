@@ -4,12 +4,12 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
 from src.bot.constants import callback_data
-from src.bot.constants.messages import display_task
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.messages import display_task
 
 
 @logger_decor
