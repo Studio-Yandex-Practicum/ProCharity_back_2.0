@@ -25,12 +25,15 @@ SUPPORT_SERVICE_BUTTON = [
 
 
 def get_personal_account_button(
-    registered: bool,
     registration_url: str = Provide[Container.settings.provided.procharity_registration_url],
+) -> list[InlineKeyboardButton]:
+    return [InlineKeyboardButton("🚪 Войти в личный кабинет", url=registration_url)]
+
+
+def get_notification_settings_button(
     volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
 ) -> list[InlineKeyboardButton]:
-    url = volunteer_auth_url if registered else registration_url
-    return [InlineKeyboardButton("🚪 Перейти в личный кабинет", url=url)]
+    return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=volunteer_auth_url)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -96,13 +99,13 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
         SUPPORT_SERVICE_BUTTON,
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
         VIEW_CATEGORIES_BUTTON,
-        get_personal_account_button(registered=True),
+        get_notification_settings_button(),
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
 async def get_unregistered_user_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup([get_personal_account_button(registered=False)])
+    return InlineKeyboardMarkup([get_personal_account_button()])
 
 
 def get_feedback_web_app_info(user: User) -> WebAppInfo:
