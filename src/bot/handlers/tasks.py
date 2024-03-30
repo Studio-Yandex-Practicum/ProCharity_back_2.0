@@ -4,12 +4,12 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
 from src.bot.constants import callback_data
+from src.bot.constants.messages import display_task
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.core.utils import display_task
 
 
 @logger_decor
@@ -19,7 +19,6 @@ async def view_task_callback(
     context: CallbackContext,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
-    bonus_info_url: str = Provide[Container.settings.provided.procharity_bonus_info_url],
 ):
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
@@ -29,7 +28,7 @@ async def view_task_callback(
     )
 
     for task in tasks_to_show:
-        message = display_task(task, bonus_info_url)
+        message = display_task(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,

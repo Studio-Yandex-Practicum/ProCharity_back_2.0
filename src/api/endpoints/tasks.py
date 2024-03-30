@@ -5,9 +5,9 @@ from src.api.auth import check_header_contains_token
 from src.api.schemas import TaskResponse, TasksRequest
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
+from src.bot.constants.messages import display_task
 from src.core.db.models import Task
 from src.core.depends import Container
-from src.core.utils import display_task
 
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
@@ -20,12 +20,11 @@ async def actualize_tasks(
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
-    bonus_info_url: str = Depends(Provide[Container.settings.provided.procharity_bonus_info_url]),
 ) -> None:
     new_tasks_ids = await task_service.actualize_objects(tasks.root, Task)
     new_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids)
     for task in new_category_tasks:
-        message = display_task(task, bonus_info_url)
+        message = display_task(task)
         await telegram_notification_service.send_messages_to_subscribed_users(message, task.category_id)
 
 
