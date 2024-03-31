@@ -61,7 +61,6 @@ async def view_task_callback(
     await show_next_tasks(update, context, page_number, remaining_tasks)
 
 
-@delete_previous_message
 async def show_next_tasks(update: Update, context: CallbackContext, page_number: int, remaining_tasks: int):
     if remaining_tasks > 0:
         text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
