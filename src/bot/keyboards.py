@@ -5,7 +5,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
-from src.core.db.models import Category, User
+from src.core.db.models import Category, Task, User
 from src.core.depends import Container
 from src.settings import settings
 
@@ -171,4 +171,15 @@ async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_task_web_app_info(task: Task) -> WebAppInfo:
+    """WebApp для отображения подробной информации о задании и фонде"""
+    return WebAppInfo(url=task.link)
+
+
+def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
+    """Клавиатура с кнопкой для отображения подробной информации о задании и фонде"""
+    keyboard = [[InlineKeyboardButton("ℹ️ Посмотреть задание", web_app=get_task_web_app_info(task))]]
     return InlineKeyboardMarkup(keyboard)
