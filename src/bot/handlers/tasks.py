@@ -1,33 +1,15 @@
 from dependency_injector.wiring import Provide
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
-from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_back_menu, view_more_tasks_keyboard
+from src.bot.constants import callback_data
+from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-from src.core.utils import display_task_verbosely, display_tasks
-
-
-@logger_decor
-async def task_details_callback(
-    update: Update,
-    context: CallbackContext,
-    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
-    help_procharity_url: str = Provide[Container.settings.provided.HELP_PROCHARITY_URL],
-):
-    query = update.callback_query
-    task_id = int(context.match.group(1))
-    task = await task_service.get_task_by_id(task_id)
-    detailed_text = display_task_verbosely(task, help_procharity_url)
-    await query.message.edit_text(
-        detailed_text,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
+from src.core.messages import display_task
 
 
 @logger_decor
@@ -37,7 +19,6 @@ async def view_task_callback(
     context: CallbackContext,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
-    help_procharity_url: str = Provide[Container.settings.provided.HELP_PROCHARITY_URL],
 ):
     telegram_id = context._user_id
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
@@ -47,15 +28,13 @@ async def view_task_callback(
     )
 
     for task in tasks_to_show:
-        message = display_tasks(task, help_procharity_url)
-        inline_keyboard = [[InlineKeyboardButton("ℹ️ Подробнее", callback_data=f"task_details_{task.id}")]]
-        reply_markup = InlineKeyboardMarkup(inline_keyboard)
+        message = display_task(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=message,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
-            reply_markup=reply_markup,
+            reply_markup=get_task_info_keyboard(task),
         )
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
     await show_next_tasks(update, context, page_number, remaining_tasks)
@@ -79,4 +58,3 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
 
 def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
-    app.add_handler(CallbackQueryHandler(task_details_callback, pattern=patterns.TASK_DETAILS))

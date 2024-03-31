@@ -140,6 +140,11 @@ class Settings(BaseSettings):
         """Получить url-ссылку на страницу базы знаний."""
         return urljoin(self.HELP_PROCHARITY_URL, "category/1876")
 
+    @property
+    def procharity_bonus_info_url(self) -> str:
+        """Получить url-ссылку на страницу с информацией о бонусах."""
+        return urljoin(self.HELP_PROCHARITY_URL, "article/6646")
+
 
 @lru_cache()
 def get_settings():
