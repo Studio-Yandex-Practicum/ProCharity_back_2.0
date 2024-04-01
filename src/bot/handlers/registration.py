@@ -8,11 +8,10 @@ from telegram.ext import Application, ChatMemberHandler, CommandHandler, Context
 from src.bot.constants import commands
 from src.bot.keyboards import get_start_keyboard
 from src.bot.services import UserService
+from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
-
-from .decorators import registered_user_required
 
 
 @logger_decor

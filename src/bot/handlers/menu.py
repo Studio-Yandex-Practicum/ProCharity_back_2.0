@@ -16,13 +16,11 @@ from src.bot.keyboards import (
 )
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
-from src.bot.utils import delete_previous_message
+from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.services.email import EmailProvider
-
-from .decorators import registered_user_required
 
 log = structlog.get_logger()
 
