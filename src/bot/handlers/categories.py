@@ -45,7 +45,6 @@ async def view_categories(
     set_has_mailing_attribute: bool = False,
 ):
     """Выводит список выбранных волонтером категорий в заданном формате и заданную клавиатуру.
-
     Если set_has_mailing_attribute=True и имеются выбранные категории, выполняется обновление флага подписки.
     """
     query = update.callback_query
@@ -74,7 +73,10 @@ async def view_old_categories_callback(
     """Выводит список выбранных волонтером категорий перед их изменением."""
     text_format = "*Твои профессиональные компетенции:*\n\n" "{categories}\n\n"
     await view_categories(
-        update, user_service, reply_markup=await get_view_categories_keyboard(), text_format=text_format
+        update,
+        user_service,
+        reply_markup=await get_view_categories_keyboard(),
+        text_format=text_format,
     )
 
 
