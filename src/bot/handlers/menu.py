@@ -24,6 +24,18 @@ from src.core.services.email import EmailProvider
 log = structlog.get_logger()
 
 
+async def menu_send_message(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService,
+):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Выбери, что тебя интересует:",
+        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
+    )
+
+
 @logger_decor
 @delete_previous_message
 async def menu_callback(
@@ -32,11 +44,7 @@ async def menu_callback(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Возвращает в меню."""
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
-    )
+    await menu_send_message(update, context, user_service)
 
 
 @logger_decor
@@ -69,6 +77,19 @@ async def set_mailing(
         parse_mode=parse_mode,
         disable_web_page_preview=True,
     )
+
+
+@logger_decor
+@delete_previous_message
+async def no_unset_mailing(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+):
+    """Отмена отписки пользователя на почтовую рассылку."""
+    telegram_id = update.effective_user.id
+    await user_service.set_mailing(telegram_id)
+    await menu_send_message(update, context, user_service)
 
 
 @logger_decor
@@ -149,5 +170,6 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
+    app.add_handler(CallbackQueryHandler(no_unset_mailing, pattern=callback_data.NO_UNSET_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
     app.add_handler(CallbackQueryHandler(support_service_callback, pattern=callback_data.SUPPORT_SERVICE))

@@ -17,6 +17,9 @@ ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", call
 ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
 UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
+NO_UNSET_SUBSCRIBE_BUTTON = [
+    InlineKeyboardButton("Не отменять подписку", callback_data=callback_data.NO_UNSET_SUBSCRIPTION)
+]
 PERSONAL_ACCOUNT_BUTTON = [
     InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
 ]
@@ -29,6 +32,9 @@ SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё зада
 
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
+]
+CHOISE_REASONS_BUTTONS = [
+    [InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS
 ]
 
 
@@ -156,7 +162,10 @@ async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
 
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
-    keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
+    keyboard = [
+        *CHOISE_REASONS_BUTTONS,
+        NO_UNSET_SUBSCRIBE_BUTTON,
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
