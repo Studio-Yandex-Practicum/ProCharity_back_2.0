@@ -54,29 +54,21 @@ async def start_command(
 @inject
 async def on_chat_member_update(
     update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    my_chat_member = update.my_chat_member or Never
-    effective_user = update.effective_user or Never
+    """Обновление статуса пользователя."""
+    my_chat_member = update.my_chat_member
+    effective_user = update.effective_user
     user = await user_service.get_by_telegram_id(effective_user.id)
 
-    if user is None:
-        return None
-
-    if (
-        my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED
-        and my_chat_member.old_chat_member.status == my_chat_member.old_chat_member.MEMBER
-    ):
-        return await user_service.bot_banned(user)
-    if (
-        my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER
-        and my_chat_member.old_chat_member.status == my_chat_member.old_chat_member.BANNED
-    ):
-        return await user_service.bot_unbanned(user)
-
-    return None
+    if user and my_chat_member and effective_user:
+        if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
+            return await user_service.bot_banned(user)
+        if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
+            return await user_service.bot_unbanned(user)
 
 
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.START, start_command))
-    app.add_handler(ChatMemberHandler(on_chat_member_update, chat_member_types=ChatMemberHandler.MY_CHAT_MEMBER))
+    app.add_handler(ChatMemberHandler(on_chat_member_update))
