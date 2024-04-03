@@ -1,5 +1,5 @@
 from dependency_injector.wiring import Provide
-from telegram import Update
+from telegram import InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
@@ -37,29 +37,45 @@ async def categories_callback(
     )
 
 
+async def view_categories(
+    update: Update,
+    user_service: UserService,
+    reply_markup: InlineKeyboardMarkup,
+    text_format: str,
+    set_has_mailing_attribute: bool = False,
+):
+    """Выводит список выбранных волонтером категорий в заданном формате и заданную клавиатуру.
+
+    Если set_has_mailing_attribute=True и имеются выбранные категории, выполняется обновление флага подписки.
+    """
+    query = update.callback_query
+    telegram_id = update.effective_user.id
+    categories = await user_service.get_user_categories(telegram_id)
+    if not categories:
+        await query.message.edit_text(
+            text="Категории не выбраны.",
+            reply_markup=reply_markup,
+        )
+    else:
+        await query.message.edit_text(
+            text=text_format.format(categories=get_marked_list(categories.values(), "🎓 ")),
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=reply_markup,
+        )
+        if set_has_mailing_attribute:
+            await user_service.check_and_set_has_mailing_atribute(telegram_id)
+
+
 async def view_old_categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Выводит список выбранных волонтером категорий перед их изменением."""
-    query = update.callback_query
-    telegram_id = update.effective_user.id
-
-    categories = await user_service.get_user_categories(telegram_id)
-    if not categories:
-        await query.message.edit_text(
-            text="Категории не выбраны.",
-            reply_markup=await get_view_categories_keyboard(),
-        )
-    else:
-        await query.message.edit_text(
-            text=(
-                "*Твои профессиональные компетенции:*\n\n" "{}\n\n".format(get_marked_list(categories.values(), "🎓 "))
-            ),
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=await get_view_categories_keyboard(),
-        )
+    text_format = "*Твои профессиональные компетенции:*\n\n" "{categories}\n\n"
+    await view_categories(
+        update, user_service, reply_markup=await get_view_categories_keyboard(), text_format=text_format
+    )
 
 
 async def confirm_categories_callback(
@@ -67,56 +83,20 @@ async def confirm_categories_callback(
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    """Записывает выбранные категории в базу данных и отправляет пользователю отчет о выбранных категориях."""
-    query = update.callback_query
-    telegram_id = update.effective_user.id
-
-    categories = await user_service.get_user_categories(telegram_id)
-    if not categories:
-        await query.message.edit_text(
-            text="Категории не выбраны.",
-            reply_markup=await get_tasks_and_open_menu_keyboard(),
-        )
-    else:
-        await query.message.edit_text(
-            text=(
-                "*Отлично!*\n\n"
-                "Теперь сюда будут приходить уведомления о новых заданиях "
-                "в следующих категориях:\n\n{}\n\n"
-                "А пока можешь посмотреть актуальные задания.".format(get_marked_list(categories.values(), "🎓 "))
-            ),
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=await get_tasks_and_open_menu_keyboard(),
-        )
-        await user_service.check_and_set_has_mailing_atribute(telegram_id)
-
-
-async def all_right_categories_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-):
-    """Отображает список текущих выбранных категорий (без изменения)."""
-    query = update.callback_query
-    telegram_id = update.effective_user.id
-
-    categories = await user_service.get_user_categories(telegram_id)
-    if not categories:
-        await query.message.edit_text(
-            text="Категории не выбраны.",
-            reply_markup=await get_tasks_and_open_menu_keyboard(),
-        )
-    else:
-        await query.message.edit_text(
-            text=(
-                "*Отлично!*\n\n"
-                "Теперь сюда будут приходить уведомления о новых заданиях "
-                "в следующих категориях:\n\n{}\n\n"
-                "А пока можешь посмотреть актуальные задания.".format(get_marked_list(categories.values(), "🎓 "))
-            ),
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=await get_tasks_and_open_menu_keyboard(),
-        )
+    """Выводит список выбранных волонтером категорий после их изменения и включает рассылку (если еще не включена)."""
+    text_format = (
+        "*Отлично!*\n\n"
+        "Теперь сюда будут приходить уведомления о новых заданиях "
+        "в следующих категориях:\n\n{categories}\n\n"
+        "А пока можешь посмотреть актуальные задания."
+    )
+    await view_categories(
+        update,
+        user_service,
+        reply_markup=await get_tasks_and_open_menu_keyboard(),
+        text_format=text_format,
+        set_has_mailing_attribute=True,
+    )
 
 
 @logger_decor
@@ -196,4 +176,3 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.CHANGE_CATEGORY))
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.GET_CATEGORIES))
     app.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES))
-    app.add_handler(CallbackQueryHandler(all_right_categories_callback, pattern=callback_data.ALL_RIGHT_CATEGORIES))
