@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete, insert, orm, select
+from sqlalchemy import delete, false, insert, orm, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
@@ -83,6 +83,13 @@ class UserRepository(AbstractRepository):
     async def get_user_categories(self, user: User) -> Sequence[Category]:
         """Возвращает список категорий пользователя."""
         user_categories = await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))
+        return user_categories.all()
+
+    async def get_user_unarchived_categories(self, user: User) -> Sequence[Category]:
+        """Возвращает список не архивных категорий пользователя."""
+        user_categories = await self._session.scalars(
+            select(Category).join(User.categories).where(User.id == user.id).where(Category.is_archived == false())
+        )
         return user_categories.all()
 
     async def set_mailing(self, user: User, has_mailing: bool) -> None:
