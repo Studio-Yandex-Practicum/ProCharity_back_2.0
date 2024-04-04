@@ -42,10 +42,10 @@ async def categories_callback(
 
 async def view_categories(
     update: Update,
-    user_service: UserService,
     reply_markup: InlineKeyboardMarkup,
     text_format: str,
     set_has_mailing_attribute: bool = False,
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Выводит список выбранных волонтером категорий в заданном формате и заданную клавиатуру.
     Если set_has_mailing_attribute=True и имеются выбранные категории, выполняется обновление флага подписки.
@@ -68,26 +68,17 @@ async def view_categories(
             await user_service.check_and_set_has_mailing_atribute(telegram_id)
 
 
-async def view_old_categories_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-):
+async def view_current_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Выводит список выбранных волонтером категорий перед их изменением."""
     text_format = "*Твои профессиональные компетенции:*\n\n" "{categories}\n\n"
     await view_categories(
         update,
-        user_service,
         reply_markup=await get_view_categories_keyboard(),
         text_format=text_format,
     )
 
 
-async def confirm_categories_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-):
+async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Выводит список выбранных волонтером категорий после их изменения и включает рассылку (если еще не включена)."""
     text_format = (
         "*Отлично!*\n\n"
@@ -97,7 +88,6 @@ async def confirm_categories_callback(
     )
     await view_categories(
         update,
-        user_service,
         reply_markup=await get_tasks_and_open_menu_keyboard(),
         text_format=text_format,
         set_has_mailing_attribute=True,
@@ -180,7 +170,7 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(subcategories_callback, pattern=patterns.SUBCATEGORIES))
     app.add_handler(CallbackQueryHandler(select_subcategory_callback, pattern=patterns.SELECT_CATEGORY))
     app.add_handler(CallbackQueryHandler(back_subcategory_callback, pattern=patterns.BACK_SUBCATEGORY))
-    app.add_handler(CallbackQueryHandler(view_old_categories_callback, pattern=callback_data.VIEW_CATEGORIES))
+    app.add_handler(CallbackQueryHandler(view_current_categories_callback, pattern=callback_data.VIEW_CATEGORIES))
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.CHANGE_CATEGORY))
     app.add_handler(CallbackQueryHandler(categories_callback, pattern=callback_data.GET_CATEGORIES))
     app.add_handler(CallbackQueryHandler(confirm_categories_callback, pattern=callback_data.CONFIRM_CATEGORIES))
