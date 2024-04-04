@@ -8,3 +8,10 @@ class TelegramNotificationUsersGroups(StrEnum):
     ALL = "all"
     SUBSCRIBED = "subscribed"
     UNSUBSCRIBED = "unsubscribed"
+
+
+class UserRoles(StrEnum):
+    """Роли пользователя в системе."""
+
+    FUND = "fund"
+    VOLUNTEER = "volunteer"
