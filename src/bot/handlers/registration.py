@@ -58,11 +58,15 @@ async def on_chat_member_update(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Обновление статуса пользователя."""
-    my_chat_member = update.my_chat_member
+    my_chat_member = update.my_chat_member or Never
+
+    if not my_chat_member or not Never:
+        return
+
     effective_user = update.effective_user or Never
     user = await user_service.get_by_telegram_id(effective_user.id)
 
-    if not my_chat_member:
+    if not user:
         return
 
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
