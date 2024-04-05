@@ -61,10 +61,9 @@ async def on_chat_member_update(
     my_chat_member = update.my_chat_member or Never
     effective_user = update.effective_user or Never
 
-    if effective_user:
+    if my_chat_member and effective_user:
         user = await user_service.get_by_telegram_id(effective_user.id)
 
-    if user and my_chat_member:
         if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
             return await user_service.bot_banned(user)
         if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
