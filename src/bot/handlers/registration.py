@@ -58,8 +58,8 @@ async def on_chat_member_update(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Обновление статуса пользователя."""
-    my_chat_member = update.my_chat_member
-    effective_user = update.effective_user
+    my_chat_member = update.my_chat_member or Never
+    effective_user = update.effective_user or Never
 
     if effective_user:
         user = await user_service.get_by_telegram_id(effective_user.id)
