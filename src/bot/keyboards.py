@@ -51,10 +51,8 @@ async def get_checked_categories_keyboard(
             button = InlineKeyboardButton(category_name, callback_data=f"category_{category_id}")
         keyboard.append([button])
 
-    keyboard.extend(
-        [
-            [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
-        ]
+    keyboard.append(
+        [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
     )
     return InlineKeyboardMarkup(keyboard)
 
