@@ -37,10 +37,10 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[str, int, int], selected_categories: dict[Category] = {}
-) -> InlineKeyboardButton:
+    categories: dict[str, int, int], selected_categories: dict[Category] = None
+) -> InlineKeyboardMarkup:
     keyboard = []
-
+    selected_categories = {} if selected_categories is None else selected_categories
     for category_name, category_id, category_children_count in categories:
         if category_id in selected_categories:
             if category_children_count == len(selected_categories[category_id]):
@@ -51,11 +51,8 @@ async def get_checked_categories_keyboard(
             button = InlineKeyboardButton(category_name, callback_data=f"category_{category_id}")
         keyboard.append([button])
 
-    keyboard.extend(
-        [
-            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
-            [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
-        ]
+    keyboard.append(
+        [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
     )
     return InlineKeyboardMarkup(keyboard)
 
@@ -66,10 +63,10 @@ async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
 
 
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = {}
+    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
     keyboard = []
-
+    selected_categories = {} if selected_categories is None else selected_categories
     for category in subcategories:
         if category.id not in selected_categories:
             button = InlineKeyboardButton(category.name, callback_data=f"select_category_{category.id}")
