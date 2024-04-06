@@ -246,16 +246,17 @@ async def filling_user_and_external_site_user_in_db(
     days_period = 90
     for id in range(1, USERS_TABLE_ROWS + 1):
         role = choice([UserRoles.FUND, UserRoles.VOLUNTEER])
+        role_field = choice([None, role])
         email = choice([None, user_fake.unique.email()])
         external_id = external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)
-        if role == UserRoles.VOLUNTEER:
+        if role_field is None:
             external_id = choice([None, external_id])
 
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
         specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3)) if role == UserRoles.VOLUNTEER else None
         user = User(
             telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
-            role=role,
+            role=role_field,
             username=user_fake.unique.user_name(),
             email=email,
             external_id=external_id,
@@ -269,7 +270,7 @@ async def filling_user_and_external_site_user_in_db(
         if user.external_id is not None:
             external_user = ExternalSiteUser(
                 external_id=external_id,
-                role=role,
+                role=role_field,
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=email,
