@@ -24,8 +24,8 @@ async def start_command(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
 ):
-    telegram_user = update.effective_user
-    await user_service.register_or_update_user(ext_site_user, telegram_user)
+    telegram_user = update.effective_user or Never
+    await user_service.register_user(ext_site_user, telegram_user)
     keyboard = await get_start_keyboard()
     await context.bot.send_message(
         chat_id=telegram_user.id,

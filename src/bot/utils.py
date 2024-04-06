@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Iterable, ParamSpec, Protocol, TypeVar
+from typing import Iterable, Never, ParamSpec, Protocol, TypeVar
 
 from dependency_injector.wiring import Provide, inject
 from telegram import Update
@@ -55,7 +55,7 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
         *args,
         **kwargs,
     ):
-        telegram_user = update.effective_user
+        telegram_user = update.effective_user or Never
         id_hash = context.args[0] if context.args and len(context.args) == 1 else None
         ext_site_user = (
             await ext_site_user_service.get_by_id_hash(id_hash)

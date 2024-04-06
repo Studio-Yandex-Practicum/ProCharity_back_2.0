@@ -20,34 +20,38 @@ class UserService:
             setattr(user, attr, attrs[attr])
         return await self._user_repository.update(user.id, user)
 
-    async def register_or_update_user(
+    async def register_user(
         self,
         ext_site_user: ExternalSiteUser,
         telegram_user: TelegramUser,
     ) -> User:
-        """Регистрирует нового пользователя, а если он уже есть, то обновляет его данные."""
+        """Регистрирует нового пользователя, если он ещё не зарегистрирован."""
         telegram_id = telegram_user.id
         user = ext_site_user.user
         user_by_telegram_id = await self._user_repository.get_by_telegram_id(telegram_id)
+        do_update_or_create = False
         if user:
-            if user.telegram_id != telegram_id and user_by_telegram_id:
+            if user.telegram_id != telegram_id:
                 await self._update_or_create(user, external_id=None)
                 user = user_by_telegram_id
+                do_update_or_create = True
 
-        elif user_by_telegram_id:
+        else:
             user = user_by_telegram_id
+            do_update_or_create = True
 
-        user = await self._update_or_create(
-            user,
-            telegram_id=telegram_id,
-            external_id=ext_site_user.id,
-            first_name=ext_site_user.first_name or telegram_user.first_name,
-            last_name=ext_site_user.last_name or telegram_user.last_name,
-            username=telegram_user.username,
-            email=ext_site_user.email,
-        )
-        if ext_site_user.specializations:
-            await self.set_categories_to_user(user.id, ext_site_user.specializations)
+        if do_update_or_create:
+            user = await self._update_or_create(
+                user,
+                telegram_id=telegram_id,
+                external_id=ext_site_user.id,
+                first_name=ext_site_user.first_name or telegram_user.first_name,
+                last_name=ext_site_user.last_name or telegram_user.last_name,
+                username=telegram_user.username,
+                email=ext_site_user.email,
+            )
+            if ext_site_user.specializations:
+                await self.set_categories_to_user(user.id, ext_site_user.specializations)
 
         return user
 
