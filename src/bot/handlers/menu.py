@@ -45,19 +45,21 @@ async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
+    tasks_procharity_url: str = Provide[Container.settings.provided.TASKS_PROCHARITY_URL],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
-    has_mailing = await user_service.set_mailing(telegram_id)
-    if has_mailing:
-        text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
+    has_mailing = await user_service.get_mailing(telegram_id)
+    if not has_mailing:
+        await user_service.set_mailing(telegram_id)
+        text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
     else:
         text = (
-            "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-            f'<a href="{procharity_url}">ProCharity</a>.\n\n'
+            "<b>Подписка остановлена!</b>\n\n"
+            "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их в меню бота или "
+            f'<a href="{tasks_procharity_url}">на сайте</a>.\n\n'
             "Поделись, пожалуйста, почему ты решил отписаться?"
         )
         keyboard = get_no_mailing_keyboard()
@@ -72,7 +74,6 @@ async def set_mailing(
 
 
 @logger_decor
-@delete_previous_message
 async def reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
@@ -83,37 +84,27 @@ async def reason_handler(
     email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
     email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
 ):
+    """Выключение подписки пользователя и отправка сообщения с причиной на почту."""
+    telegram_id = update.effective_user.id
+    await user_service.set_mailing(telegram_id)
+    query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
-
-    if reason == enum.REASONS.no_unset_subscribe:
-        telegram_id = update.effective_user.id
-        await user_service.set_mailing(telegram_id)
-
-        text = "Выбери, что тебя интересует:"
-        reply_markup = await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id))
-    else:
-        text = "Спасибо, я передал информацию команде ProCharity!"
-        reply_markup = await get_back_menu()
-
-        await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
-        background_task = email_provider.unsubscribe_notification(
-            user_name=update.effective_user.username,
-            user_id=update.effective_user.id,
-            reason=reason,
-            to_email=email_admin,
-        )
-        asyncio.create_task(background_task)
-        await log.ainfo(
-            f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
-            f"рассылки по причине: {reason}"
-        )
-
-    await context.bot.send_message(
-        chat_id=update.effective_user.id,
-        text=text,
-        reply_markup=reply_markup,
+    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
+    background_task = email_provider.unsubscribe_notification(
+        user_name=update.effective_user.username,
+        user_id=update.effective_user.id,
+        reason=reason,
+        to_email=email_admin,
+    )
+    asyncio.create_task(background_task)
+    await log.ainfo(
+        f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
+        f"рассылки по причине: {reason}"
+    )
+    await query.message.edit_text(
+        text="Спасибо, я передал информацию команде ProCharity!",
+        reply_markup=await get_back_menu(),
         parse_mode=ParseMode.MARKDOWN,
-        disable_web_page_preview=True,
     )
 
 
