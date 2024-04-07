@@ -24,18 +24,6 @@ from src.core.services.email import EmailProvider
 log = structlog.get_logger()
 
 
-async def menu_send_message(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService,
-):
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
-    )
-
-
 @logger_decor
 @delete_previous_message
 async def menu_callback(
@@ -44,7 +32,11 @@ async def menu_callback(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
     """Возвращает в меню."""
-    await menu_send_message(update, context, user_service)
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Выбери, что тебя интересует:",
+        reply_markup=await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
+    )
 
 
 @logger_decor
@@ -81,45 +73,47 @@ async def set_mailing(
 
 @logger_decor
 @delete_previous_message
-async def no_unset_mailing(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-):
-    """Отмена отписки пользователя на почтовую рассылку."""
-    telegram_id = update.effective_user.id
-    await user_service.set_mailing(telegram_id)
-    await menu_send_message(update, context, user_service)
-
-
-@logger_decor
 async def reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     unsubscribe_reason_service: UnsubscribeReasonService = Provide[
         Container.bot_services_container.unsubscribe_reason_service
     ],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
     email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
 ):
-    query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
-    await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
-    background_task = email_provider.unsubscribe_notification(
-        user_name=update.effective_user.username,
-        user_id=update.effective_user.id,
-        reason=reason,
-        to_email=email_admin,
-    )
-    asyncio.create_task(background_task)
-    await log.ainfo(
-        f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
-        f"рассылки по причине: {reason}"
-    )
-    await query.message.edit_text(
-        text="Спасибо, я передал информацию команде ProCharity!",
-        reply_markup=await get_back_menu(),
+
+    if reason == enum.REASONS.no_unset_subscribe:
+        telegram_id = update.effective_user.id
+        await user_service.set_mailing(telegram_id)
+
+        text = "Выбери, что тебя интересует:"
+        reply_markup = await get_menu_keyboard(await user_service.get_by_telegram_id(update.effective_user.id))
+    else:
+        text = "Спасибо, я передал информацию команде ProCharity!"
+        reply_markup = await get_back_menu()
+
+        await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
+        background_task = email_provider.unsubscribe_notification(
+            user_name=update.effective_user.username,
+            user_id=update.effective_user.id,
+            reason=reason,
+            to_email=email_admin,
+        )
+        asyncio.create_task(background_task)
+        await log.ainfo(
+            f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
+            f"рассылки по причине: {reason}"
+        )
+
+    await context.bot.send_message(
+        chat_id=update.effective_user.id,
+        text=text,
+        reply_markup=reply_markup,
         parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
     )
 
 
@@ -170,6 +164,5 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
-    app.add_handler(CallbackQueryHandler(no_unset_mailing, pattern=callback_data.NO_UNSET_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
     app.add_handler(CallbackQueryHandler(support_service_callback, pattern=callback_data.SUPPORT_SERVICE))
