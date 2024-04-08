@@ -85,7 +85,7 @@ class UserRepository(AbstractRepository):
         user_categories = await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))
         return user_categories.all()
 
-    async def set_mailing(self, user: User, has_mailing: bool) -> None:
+    async def toggle_mailing(self, user: User, has_mailing: bool) -> None:
         """
         Присваивает пользователю статус получения
         почтовой рассылки на задания.
