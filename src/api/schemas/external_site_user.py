@@ -2,6 +2,7 @@ from pydantic import Field, field_validator
 
 from src.api.schemas.base import RequestBase
 from src.core.db.models import ExternalSiteUser
+from src.core.enums import UserRoles
 
 
 class ExternalSiteUserRequest(RequestBase):
@@ -16,6 +17,7 @@ class ExternalSiteUserRequest(RequestBase):
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
+            role=UserRoles.VOLUNTEER,
             external_id=self.user_id,
             id_hash=self.id_hash,
             email=self.email,
