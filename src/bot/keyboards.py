@@ -4,20 +4,32 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
-from src.core.db.models import Category, User
+from src.core.db.models import Category, Task, User
 from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
-CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.CHANGE_CATEGORY)]
-ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
-UNSUBSCRIBE_BUTTON = [
-    InlineKeyboardButton("⏹️ Отменить подписку на задания", callback_data=callback_data.JOB_SUBSCRIPTION)
+VIEW_CURRENT_TASKS_BUTTON = [
+    InlineKeyboardButton("Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)
 ]
+VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
+CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
+ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.MENU)]
+ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
+UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
-    InlineKeyboardButton("🚪 Перейти в личный кабинет", url="https://procharity.ru/volunteers/settings/")
+    InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
 ]
-OPEN_MENU_BUTTON = [InlineKeyboardButton(text="Открыть меню", callback_data=callback_data.MENU)]
+OPEN_MENU_BUTTON = [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
+RETURN_MENU_BUTTON = [InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU)]
+CHECK_CATEGORIES_BUTTON = [
+    InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
+]
+SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
+
+SUPPORT_SERVICE_BUTTON = [
+    InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
+]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -25,10 +37,10 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[str, int, int], selected_categories: dict[Category] = {}
-) -> InlineKeyboardButton:
+    categories: dict[str, int, int], selected_categories: dict[Category] = None
+) -> InlineKeyboardMarkup:
     keyboard = []
-
+    selected_categories = {} if selected_categories is None else selected_categories
     for category_name, category_id, category_children_count in categories:
         if category_id in selected_categories:
             if category_children_count == len(selected_categories[category_id]):
@@ -39,20 +51,22 @@ async def get_checked_categories_keyboard(
             button = InlineKeyboardButton(category_name, callback_data=f"category_{category_id}")
         keyboard.append([button])
 
-    keyboard.extend(
-        [
-            [InlineKeyboardButton("Нет моих компетенций 😕", callback_data=callback_data.ADD_CATEGORIES)],
-            [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
-        ]
+    keyboard.append(
+        [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_CATEGORIES)],
     )
     return InlineKeyboardMarkup(keyboard)
 
 
+async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [ALL_RIGHT_CATEGORY_BUTTON, CHANGE_CATEGORY_BUTTON]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = {}
+    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
     keyboard = []
-
+    selected_categories = {} if selected_categories is None else selected_categories
     for category in subcategories:
         if category.id not in selected_categories:
             button = InlineKeyboardButton(category.name, callback_data=f"select_category_{category.id}")
@@ -64,12 +78,20 @@ async def get_subcategories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
+async def support_service_keyboard(user: User) -> InlineKeyboardMarkup:
+    keyboard = [
+        get_support_service_button(user),
+        [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
         VIEW_TASKS_BUTTON,
-        get_support_service_button(user),
+        SUPPORT_SERVICE_BUTTON,
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
-        CHANGE_CATEGORY_BUTTON,
+        VIEW_CATEGORIES_BUTTON,
         PERSONAL_ACCOUNT_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -91,21 +113,23 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
 
 
 async def get_back_menu() -> InlineKeyboardMarkup:
-    keyboard = [[InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)]]
+    keyboard = [
+        RETURN_MENU_BUTTON,
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
 async def get_start_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)],
+        CHECK_CATEGORIES_BUTTON,
         OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
+async def get_tasks_and_open_menu_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton("Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)],
+        VIEW_CURRENT_TASKS_BUTTON,
         OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -113,8 +137,16 @@ async def get_open_tasks_and_menu_keyboard() -> InlineKeyboardMarkup:
 
 async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
     keyboard = [
-        [InlineKeyboardButton(text="Показать ещё задания", callback_data=callback_data.VIEW_TASKS)],
+        SHOW_MORE_TASKS_BUTTON,
         OPEN_MENU_BUTTON,
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        VIEW_TASKS_BUTTON,
+        RETURN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -122,4 +154,15 @@ async def view_more_tasks_keyboard() -> InlineKeyboardMarkup:
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_task_web_app_info(task: Task) -> WebAppInfo:
+    """WebApp для отображения подробной информации о задании и фонде"""
+    return WebAppInfo(url=task.link)
+
+
+def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
+    """Клавиатура с кнопкой для отображения подробной информации о задании и фонде"""
+    keyboard = [[InlineKeyboardButton("ℹ️ Посмотреть задание", web_app=get_task_web_app_info(task))]]
     return InlineKeyboardMarkup(keyboard)

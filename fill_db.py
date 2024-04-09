@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.core.db import get_session
 from src.core.db.models import Category, ExternalSiteUser, Task, UnsubscribeReason, User
+from src.core.enums import UserRoles
 
 CHARACTERS = string.ascii_uppercase + string.digits
 CATEGORIES_FILL_DATA = []
@@ -228,7 +229,7 @@ async def filling_task_in_db(
                     title=title,
                     bonus=randint(1, 4) + randint(1, 4),
                     location=f"{choice(TEST_LOCATION)}",
-                    link=f"http://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
+                    link=f"https://example.com/task/" f"{''.join(choices(CHARACTERS, k=6))}",
                     description=f"Описание {title}",
                     is_archived=choice([True, False]),
                 )
@@ -244,12 +245,18 @@ async def filling_user_and_external_site_user_in_db(
     external_id_fake = Faker()
     days_period = 90
     for id in range(1, USERS_TABLE_ROWS + 1):
+        role = choice([UserRoles.FUND, UserRoles.VOLUNTEER])
+        role_field = choice([None, role])
         email = choice([None, user_fake.unique.email()])
-        external_id = choice([None, external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)])
+        external_id = external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)
+        if role_field is None:
+            external_id = choice([None, external_id])
+
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
-        specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3))
+        specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3)) if role == UserRoles.VOLUNTEER else None
         user = User(
             telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
+            role=role_field,
             username=user_fake.unique.user_name(),
             email=email,
             external_id=external_id,
@@ -263,6 +270,7 @@ async def filling_user_and_external_site_user_in_db(
         if user.external_id is not None:
             external_user = ExternalSiteUser(
                 external_id=external_id,
+                role=role_field,
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=email,
