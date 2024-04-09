@@ -29,7 +29,7 @@ async def categories_callback(
     categories = await category_service.get_unarchived_parents_with_children_count()
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(
         update.effective_user.id,
-        filter_archived=True,
+        without_archived=True,
     )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -52,7 +52,7 @@ async def view_categories(
     """
     query = update.callback_query
     telegram_id = update.effective_user.id
-    categories = await user_service.get_user_categories(telegram_id, filter_archived=True)
+    categories = await user_service.get_user_categories(telegram_id, without_archived=True)
     if not categories:
         await query.message.edit_text(
             text="Категории не выбраны.",
@@ -105,7 +105,7 @@ async def subcategories_callback(
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
-    selected_categories = await user_service.get_user_categories(update.effective_user.id, filter_archived=True)
+    selected_categories = await user_service.get_user_categories(update.effective_user.id, without_archived=True)
 
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
@@ -124,7 +124,7 @@ async def select_subcategory_callback(
 ):
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
-    selected_categories = await user_service.get_user_categories(update.effective_user.id, filter_archived=True)
+    selected_categories = await user_service.get_user_categories(update.effective_user.id, without_archived=True)
 
     if subcategory_id not in selected_categories:
         selected_categories[subcategory_id] = None
@@ -155,7 +155,7 @@ async def back_subcategory_callback(
     categories = await category_service.get_unarchived_parents_with_children_count()
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(
         update.effective_user.id,
-        filter_archived=True,
+        without_archived=True,
     )
 
     await query.message.edit_text(
