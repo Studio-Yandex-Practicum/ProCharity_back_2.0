@@ -18,6 +18,7 @@ class UserService:
 
         for attr in attrs:
             setattr(user, attr, attrs[attr])
+
         return await self._user_repository.update(user.id, user)
 
     async def register_user(
