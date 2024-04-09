@@ -11,6 +11,7 @@ class UserService:
         self,
         telegram_id: int,
         external_id: int,
+        role: str,
         first_name: str,
         last_name: str | None = None,
         username: str | None = None,
@@ -25,6 +26,7 @@ class UserService:
             return await self._user_repository.create(
                 User(
                     telegram_id=telegram_id,
+                    role=role,
                     username=username,
                     first_name=first_name,
                     last_name=last_name,
@@ -52,6 +54,7 @@ class UserService:
         user = await self._register_or_update_user(
             telegram_id=telegram_id,
             external_id=ext_site_user.id,
+            role=ext_site_user.role,
             first_name=ext_site_user.first_name or first_name,
             last_name=ext_site_user.last_name or last_name,
             username=username,
