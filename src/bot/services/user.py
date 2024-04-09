@@ -114,7 +114,7 @@ class UserService:
         Возвращает статус подписки пользователя на почтовую рассылку.
         """
         user = await self._user_repository.get_by_telegram_id(telegram_id)
-        await self._user_repository.toggle_mailing(user, not user.has_mailing)
+        await self._user_repository.set_mailing(user, not user.has_mailing)
         return user.has_mailing
 
     async def check_and_set_has_mailing_atribute(self, telegram_id: int) -> None:
@@ -126,7 +126,7 @@ class UserService:
         """
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         if not user.has_mailing:
-            await self._user_repository.toggle_mailing(user, True)
+            await self._user_repository.set_mailing(user, True)
 
     async def get_by_telegram_id(self, telegram_id: int) -> User:
         """Оборачивает одноименную функцию из UserRepository."""
