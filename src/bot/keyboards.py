@@ -57,7 +57,7 @@ async def get_checked_categories_keyboard(
 
 
 async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
-    keyboard = [[*ALL_RIGHT_CATEGORY_BUTTON, *CHANGE_CATEGORY_BUTTON]]
+    keyboard = [ALL_RIGHT_CATEGORY_BUTTON, CHANGE_CATEGORY_BUTTON]
     return InlineKeyboardMarkup(keyboard)
 
 
