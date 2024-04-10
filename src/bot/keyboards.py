@@ -13,7 +13,7 @@ VIEW_CURRENT_TASKS_BUTTON = [
 ]
 VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
-ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.ALL_RIGHT_CATEGORIES)]
+ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.MENU)]
 UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
@@ -40,6 +40,7 @@ async def get_checked_categories_keyboard(
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
+    print(type(categories))
     for category_name, category_id, category_children_count in categories:
         if category_id in selected_categories:
             if category_children_count == len(selected_categories[category_id]):
