@@ -92,3 +92,10 @@ class UserRepository(AbstractRepository):
         """
         user.has_mailing = has_mailing
         await self.update(user.id, user)
+
+    async def set_role(self, user: User, role: str) -> None:
+        """
+        Присваивает пользователю роль.
+        """
+        user.role = role
+        await self.update(user.id, user)

@@ -5,14 +5,19 @@ from src.core.db.models import ExternalSiteUser
 from src.core.enums import UserRoles
 
 
-class ExternalSiteUserRequest(RequestBase):
-    """Класс модели запроса для ExternalSiteUser."""
+class BaseExternalSiteUserRequest(RequestBase):
+    """Базовый класс модели запроса для ExternalSiteUser."""
 
     user_id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
     first_name: str | None = Field(None, max_length=64)
     last_name: str | None = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
+
+
+class ExternalSiteUserRequest(BaseExternalSiteUserRequest):
+    """Класс модели запроса для ExternalSiteUser (Volunteer)."""
+
     specializations: list[int] | None = None
 
     def to_orm(self) -> ExternalSiteUser:
@@ -37,3 +42,17 @@ class ExternalSiteUserRequest(RequestBase):
             raise ValueError(
                 'Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3"'
             ) from exc
+
+
+class ExternalSiteFundRequest(BaseExternalSiteUserRequest):
+    """Класс модели запроса для ExternalSiteUser (Fund)."""
+
+    def to_orm(self) -> ExternalSiteUser:
+        return ExternalSiteUser(
+            role=UserRoles.FUND,
+            external_id=self.user_id,
+            id_hash=self.id_hash,
+            email=self.email,
+            first_name=self.first_name,
+            last_name=self.last_name,
+        )

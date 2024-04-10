@@ -2,7 +2,7 @@ from .admin import AdminUserRequest
 from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCancelingStatistics
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
-from .external_site_user import ExternalSiteUser, ExternalSiteUserRequest
+from .external_site_user import ExternalSiteFundRequest, ExternalSiteUser, ExternalSiteUserRequest
 from .feedback import FeedbackSchema
 from .health_check import BotStatus, CommitStatus, DBStatus, HealthCheck
 from .notification import (
@@ -29,6 +29,7 @@ __all__ = (
     "CategoryResponse",
     "ExternalSiteUser",
     "ExternalSiteUserRequest",
+    "ExternalSiteFundRequest",
     "BotStatus",
     "CommitStatus",
     "DBStatus",
