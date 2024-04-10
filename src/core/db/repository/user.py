@@ -80,16 +80,18 @@ class UserRepository(AbstractRepository):
             .where(UsersCategories.category_id == category_id)
         )
 
-    async def get_user_categories(self, user: User) -> Sequence[Category]:
-        """Возвращает список категорий пользователя."""
-        user_categories = await self._session.scalars(select(Category).join(User.categories).where(User.id == user.id))
-        return user_categories.all()
-
-    async def get_user_unarchived_categories(self, user: User) -> Sequence[Category]:
-        """Возвращает список не архивных категорий пользователя."""
-        user_categories = await self._session.scalars(
-            select(Category).join(User.categories).where(User.id == user.id).where(Category.is_archived == false())
-        )
+    async def get_user_categories(self, user: User, with_archived=False) -> Sequence[Category]:
+        """Возвращает список категорий пользователя.
+        Если with_archived=True, возвращаются все категории, включая архивные.
+        """
+        if with_archived:
+            user_categories = await self._session.scalars(
+                select(Category).join(User.categories).where(User.id == user.id)
+            )
+        else:
+            user_categories = await self._session.scalars(
+                select(Category).join(User.categories).where(User.id == user.id).where(Category.is_archived == false())
+            )
         return user_categories.all()
 
     async def set_mailing(self, user: User, has_mailing: bool) -> None:
