@@ -168,6 +168,7 @@ async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
+    keyboard.append([InlineKeyboardButton("↩️ Не отменять подписку", callback_data=callback_data.MENU)])
     return InlineKeyboardMarkup(keyboard)
 
 
