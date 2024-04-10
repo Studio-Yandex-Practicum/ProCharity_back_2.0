@@ -36,6 +36,16 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
     return [InlineKeyboardButton("✍ Написать в службу поддержки", web_app=get_feedback_web_app_info(user))]
 
 
+async def tasks_again_get_back_menu():
+    keyboard = [
+        [
+            InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU),
+            InlineKeyboardButton("Посмотреть задания еще раз", callback_data=callback_data.VIEW_TASKS_AGAIN),
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_checked_categories_keyboard(
     categories: dict[str, int, int], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
