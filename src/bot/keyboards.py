@@ -26,7 +26,6 @@ CHECK_CATEGORIES_BUTTON = [
     InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
 ]
 SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
-
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
 ]
@@ -154,6 +153,7 @@ async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
+    keyboard.append([InlineKeyboardButton("↩️ Не отменять подписку", callback_data=callback_data.MENU)])
     return InlineKeyboardMarkup(keyboard)
 
 

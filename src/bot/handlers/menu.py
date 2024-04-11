@@ -45,19 +45,21 @@ async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
-    procharity_url: str = Provide[Container.settings.provided.PROCHARITY_URL],
+    procharity_tasks_url: str = Provide[Container.settings.provided.procharity_tasks_url],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
-    has_mailing = await user_service.set_mailing(telegram_id)
-    if has_mailing:
-        text = "Отлично! Теперь я буду присылать тебе уведомления о новых заданиях на почту."
+    has_mailing = await user_service.get_mailing(telegram_id)
+    if not has_mailing:
+        await user_service.toggle_mailing(telegram_id)
+        text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
     else:
         text = (
-            "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их на сайте "
-            f'<a href="{procharity_url}">ProCharity</a>.\n\n'
+            "<b>Подписка остановлена!</b>\n\n"
+            "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их в меню бота или "
+            f'<a href="{procharity_tasks_url}">на сайте</a>.\n\n'
             "Поделись, пожалуйста, почему ты решил отписаться?"
         )
         keyboard = get_no_mailing_keyboard()
@@ -72,15 +74,19 @@ async def set_mailing(
 
 
 @logger_decor
-async def reason_handler(
+async def unsubscription_reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     unsubscribe_reason_service: UnsubscribeReasonService = Provide[
         Container.bot_services_container.unsubscribe_reason_service
     ],
+    user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
     email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
 ):
+    """Выключение подписки пользователя и отправка сообщения с причиной на почту."""
+    telegram_id = update.effective_user.id
+    await user_service.toggle_mailing(telegram_id)
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
     await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
@@ -149,5 +155,5 @@ def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
     app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
-    app.add_handler(CallbackQueryHandler(reason_handler, pattern=patterns.NO_MAILING_REASON))
+    app.add_handler(CallbackQueryHandler(unsubscription_reason_handler, pattern=patterns.NO_MAILING_REASON))
     app.add_handler(CallbackQueryHandler(support_service_callback, pattern=callback_data.SUPPORT_SERVICE))

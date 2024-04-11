@@ -21,11 +21,22 @@ async def view_task_callback(
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
     telegram_id = context._user_id
+    page_number = context.user_data.get("page_number", 1)
+
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
-        context.user_data.get("page_number", 1),
+        page_number,
         limit,
         telegram_id,
     )
+
+    if not tasks_to_show and page_number == 1:
+        keyboard = await get_back_menu()
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Актуальных заданий по твоим компетенциям на сегодня нет.",
+            reply_markup=keyboard,
+        )
+        return
 
     for task in tasks_to_show:
         message = display_task(task)
