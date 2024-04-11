@@ -14,22 +14,26 @@ class BaseExternalSiteUserRequest(RequestBase):
     last_name: str | None = Field(None, max_length=64)
     email: str = Field(..., max_length=48)
 
-
-class ExternalSiteUserRequest(BaseExternalSiteUserRequest):
-    """Класс модели запроса для ExternalSiteUser (Volunteer)."""
-
-    specializations: list[int] | None = None
-
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
-            role=UserRoles.VOLUNTEER,
             external_id=self.user_id,
             id_hash=self.id_hash,
             email=self.email,
             first_name=self.first_name,
             last_name=self.last_name,
-            specializations=self.specializations,
         )
+
+
+class ExternalSiteVolunteerRequest(BaseExternalSiteUserRequest):
+    """Класс модели запроса для ExternalSiteUser (Volunteer)."""
+
+    specializations: list[int] | None = None
+
+    def to_orm(self) -> ExternalSiteUser:
+        to_orm = super().to_orm()
+        to_orm.role = UserRoles.VOLUNTEER
+        to_orm.specializations = self.specializations
+        return to_orm
 
     @field_validator("specializations", mode="before")
     def specializations_str_validation(cls, value: str):
@@ -48,11 +52,6 @@ class ExternalSiteFundRequest(BaseExternalSiteUserRequest):
     """Класс модели запроса для ExternalSiteUser (Fund)."""
 
     def to_orm(self) -> ExternalSiteUser:
-        return ExternalSiteUser(
-            role=UserRoles.FUND,
-            external_id=self.user_id,
-            id_hash=self.id_hash,
-            email=self.email,
-            first_name=self.first_name,
-            last_name=self.last_name,
-        )
+        to_orm = super().to_orm()
+        to_orm.role = UserRoles.FUND
+        return to_orm
