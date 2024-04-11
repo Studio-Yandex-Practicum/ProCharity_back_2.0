@@ -36,11 +36,10 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[str, int, int], selected_categories: dict[Category] = None
+    categories: list[str, int, int], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
-    print(type(categories))
     for category_name, category_id, category_children_count in categories:
         if category_id in selected_categories:
             if category_children_count == len(selected_categories[category_id]):
@@ -63,7 +62,9 @@ async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
 
 
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = None
+    parent_id: int,
+    subcategories: list[Category],
+    selected_categories: dict[Category] = None,
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
