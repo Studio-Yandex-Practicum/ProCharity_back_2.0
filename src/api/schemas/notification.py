@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from src.api.schemas.base import RequestBase
 from src.core.enums import TelegramNotificationUsersGroups
 
+from .tasks import TaskRequest
+
 
 class FeedbackFormQueryParams(BaseModel):
     """Класс формирования параметров запроса для формы обратной связи."""
@@ -14,6 +16,15 @@ class FeedbackFormQueryParams(BaseModel):
     name: str | None
     surname: str | None
     email: str | None
+
+    def as_url_query(self):
+        return f"?{urllib.parse.urlencode(self.model_dump(exclude_none=True))}"
+
+
+class TaskInfoPageQueryParams(TaskRequest):
+    """Класс формирования параметров запроса для страницы с информацией о задании."""
+
+    category: str
 
     def as_url_query(self):
         return f"?{urllib.parse.urlencode(self.model_dump(exclude_none=True))}"

@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
-from src.api.schemas import FeedbackFormQueryParams
+from src.api.schemas import FeedbackFormQueryParams, TaskInfoPageQueryParams
 from src.bot.constants import callback_data, enum
 from src.core.db.models import Category, Task, User
 from src.settings import settings
@@ -159,7 +159,13 @@ def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
 
 def get_task_web_app_info(task: Task) -> WebAppInfo:
     """WebApp для отображения подробной информации о задании и фонде"""
-    return WebAppInfo(url=task.link)
+    # return WebAppInfo(url=task.link)
+    url = urljoin(
+        settings.task_info_page_template_url,
+        TaskInfoPageQueryParams(id=task.id, title=task.title, category="XXX").as_url_query(),
+    )
+    print(f"********* {url=}")
+    return WebAppInfo(url=url)
 
 
 def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
