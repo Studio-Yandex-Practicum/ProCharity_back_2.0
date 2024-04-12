@@ -82,8 +82,8 @@ class UserRepository(AbstractRepository):
         )
 
     @auto_commit
-    async def delete_all_categorys_from_user(self, user: User) -> None:
-        """Удаляет все категорию у пользователя."""
+    async def delete_all_categories_from_user(self, user: User) -> None:
+        """Удаляет все категории у пользователя."""
         await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user.id))
 
     async def get_user_categories(self, user: User) -> Sequence[Category]:
