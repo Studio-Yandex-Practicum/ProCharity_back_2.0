@@ -31,10 +31,13 @@ class ExternalSiteUserService:
             site_user.user.first_name = site_user_schema.first_name
             site_user.user.last_name = site_user_schema.last_name
 
-            if isinstance(site_user_schema, ExternalSiteVolunteerRequest):
+            if site_user.role == UserRoles.VOLUNTEER:
                 site_user.user.role = UserRoles.VOLUNTEER
                 await self._user_repository.set_categories_to_user(site_user.user.id, site_user_schema.specializations)
             else:
                 site_user.user.role = UserRoles.FUND
+                await self._user_repository.delete_all_categorys_from_user(site_user.user)
+
+                site_user.specializations = None
 
             await self._user_repository.update(site_user.user.id, site_user.user)
