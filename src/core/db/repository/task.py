@@ -65,3 +65,8 @@ class TaskRepository(ContentRepository):
         """Получить список задач по ids из категорий на которые подписан пользователь."""
         tasks = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
         return tasks.all()
+
+    async def get_tasks_by_filter(self, **filter_by) -> Sequence[Task]:
+        """Получить список задач по заданному фильтру полей."""
+        tasks = await self._session.scalars(select(Task).filter_by(**filter_by))
+        return tasks.all()
