@@ -112,27 +112,6 @@ async def unsubscription_reason_handler(
 
 @logger_decor
 @delete_previous_message
-async def about_project(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    ya_praktikum_url: str = Provide[Container.settings.provided.YA_PRAKTIKUM_URL],
-):
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="С ProCharity профессионалы могут помочь некоммерческим "
-        "организациям в вопросах, которые требуют специальных знаний и "
-        "опыта.\n\nИнтеллектуальный волонтёр безвозмездно дарит фонду своё "
-        "время и профессиональные навыки, позволяя решать задачи, "
-        "которые трудно закрыть силами штатных сотрудников.\n\n"
-        f'Сделано студентами <a href="{ya_praktikum_url}">Яндекс.Практикума.</a>',
-        reply_markup=await get_back_menu(),
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
-
-
-@logger_decor
-@delete_previous_message
 async def support_service_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
@@ -155,7 +134,6 @@ async def support_service_callback(
 def registration_handlers(app: Application):
     app.add_handler(CommandHandler(commands.MENU, menu_callback))
     app.add_handler(CallbackQueryHandler(menu_callback, pattern=callback_data.MENU))
-    app.add_handler(CallbackQueryHandler(about_project, pattern=callback_data.ABOUT_PROJECT))
     app.add_handler(CallbackQueryHandler(set_mailing, pattern=callback_data.JOB_SUBSCRIPTION))
     app.add_handler(CallbackQueryHandler(unsubscription_reason_handler, pattern=patterns.NO_MAILING_REASON))
     app.add_handler(CallbackQueryHandler(support_service_callback, pattern=callback_data.SUPPORT_SERVICE))
