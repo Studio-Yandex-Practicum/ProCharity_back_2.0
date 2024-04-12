@@ -54,4 +54,5 @@ class ExternalSiteFundRequest(BaseExternalSiteUserRequest):
     def to_orm(self) -> ExternalSiteUser:
         user_orm = super().to_orm()
         user_orm.role = UserRoles.FUND
+        user_orm.specializations = None
         return user_orm
