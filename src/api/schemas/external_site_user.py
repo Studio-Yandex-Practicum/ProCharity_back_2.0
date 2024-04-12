@@ -6,7 +6,7 @@ from src.core.enums import UserRoles
 
 
 class BaseExternalSiteUserRequest(RequestBase):
-    """Базовый класс модели запроса для ExternalSiteUser."""
+    """Базовый класс схемы запроса для ExternalSiteUser."""
 
     user_id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
@@ -25,15 +25,15 @@ class BaseExternalSiteUserRequest(RequestBase):
 
 
 class ExternalSiteVolunteerRequest(BaseExternalSiteUserRequest):
-    """Класс модели запроса для ExternalSiteUser (Volunteer)."""
+    """Класс схемы запроса для ExternalSiteUser (Volunteer)."""
 
     specializations: list[int] | None = None
 
     def to_orm(self) -> ExternalSiteUser:
-        to_orm = super().to_orm()
-        to_orm.role = UserRoles.VOLUNTEER
-        to_orm.specializations = self.specializations
-        return to_orm
+        user_orm = super().to_orm()
+        user_orm.role = UserRoles.VOLUNTEER
+        user_orm.specializations = self.specializations
+        return user_orm
 
     @field_validator("specializations", mode="before")
     def specializations_str_validation(cls, value: str):
@@ -49,9 +49,9 @@ class ExternalSiteVolunteerRequest(BaseExternalSiteUserRequest):
 
 
 class ExternalSiteFundRequest(BaseExternalSiteUserRequest):
-    """Класс модели запроса для ExternalSiteUser (Fund)."""
+    """Класс схемы запроса для ExternalSiteUser (Fund)."""
 
     def to_orm(self) -> ExternalSiteUser:
-        to_orm = super().to_orm()
-        to_orm.role = UserRoles.FUND
-        return to_orm
+        user_orm = super().to_orm()
+        user_orm.role = UserRoles.FUND
+        return user_orm
