@@ -20,11 +20,16 @@ async def actualize_tasks(
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
+    trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ) -> None:
+    unchanged_task_ids = set(await task_service.get_unchanged_task_ids(tasks.root, trigger_mailing_fields))
     new_tasks_ids = await task_service.actualize_objects(tasks.root, Task)
-    new_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids)
-    for task in new_category_tasks:
-        message = display_task(task)
+    unchanged_and_new_tasks = set(new_tasks_ids) | unchanged_task_ids
+    updated_tasks_ids = [task.id for task in tasks.root if task.id not in unchanged_and_new_tasks]
+    updated_tasks_ids_set = set(updated_tasks_ids)
+    mailing_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids + updated_tasks_ids)
+    for task in mailing_category_tasks:
+        message = display_task(task, task.id in updated_tasks_ids_set)
         await telegram_notification_service.send_messages_to_subscribed_users(message, task.category_id)
 
 

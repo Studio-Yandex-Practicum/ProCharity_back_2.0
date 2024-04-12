@@ -36,7 +36,7 @@ class TaskService(ContentService):
         for obj in objects:
             obj_dict = obj.dict()
             filter = {key: obj_dict[key] for key in fields if key in obj_dict}
-            tasks = await self._repository.get_tasks_by_filter(**filter)
+            tasks = await self._repository.get_tasks_by_filter(id=obj.id, **filter)
             if tasks:
                 unchanged_ids.append(obj.id)
         return unchanged_ids
