@@ -86,18 +86,22 @@ class UserService:
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         await self._user_repository.delete_category_from_user(user, category_id)
 
-    async def get_user_categories(self, telegram_id: int) -> dict[int, str]:
-        """Возвращает словарь с id и name категорий пользователя по его telegram_id."""
+    async def get_user_categories(self, telegram_id: int, with_archived: bool = False) -> dict[int, str]:
+        """Возвращает словарь с id и name категорий пользователя по его telegram_id.
+        Если with_archived=True, будут возвращены все категории, включая архивные.
+        """
         user = await self._user_repository.get_by_telegram_id(telegram_id)
-        categories = await self._user_repository.get_user_categories(user)
+        categories = await self._user_repository.get_user_categories(user, with_archived)
         return {category.id: category.name for category in categories}
 
-    async def get_user_categories_with_parents(self, telegram_id: int) -> dict[int, dict[int, str]]:
+    async def get_user_categories_with_parents(
+        self, telegram_id: int, with_archived: bool = False
+    ) -> dict[int, dict[int, str]]:
         """Возвращает словарь с id родительской группы словарей с id и name категорий пользователя
-        по его telegram_id."""
+        по его telegram_id. Если with_archived=True, будут возвращены все категории, включая архивные."""
         repository = self._user_repository
         user = await repository.get_by_telegram_id(telegram_id)
-        categories = await repository.get_user_categories(user)
+        categories = await repository.get_user_categories(user, with_archived)
         result = {}
         for category in categories:
             if category.parent_id in result:

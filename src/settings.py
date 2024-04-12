@@ -101,7 +101,6 @@ class Settings(BaseSettings):
 
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
-    YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
