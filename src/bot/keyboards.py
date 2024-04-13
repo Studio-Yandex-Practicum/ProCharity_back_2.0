@@ -14,7 +14,6 @@ VIEW_CURRENT_TASKS_BUTTON = [
 VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
 ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.MENU)]
-ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
 UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 PERSONAL_ACCOUNT_BUTTON = [
@@ -36,7 +35,7 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[str, int, int], selected_categories: dict[Category] = None
+    categories: list[str, int, int], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
@@ -62,7 +61,9 @@ async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
 
 
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = None
+    parent_id: int,
+    subcategories: list[Category],
+    selected_categories: dict[Category] = None,
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
