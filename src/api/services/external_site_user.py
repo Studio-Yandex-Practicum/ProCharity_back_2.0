@@ -20,12 +20,13 @@ class ExternalSiteUserService:
 
     async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
         site_user = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash)
-        user = site_user.user
-
         if site_user:
-            await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
+            site_user = await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
         else:
-            await self._site_user_repository.create(site_user_schema.to_orm())
+            site_user = await self._site_user_repository.create(site_user_schema.to_orm())
+
+        if site_user.user:
+            user = site_user.user
 
         if user:
             user.email = site_user.email
@@ -36,6 +37,6 @@ class ExternalSiteUserService:
             if site_user.role == UserRoles.VOLUNTEER:
                 await self._user_repository.set_categories_to_user(user.id, site_user_schema.specializations)
             else:
-                await self._user_repository.delete_all_categories_from_user(user)
+                await self._user_repository.set_categories_to_user(user.id, None)
 
             await self._user_repository.update(user.id, user)
