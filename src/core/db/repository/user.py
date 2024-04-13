@@ -63,18 +63,15 @@ class UserRepository(AbstractRepository):
     ) -> Sequence[UsersCategories] | None:
         """Присваивает или удаляет список категорий."""
         await self._session.commit()
-        async with self._session.begin() as transaction:
+        async with self._session.begin():
             await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
-            await logger.ainfo("Изменены категории у пользователя")
             if categories_ids:
-                user_categories = await self._session.execute(
-                    insert(UsersCategories)
-                    .values([{"user_id": user_id, "category_id": category_id} for category_id in categories_ids])
-                    .returning(UsersCategories)
+                await self._session.execute(
+                    insert(UsersCategories).values(
+                        [{"user_id": user_id, "category_id": category_id} for category_id in categories_ids]
+                    )
                 )
-                await transaction.commit()
-                return user_categories.all()
-            await transaction.commit()
+            await logger.ainfo("Изменены категории у пользователя")
 
     @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:

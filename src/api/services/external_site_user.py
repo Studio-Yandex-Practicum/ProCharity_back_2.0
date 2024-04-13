@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import ExternalSiteFundRequest, ExternalSiteVolunteerRequest
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
-from src.core.enums import UserRoles
 
 
 class ExternalSiteUserService:
@@ -25,18 +24,12 @@ class ExternalSiteUserService:
         else:
             site_user = await self._site_user_repository.create(site_user_schema.to_orm())
 
-        if site_user.user:
-            user = site_user.user
-
+        user = site_user.user
         if user:
             user.email = site_user.email
             user.first_name = site_user.first_name
             user.last_name = site_user.last_name
             user.role = site_user.role
 
-            if site_user.role == UserRoles.VOLUNTEER:
-                await self._user_repository.set_categories_to_user(user.id, site_user_schema.specializations)
-            else:
-                await self._user_repository.set_categories_to_user(user.id, None)
-
             await self._user_repository.update(user.id, user)
+            await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
