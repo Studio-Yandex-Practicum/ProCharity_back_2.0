@@ -55,6 +55,7 @@ class UserService:
                 last_name=ext_site_user.last_name or telegram_user.last_name,
                 username=telegram_user.username,
                 email=ext_site_user.email,
+                role=ext_site_user.role,
             )
             await logger.ainfo(f"Обновлены данные пользователя {user=}")
             if ext_site_user.specializations:
