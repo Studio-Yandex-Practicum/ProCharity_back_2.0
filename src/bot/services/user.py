@@ -1,7 +1,11 @@
+from structlog import get_logger
 from telegram import User as TelegramUser
 
 from src.core.db.models import ExternalSiteUser, User, UsersCategories
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
+from src.core.logging.utils import logger_decor
+
+logger = get_logger()
 
 
 class UserService:
@@ -21,6 +25,7 @@ class UserService:
 
         return await self._user_repository.update(user.id, user)
 
+    @logger_decor
     async def register_user(
         self,
         ext_site_user: ExternalSiteUser,
@@ -28,7 +33,7 @@ class UserService:
     ) -> User:
         """Регистрирует нового пользователя, если он ещё не зарегистрирован."""
         telegram_id = telegram_user.id
-        user = ext_site_user.user
+        user = await self._user_repository.get_by_external_id(ext_site_user.id)
         user_by_telegram_id = await self._user_repository.get_by_telegram_id(telegram_id)
         do_update_or_create = False
         if user:
@@ -51,6 +56,7 @@ class UserService:
                 username=telegram_user.username,
                 email=ext_site_user.email,
             )
+            await logger.ainfo(f"Обновлены данные пользователя {user=}")
             if ext_site_user.specializations:
                 await self.set_categories_to_user(user.id, ext_site_user.specializations)
 

@@ -28,6 +28,10 @@ class UserRepository(AbstractRepository):
             select(User).options(orm.selectinload(User.external_user)).where(User.telegram_id == telegram_id)
         )
 
+    async def get_by_external_id(self, external_id: int) -> User | None:
+        """Возвращает пользователя (или None) по external_id."""
+        return await self._session.scalar(select(User).where(User.external_id == external_id))
+
     async def restore_existing_user(
         self, user: User, username: str, first_name: str, last_name: str, external_id: int | None
     ) -> User:
