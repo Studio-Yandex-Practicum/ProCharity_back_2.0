@@ -24,7 +24,7 @@ class ExternalSiteUserService:
         else:
             site_user = await self._site_user_repository.create(site_user_schema.to_orm())
 
-        user = site_user.user
+        user = await self._user_repository.get_by_external_id(site_user.id)
         if user:
             user.email = site_user.email
             user.first_name = site_user.first_name
