@@ -159,13 +159,30 @@ def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
 
 def get_task_web_app_info(task: Task) -> WebAppInfo:
     """WebApp для отображения подробной информации о задании и фонде"""
-    # return WebAppInfo(url=task.link)
-    url = urljoin(
-        settings.task_info_page_template_url,
-        TaskInfoPageQueryParams(id=task.id, title=task.title, category="XXX").as_url_query(),
+    query_params = TaskInfoPageQueryParams(
+        id=task.id,
+        title=task.title,
+        name_organization=task.name_organization,
+        legal_address=task.legal_address,
+        fund_city=task.fund_city,
+        fund_rating=task.fund_rating,
+        fund_site=task.fund_site,
+        yb_link=task.yb_link,
+        vk_link=task.vk_link,
+        fund_sections=task.fund_sections,
+        deadline=task.deadline,
+        category=task.category.name if task.category else None,
+        bonus=task.bonus,
+        location=task.location,
+        link=task.link,
+        description=task.description,
     )
-    print(f"********* {url=}")
-    return WebAppInfo(url=url)
+    return WebAppInfo(
+        url=urljoin(
+            settings.task_info_page_template_url,
+            query_params.as_url_query(),
+        )
+    )
 
 
 def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
