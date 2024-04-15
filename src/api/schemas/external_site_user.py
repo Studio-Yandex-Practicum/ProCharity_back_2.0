@@ -1,4 +1,4 @@
-from pydantic import Field, field_validator
+from pydantic import EmailStr, Field, field_validator
 
 from src.api.schemas.base import RequestBase
 from src.core.db.models import ExternalSiteUser
@@ -12,7 +12,7 @@ class BaseExternalSiteUserRequest(RequestBase):
     id_hash: str = Field(..., max_length=256)
     first_name: str | None = Field(None, max_length=64)
     last_name: str | None = Field(None, max_length=64)
-    email: str = Field(..., max_length=48)
+    email: EmailStr = Field(..., max_length=48)
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
