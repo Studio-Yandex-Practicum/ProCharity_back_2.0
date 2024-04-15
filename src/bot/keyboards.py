@@ -1,10 +1,12 @@
 from urllib.parse import urljoin
 
+from dependency_injector.wiring import Provide
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from src.api.schemas import FeedbackFormQueryParams, TaskInfoPageQueryParams
 from src.bot.constants import callback_data, enum
 from src.core.db.models import Category, Task, User
+from src.core.depends import Container
 from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
@@ -14,12 +16,8 @@ VIEW_CURRENT_TASKS_BUTTON = [
 VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
 ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.MENU)]
-ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
 UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
-PERSONAL_ACCOUNT_BUTTON = [
-    InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
-]
 OPEN_MENU_BUTTON = [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
 RETURN_MENU_BUTTON = [InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU)]
 CHECK_CATEGORIES_BUTTON = [
@@ -27,8 +25,20 @@ CHECK_CATEGORIES_BUTTON = [
 ]
 SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
 SUPPORT_SERVICE_BUTTON = [
-    InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
+    InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
 ]
+
+
+def get_personal_account_button(
+    registration_url: str = Provide[Container.settings.provided.procharity_registration_url],
+) -> list[InlineKeyboardButton]:
+    return [InlineKeyboardButton("🚪 Войти в личный кабинет", url=registration_url)]
+
+
+def get_notification_settings_button(
+    volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+) -> list[InlineKeyboardButton]:
+    return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=volunteer_auth_url)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -36,7 +46,7 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[str, int, int], selected_categories: dict[Category] = None
+    categories: list[str, int, int], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
@@ -62,7 +72,9 @@ async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
 
 
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = None
+    parent_id: int,
+    subcategories: list[Category],
+    selected_categories: dict[Category] = None,
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
@@ -91,9 +103,13 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
         SUPPORT_SERVICE_BUTTON,
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
         VIEW_CATEGORIES_BUTTON,
-        PERSONAL_ACCOUNT_BUTTON,
+        get_notification_settings_button(),
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+async def get_unregistered_user_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([get_personal_account_button()])
 
 
 def get_feedback_web_app_info(user: User) -> WebAppInfo:
