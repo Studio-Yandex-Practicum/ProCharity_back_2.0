@@ -124,3 +124,8 @@ class ContentRepository(AbstractRepository, abc.ABC):
         """Возвращает id объектов модели из базы данных по указанным ids"""
         filtered_ids = await self._session.scalars(select(self._model.id).where(self._model.id.in_(ids)))
         return filtered_ids.all()
+
+    async def get_by_filter(self, **filter_by) -> Sequence[int]:
+        """Возвращает id объектов модели из базы данных по указанному фильтру полей."""
+        filtered_ids = await self._session.scalars(select(self._model.id).filter_by(**filter_by))
+        return filtered_ids.all()

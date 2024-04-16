@@ -88,6 +88,17 @@ class Settings(BaseSettings):
     COMMIT_DATE: str = ""
     TAGS: list[str] = []
 
+    # Ключевые поля, изменение которых вызывает рассылку обновленного задания
+    TRIGGER_MAILING_FIELDS: list[str] = [
+        "title",
+        "deadline",
+        "category_id",
+        "bonus",
+        "location",
+        "link",
+        "description",
+    ]
+
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"

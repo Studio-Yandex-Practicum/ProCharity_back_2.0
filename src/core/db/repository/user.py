@@ -62,19 +62,18 @@ class UserRepository(AbstractRepository):
         user.banned = banned
         await self.update(user.id, user)
 
-    async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> Sequence[UsersCategories]:
-        """Присваивает пользователю список категорий."""
+    async def set_categories_to_user(self, user_id: int, categories_ids: list[int] | None) -> None:
+        """Присваивает или удаляет список категорий."""
         await self._session.commit()
-        async with self._session.begin() as transaction:
+        async with self._session.begin():
             await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
-            user_categories = await self._session.execute(
-                insert(UsersCategories)
-                .values([{"user_id": user_id, "category_id": category_id} for category_id in categories_ids])
-                .returning(UsersCategories)
-            )
-            await transaction.commit()
-            await logger.ainfo("Изменены категории у пользователя")
-        return user_categories.all()
+            if categories_ids:
+                await self._session.execute(
+                    insert(UsersCategories).values(
+                        [{"user_id": user_id, "category_id": category_id} for category_id in categories_ids]
+                    )
+                )
+        await logger.ainfo("Изменены категории у пользователя")
 
     @auto_commit
     async def delete_category_from_user(self, user: User, category_id: int) -> None:
