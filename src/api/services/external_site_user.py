@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.schemas import ExternalSiteUserRequest
+from src.api.schemas import ExternalSiteFundRequest, ExternalSiteVolunteerRequest
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 
 
@@ -17,14 +17,19 @@ class ExternalSiteUserService:
         self._site_user_repository: ExternalSiteUserRepository = site_user_repository
         self._session: AsyncSession = session
 
-    async def register(self, site_user_schema: ExternalSiteUserRequest) -> None:
+    async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
         site_user = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash)
-        user = await self._user_repository.get_by_user_id(site_user_schema.user_id)
         if site_user:
-            await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
+            site_user = await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
         else:
-            await self._site_user_repository.create(site_user_schema.to_orm())
+            site_user = await self._site_user_repository.create(site_user_schema.to_orm())
+
+        user = await self._user_repository.get_by_external_id(site_user.id)
         if user:
-            await self._user_repository.set_categories_to_user(
-                site_user_schema.user_id, site_user_schema.specializations
-            )
+            user.email = site_user.email
+            user.first_name = site_user.first_name
+            user.last_name = site_user.last_name
+            user.role = site_user.role
+
+            await self._user_repository.update(user.id, user)
+            await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
