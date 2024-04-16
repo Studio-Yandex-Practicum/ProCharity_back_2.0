@@ -2,8 +2,8 @@ from urllib.parse import urljoin
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
-from src.api.schemas import FeedbackFormQueryParams, TaskInfoPageQueryParams
 from src.bot.constants import callback_data, enum
+from src.bot.schemas import FeedbackFormQueryParams, TaskInfoPageQueryParams
 from src.core.db.models import Category, Task, User
 from src.settings import settings
 
