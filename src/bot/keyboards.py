@@ -1,11 +1,9 @@
-from urllib.parse import urljoin
-
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from src.bot.constants import callback_data, enum
-from src.bot.schemas import FeedbackFormQueryParams, TaskInfoPageQueryParams
 from src.core.db.models import Category, Task, User
-from src.settings import settings
+
+from .web_apps import get_feedback_web_app_info, get_task_web_app_info
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 VIEW_CURRENT_TASKS_BUTTON = [
@@ -96,21 +94,6 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_feedback_web_app_info(user: User) -> WebAppInfo:
-    return WebAppInfo(
-        url=urljoin(
-            settings.feedback_form_template_url,
-            FeedbackFormQueryParams(
-                external_id=user.external_user.external_id if user.external_user else None,
-                telegram_link=user.telegram_link,
-                name=user.first_name,
-                surname=user.last_name,
-                email=getattr(user, "email", None),
-            ).as_url_query(),
-        )
-    )
-
-
 async def get_back_menu() -> InlineKeyboardMarkup:
     keyboard = [
         RETURN_MENU_BUTTON,
@@ -155,34 +138,6 @@ def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
     keyboard.append([InlineKeyboardButton("↩️ Не отменять подписку", callback_data=callback_data.MENU)])
     return InlineKeyboardMarkup(keyboard)
-
-
-def get_task_web_app_info(task: Task) -> WebAppInfo:
-    """WebApp для отображения подробной информации о задании и фонде"""
-    query_params = TaskInfoPageQueryParams(
-        id=task.id,
-        title=task.title,
-        name_organization=task.name_organization,
-        legal_address=task.legal_address,
-        fund_city=task.fund_city,
-        fund_rating=task.fund_rating,
-        fund_site=task.fund_site,
-        yb_link=task.yb_link,
-        vk_link=task.vk_link,
-        fund_sections=task.fund_sections,
-        deadline=task.deadline,
-        category=task.category.name if task.category else None,
-        bonus=task.bonus,
-        location=task.location,
-        link=task.link,
-        description=task.description,
-    )
-    return WebAppInfo(
-        url=urljoin(
-            settings.task_info_page_template_url,
-            query_params.as_url_query(),
-        )
-    )
 
 
 def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
