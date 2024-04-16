@@ -88,9 +88,19 @@ class Settings(BaseSettings):
     COMMIT_DATE: str = ""
     TAGS: list[str] = []
 
+    # Ключевые поля, изменение которых вызывает рассылку обновленного задания
+    TRIGGER_MAILING_FIELDS: list[str] = [
+        "title",
+        "deadline",
+        "category_id",
+        "bonus",
+        "location",
+        "link",
+        "description",
+    ]
+
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
-    YA_PRAKTIKUM_URL: Url = "https://praktikum.yandex.ru/"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
@@ -139,6 +149,16 @@ class Settings(BaseSettings):
     def task_info_page_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон страницы с информацией о задании."""
         return urljoin(self.static_url, "task_info_page/task_info_page.html")
+
+    @property
+    def procharity_registration_url(self) -> str:
+        """Получить url-ссылку на страницу регистрации."""
+        return urljoin(self.PROCHARITY_URL, "registration/")
+
+    @property
+    def procharity_volunteer_auth_url(self) -> str:
+        """Получить url-ссылку на страницу авторизации волонтёра."""
+        return urljoin(self.PROCHARITY_URL, "volunteers/settings/")
 
     @property
     def procharity_faq_volunteer_url(self) -> str:
