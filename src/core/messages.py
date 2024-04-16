@@ -8,10 +8,12 @@ TASK_DEADLINE_FORMAT = "%d.%m.%y"
 
 def display_task(
     task: Task,
+    updated_task: bool = False,
     bonus_info_url: str = Provide[Container.settings.provided.procharity_bonus_info_url],
 ) -> str:
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT) if task.deadline else "Не указан."
-    return (
+    title = "--- Обновленное задание ---\n\n" if updated_task else ""
+    return title + (
         f"<b>Фонд:</b> {task.name_organization}\n\n"
         f"<b>Категория:</b> {task.category.name if task.category else 'Не указана.'}\n\n"
         f"<b>Срок:</b> {deadline}\n\n"
