@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, ExternalSiteUser, User
@@ -43,7 +43,11 @@ class TelegramNotificationService:
     async def send_messages_to_subscribed_users(self, notifications, category_id):
         """Отправляет сообщение пользователям, подписанным на определенные категории"""
         qr = await self._session.scalars(
-            select(Category).options(joinedload(Category.users)).where(Category.id == category_id)
+            select(Category)
+            .join(Category.users)
+            .options(contains_eager(Category.users))
+            .where(User.has_mailing)
+            .where(Category.id == category_id)
         )
         if (category := qr.first()) is None:
             return
