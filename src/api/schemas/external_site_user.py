@@ -1,30 +1,39 @@
-from pydantic import Field, field_validator
+from pydantic import EmailStr, Field, field_validator
 
 from src.api.schemas.base import RequestBase
 from src.core.db.models import ExternalSiteUser
 from src.core.enums import UserRoles
 
 
-class ExternalSiteUserRequest(RequestBase):
-    """Класс модели запроса для ExternalSiteUser."""
+class BaseExternalSiteUserRequest(RequestBase):
+    """Базовый класс схемы запроса для ExternalSiteUser."""
 
     user_id: int = Field(...)
     id_hash: str = Field(..., max_length=256)
     first_name: str | None = Field(None, max_length=64)
     last_name: str | None = Field(None, max_length=64)
-    email: str = Field(..., max_length=48)
-    specializations: list[int] | None = None
+    email: EmailStr = Field(..., max_length=48)
 
     def to_orm(self) -> ExternalSiteUser:
         return ExternalSiteUser(
-            role=UserRoles.VOLUNTEER,
             external_id=self.user_id,
             id_hash=self.id_hash,
             email=self.email,
             first_name=self.first_name,
             last_name=self.last_name,
-            specializations=self.specializations,
         )
+
+
+class ExternalSiteVolunteerRequest(BaseExternalSiteUserRequest):
+    """Класс схемы запроса для ExternalSiteUser (Volunteer)."""
+
+    specializations: list[int] | None = None
+
+    def to_orm(self) -> ExternalSiteUser:
+        user_orm = super().to_orm()
+        user_orm.role = UserRoles.VOLUNTEER
+        user_orm.specializations = self.specializations
+        return user_orm
 
     @field_validator("specializations", mode="before")
     def specializations_str_validation(cls, value: str):
@@ -37,3 +46,13 @@ class ExternalSiteUserRequest(RequestBase):
             raise ValueError(
                 'Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3"'
             ) from exc
+
+
+class ExternalSiteFundRequest(BaseExternalSiteUserRequest):
+    """Класс схемы запроса для ExternalSiteUser (Fund)."""
+
+    def to_orm(self) -> ExternalSiteUser:
+        user_orm = super().to_orm()
+        user_orm.role = UserRoles.FUND
+        user_orm.specializations = None
+        return user_orm
