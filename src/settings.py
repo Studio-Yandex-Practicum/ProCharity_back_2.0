@@ -146,6 +146,16 @@ class Settings(BaseSettings):
         return urljoin(self.static_url, "feedback_form/feedback_form.html")
 
     @property
+    def procharity_registration_url(self) -> str:
+        """Получить url-ссылку на страницу регистрации."""
+        return urljoin(self.PROCHARITY_URL, "registration/")
+
+    @property
+    def procharity_volunteer_auth_url(self) -> str:
+        """Получить url-ссылку на страницу авторизации волонтёра."""
+        return urljoin(self.PROCHARITY_URL, "volunteers/settings/")
+
+    @property
     def procharity_faq_volunteer_url(self) -> str:
         """Получить url-ссылку на страницу базы знаний."""
         return urljoin(self.HELP_PROCHARITY_URL, "category/1876")

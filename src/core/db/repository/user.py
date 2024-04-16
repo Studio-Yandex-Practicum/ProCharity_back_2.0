@@ -28,6 +28,10 @@ class UserRepository(AbstractRepository):
             select(User).options(orm.selectinload(User.external_user)).where(User.telegram_id == telegram_id)
         )
 
+    async def get_by_external_id(self, external_id: int) -> User | None:
+        """Возвращает пользователя (или None) по external_id."""
+        return await self._session.scalar(select(User).where(User.external_id == external_id))
+
     async def restore_existing_user(
         self, user: User, username: str, first_name: str, last_name: str, external_id: int | None
     ) -> User:
@@ -60,6 +64,7 @@ class UserRepository(AbstractRepository):
 
     async def set_categories_to_user(self, user_id: int, categories_ids: list[int]) -> Sequence[UsersCategories]:
         """Присваивает пользователю список категорий."""
+        await self._session.commit()
         async with self._session.begin() as transaction:
             await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
             user_categories = await self._session.execute(
