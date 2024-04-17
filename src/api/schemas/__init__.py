@@ -7,7 +7,6 @@ from .feedback import FeedbackSchema
 from .health_check import BotStatus, CommitStatus, DBStatus, HealthCheck
 from .notification import (
     ErrorsSending,
-    FeedbackFormQueryParams,
     InfoRate,
     Message,
     MessageList,
@@ -35,7 +34,6 @@ __all__ = (
     "DBStatus",
     "HealthCheck",
     "ErrorsSending",
-    "FeedbackFormQueryParams",
     "InfoRate",
     "Message",
     "MessageList",

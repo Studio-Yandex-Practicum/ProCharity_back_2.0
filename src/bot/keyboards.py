@@ -1,13 +1,10 @@
-from urllib.parse import urljoin
-
 from dependency_injector.wiring import Provide
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
+from src.bot.web_apps import get_feedback_web_app_info, get_task_web_app_info
 from src.core.db.models import Category, Task, User
 from src.core.depends import Container
-from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 VIEW_CURRENT_TASKS_BUTTON = [
@@ -112,21 +109,6 @@ async def get_unregistered_user_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([get_personal_account_button()])
 
 
-def get_feedback_web_app_info(user: User) -> WebAppInfo:
-    return WebAppInfo(
-        url=urljoin(
-            settings.feedback_form_template_url,
-            FeedbackFormQueryParams(
-                external_id=user.external_user.external_id if user.external_user else None,
-                telegram_link=user.telegram_link,
-                name=user.first_name,
-                surname=user.last_name,
-                email=getattr(user, "email", None),
-            ).as_url_query(),
-        )
-    )
-
-
 async def get_back_menu() -> InlineKeyboardMarkup:
     keyboard = [
         RETURN_MENU_BUTTON,
@@ -171,11 +153,6 @@ def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
     keyboard.append([InlineKeyboardButton("↩️ Не отменять подписку", callback_data=callback_data.MENU)])
     return InlineKeyboardMarkup(keyboard)
-
-
-def get_task_web_app_info(task: Task) -> WebAppInfo:
-    """WebApp для отображения подробной информации о задании и фонде"""
-    return WebAppInfo(url=task.link)
 
 
 def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
