@@ -21,11 +21,32 @@ async def view_task_callback(
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
     telegram_id = context._user_id
+    page_number = context.user_data.get("page_number", 1)
+    viewed_all = context.user_data.get("viewed_all", False)
+    if viewed_all:
+        keyboard = await tasks_again_get_back_menu()
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Актуальных заданий по твоим компетенциям на сегодня нет.",
+            reply_markup=keyboard,
+        )
+        return
+
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
-        context.user_data.get("page_number", 1),
+        page_number,
         limit,
         telegram_id,
     )
+
+    if not tasks_to_show and page_number == 1:
+        keyboard = await tasks_again_get_back_menu()
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Актуальных заданий по твоим компетенциям на сегодня нет.",
+            reply_markup=keyboard,
+        )
+        context.user_data["viewed_all"] = True
+        return
 
     for task in tasks_to_show:
         message = display_task(task)
@@ -48,6 +69,7 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
     else:
         text = "Ты просмотрел все актуальные задания на сегодня."
         keyboard = await tasks_again_get_back_menu()
+        context.user_data["viewed_all"] = True
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -56,18 +78,17 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
     )
 
 
-@logger_decor
-@delete_previous_message
 async def view_tasks_again_callback(
     update: Update,
     context: CallbackContext,
-    limit: int = 3,
-    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
+    context.user_data["viewed_all"] = False
     context.user_data["page_number"] = 1
-    await view_task_callback(update, context, limit, task_service)
+    await view_task_callback(
+        update, context, limit=3, task_service=Provide[Container.bot_services_container.bot_task_service]
+    )
 
 
 def registration_handlers(app: Application):
-    app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
     app.add_handler(CallbackQueryHandler(view_tasks_again_callback, pattern=callback_data.VIEW_TASKS_AGAIN))
+    app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
