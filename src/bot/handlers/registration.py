@@ -6,7 +6,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import commands
-from src.bot.keyboards import get_open_menu_keyboard, get_start_keyboard
+from src.bot.keyboards import get_start_menu_keyboard
 from src.bot.services import UserService
 from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
@@ -28,13 +28,7 @@ async def start_command(
 ):
     telegram_user = update.effective_user or Never
     user = await user_service.register_user(ext_site_user, telegram_user)
-
-    if user.role == UserRoles.VOLUNTEER:
-        keyboard = await get_start_keyboard()
-        auth_url = volunteer_auth_url
-    else:
-        keyboard = await get_open_menu_keyboard()
-        auth_url = found_auth_url
+    auth_url = volunteer_auth_url if user.role == UserRoles.VOLUNTEER else found_auth_url
 
     await context.bot.send_message(
         chat_id=telegram_user.id,
@@ -43,7 +37,7 @@ async def start_command(
         f'Изменить настройку уведомлений можно в <a href="{auth_url}">личном кабинете</a>.\n\n'
         "Навигация по боту запускается командой /menu.",
         parse_mode=ParseMode.HTML,
-        reply_markup=keyboard,
+        reply_markup=await get_start_menu_keyboard(user.role),
         disable_web_page_preview=True,
     )
 
