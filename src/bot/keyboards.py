@@ -127,6 +127,13 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
     )
 
 
+async def get_open_menu_keyboard() -> InlineKeyboardMarkup:
+    keyboard = [
+        OPEN_MENU_BUTTON,
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_back_menu() -> InlineKeyboardMarkup:
     keyboard = [
         RETURN_MENU_BUTTON,

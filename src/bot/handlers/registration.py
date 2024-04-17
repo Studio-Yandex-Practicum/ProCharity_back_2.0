@@ -6,11 +6,12 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
 
 from src.bot.constants import commands
-from src.bot.keyboards import get_start_keyboard
+from src.bot.keyboards import get_open_menu_keyboard, get_start_keyboard
 from src.bot.services import UserService
 from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
+from src.core.enums import UserRoles
 from src.core.logging.utils import logger_decor
 
 
@@ -23,15 +24,23 @@ async def start_command(
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+    found_auth_url: str = Provide[Container.settings.provided.procharity_found_auth_url],
 ):
     telegram_user = update.effective_user or Never
-    await user_service.register_user(ext_site_user, telegram_user)
-    keyboard = await get_start_keyboard()
+    user = await user_service.register_user(ext_site_user, telegram_user)
+
+    if user.role == UserRoles.VOLUNTEER:
+        keyboard = await get_start_keyboard()
+        auth_url = volunteer_auth_url
+    else:
+        keyboard = await get_open_menu_keyboard()
+        auth_url = found_auth_url
+
     await context.bot.send_message(
         chat_id=telegram_user.id,
         text="<b>Авторизация прошла успешно!</b>\n\n"
         "Теперь оповещения будут приходить сюда. "
-        f'Изменить настройку уведомлений можно в <a href="{volunteer_auth_url}">личном кабинете</a>.\n\n'
+        f'Изменить настройку уведомлений можно в <a href="{auth_url}">личном кабинете</a>.\n\n'
         "Навигация по боту запускается командой /menu.",
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
