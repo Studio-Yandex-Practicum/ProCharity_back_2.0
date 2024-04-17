@@ -2,9 +2,9 @@ from dependency_injector.wiring import Provide
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from src.bot.constants import callback_data, enum
+from src.bot.web_apps import get_feedback_web_app_info, get_task_web_app_info
 from src.core.db.models import Category, Task, User
 from src.core.depends import Container
-from src.web_apps import get_feedback_web_app_info, get_task_web_app_info
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 VIEW_CURRENT_TASKS_BUTTON = [
