@@ -179,7 +179,7 @@ class Settings(BaseSettings):
     @property
     def procharity_send_user_categories_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки категорий пользователя."""
-        return urljoin(self.PROCHARITY_URL, "api/v1/user_categories")
+        return urljoin(self.PROCHARITY_URL, "api/v1/user_categories/")
 
 
 @lru_cache()

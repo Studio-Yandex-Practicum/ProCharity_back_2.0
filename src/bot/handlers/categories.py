@@ -132,10 +132,12 @@ async def select_subcategory_callback(
         del selected_categories[subcategory_id]
         await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
 
-    await procharity_api.send_user_categories(update.effective_user.id, selected_categories.keys())
+    user = await user_service.get_by_telegram_id(update.effective_user.id)
+    if user and user.external_user:
+        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
+
     parent_id = context.user_data["parent_id"]
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
-
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
