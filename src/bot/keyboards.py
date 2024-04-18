@@ -135,7 +135,7 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_menu_keyboard(user_role: str) -> InlineKeyboardMarkup:
+async def get_start_keyboard(user_role: str) -> InlineKeyboardMarkup:
     keyboard = [
         CHECK_CATEGORIES_BUTTON if user_role == UserRoles.VOLUNTEER else [],
         OPEN_MENU_BUTTON,

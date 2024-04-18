@@ -156,7 +156,7 @@ class Settings(BaseSettings):
         return urljoin(self.PROCHARITY_URL, "volunteers/settings/")
 
     @property
-    def procharity_found_auth_url(self) -> str:
+    def procharity_fund_auth_url(self) -> str:
         """Получить url-ссылку на страницу авторизации фонда."""
         return urljoin(self.PROCHARITY_URL, "foundations/lk/settings/")
 
