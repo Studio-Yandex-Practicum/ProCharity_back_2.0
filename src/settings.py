@@ -102,6 +102,7 @@ class Settings(BaseSettings):
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
+    ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = "no-token-data"
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
     def check_last_slash_url(cls, v) -> str:
@@ -174,6 +175,11 @@ class Settings(BaseSettings):
     def procharity_tasks_url(self) -> str:
         """Получить url-ссылку на страницу с заданиями."""
         return urljoin(self.PROCHARITY_URL, "tasks")
+
+    @property
+    def procharity_send_user_categories_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки категорий пользователя."""
+        return urljoin(self.PROCHARITY_URL, "api/v1/user_categories")
 
 
 @lru_cache()

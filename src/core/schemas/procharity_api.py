@@ -1,11 +1,10 @@
-from pydantic import Field
-
-from src.api.schemas.base import ResponseBase
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class SiteUserCategoriesRequest(ResponseBase):
+class SiteUserCategoriesRequest(BaseModel):
     """Класс модели запроса для user_categories сайта."""
 
+    model_config = ConfigDict(from_attributes=True)
     user_id: int = Field(..., example=1, description="Уникальный идентификатор пользователя.")
     specializations: str = Field(..., example="23, 51", description="Идентификаторы категорий пользователя.")
 
