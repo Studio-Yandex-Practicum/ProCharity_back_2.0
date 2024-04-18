@@ -57,6 +57,7 @@ async def view_task_callback(
             disable_web_page_preview=True,
             reply_markup=get_task_info_keyboard(task),
         )
+
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
     await show_next_tasks(update, context, page_number, remaining_tasks)
 
