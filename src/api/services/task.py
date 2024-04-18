@@ -19,3 +19,6 @@ class TaskService(ContentService):
 
     async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
         return await self._repository.get_user_tasks_ids(ids)
+
+    async def get_tasks_by_filter(self, **filter_by) -> list[Task]:
+        return await self._repository.get_tasks_by_filter(**filter_by)

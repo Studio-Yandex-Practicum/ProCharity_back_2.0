@@ -1,11 +1,10 @@
-from urllib.parse import urljoin
+from dependency_injector.wiring import Provide
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-
-from src.api.schemas import FeedbackFormQueryParams
 from src.bot.constants import callback_data, enum
+from src.bot.web_apps import get_feedback_web_app_info, get_task_web_app_info
 from src.core.db.models import Category, Task, User
-from src.settings import settings
+from src.core.depends import Container
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 VIEW_CURRENT_TASKS_BUTTON = [
@@ -14,22 +13,29 @@ VIEW_CURRENT_TASKS_BUTTON = [
 VIEW_CATEGORIES_BUTTON = [InlineKeyboardButton("🎓 Изменить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 CHANGE_CATEGORY_BUTTON = [InlineKeyboardButton("✍ Изменить", callback_data=callback_data.CHANGE_CATEGORY)]
 ALL_RIGHT_CATEGORY_BUTTON = [InlineKeyboardButton("👌 Всё верно", callback_data=callback_data.MENU)]
-ABOUT_PROJECT_BUTTON = [InlineKeyboardButton("ℹ️ О платформе", callback_data=callback_data.ABOUT_PROJECT)]
 UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от заданий", callback_data=callback_data.JOB_SUBSCRIPTION)]
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
-PERSONAL_ACCOUNT_BUTTON = [
-    InlineKeyboardButton("🚪 Изменить настройку уведомлений", url="https://procharity.ru/volunteers/settings/")
-]
 OPEN_MENU_BUTTON = [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
 RETURN_MENU_BUTTON = [InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU)]
 CHECK_CATEGORIES_BUTTON = [
     InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
 ]
 SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
-
 SUPPORT_SERVICE_BUTTON = [
-    InlineKeyboardButton(text="✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
+    InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
 ]
+
+
+def get_personal_account_button(
+    registration_url: str = Provide[Container.settings.provided.procharity_registration_url],
+) -> list[InlineKeyboardButton]:
+    return [InlineKeyboardButton("🚪 Войти в личный кабинет", url=registration_url)]
+
+
+def get_notification_settings_button(
+    volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+) -> list[InlineKeyboardButton]:
+    return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=volunteer_auth_url)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -47,7 +53,7 @@ async def tasks_again_get_back_menu():
 
 
 async def get_checked_categories_keyboard(
-    categories: dict[str, int, int], selected_categories: dict[Category] = None
+    categories: list[str, int, int], selected_categories: dict[Category] = None
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
@@ -73,7 +79,9 @@ async def get_view_categories_keyboard() -> InlineKeyboardMarkup:
 
 
 async def get_subcategories_keyboard(
-    parent_id: int, subcategories: list[Category], selected_categories: dict[Category] = None
+    parent_id: int,
+    subcategories: list[Category],
+    selected_categories: dict[Category] = None,
 ) -> InlineKeyboardMarkup:
     keyboard = []
     selected_categories = {} if selected_categories is None else selected_categories
@@ -102,24 +110,13 @@ async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
         SUPPORT_SERVICE_BUTTON,
         UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
         VIEW_CATEGORIES_BUTTON,
-        PERSONAL_ACCOUNT_BUTTON,
+        get_notification_settings_button(),
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_feedback_web_app_info(user: User) -> WebAppInfo:
-    return WebAppInfo(
-        url=urljoin(
-            settings.feedback_form_template_url,
-            FeedbackFormQueryParams(
-                external_id=user.external_user.external_id if user.external_user else None,
-                telegram_link=user.telegram_link,
-                name=user.first_name,
-                surname=user.last_name,
-                email=getattr(user, "email", None),
-            ).as_url_query(),
-        )
-    )
+async def get_unregistered_user_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([get_personal_account_button()])
 
 
 async def get_back_menu() -> InlineKeyboardMarkup:
@@ -164,12 +161,8 @@ async def get_tasks_and_back_menu_keyboard() -> InlineKeyboardMarkup:
 def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     """Клавиатура с причинами отписки от рассылки на почту"""
     keyboard = [[InlineKeyboardButton(reason, callback_data=f"reason_{reason.name}")] for reason in enum.REASONS]
+    keyboard.append([InlineKeyboardButton("↩️ Не отменять подписку", callback_data=callback_data.MENU)])
     return InlineKeyboardMarkup(keyboard)
-
-
-def get_task_web_app_info(task: Task) -> WebAppInfo:
-    """WebApp для отображения подробной информации о задании и фонде"""
-    return WebAppInfo(url=task.link)
 
 
 def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:

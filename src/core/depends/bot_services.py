@@ -28,6 +28,7 @@ class BotServicesContainer(containers.DeclarativeContainer):
     bot_site_user_service = providers.Factory(
         BotExternalSiteUserService,
         site_user_repository=repositories.site_user_repository,
+        user_repository=repositories.user_repository,
     )
     unsubscribe_reason_service = providers.Factory(
         UnsubscribeReasonService,
