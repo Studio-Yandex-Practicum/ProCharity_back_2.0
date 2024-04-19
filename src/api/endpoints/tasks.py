@@ -5,6 +5,7 @@ from src.api.auth import check_header_contains_token
 from src.api.schemas import TaskResponse, TasksRequest
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
+from src.bot.keyboards import get_task_info_keyboard
 from src.core.db.models import Task
 from src.core.depends import Container
 from src.core.messages import display_task
@@ -27,7 +28,9 @@ async def actualize_tasks(
     mailing_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids + updated_tasks_ids)
     for task in mailing_category_tasks:
         message = display_task(task, task.id in updated_tasks_ids_set)
-        await telegram_notification_service.send_messages_to_subscribed_users(message, task.category_id)
+        await telegram_notification_service.send_messages_to_subscribed_users(
+            message, task.category_id, reply_markup=get_task_info_keyboard(task)
+        )
 
 
 @task_router.get(
