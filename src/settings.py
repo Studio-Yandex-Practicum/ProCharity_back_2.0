@@ -102,7 +102,7 @@ class Settings(BaseSettings):
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
-    ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = "no-token-data"
+    ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = ""
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
     def check_last_slash_url(cls, v) -> str:
