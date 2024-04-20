@@ -10,6 +10,7 @@ from src.api.endpoints import (
     site_user_router,
     task_router,
     telegram_webhook_router,
+    user_router,
 )
 from src.settings import settings
 
@@ -23,4 +24,5 @@ api_router.include_router(task_router, prefix="/tasks", tags=["Content"])
 api_router.include_router(telegram_webhook_router, prefix="/telegram", tags=["Telegram"])
 api_router.include_router(admin_user_router, prefix="/auth", tags=["AdminUser"])
 api_router.include_router(site_user_router, prefix="/auth", tags=["ExternalSiteUser"])
+api_router.include_router(user_router, prefix="/users", tags=["User"])
 api_router.include_router(feedback_router, prefix="/feedback", tags=["Feedback Form"])
