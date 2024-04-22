@@ -5,7 +5,6 @@ from src.bot.constants import callback_data, enum
 from src.bot.web_apps import get_feedback_web_app_info, get_task_web_app_info
 from src.core.db.models import Category, Task, User
 from src.core.depends import Container
-from src.core.enums import UserRoles
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 VIEW_CURRENT_TASKS_BUTTON = [
@@ -127,9 +126,9 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_keyboard(user_role: str) -> InlineKeyboardMarkup:
+async def get_start_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
-        CHECK_CATEGORIES_BUTTON if user_role == UserRoles.VOLUNTEER else [],
+        CHECK_CATEGORIES_BUTTON if user.is_volunteer else [],
         OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
