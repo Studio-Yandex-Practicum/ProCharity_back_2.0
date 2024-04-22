@@ -58,8 +58,7 @@ class UserService:
                 role=ext_site_user.role,
             )
             await logger.ainfo(f"Обновлены данные пользователя {user=}")
-            if ext_site_user.specializations:
-                await self.set_categories_to_user(user.id, ext_site_user.specializations)
+            await self.set_categories_to_user(user.id, ext_site_user.specializations)
 
         return user
 

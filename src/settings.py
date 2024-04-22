@@ -89,15 +89,8 @@ class Settings(BaseSettings):
     TAGS: list[str] = []
 
     # Ключевые поля, изменение которых вызывает рассылку обновленного задания
-    TRIGGER_MAILING_FIELDS: list[str] = [
-        "title",
-        "deadline",
-        "category_id",
-        "bonus",
-        "location",
-        "link",
-        "description",
-    ]
+    # Изменение ключевых полей может потребовать изменения формата сообщения в src.core.messages.display_task()
+    TRIGGER_MAILING_FIELDS: list[str] = ["deadline"]
 
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
@@ -160,6 +153,11 @@ class Settings(BaseSettings):
     def procharity_volunteer_auth_url(self) -> str:
         """Получить url-ссылку на страницу авторизации волонтёра."""
         return urljoin(self.PROCHARITY_URL, "volunteers/settings/")
+
+    @property
+    def procharity_fund_auth_url(self) -> str:
+        """Получить url-ссылку на страницу авторизации фонда."""
+        return urljoin(self.PROCHARITY_URL, "foundations/lk/settings/")
 
     @property
     def procharity_faq_volunteer_url(self) -> str:
