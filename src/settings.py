@@ -89,6 +89,7 @@ class Settings(BaseSettings):
     TAGS: list[str] = []
 
     # Ключевые поля, изменение которых вызывает рассылку обновленного задания
+    # Изменение ключевых полей может потребовать изменения формата сообщения в src.core.messages.display_task()
     TRIGGER_MAILING_FIELDS: list[str] = ["deadline"]
 
     # URLs проекта Procharity
