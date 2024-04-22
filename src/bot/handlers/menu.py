@@ -35,7 +35,8 @@ async def menu_callback(
 ):
     """Отображает меню."""
     user = ext_site_user.user
-    text = "Выбери, что тебя интересует:" if user.is_volunteer else "Выберите, что вас интересует:"
+    filling = ("", "тебя") if user.is_volunteer else ("те", "вас")
+    text = "Выбери{}, что {} интересует:".format(*filling)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=text,
@@ -123,23 +124,14 @@ async def support_service_callback(
 ):
     """Обращение в службу поддержки."""
     user = await user_service.get_by_telegram_id(update.effective_user.id)
+    filling = ("", "твой", "шь", volunteer_faq_url) if user.is_volunteer else ("те", "ваш", "те", fund_faq_url)
     text = (
-        (
-            "Мы на связи с 10.00 до 19.00 "
-            "в будние дни по любым вопросам. Смело пиши нам!\n\n"
-            "А пока мы изучаем твой запрос, можешь ознакомиться с "
-            "популярными вопросами и ответами на них в нашей"
-            f'<a href="{volunteer_faq_url}"> базе знаний.</a>'
-        )
-        if user.is_volunteer
-        else (
-            "Мы на связи с 10.00 до 19.00 "
-            "в будние дни по любым вопросам. Смело пишите нам!\n\n"
-            "А пока мы изучаем ваш запрос, можете ознакомиться с "
-            "популярными вопросами и ответами на них в нашей"
-            f'<a href="{fund_faq_url}"> базе знаний.</a>'
-        )
-    )
+        "Мы на связи с 10.00 до 19.00 "
+        "в будние дни по любым вопросам. Смело пиши{} нам!\n\n"
+        "А пока мы изучаем {} запрос, може{} ознакомиться с "
+        "популярными вопросами и ответами на них в нашей "
+        '<a href="{}">базе знаний.</a>'
+    ).format(*filling)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=text,
