@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     TAGS: list[str] = []
 
     # Ключевые поля, изменение которых вызывает рассылку обновленного задания
-    TRIGGER_MAILING_FIELDS: list[str] = ["deadline", "category_id"]
+    TRIGGER_MAILING_FIELDS: list[str] = ["deadline"]
 
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
