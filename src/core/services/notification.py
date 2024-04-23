@@ -1,6 +1,7 @@
 import asyncio
 
 import structlog
+from telegram import TelegramObject
 from telegram.constants import ParseMode
 from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application
@@ -15,10 +16,19 @@ class TelegramNotification:
         self.__bot_application = telegram_bot
         self.__bot = telegram_bot.bot
 
-    async def __send_message(self, user_id: int, message: str) -> tuple[bool, str]:
+    async def __send_message(
+        self,
+        user_id: int,
+        message: str,
+        reply_markup: TelegramObject | None = None,
+    ) -> tuple[bool, str]:
         try:
             await self.__bot.send_message(
-                chat_id=user_id, text=message, parse_mode=ParseMode.HTML, disable_web_page_preview=True
+                chat_id=user_id,
+                text=message,
+                parse_mode=ParseMode.HTML,
+                disable_web_page_preview=True,
+                reply_markup=reply_markup,
             )
             msg = f"Отправлено оповещение пользователю {user_id}"
             await log.adebug(msg)
@@ -38,9 +48,10 @@ class TelegramNotification:
         self,
         message: str,
         users: list[User],
+        reply_markup: TelegramObject | None = None,
     ) -> list[tuple[bool, str]]:
         """Делает массовую рассылку сообщения message пользователям users."""
-        send_message_tasks = [self.__send_message(user.telegram_id, message) for user in users]
+        send_message_tasks = [self.__send_message(user.telegram_id, message, reply_markup) for user in users]
         result = await asyncio.gather(*send_message_tasks)
         return result
 
@@ -48,6 +59,7 @@ class TelegramNotification:
         self,
         message: str,
         user_id: int,
+        reply_markup: TelegramObject | None = None,
     ) -> tuple[bool, str]:
         """Отправляет сообщение message конкретному пользователю user."""
-        return await self.__send_message(user_id, message)
+        return await self.__send_message(user_id, message, reply_markup)
