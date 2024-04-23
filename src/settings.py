@@ -159,9 +159,14 @@ class Settings(BaseSettings):
         return urljoin(self.PROCHARITY_URL, "foundations/lk/settings/")
 
     @property
-    def procharity_faq_volunteer_url(self) -> str:
-        """Получить url-ссылку на страницу базы знаний."""
+    def procharity_volunteer_faq_url(self) -> str:
+        """Получить url-ссылку на страницу базы знаний для волонтёров."""
         return urljoin(self.HELP_PROCHARITY_URL, "category/1876")
+
+    @property
+    def procharity_fund_faq_url(self) -> str:
+        """Получить url-ссылку на страницу базы знаний для фондов."""
+        return urljoin(self.HELP_PROCHARITY_URL, "category/1877")
 
     @property
     def procharity_bonus_info_url(self) -> str:

@@ -11,7 +11,6 @@ from src.bot.services import UserService
 from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
-from src.core.enums import UserRoles
 from src.core.logging.utils import logger_decor
 
 
@@ -28,7 +27,7 @@ async def start_command(
 ):
     telegram_user = update.effective_user or Never
     user = await user_service.register_user(ext_site_user, telegram_user)
-    auth_url = volunteer_auth_url if user.role == UserRoles.VOLUNTEER else fund_auth_url
+    auth_url = volunteer_auth_url if user.is_volunteer else fund_auth_url
 
     await context.bot.send_message(
         chat_id=telegram_user.id,
@@ -37,7 +36,7 @@ async def start_command(
         f'Изменить настройку уведомлений можно в <a href="{auth_url}">личном кабинете</a>.\n\n'
         "Навигация по боту запускается командой /menu.",
         parse_mode=ParseMode.HTML,
-        reply_markup=await get_start_keyboard(user.role),
+        reply_markup=await get_start_keyboard(user),
         disable_web_page_preview=True,
     )
 
