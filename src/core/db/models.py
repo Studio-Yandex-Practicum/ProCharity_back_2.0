@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
 
+from src.core.enums import UserRoles
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 MAX_USER_ROLE_NAME_LENGTH = 20
@@ -64,6 +66,10 @@ class User(Base):
 
     external_id: Mapped[int | None] = mapped_column(ForeignKey("external_site_users.id"), nullable=True)
     external_user: Mapped["ExternalSiteUser"] = relationship(back_populates="user")
+
+    @property
+    def is_volunteer(self) -> bool:
+        return self.role == UserRoles.VOLUNTEER
 
     @property
     def telegram_link(self) -> str | None:
