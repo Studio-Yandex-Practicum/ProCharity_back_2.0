@@ -12,17 +12,20 @@ from src.bot.keyboards import (
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
-from src.bot.utils import delete_previous_message, get_marked_list
+from src.bot.utils import delete_previous_message, get_marked_list, registered_user_required
+from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.services.procharity_api import ProcharityAPI
 
 
 @logger_decor
+@registered_user_required
 @delete_previous_message
 async def categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
@@ -66,7 +69,10 @@ async def view_categories(
             await user_service.check_and_set_has_mailing_atribute(telegram_id)
 
 
-async def view_current_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@registered_user_required
+async def view_current_categories_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, ext_site_user: ExternalSiteUser
+):
     """Выводит список выбранных волонтером категорий перед их изменением."""
     text_format = "*Твои профессиональные компетенции:*\n\n" "{categories}\n\n"
     await view_categories(
@@ -76,7 +82,10 @@ async def view_current_categories_callback(update: Update, context: ContextTypes
     )
 
 
-async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@registered_user_required
+async def confirm_categories_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, ext_site_user: ExternalSiteUser
+):
     """Выводит список выбранных волонтером категорий после их изменения и включает рассылку (если еще не включена)."""
     text_format = (
         "*Отлично!*\n\n"
@@ -93,9 +102,11 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
 
 @logger_decor
+@registered_user_required
 async def subcategories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
@@ -114,9 +125,11 @@ async def subcategories_callback(
 
 
 @logger_decor
+@registered_user_required
 async def select_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
@@ -147,9 +160,11 @@ async def select_subcategory_callback(
 
 
 @logger_decor
+@registered_user_required
 async def back_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
