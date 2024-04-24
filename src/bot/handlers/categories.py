@@ -15,6 +15,7 @@ from src.bot.services.user import UserService
 from src.bot.utils import delete_previous_message, get_marked_list
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.services.procharity_api import ProcharityAPI
 
 
 @logger_decor
@@ -118,6 +119,7 @@ async def select_subcategory_callback(
     context: ContextTypes.DEFAULT_TYPE,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
@@ -130,9 +132,12 @@ async def select_subcategory_callback(
         del selected_categories[subcategory_id]
         await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
 
+    user = await user_service.get_by_telegram_id(update.effective_user.id)
+    if user and user.external_user:
+        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
+
     parent_id = context.user_data["parent_id"]
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
-
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
