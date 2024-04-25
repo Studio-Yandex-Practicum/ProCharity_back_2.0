@@ -45,10 +45,12 @@ async def menu_callback(
 
 
 @logger_decor
+@registered_user_required
 @delete_previous_message
 async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     procharity_tasks_url: str = Provide[Container.settings.provided.procharity_tasks_url],
 ):
@@ -79,9 +81,11 @@ async def set_mailing(
 
 
 @logger_decor
+@registered_user_required
 async def unsubscription_reason_handler(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     unsubscribe_reason_service: UnsubscribeReasonService = Provide[
         Container.bot_services_container.unsubscribe_reason_service
     ],
@@ -114,10 +118,12 @@ async def unsubscription_reason_handler(
 
 
 @logger_decor
+@registered_user_required
 @delete_previous_message
 async def support_service_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     volunteer_faq_url: str = Provide[Container.settings.provided.procharity_volunteer_faq_url],
     fund_faq_url: str = Provide[Container.settings.provided.procharity_fund_faq_url],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],

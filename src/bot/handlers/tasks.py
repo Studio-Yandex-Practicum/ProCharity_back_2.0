@@ -6,17 +6,20 @@ from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 from src.bot.constants import callback_data
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
-from src.bot.utils import delete_previous_message
+from src.bot.utils import delete_previous_message, registered_user_required
+from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.messages import display_task
 
 
 @logger_decor
+@registered_user_required
 @delete_previous_message
 async def view_task_callback(
     update: Update,
     context: CallbackContext,
+    ext_site_user: ExternalSiteUser,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
