@@ -2,13 +2,12 @@ import math
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.services.base import ContentService
 from src.api.utils import user_formatter, users_paginate_responce
 from src.core.db.models import User
 from src.core.db.repository import UserRepository
 
 
-class UserService(ContentService):
+class UserService:
     """Сервис для работы с моделью User."""
 
     def __init__(
