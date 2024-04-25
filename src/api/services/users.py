@@ -19,8 +19,8 @@ class UserService(ContentService):
         self._user_repository: UserRepository = user_repository
         self._session: AsyncSession = session
 
-    async def get_by_user_id(self, user_id: int) -> User | None:
-        return await self._user_repository.get_by_user_id(user_id)
+    async def get_by_telegram_id(self, telegram_id: int) -> User | None:
+        return await self._user_repository.get_by_telegram_id(telegram_id)
 
     async def get_users_by_page(self, page: int, limit: int) -> dict:
         offset = (page - 1) * limit

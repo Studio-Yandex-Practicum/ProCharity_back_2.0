@@ -30,14 +30,14 @@ async def get_all_users(
 
 
 @user_router.get(
-    "/{user_id}",
+    "/{telegram_id}",
     response_model=UserResponse | None,
     response_model_exclude_none=True,
     description="Получает пользователя по его id.",
 )
 @inject
-async def get_by_user_id(
-    user_id: int,
+async def get_by_telegram_id(
+    telegram_id: int,
     user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
 ) -> UserResponse | None:
-    return await user_service.get_by_user_id(user_id)
+    return await user_service.get_by_telegram_id(telegram_id)
