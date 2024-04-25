@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete, false, insert, orm, select
+from sqlalchemy import delete, false, func, insert, orm, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
@@ -110,3 +110,8 @@ class UserRepository(AbstractRepository):
         """Получить limit-выборку всех пользователей."""
         limit_users = await self._session.scalars((select(User).limit(limit).offset(offset)))
         return limit_users.all()
+
+    async def get_count_all_users(self) -> int:
+        """Получить общее число пользователей."""
+        count_users = await self._session.execute(select(func.count(User.id)))
+        return count_users.scalar()

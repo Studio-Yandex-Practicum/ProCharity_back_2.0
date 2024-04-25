@@ -16,7 +16,7 @@ user_router = APIRouter(
 
 @user_router.get(
     "",
-    response_model=list[UserResponse],
+    response_model=dict,
     response_model_exclude_none=True,
     description="Получает список всех пользователей.",
 )
@@ -25,7 +25,7 @@ async def get_all_users(
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=20, ge=1),
     user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
-) -> list[UserResponse]:
+) -> dict:
     return await user_service.get_users_by_page(page, limit)
 
 
