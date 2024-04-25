@@ -33,7 +33,7 @@ async def get_all_users(
     "/{telegram_id}",
     response_model=UserResponse | None,
     response_model_exclude_none=True,
-    description="Получает пользователя по его id.",
+    description="Получает пользователя по его telegram_id.",
 )
 @inject
 async def get_by_telegram_id(
