@@ -28,7 +28,6 @@ on:
         type: string
         default: ./infra/docker-compose.yml
 
-
 env:
   REGISTRY: ghcr.io
   REP_OWNER: studio-yandex-practicum
@@ -129,6 +128,8 @@ jobs:
             COMMIT_DATE=${{ env.COMMIT_DATE }}
             ACCESS_TOKEN_FOR_PROCHARITY=${{ secrets.ACCESS_TOKEN_FOR_PROCHARITY }}
             REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+            PROCHARITY_URL=${{ secrets.PROCHARITY_URL }}
+            ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY=${{ secrets.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY }}
             EOM
   start_application:
     name: Start application
