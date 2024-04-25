@@ -40,8 +40,14 @@ class TelegramNotificationService:
             return False, "Телеграм пользователя не найден."
         return await self.telegram_notification.send_message(user_id=site_user.user.telegram_id, message=message)
 
-    async def send_messages_to_subscribed_users(self, notifications, category_id):
-        """Отправляет сообщение пользователям, подписанным на определенные категории"""
+    async def send_messages_to_subscribed_users(self, notifications, category_id, reply_markup=None):
+        """Отправляет сообщение всем пользователям, подписанным на заданную категорию.
+
+        Args:
+            notifications: Текст сообщения.
+            category_id: Идентификатор заданной категории, подписчикам на которую отправится сообщение.
+            reply_markup: Объект клавиатуры под сообщением рассылки.
+        """
         qr = await self._session.scalars(
             select(Category)
             .join(Category.users)
@@ -51,7 +57,9 @@ class TelegramNotificationService:
         )
         if (category := qr.first()) is None:
             return
-        await self.telegram_notification.send_messages(message=notifications, users=category.users)
+        await self.telegram_notification.send_messages(
+            message=notifications, users=category.users, reply_markup=reply_markup
+        )
 
     def count_rate(self, respond: bool, msg: str, rate: InfoRate):
         errors_sending = ErrorsSending()

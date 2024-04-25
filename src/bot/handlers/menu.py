@@ -11,8 +11,8 @@ from src.bot.keyboards import (
     get_back_menu,
     get_menu_keyboard,
     get_no_mailing_keyboard,
+    get_support_service_keyboard,
     get_tasks_and_back_menu_keyboard,
-    support_service_keyboard,
 )
 from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
 from src.bot.services.user import UserService
@@ -33,11 +33,14 @@ async def menu_callback(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
 ):
-    """Возвращает в меню."""
+    """Отображает меню."""
+    user = ext_site_user.user
+    filling = ("", "тебя") if user.is_volunteer else ("те", "вас")
+    text = "Выбери{}, что {} интересует:".format(*filling)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Выбери, что тебя интересует:",
-        reply_markup=await get_menu_keyboard(ext_site_user.user),
+        text=text,
+        reply_markup=await get_menu_keyboard(user),
     )
 
 
@@ -115,18 +118,24 @@ async def unsubscription_reason_handler(
 async def support_service_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    url: str = Provide[Container.settings.provided.procharity_faq_volunteer_url],
+    volunteer_faq_url: str = Provide[Container.settings.provided.procharity_volunteer_faq_url],
+    fund_faq_url: str = Provide[Container.settings.provided.procharity_fund_faq_url],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
-    """Отправляет сервис меню."""
+    """Обращение в службу поддержки."""
+    user = await user_service.get_by_telegram_id(update.effective_user.id)
+    filling = ("", "твой", "шь", volunteer_faq_url) if user.is_volunteer else ("те", "ваш", "те", fund_faq_url)
+    text = (
+        "Мы на связи с 10.00 до 19.00 "
+        "в будние дни по любым вопросам. Смело пиши{} нам!\n\n"
+        "А пока мы изучаем {} запрос, може{} ознакомиться с "
+        "популярными вопросами и ответами на них в нашей "
+        '<a href="{}">базе знаний.</a>'
+    ).format(*filling)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Мы на связи с 10.00 до 19.00"
-        "в будние дни по любым вопросам. Смело пиши нам!\n\n"
-        "А пока мы изучаем твой запрос, можешь ознакомиться с"
-        "популярными вопросами и ответами на них в нашей"
-        f'<a href="{url}"> базе знаний.</a>',
-        reply_markup=await support_service_keyboard(await user_service.get_by_telegram_id(update.effective_user.id)),
+        text=text,
+        reply_markup=await get_support_service_keyboard(user),
         parse_mode=ParseMode.HTML,
     )
 

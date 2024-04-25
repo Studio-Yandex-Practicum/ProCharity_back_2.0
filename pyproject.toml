@@ -51,6 +51,7 @@ passlib = "^1.7.4"
 python-jose = "^3.3.0"
 fastapi-jwt = "^0.1.12"
 fastapi-users = {version = "12.1.2", extras = ["sqlalchemy"]}
+aiohttp = "^3.9.5"
 
 
 [tool.poetry.group.dev.dependencies]
