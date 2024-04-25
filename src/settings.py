@@ -184,6 +184,16 @@ class Settings(BaseSettings):
         """Получить url-ссылку на страницу отправки категорий пользователя."""
         return urljoin(self.PROCHARITY_URL, "api/v1/user_categories/")
 
+    @property
+    def procharity_send_bot_status_volunteer_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки статуса бота для волонтера."""
+        return urljoin(self.PROCHARITY_URL, "api/v1/bot_status_volunteer/")
+
+    @property
+    def procharity_send_bot_status_fund_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки статуса бота для фонда."""
+        return urljoin(self.PROCHARITY_URL, "api/v1/bot_status_fund/")
+
 
 @lru_cache()
 def get_settings():

@@ -47,6 +47,7 @@ async def view_categories(
     text_format: str,
     set_has_mailing_attribute: bool = False,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Выводит список выбранных волонтером категорий в заданном формате и заданную клавиатуру.
     Если set_has_mailing_attribute=True и имеются выбранные категории, выполняется обновление флага подписки.
@@ -66,7 +67,10 @@ async def view_categories(
             reply_markup=reply_markup,
         )
         if set_has_mailing_attribute:
-            await user_service.check_and_set_has_mailing_atribute(telegram_id)
+            user = await user_service.get_by_telegram_id(telegram_id)
+            has_mailing_changed = await user_service.check_and_set_has_mailing_atribute(user)
+            if has_mailing_changed:
+                await procharity_api.send_user_bot_status(user)
 
 
 @registered_user_required
