@@ -24,6 +24,7 @@ SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё зада
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
 ]
+VIEW_TASKS_AGAIN = [InlineKeyboardButton("Посмотреть задания еще раз", callback_data=callback_data.VIEW_TASKS_AGAIN)]
 
 
 def get_personal_account_button(
@@ -44,10 +45,8 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 async def tasks_again_get_back_menu():
     keyboard = [
-        [
-            InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU),
-            InlineKeyboardButton("Посмотреть задания еще раз", callback_data=callback_data.VIEW_TASKS_AGAIN),
-        ]
+        VIEW_TASKS_AGAIN,
+        RETURN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 

@@ -27,7 +27,7 @@ async def view_task_callback(
         keyboard = await tasks_again_get_back_menu()
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="Актуальных заданий по твоим компетенциям на сегодня нет.",
+            text="Ты просмотрел все актуальные задания на сегодня.",
             reply_markup=keyboard,
         )
         return
