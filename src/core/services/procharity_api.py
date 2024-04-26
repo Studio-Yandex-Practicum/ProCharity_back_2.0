@@ -19,6 +19,33 @@ class ProcharityAPI:
         """Возвращает заголовок с токеном авторизации в виде словаря."""
         return {"token": self._settings.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY}
 
+    async def _site_post(self, url: str, data: str, user_id: str, log_description: str):
+        """Осуществляет post запрос на заданный url сайта.
+
+        Args:
+            url: Адрес запроса.
+            data: Данные запроса.
+            user_id: Идентификатор пользователя (для логирования).
+            log_description: Описание запроса (для логирования).
+        """
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url=url, data=data, headers=self.token_header_dict) as response:
+                    if response.status != 200:
+                        await logger.ainfo(
+                            (
+                                f"Ошибка передачи данных из бота: {log_description} пользователя {user_id}. "
+                                f"status = {response.status}"
+                            )
+                        )
+                    else:
+                        data = await response.json()
+                        await logger.adebug(
+                            f"Успешная передача данных из бота: {log_description} пользователя {user_id}. Ответ: {data}"
+                        )
+        except Exception as e:
+            await logger.aexception(e)
+
     async def send_user_categories(self, user_id: int, user_categories: list[int]):
         """Отправляет запрос на сайт с обновленными категориями пользователя.
 
@@ -28,22 +55,12 @@ class ProcharityAPI:
         """
         specializations = ", ".join(map(str, user_categories))
         body_schema = SiteUserCategoriesRequest(user_id=user_id, specializations=specializations)
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    url=self._settings.procharity_send_user_categories_api_url,
-                    data=body_schema.model_dump_json(),
-                    headers=self.token_header_dict,
-                ) as response:
-                    if response.status != 200:
-                        await logger.ainfo(
-                            f"Ошибка обновления категорий пользователя {user_id}: status = {response.status}"
-                        )
-                    else:
-                        data = await response.json()
-                        await logger.adebug(f"Отправлены обновленные категории пользователя {user_id}. Ответ: {data}")
-        except Exception as e:
-            await logger.aexception(e)
+        await self._site_post(
+            url=self._settings.procharity_send_user_categories_api_url,
+            data=body_schema.model_dump_json(),
+            user_id=user_id,
+            log_description="категории",
+        )
 
     async def send_bot_status(self, user_id: int, is_volunteer: bool, has_mailing: bool, banned: bool):
         """Отправляет запрос на сайт с обновленным статусом бота пользователя.
@@ -61,22 +78,12 @@ class ProcharityAPI:
             else self._settings.procharity_send_bot_status_fund_api_url
         )
         body_schema = SiteBotStatusRequest(user_id=user_id, bot_status=status)
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    url=site_url,
-                    data=body_schema.model_dump_json(),
-                    headers=self.token_header_dict,
-                ) as response:
-                    if response.status != 200:
-                        await logger.ainfo(
-                            f"Ошибка обновления статуса бота пользователя {user_id}: status = {response.status}"
-                        )
-                    else:
-                        data = await response.json()
-                        await logger.adebug(f"Отправлен обновленный статус бота пользователя {user_id}. Ответ: {data}")
-        except Exception as e:
-            await logger.aexception(e)
+        await self._site_post(
+            url=site_url,
+            data=body_schema.model_dump_json(),
+            user_id=user_id,
+            log_description="статус бота",
+        )
 
     async def send_user_bot_status(self, user: User):
         """Отправляет запрос на сайт с обновленным статусом бота пользователя.
