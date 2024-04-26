@@ -12,11 +12,11 @@ def display_task(
     bonus_info_url: str = Provide[Container.settings.provided.procharity_bonus_info_url],
 ) -> str:
     deadline = task.deadline.strftime(TASK_DEADLINE_FORMAT) if task.deadline else "Не указан."
-    title = "--- Обновленное задание ---\n\n" if updated_task else ""
-    return title + (
-        f"<b>Фонд:</b> {task.name_organization}\n\n"
-        f"<b>Категория:</b> {task.category.name if task.category else 'Не указана.'}\n\n"
-        f"<b>Срок:</b> {deadline}\n\n"
-        f"<a href='{bonus_info_url}'><b>Бонусы:</b></a> {task.bonus} × 💎\n\n"
+    deadline_exclamation = "❗️" if updated_task else ""
+    return (
         f"<b>{task.title}\n\n</b>"
+        f"<b>От фонда:</b> {task.name_organization}\n\n"
+        f"<b>Категория:</b> {task.category.name if task.category else 'Не указана.'}\n\n"
+        f"{deadline_exclamation}<b>Срок:</b> {deadline}\n\n"
+        f"<a href='{bonus_info_url}'>Бонусы:</a> <b>{task.bonus}</b> × 💎\n\n"
     )

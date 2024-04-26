@@ -89,19 +89,13 @@ class Settings(BaseSettings):
     TAGS: list[str] = []
 
     # Ключевые поля, изменение которых вызывает рассылку обновленного задания
-    TRIGGER_MAILING_FIELDS: list[str] = [
-        "title",
-        "deadline",
-        "category_id",
-        "bonus",
-        "location",
-        "link",
-        "description",
-    ]
+    # Изменение ключевых полей может потребовать изменения формата сообщения в src.core.messages.display_task()
+    TRIGGER_MAILING_FIELDS: list[str] = ["deadline"]
 
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
+    ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = ""
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
     def check_last_slash_url(cls, v) -> str:
@@ -166,9 +160,14 @@ class Settings(BaseSettings):
         return urljoin(self.PROCHARITY_URL, "foundations/lk/settings/")
 
     @property
-    def procharity_faq_volunteer_url(self) -> str:
-        """Получить url-ссылку на страницу базы знаний."""
+    def procharity_volunteer_faq_url(self) -> str:
+        """Получить url-ссылку на страницу базы знаний для волонтёров."""
         return urljoin(self.HELP_PROCHARITY_URL, "category/1876")
+
+    @property
+    def procharity_fund_faq_url(self) -> str:
+        """Получить url-ссылку на страницу базы знаний для фондов."""
+        return urljoin(self.HELP_PROCHARITY_URL, "category/1877")
 
     @property
     def procharity_bonus_info_url(self) -> str:
@@ -179,6 +178,11 @@ class Settings(BaseSettings):
     def procharity_tasks_url(self) -> str:
         """Получить url-ссылку на страницу с заданиями."""
         return urljoin(self.PROCHARITY_URL, "tasks")
+
+    @property
+    def procharity_send_user_categories_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки категорий пользователя."""
+        return urljoin(self.PROCHARITY_URL, "api/v1/user_categories/")
 
 
 @lru_cache()
