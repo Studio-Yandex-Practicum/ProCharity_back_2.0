@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.utils import user_formatter, users_paginate_responce
 from src.core.db.models import User
 from src.core.db.repository import UserRepository
+from src.settings import settings
 
 
 class UserService:
@@ -33,8 +34,8 @@ class UserService:
         pages = math.ceil(count_users / limit) if count_users else None
         next_page = page + 1 if page != pages else None
         previous_page = page - 1 if page != 1 else None
-        next_url = f"/api/users/?page={next_page}&limit={limit}" if next_page else None
-        previous_url = f"/api/users/?page={previous_page}&limit={limit}" if previous_page else None
+        next_url = f"{settings.users_url}?page={next_page}&limit={limit}" if next_page else None
+        previous_url = f"{settings.users_url}?page={previous_page}&limit={limit}" if previous_page else None
 
         pagination_data = {
             "total": count_users,
