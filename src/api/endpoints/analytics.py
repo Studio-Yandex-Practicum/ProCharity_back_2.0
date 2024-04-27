@@ -20,7 +20,7 @@ analytic_router = APIRouter(
 @analytic_router.get("", description="Возращает статистику сервиса.")
 @inject
 async def get_analytics(
-    date_limit: date = Query(..., example="2023-10-11"),
+    date_limit: date = Query(date.today(), example=f"{date.today()}"),
     analytic_service: AnalyticsService = Depends(Provide[Container.api_services_container.analytic_service]),
 ) -> Analytic:
     return Analytic(
