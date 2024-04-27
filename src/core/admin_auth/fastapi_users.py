@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Generic, Sequence, Type
+from typing import AsyncGenerator, Generic, Sequence, Type
 
 import structlog
 from dependency_injector.wiring import Provide
@@ -10,22 +10,31 @@ from fastapi_users.authentication import AuthenticationBackend, Authenticator
 from fastapi_users.manager import UserManagerDependency
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 from src.api.endpoints.admin_routers.auth import get_auth_router
 from src.api.endpoints.admin_routers.register import get_register_router
 from src.api.services import AdminTokenRequestService
 from src.core.admin_auth.backend import auth_backend
 from src.core.admin_auth.cookie_backend import auth_cookie_backend
-from src.core.db.db import get_session
 from src.core.db.models import AdminUser
 from src.core.depends import Container
 from src.core.exceptions.exceptions import BadRequestException, UserAlreadyExists
+from src.settings import settings
 
 log = structlog.get_logger()
 
+engine = create_async_engine(settings.database_url)
+async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-async def get_admin_db(session: AsyncSession = Depends(get_session)):
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
+
+
+async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, AdminUser)
 
 
