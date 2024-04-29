@@ -24,11 +24,15 @@ class TelegramNotificationService:
         """Отправляет сообщение указанной группе пользователей"""
         match notifications.mode.upper():
             case TelegramNotificationUsersGroups.ALL.name:
-                users = await self._session.scalars(select(User))
+                users = await self._session.scalars(select(User).where(User.banned.is_(False)))
             case TelegramNotificationUsersGroups.SUBSCRIBED.name:
-                users = await self._session.scalars(select(User).where(User.has_mailing == True))  # noqa
+                users = await self._session.scalars(
+                    select(User).where(User.has_mailing.is_(True) & User.banned.is_(False))
+                )
             case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
-                users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
+                users = await self._session.scalars(
+                    select(User).where(User.has_mailing.is_(False) & User.banned.is_(False))
+                )
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
     async def send_message_to_user(self, id_hash: str, message: str) -> tuple[bool, str]:
@@ -52,7 +56,7 @@ class TelegramNotificationService:
             select(Category)
             .join(Category.users)
             .options(contains_eager(Category.users))
-            .where(User.has_mailing)
+            .where(User.has_mailing.is_(True) & User.banned.is_(False))
             .where(Category.id == category_id)
         )
         if (category := qr.first()) is None:
