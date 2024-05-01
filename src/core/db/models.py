@@ -120,6 +120,7 @@ class Task(ContentBase):
     fund_city: Mapped[str] = mapped_column(nullable=True)
     fund_rating: Mapped[float] = mapped_column(nullable=True)
     fund_site: Mapped[str] = mapped_column(nullable=True)
+    fund_link: Mapped[str] = mapped_column(nullable=True)
     yb_link: Mapped[str] = mapped_column(nullable=True)
     vk_link: Mapped[str] = mapped_column(nullable=True)
     fund_sections: Mapped[str] = mapped_column(nullable=True)
