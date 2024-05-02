@@ -2,7 +2,7 @@ import math
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.utils import user_formatter, users_paginate_responce
+from src.api.utils import user_formatter
 from src.core.db.models import User
 from src.core.db.repository import UserRepository
 from src.settings import settings
@@ -25,7 +25,7 @@ class UserService:
     async def get_users_by_page(self, page: int, limit: int) -> dict:
         offset = (page - 1) * limit
         users = await self._user_repository.get_users_by_page(limit, offset)
-        count_users = await self._user_repository.get_count_all_users()
+        count_users = await self._user_repository.count_all()
 
         result = []
         for user in users:
@@ -48,4 +48,4 @@ class UserService:
             "result": result,
         }
 
-        return users_paginate_responce(pagination_data)
+        return pagination_data

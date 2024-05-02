@@ -13,7 +13,3 @@ def user_formatter(user: User) -> dict:
         "date_registration": user.created_at.strftime("%Y-%m-%d"),
         "banned": user.banned,
     }
-
-
-def users_paginate_responce(pagination_data: dict) -> dict:
-    return {"200": {"description": "ok", "examples": {"RESULT": pagination_data}}}
