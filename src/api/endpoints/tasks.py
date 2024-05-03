@@ -37,7 +37,7 @@ async def actualize_tasks(
     "/{user_id}",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
-    description="Получает список всех задач из категорий на которые подписан юзер.",
+    description="Получает список всех задач из категорий, на которые подписан пользователь.",
 )
 @inject
 async def get_tasks_for_user(
