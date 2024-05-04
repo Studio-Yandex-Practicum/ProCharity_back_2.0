@@ -4,6 +4,7 @@ from typing import Sequence, TypeVar
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import DuplicateColumnError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import desc
 from structlog import get_logger
 
 from src.api.constants import DATE_FORMAT_FOR_STATISTICS
@@ -107,6 +108,14 @@ class AbstractRepository(abc.ABC):
             .order_by(column)
         )
         return dict(db_data.fetchall())
+
+    async def get_objects_by_page(
+        self, object: DatabaseModel, page: int, limit: int, column_name: str = "created_at"
+    ) -> Sequence[DatabaseModel]:
+        """Получает limit-выборку из базы данных."""
+        offset = (page - 1) * limit
+        objects = await self._session.scalars((select(object).limit(limit).offset(offset).order_by(desc(column_name))))
+        return objects.all()
 
 
 class ContentRepository(AbstractRepository, abc.ABC):

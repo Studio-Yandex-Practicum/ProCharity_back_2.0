@@ -105,8 +105,3 @@ class UserRepository(AbstractRepository):
         """
         user.has_mailing = has_mailing
         await self.update(user.id, user)
-
-    async def get_users_by_page(self, limit: int = 20, offset: int = 0) -> Sequence[User]:
-        """Получить limit-выборку всех пользователей."""
-        limit_users = await self._session.scalars((select(User).limit(limit).offset(offset)))
-        return limit_users.all()
