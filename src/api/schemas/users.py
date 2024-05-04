@@ -30,3 +30,16 @@ class UserResponse(ResponseBase):
                 "date_registration": "2000-01-01T00:00:00",
             }
         }
+
+
+class UsersPaginateResponce(ResponseBase):
+    """Класс схемы постраничного ответа для User."""
+
+    total: int | None
+    pages: int | None
+    current_page: int | None
+    next_page: int | None
+    previous_page: int | None
+    next_url: str | None
+    previous_url: str | None
+    result: list[dict] | None

@@ -1,7 +1,8 @@
 import math
 
 
-def paginate(objects: list, count_objects: int, page: int, limit: int, url: str):
+def paginate(objects: list, count_objects: int, page: int, limit: int, url: str) -> dict:
+    """Формирование данных для пагинации."""
     pages = math.ceil(count_objects / limit) if count_objects else None
     next_page = page + 1 if page != pages else None
     previous_page = page - 1 if page != 1 else None
