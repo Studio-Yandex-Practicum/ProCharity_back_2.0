@@ -15,7 +15,7 @@ user_router = APIRouter(
 
 
 @user_router.get(
-    "",
+    "/",
     response_model=UsersPaginateResponce,
     response_model_exclude_none=True,
     description="Получает список всех пользователей.",
