@@ -1,7 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query
 
-from src.api.schemas import UserResponse, UsersPaginateResponce
+from src.api.schemas import UserResponse, UsersPaginatedResponse
 from src.api.services import UserService
 from src.authentication import fastapi_users
 from src.core.depends import Container
@@ -16,7 +16,7 @@ user_router = APIRouter(
 
 @user_router.get(
     "/",
-    response_model=UsersPaginateResponce,
+    response_model=UsersPaginatedResponse,
     response_model_exclude_none=True,
     description="Получает список всех пользователей.",
 )
@@ -25,7 +25,7 @@ async def get_all_users(
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=20, ge=1),
     user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
-) -> UsersPaginateResponce:
+) -> UsersPaginatedResponse:
     return await user_service.get_users_by_page(page, limit)
 
 

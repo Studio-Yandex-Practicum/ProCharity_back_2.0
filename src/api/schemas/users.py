@@ -32,7 +32,7 @@ class UserResponse(ResponseBase):
         }
 
 
-class UsersPaginateResponce(ResponseBase):
+class UsersPaginatedResponse(ResponseBase):
     """Класс схемы постраничного ответа для User."""
 
     total: int | None
@@ -42,4 +42,4 @@ class UsersPaginateResponce(ResponseBase):
     previous_page: int | None
     next_url: str | None
     previous_url: str | None
-    result: list[dict] | None
+    result: list[UserResponse] | None

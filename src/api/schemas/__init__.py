@@ -16,7 +16,7 @@ from .notification import (
 )
 from .tasks import TaskRequest, TaskResponse, TasksRequest
 from .token_schemas import TokenCheckResponse
-from .users import UserResponse, UsersPaginateResponce
+from .users import UserResponse, UsersPaginatedResponse
 
 __all__ = (
     "ActiveTasks",
@@ -48,5 +48,5 @@ __all__ = (
     "TokenCheckResponse",
     "FeedbackSchema",
     "UserResponse",
-    "UsersPaginateResponce",
+    "UsersPaginatedResponse",
 )
