@@ -62,29 +62,6 @@ class ProcharityAPI:
             log_description="категории",
         )
 
-    async def send_bot_status(self, user_id: int, is_volunteer: bool, has_mailing: bool, banned: bool):
-        """Отправляет запрос на сайт с обновленным статусом бота пользователя.
-
-        Args:
-            user_id: Идентификатор пользователя на сайте.
-            is_volunteer: True для волонтера, False для фонда.
-            has_mailing: True, если рассылка включена.
-            banned: True, если пользователь забанил бота.
-        """
-        status = "on" if has_mailing and not banned else "off"
-        site_url = (
-            self._settings.procharity_send_bot_status_volunteer_api_url
-            if is_volunteer
-            else self._settings.procharity_send_bot_status_fund_api_url
-        )
-        body_schema = SiteBotStatusRequest(user_id=user_id, bot_status=status)
-        await self._site_post(
-            url=site_url,
-            data=body_schema.model_dump_json(),
-            user_id=user_id,
-            log_description="статус бота",
-        )
-
     async def send_user_bot_status(self, user: User):
         """Отправляет запрос на сайт с обновленным статусом бота пользователя.
 
@@ -92,9 +69,17 @@ class ProcharityAPI:
             user: Модель пользователя.
         """
         if user and user.external_user:
-            await self.send_bot_status(
-                user_id=user.external_user.external_id,
-                is_volunteer=user.is_volunteer,
-                has_mailing=user.has_mailing,
-                banned=user.banned,
+            user_id = user.external_user.external_id
+            status = "off" if user.banned or (user.is_volunteer and not user.has_mailing) else "on"
+            site_url = (
+                self._settings.procharity_send_bot_status_volunteer_api_url
+                if user.is_volunteer
+                else self._settings.procharity_send_bot_status_fund_api_url
+            )
+            body_schema = SiteBotStatusRequest(user_id=user_id, bot_status=status)
+            await self._site_post(
+                url=site_url,
+                data=body_schema.model_dump_json(),
+                user_id=user_id,
+                log_description="статус бота",
             )
