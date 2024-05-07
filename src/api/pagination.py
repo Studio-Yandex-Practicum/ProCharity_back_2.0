@@ -1,8 +1,19 @@
 import math
 
+from src.core.db.repository import AbstractRepository
 
-def paginate(objects: list, count_objects: int, page: int, limit: int, url: str) -> dict:
+
+async def paginate(repository: AbstractRepository, page: int, limit: int, url: str, format_objects=None) -> dict:
     """Формирование данных для пагинации."""
+    objects = await repository.get_objects_by_page(page, limit)
+    count_objects = await repository.count_all()
+
+    if format_objects:
+        result = []
+        for object in objects:
+            result.append(format_objects(object))
+        objects = result
+
     pages = math.ceil(count_objects / limit)
     next_page = page + 1 if page < pages else None
     previous_page = page - 1 if page > 1 else None

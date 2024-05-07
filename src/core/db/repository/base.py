@@ -110,11 +110,13 @@ class AbstractRepository(abc.ABC):
         return dict(db_data.fetchall())
 
     async def get_objects_by_page(
-        self, object: DatabaseModel, page: int, limit: int, column_name: str = "created_at"
+        self, page: int, limit: int, column_name: str = "created_at"
     ) -> Sequence[DatabaseModel]:
-        """Получает limit-выборку из базы данных."""
+        """Получает limit-выборку из базы данных отфильтрованную по полю column_name."""
         offset = (page - 1) * limit
-        objects = await self._session.scalars((select(object).limit(limit).offset(offset).order_by(desc(column_name))))
+        objects = await self._session.scalars(
+            (select(self._model).limit(limit).offset(offset).order_by(desc(column_name)))
+        )
         return objects.all()
 
 
