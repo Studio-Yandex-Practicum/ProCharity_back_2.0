@@ -11,7 +11,7 @@ logger = get_logger()
 
 class UserService(BaseUserService):
     def __init__(self, user_repository: UserRepository, ext_user_repository: ExternalSiteUserRepository) -> None:
-        self._user_repository = user_repository
+        super().__init__(user_repository)
         self._ext_user_repository = ext_user_repository
 
     async def _update_or_create(self, user: User, **attrs) -> User:

@@ -61,5 +61,4 @@ class APIServicesContainer(containers.DeclarativeContainer):
     user_service = providers.Factory(
         UserService,
         user_repository=repositories.user_repository,
-        session=data_base_connection.session,
     )

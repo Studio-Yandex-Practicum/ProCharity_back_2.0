@@ -112,7 +112,10 @@ class AbstractRepository(abc.ABC):
     async def get_objects_by_page(
         self, page: int, limit: int, column_name: str = "created_at"
     ) -> Sequence[DatabaseModel]:
-        """Получает limit-выборку из базы данных отфильтрованную по полю column_name."""
+        """
+        Получает данные ограниченные параметрами page и limit,
+        и отсортированные по полю column_name в порядке убывания.
+        """
         offset = (page - 1) * limit
         objects = await self._session.scalars(
             (select(self._model).limit(limit).offset(offset).order_by(desc(column_name)))

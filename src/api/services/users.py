@@ -1,5 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.api.pagination import paginate
 from src.api.utils import format_user
 from src.core.db.repository import UserRepository
@@ -13,9 +11,8 @@ class UserService(BaseUserService):
     def __init__(
         self,
         user_repository: UserRepository,
-        session: AsyncSession,
     ) -> None:
-        self._user_repository: UserRepository = user_repository
+        super().__init__(user_repository)
 
     async def get_users_by_page(self, page: int, limit: int) -> dict:
         return await paginate(self._user_repository, page, limit, settings.users_url, format_user)

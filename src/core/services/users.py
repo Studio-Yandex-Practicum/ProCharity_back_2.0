@@ -1,5 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.core.db.models import User
 from src.core.db.repository import UserRepository
 
@@ -10,7 +8,6 @@ class BaseUserService:
     def __init__(
         self,
         user_repository: UserRepository,
-        session: AsyncSession,
     ) -> None:
         self._user_repository: UserRepository = user_repository
 
