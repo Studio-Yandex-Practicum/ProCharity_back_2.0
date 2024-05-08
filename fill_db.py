@@ -325,7 +325,7 @@ async def run(generate_fake_users: bool):
         await filling_task_in_db(session)
         if generate_fake_users:
             await filling_user_and_external_site_user_in_db(session)
-        await filling_unsubscribe_reason_in_db(session)
+            await filling_unsubscribe_reason_in_db(session)
         print("Тестовые данные загружены в БД.")
 
 
