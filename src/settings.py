@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Annotated
 from urllib.parse import urljoin
 
-from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, field_validator, validator
+from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, field_validator
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,16 +98,17 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = ""
 
     @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
-    def check_last_slash_url(cls, v) -> str:
-        """Кастомный валидатор-добавлятор последнего слэша в константе URL."""
-
+    @classmethod
+    def check_last_slash_url(cls, v: str) -> str:
+        """Проверить и добавить последний слэш в константе URL."""
         if v[-1] != "/":
             return urljoin(v, "/")
         return v
 
-    @validator("APPLICATION_URL")
-    def check_domain_startswith_https_or_add_https(cls, v) -> str:
-        """Добавить 'https://' к домену."""
+    @field_validator("APPLICATION_URL")
+    @classmethod
+    def check_domain_startswith_https_or_add_https(cls, v: str) -> str:
+        """Добавить 'https://' к домену, если он не содержит протокол."""
         if "https://" in v or "http://" in v:
             return v
         return urljoin("https://", f"//{v}")

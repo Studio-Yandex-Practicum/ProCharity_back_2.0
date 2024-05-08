@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import Field, root_validator
+from pydantic import Field, model_validator
 
 from src.api.schemas.base import RequestBase, ResponseBase
 
@@ -16,8 +16,9 @@ class CategoryRequest(RequestBase):
         description="Принадлежность к родительской категории. Если null, то это родительская категория.",
     )
 
-    @root_validator(skip_on_failure=True)
-    def validate_self_parent(cls, values):
+    @model_validator(mode="before")
+    @classmethod
+    def validate_self_parent(cls, values: dict) -> dict:
         if values["parent_id"] and values["parent_id"] == values["id"]:
             raise ValueError("Категория не может быть дочерней для самой себя.")
         return values

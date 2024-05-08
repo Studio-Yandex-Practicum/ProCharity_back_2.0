@@ -36,7 +36,8 @@ class ExternalSiteVolunteerRequest(BaseExternalSiteUserRequest):
         return user_orm
 
     @field_validator("specializations", mode="before")
-    def specializations_str_validation(cls, value: str):
+    @classmethod
+    def specializations_str_validation(cls, value: str) -> list[int] | None:
         if not isinstance(value, str):
             return value
         try:

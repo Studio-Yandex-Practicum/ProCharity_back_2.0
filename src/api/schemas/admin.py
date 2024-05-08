@@ -1,7 +1,7 @@
 import re
 
 from fastapi_users import schemas
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from src.api.constants import PASSWORD_POLICY
 from src.api.schemas.base import RequestBase
@@ -29,8 +29,9 @@ class UserCreate(schemas.CreateUpdateDictModel):
     last_name: str | None = Field(None, max_length=64, description="User's Last Name.")
     password: str = Field(..., description="Account password.")
 
-    @validator("password")
-    def validate_password(cls, value: str):
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
         if re.match(PASSWORD_POLICY, value) is None:
             raise InvalidPassword
         return value
