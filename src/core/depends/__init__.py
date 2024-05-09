@@ -14,4 +14,5 @@ __all__ = (
     "DataBaseConnectionContainer",
     "JWTServicesContainer",
     "RepositoriesContainer",
+    "PaginateContainer",
 )
