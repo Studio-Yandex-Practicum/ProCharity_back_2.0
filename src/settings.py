@@ -109,7 +109,7 @@ class Settings(BaseSettings):
     @classmethod
     def check_domain_startswith_https_or_add_https(cls, v: str) -> str:
         """Добавить 'https://' к домену, если он не содержит протокол."""
-        if "https://" in v or "http://" in v:
+        if v.startswith("https://") or v.startswith("http://"):
             return v
         return urljoin("https://", f"//{v}")
 
