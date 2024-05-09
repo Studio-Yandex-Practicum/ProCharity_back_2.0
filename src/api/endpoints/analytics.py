@@ -3,10 +3,10 @@ from datetime import date
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query
 
+from src.api.fastapi_users import fastapi_admin_users
 from src.api.schemas import ActiveTasks, AllUsersStatistic, Analytic, DBStatus, ReasonCancelingStatistics
 from src.api.services import HealthCheckService
 from src.api.services.analytics import AnalyticsService
-from src.core.admin_auth.fastapi_users import fastapi_admin_users
 from src.core.depends import Container
 from src.settings import settings
 

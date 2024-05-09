@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
+from src.api.fastapi_users import auth_backend, auth_cookie_backend, fastapi_admin_users
 from src.api.schemas.admin import AdminUserCreate, AdminUserRead
-from src.core.admin_auth.fastapi_users import auth_backend, auth_cookie_backend, fastapi_admin_users
 
 admin_user_router = APIRouter()
 
