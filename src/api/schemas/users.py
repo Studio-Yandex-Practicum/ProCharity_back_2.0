@@ -8,13 +8,13 @@ from src.api.schemas.base import ResponseBase
 class UserResponse(ResponseBase):
     """Класс схемы ответа для User."""
 
-    telegram_id: int = Field(...)
-    first_name: str = Field(...)
-    last_name: str = Field(...)
-    email: str | None = Field(...)
-    username: str = Field(...)
-    has_mailing: bool = Field(...)
-    banned: bool = Field(...)
+    telegram_id: int
+    first_name: str
+    last_name: str
+    email: str | None
+    username: str
+    has_mailing: bool
+    banned: bool
     created_at: datetime = Field(..., serialization_alias="date_registration")
 
     class Config:

@@ -1,5 +1,5 @@
 import abc
-from typing import Sequence, TypeVar
+from typing import Generic, Sequence, TypeVar
 
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import DuplicateColumnError
@@ -16,7 +16,7 @@ DatabaseModel = TypeVar("DatabaseModel")
 DATE_TIME_FORMAT_LAST_UPDATE = "YYYY-MM-DD HH24:MI:SS"
 
 
-class AbstractRepository(abc.ABC):
+class AbstractRepository(abc.ABC, Generic[DatabaseModel]):
     """Абстрактный класс, для реализации паттерна Repository."""
 
     def __init__(self, session: AsyncSession, model: DatabaseModel) -> None:
