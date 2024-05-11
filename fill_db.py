@@ -1,5 +1,6 @@
 import asyncio
 import string
+import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from random import choice, choices, randint, sample
@@ -315,17 +316,19 @@ async def delete_all_data(
     await session.commit()
 
 
-async def run():
+async def run(generate_fake_users: bool):
     session_manager = asynccontextmanager(get_session)
     async with session_manager() as session:
         await delete_all_data(session)
         await filling_category_in_db(session)
         await filling_subcategory_in_db(session)
         await filling_task_in_db(session)
-        await filling_user_and_external_site_user_in_db(session)
-        await filling_unsubscribe_reason_in_db(session)
+        if generate_fake_users:
+            await filling_user_and_external_site_user_in_db(session)
+            await filling_unsubscribe_reason_in_db(session)
         print("Тестовые данные загружены в БД.")
 
 
 if __name__ == "__main__":
-    asyncio.run(run())
+    generate_fake_users = "with_fake_users" in sys.argv[1:]
+    asyncio.run(run(generate_fake_users))
