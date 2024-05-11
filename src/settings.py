@@ -97,12 +97,12 @@ class Settings(BaseSettings):
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
     ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = ""
 
-    @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
+    @field_validator("APPLICATION_URL", "PROCHARITY_URL", "HELP_PROCHARITY_URL")
     @classmethod
     def check_last_slash_url(cls, v: str) -> str:
         """Проверить и добавить последний слэш в константе URL."""
         if v[-1] != "/":
-            return urljoin(v, "/")
+            return f"{v}/"
         return v
 
     @field_validator("APPLICATION_URL")
