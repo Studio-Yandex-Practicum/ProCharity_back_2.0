@@ -101,7 +101,7 @@ class Settings(BaseSettings):
     @classmethod
     def check_last_slash_url(cls, v: str) -> str:
         """Проверить и добавить последний слэш в константе URL."""
-        if v[-1] != "/":
+        if v and v[-1] != "/":
             return f"{v}/"
         return v
 
