@@ -11,6 +11,7 @@ from src.core.depends import Container
 from src.core.messages import display_task
 
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+task_detail_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
 @task_router.post("", description="Актуализирует список задач.")
@@ -58,3 +59,17 @@ async def get_all_tasks(
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> list[TaskResponse]:
     return await task_service.get_all()
+
+
+@task_detail_router.get(
+    "/{task_id}",
+    response_model=TaskResponse,
+    response_model_exclude_none=True,
+    description="Получает данные по выбранной задаче.",
+)
+@inject
+async def get_task_detail(
+    task_id: int,
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
+) -> TaskResponse:
+    return await task_service.get(task_id)
