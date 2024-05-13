@@ -1,4 +1,3 @@
-from .admin import AdminUserRequest
 from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCancelingStatistics
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
@@ -19,7 +18,6 @@ from .token_schemas import TokenCheckResponse
 
 __all__ = (
     "ActiveTasks",
-    "AdminUserRequest",
     "AllUsersStatistic",
     "Analytic",
     "RequestBase",
