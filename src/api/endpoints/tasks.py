@@ -11,7 +11,7 @@ from src.core.depends import Container
 from src.core.messages import display_task
 
 task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
-task_detail_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+task_detail_router = APIRouter()
 
 
 @task_router.post("", description="Актуализирует список задач.")
