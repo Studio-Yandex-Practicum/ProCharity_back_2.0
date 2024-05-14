@@ -1,29 +1,14 @@
 import re
 
+from fastapi.param_functions import Form
 from fastapi_users import schemas
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from src.api.constants import PASSWORD_POLICY
-from src.api.schemas.base import RequestBase
 from src.core.exceptions.exceptions import InvalidPassword
 
 
-class AdminUserRequest(RequestBase):
-    """Класс модели запроса для AdminUser."""
-
-    email: str = Field(..., max_length=48)
-    password: str = Field(..., max_length=48)
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "email",
-                "password": "password",
-            }
-        }
-
-
-class UserCreate(schemas.CreateUpdateDictModel):
+class AdminUserCreate(schemas.CreateUpdateDictModel):
     token: str = Field(..., description="Invitation token.")
     first_name: str | None = Field(None, max_length=64, description="User's First Name.")
     last_name: str | None = Field(None, max_length=64, description="User's Last Name.")
@@ -37,10 +22,29 @@ class UserCreate(schemas.CreateUpdateDictModel):
         return value
 
 
-class UserRead(schemas.BaseUser[int]):
+class AdminUserRead(schemas.BaseUser[int]):
     pass
 
 
 class CustomBearerResponse(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class OAuth2PasswordRequestForm:
+    def __init__(
+        self,
+        *,
+        grant_type: str | None = Form(default=None, regex="password"),
+        email: EmailStr = Form(),
+        password: str = Form(),
+        scope: str = Form(default=""),
+        client_id: str | None = Form(default=None),
+        client_secret: str | None = Form(default=None),
+    ):
+        self.grant_type = grant_type
+        self.username = email
+        self.password = password
+        self.scopes = scope.split()
+        self.client_id = client_id
+        self.client_secret = client_secret
