@@ -135,6 +135,11 @@ class Settings(BaseSettings):
         return urljoin(self.api_url, "telegram/webhook")
 
     @property
+    def users_url(self) -> str:
+        """Получить url-ссылку на эндпоинт Users."""
+        return urljoin(self.ROOT_PATH + "/", "users")
+
+    @property
     def feedback_form_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
         return urljoin(self.static_url, "feedback_form/feedback_form.html")
@@ -183,6 +188,16 @@ class Settings(BaseSettings):
     def procharity_send_user_categories_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки категорий пользователя."""
         return urljoin(self.PROCHARITY_URL, "api/v1/user_categories/")
+
+    @property
+    def procharity_send_bot_status_volunteer_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки статуса бота для волонтера."""
+        return urljoin(self.PROCHARITY_URL, "api/v1/bot_status_volunteer/")
+
+    @property
+    def procharity_send_bot_status_fund_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки статуса бота для фонда."""
+        return urljoin(self.PROCHARITY_URL, "api/v1/bot_status_fund/")
 
 
 @lru_cache()

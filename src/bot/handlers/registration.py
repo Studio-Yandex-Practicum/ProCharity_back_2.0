@@ -12,6 +12,7 @@ from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.services.procharity_api import ProcharityAPI
 
 
 @logger_decor
@@ -47,6 +48,7 @@ async def on_chat_member_update(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Обновление статуса пользователя."""
     my_chat_member = update.my_chat_member or Never
@@ -59,11 +61,14 @@ async def on_chat_member_update(
 
     if not user:
         return None
-
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
-        return await user_service.bot_banned(user)
+        await user_service.bot_banned(user)
+        await procharity_api.send_user_bot_status(user)
+        return user
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
-        return await user_service.bot_unbanned(user)
+        await user_service.bot_unbanned(user)
+        await procharity_api.send_user_bot_status(user)
+        return user
 
 
 def registration_handlers(app: Application):

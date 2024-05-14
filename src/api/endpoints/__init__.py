@@ -7,6 +7,7 @@ from .health_check import health_check_router
 from .notification import notification_router
 from .tasks import task_detail_router, task_router
 from .telegram_webhook import telegram_webhook_router
+from .users import user_router
 
 __all__ = (
     "analytic_router",
@@ -20,4 +21,5 @@ __all__ = (
     "site_user_router",
     "admin_user_router",
     "feedback_router",
+    "user_router",
 )
