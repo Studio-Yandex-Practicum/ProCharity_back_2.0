@@ -7,6 +7,7 @@ from .external_site_user import ExternalSiteUserService
 from .health_check import HealthCheckService
 from .messages import TelegramNotificationService
 from .task import TaskService
+from .users import UserService
 
 __all__ = (
     "ContentService",
@@ -18,4 +19,5 @@ __all__ = (
     "AnalyticsService",
     "HealthCheckService",
     "TelegramNotificationService",
+    "UserService",
 )
