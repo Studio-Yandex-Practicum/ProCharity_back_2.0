@@ -136,6 +136,11 @@ class Settings(BaseSettings):
         return urljoin(self.api_url, "telegram/webhook")
 
     @property
+    def users_url(self) -> str:
+        """Получить url-ссылку на эндпоинт Users."""
+        return urljoin(self.ROOT_PATH + "/", "users")
+
+    @property
     def feedback_form_template_url(self) -> str:
         """Получить url-ссылку на HTML шаблон формы обратной связи."""
         return urljoin(self.static_url, "feedback_form/feedback_form.html")

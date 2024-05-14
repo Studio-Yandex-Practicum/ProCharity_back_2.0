@@ -8,6 +8,7 @@ from .bot_services import BotServicesContainer
 from .core_services import CoreServicesContainer
 from .data_base_connection import DataBaseConnectionContainer
 from .jwt_services import JWTServicesContainer
+from .pagination import PaginateContainer
 from .repositories import RepositoriesContainer
 
 
@@ -40,3 +41,5 @@ class Container(containers.DeclarativeContainer):
     bot_services_container = providers.Container(BotServicesContainer, repositories=repositories_container)
 
     jwt_services_container = providers.Container(JWTServicesContainer, settings=settings)
+
+    api_paginate_container = providers.Container(PaginateContainer, repositories=repositories_container)
