@@ -4,13 +4,14 @@ from telegram import User as TelegramUser
 from src.core.db.models import ExternalSiteUser, User, UsersCategories
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 from src.core.logging.utils import logger_decor
+from src.core.services.users import BaseUserService
 
 logger = get_logger()
 
 
-class UserService:
+class UserService(BaseUserService):
     def __init__(self, user_repository: UserRepository, ext_user_repository: ExternalSiteUserRepository) -> None:
-        self._user_repository = user_repository
+        super().__init__(user_repository)
         self._ext_user_repository = ext_user_repository
 
     async def _update_or_create(self, user: User, **attrs) -> User:
@@ -132,11 +133,6 @@ class UserService:
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         if not user.has_mailing:
             await self._user_repository.set_mailing(user, True)
-
-    async def get_by_telegram_id(self, telegram_id: int) -> User:
-        """Оборачивает одноименную функцию из UserRepository."""
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
-        return user
 
     async def get_by_user_id(self, user_id: int) -> User:
         """Возвращает пользователя (или None) по user_id."""

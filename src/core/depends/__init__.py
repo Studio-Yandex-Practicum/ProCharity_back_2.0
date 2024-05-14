@@ -4,6 +4,7 @@ from .bot_services import BotServicesContainer
 from .container import Container
 from .data_base_connection import DataBaseConnectionContainer
 from .jwt_services import JWTServicesContainer
+from .pagination import PaginateContainer
 from .repositories import RepositoriesContainer
 
 __all__ = (
@@ -14,4 +15,5 @@ __all__ = (
     "DataBaseConnectionContainer",
     "JWTServicesContainer",
     "RepositoriesContainer",
+    "PaginateContainer",
 )
