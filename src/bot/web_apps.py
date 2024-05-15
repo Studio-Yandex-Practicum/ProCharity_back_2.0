@@ -27,21 +27,7 @@ def get_task_web_app_info(task: Task) -> WebAppInfo:
     """WebApp для отображения подробной информации о задании и фонде."""
     query_params = TaskInfoPageQueryParams(
         id=task.id,
-        title=task.title,
-        name_organization=task.name_organization,
-        legal_address=task.legal_address,
-        fund_city=task.fund_city,
-        fund_rating=task.fund_rating,
-        fund_site=task.fund_site,
-        yb_link=task.yb_link,
-        vk_link=task.vk_link,
-        fund_sections=task.fund_sections,
-        deadline=task.deadline,
-        category=task.category.name if task.category else None,
-        bonus=task.bonus,
-        location=task.location,
-        link=task.link,
-        description=task.description,
+        api_root_path=settings.ROOT_PATH,
     )
     return WebAppInfo(
         url=urljoin(
