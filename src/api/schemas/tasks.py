@@ -29,7 +29,7 @@ class TaskCommonFieldsMixin:
     category_id: PositiveInt = Field(
         ..., examples=[1], description="ID дочерней категории, к которой относится задача."
     )
-    bonus: int = Field(..., ge=1, le=10, examples=[5], description="Количество бонусов за выполнение задачи.")
+    bonus: PositiveInt = Field(..., ge=1, le=10, examples=[5], description="Количество бонусов за выполнение задачи.")
     location: str = Field(..., examples=["Task Location"], description="Место выполнения задачи.")
     link: str = Field(..., examples=["https://mainsite.com/tasks/1234"], description="Ссылка на страницу задачи.")
     description: str = Field(..., examples=["Task description"], description="Описание задачи.")
