@@ -10,7 +10,7 @@ class TaskCommonFieldsMixin:
     """Набор общих полей для схем модели Task."""
 
     title: str = Field(..., examples=["Example Task"], description="Название задачи.")
-    name_organization: str | None = Field(None, examples=["Example Fund"], description="Название Фонда.")
+    name_organization: str = Field(..., examples=["Example Fund"], description="Название Фонда.")
     legal_address: str | None = Field(None, examples=["Fund Legal Address"], description="Юридический адрес Фонда.")
     fund_city: str | None = Field(None, examples=["Fund City"], description="Фактический адрес Фонда.")
     fund_rating: StrictFloat | None = Field(None, examples=[78.65], description="Рейтинг Фонда.")
@@ -25,11 +25,9 @@ class TaskCommonFieldsMixin:
     )
     vk_link: str | None = Field(None, examples=["https://vk.com/example_fund"], description="Страница Фонда в VK.")
     fund_sections: str | None = Field(None, examples=["1, 7"], description="Сферы деятельности Фонда.")
-    deadline: date | None = Field(
-        None, format=DATE_FORMAT, examples=["23.11.2024"], description="Дедлайн выполнения задачи."
-    )
-    category_id: PositiveInt | None = Field(
-        None, examples=[1], description="ID дочерней категории, к которой относится задача."
+    deadline: date = Field(..., format=DATE_FORMAT, examples=["23.11.2024"], description="Дедлайн выполнения задачи.")
+    category_id: PositiveInt = Field(
+        ..., examples=[1], description="ID дочерней категории, к которой относится задача."
     )
     bonus: int = Field(..., ge=1, le=10, examples=[5], description="Количество бонусов за выполнение задачи.")
     location: str = Field(..., examples=["Task Location"], description="Место выполнения задачи.")
@@ -41,6 +39,7 @@ class TaskRequest(RequestBase, TaskCommonFieldsMixin):
     """Схема запроса для модели Task."""
 
     id: PositiveInt = Field(..., examples=[1], description="Уникальный идентификатор задачи.")
+    category: str | None = Field(None, examples=["Subcategory name"], description="Название дочерней категории.")
 
     @field_validator("deadline", mode="before")
     @classmethod
