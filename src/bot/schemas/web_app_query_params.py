@@ -1,7 +1,6 @@
 import urllib.parse
-from datetime import date
 
-from pydantic import BaseModel, NonNegativeInt, StrictFloat
+from pydantic import BaseModel, NonNegativeInt
 
 
 class QueryParams(BaseModel):
@@ -25,18 +24,4 @@ class TaskInfoPageQueryParams(QueryParams):
     """Параметры запроса для страницы с информацией о задании."""
 
     id: NonNegativeInt
-    title: str
-    name_organization: str | None
-    legal_address: str | None
-    fund_city: str | None
-    fund_rating: StrictFloat | None
-    fund_site: str | None
-    yb_link: str | None
-    vk_link: str | None
-    fund_sections: str | None
-    deadline: date | None
-    category: str | None
-    bonus: NonNegativeInt | None
-    location: str | None
-    link: str | None
-    description: str | None
+    api_root_path: str

@@ -114,12 +114,11 @@ class UserService(BaseUserService):
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         return user.has_mailing
 
-    async def toggle_mailing(self, telegram_id: int) -> bool:
+    async def toggle_mailing(self, user: User) -> bool:
         """
         Переключает пользователю флаг получения почтовой рассылки на задания.
         Возвращает статус подписки пользователя на почтовую рассылку.
         """
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
         await self._user_repository.set_mailing(user, not user.has_mailing)
         return user.has_mailing
 
