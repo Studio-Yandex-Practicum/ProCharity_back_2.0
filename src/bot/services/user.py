@@ -114,25 +114,27 @@ class UserService(BaseUserService):
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         return user.has_mailing
 
-    async def toggle_mailing(self, telegram_id: int) -> bool:
+    async def toggle_mailing(self, user: User) -> bool:
         """
         Переключает пользователю флаг получения почтовой рассылки на задания.
         Возвращает статус подписки пользователя на почтовую рассылку.
         """
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
         await self._user_repository.set_mailing(user, not user.has_mailing)
         return user.has_mailing
 
-    async def check_and_set_has_mailing_atribute(self, telegram_id: int) -> None:
+    async def check_and_set_has_mailing_atribute(self, user: User) -> bool:
         """
         Присваивает пользователю атрибут has_mailing, для получения почтовой
         рассылки на задания после выбора категорий. Предварительно
         осуществляется проверка, установлен ли этот атрибут у пользователя
         ранее.
+
+        Returns: True если значение has_mailing изменилось.
         """
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
-        if not user.has_mailing:
-            await self._user_repository.set_mailing(user, True)
+        if user.has_mailing:
+            return False
+        await self._user_repository.set_mailing(user, True)
+        return True
 
     async def get_by_user_id(self, user_id: int) -> User:
         """Возвращает пользователя (или None) по user_id."""

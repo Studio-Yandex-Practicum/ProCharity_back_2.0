@@ -21,6 +21,7 @@ from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.services.email import EmailProvider
+from src.core.services.procharity_api import ProcharityAPI
 
 log = structlog.get_logger()
 
@@ -53,15 +54,17 @@ async def set_mailing(
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     procharity_tasks_url: str = Provide[Container.settings.provided.procharity_tasks_url],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
-    has_mailing = await user_service.get_mailing(telegram_id)
-    if not has_mailing:
-        await user_service.toggle_mailing(telegram_id)
+    user = await user_service.get_by_telegram_id(telegram_id)
+    if not user.has_mailing:
+        await user_service.toggle_mailing(user)
         text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
+        await procharity_api.send_user_bot_status(user)
     else:
         text = (
             "<b>Подписка остановлена!</b>\n\n"
@@ -71,6 +74,7 @@ async def set_mailing(
         )
         keyboard = get_no_mailing_keyboard()
         parse_mode = ParseMode.HTML
+
     await context.bot.send_message(
         chat_id=update.effective_user.id,
         text=text,
@@ -92,10 +96,12 @@ async def unsubscription_reason_handler(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
     email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Выключение подписки пользователя и отправка сообщения с причиной на почту."""
     telegram_id = update.effective_user.id
-    await user_service.toggle_mailing(telegram_id)
+    user = await user_service.get_by_telegram_id(telegram_id)
+    await user_service.toggle_mailing(user)
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
     await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
@@ -106,6 +112,7 @@ async def unsubscription_reason_handler(
         to_email=email_admin,
     )
     asyncio.create_task(background_task)
+    await procharity_api.send_user_bot_status(user)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
         f"рассылки по причине: {reason}"
