@@ -39,7 +39,6 @@ class TaskRequest(RequestBase, TaskCommonFieldsMixin):
     """Схема запроса для модели Task."""
 
     id: PositiveInt = Field(..., examples=[1], description="Уникальный идентификатор задачи.")
-    category: str | None = Field(None, examples=["Subcategory name"], description="Название дочерней категории.")
 
     @field_validator("deadline", mode="before")
     @classmethod
