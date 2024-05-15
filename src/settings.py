@@ -97,12 +97,20 @@ class Settings(BaseSettings):
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
     ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = ""
 
-    @field_validator("APPLICATION_URL", "PROCHARITY_URL", "HELP_PROCHARITY_URL")
+    @field_validator("APPLICATION_URL", "PROCHARITY_URL", "HELP_PROCHARITY_URL", "STATIC_URL")
     @classmethod
     def check_last_slash_url(cls, v: str) -> str:
         """Проверить и добавить последний слэш в константе URL."""
         if not v or v[-1] != "/":
             return f"{v}/"
+        return v
+
+    @field_validator("ROOT_PATH")
+    @classmethod
+    def check_prefix_not_end_with_slash(cls, v: str) -> str:
+        """Проверить и убрать слэш в конце префикса для APIRouter."""
+        if v and v[-1] == "/":
+            return v[:-1]
         return v
 
     @field_validator("APPLICATION_URL")
@@ -128,7 +136,7 @@ class Settings(BaseSettings):
 
     @property
     def static_url(self) -> str:
-        return urljoin(self.APPLICATION_URL, settings.STATIC_URL)
+        return urljoin(self.APPLICATION_URL, self.STATIC_URL)
 
     @property
     def telegram_webhook_url(self) -> str:
@@ -183,7 +191,7 @@ class Settings(BaseSettings):
     @property
     def procharity_tasks_url(self) -> str:
         """Получить url-ссылку на страницу с заданиями."""
-        return urljoin(self.PROCHARITY_URL, "tasks")
+        return urljoin(self.PROCHARITY_URL, "tasks/")
 
     @property
     def procharity_send_user_categories_api_url(self) -> str:
