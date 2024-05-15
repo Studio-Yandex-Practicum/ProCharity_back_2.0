@@ -60,7 +60,7 @@ async def set_mailing(
     telegram_id = update.effective_user.id
     user = await user_service.get_by_telegram_id(telegram_id)
     if not user.has_mailing:
-        await user_service.toggle_mailing(telegram_id)
+        await user_service.toggle_mailing(user)
         text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
@@ -101,7 +101,7 @@ async def unsubscription_reason_handler(
     """Выключение подписки пользователя и отправка сообщения с причиной на почту."""
     telegram_id = update.effective_user.id
     user = await user_service.get_by_telegram_id(telegram_id)
-    await user_service.toggle_mailing(telegram_id)
+    await user_service.toggle_mailing(user)
     query = update.callback_query
     reason = enum.REASONS[context.match.group(1)]
     await unsubscribe_reason_service.save_reason(telegram_id=context._user_id, reason=reason.name)
