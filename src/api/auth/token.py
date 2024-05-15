@@ -22,6 +22,7 @@ async def check_header_contains_token(
     #         "ACCESS_TOKEN_FOR_PROCHARITY не определен, возможны проблемы безопасности. Проверьте настройки проекта."
     #     )
     #     return
+    await log.ainfo(f"!!!!!!!!!!!!!!!!!!! Проверка, что токен от сайта читается !!!!!!!!!!!!!!!{token}")
     match token:
         case None:
             await log.ainfo("В заголовке запроса не содержится токен.")
