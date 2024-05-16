@@ -12,16 +12,20 @@ from src.bot.keyboards import (
 )
 from src.bot.services.category import CategoryService
 from src.bot.services.user import UserService
-from src.bot.utils import delete_previous_message, get_marked_list
+from src.bot.utils import delete_previous_message, get_marked_list, registered_user_required
+from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.services.procharity_api import ProcharityAPI
 
 
 @logger_decor
+@registered_user_required
 @delete_previous_message
 async def categories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
@@ -43,6 +47,7 @@ async def view_categories(
     text_format: str,
     set_has_mailing_attribute: bool = False,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Выводит список выбранных волонтером категорий в заданном формате и заданную клавиатуру.
     Если set_has_mailing_attribute=True и имеются выбранные категории, выполняется обновление флага подписки.
@@ -62,10 +67,16 @@ async def view_categories(
             reply_markup=reply_markup,
         )
         if set_has_mailing_attribute:
-            await user_service.check_and_set_has_mailing_atribute(telegram_id)
+            user = await user_service.get_by_telegram_id(telegram_id)
+            has_mailing_changed = await user_service.check_and_set_has_mailing_atribute(user)
+            if has_mailing_changed:
+                await procharity_api.send_user_bot_status(user)
 
 
-async def view_current_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@registered_user_required
+async def view_current_categories_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, ext_site_user: ExternalSiteUser
+):
     """Выводит список выбранных волонтером категорий перед их изменением."""
     text_format = "*Твои профессиональные компетенции:*\n\n" "{categories}\n\n"
     await view_categories(
@@ -75,7 +86,10 @@ async def view_current_categories_callback(update: Update, context: ContextTypes
     )
 
 
-async def confirm_categories_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@registered_user_required
+async def confirm_categories_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, ext_site_user: ExternalSiteUser
+):
     """Выводит список выбранных волонтером категорий после их изменения и включает рассылку (если еще не включена)."""
     text_format = (
         "*Отлично!*\n\n"
@@ -94,9 +108,11 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
 
 
 @logger_decor
+@registered_user_required
 async def subcategories_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):
@@ -115,11 +131,14 @@ async def subcategories_callback(
 
 
 @logger_decor
+@registered_user_required
 async def select_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
@@ -132,9 +151,12 @@ async def select_subcategory_callback(
         del selected_categories[subcategory_id]
         await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
 
+    user = await user_service.get_by_telegram_id(update.effective_user.id)
+    if user and user.external_user:
+        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
+
     parent_id = context.user_data["parent_id"]
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
-
     await query.message.edit_text(
         "Чтобы я знал, с какими задачами ты готов помогать, "
         "выбери свои профессиональные компетенции (можно выбрать "
@@ -144,9 +166,11 @@ async def select_subcategory_callback(
 
 
 @logger_decor
+@registered_user_required
 async def back_subcategory_callback(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
     category_service: CategoryService = Provide[Container.bot_services_container.bot_category_service],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
 ):

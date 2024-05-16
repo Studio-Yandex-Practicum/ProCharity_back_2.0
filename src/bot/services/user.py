@@ -4,13 +4,14 @@ from telegram import User as TelegramUser
 from src.core.db.models import ExternalSiteUser, User, UsersCategories
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 from src.core.logging.utils import logger_decor
+from src.core.services.users import BaseUserService
 
 logger = get_logger()
 
 
-class UserService:
+class UserService(BaseUserService):
     def __init__(self, user_repository: UserRepository, ext_user_repository: ExternalSiteUserRepository) -> None:
-        self._user_repository = user_repository
+        super().__init__(user_repository)
         self._ext_user_repository = ext_user_repository
 
     async def _update_or_create(self, user: User, **attrs) -> User:
@@ -58,8 +59,7 @@ class UserService:
                 role=ext_site_user.role,
             )
             await logger.ainfo(f"Обновлены данные пользователя {user=}")
-            if ext_site_user.specializations:
-                await self.set_categories_to_user(user.id, ext_site_user.specializations)
+            await self.set_categories_to_user(user.id, ext_site_user.specializations)
 
         return user
 
@@ -114,30 +114,27 @@ class UserService:
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         return user.has_mailing
 
-    async def toggle_mailing(self, telegram_id: int) -> bool:
+    async def toggle_mailing(self, user: User) -> bool:
         """
         Переключает пользователю флаг получения почтовой рассылки на задания.
         Возвращает статус подписки пользователя на почтовую рассылку.
         """
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
         await self._user_repository.set_mailing(user, not user.has_mailing)
         return user.has_mailing
 
-    async def check_and_set_has_mailing_atribute(self, telegram_id: int) -> None:
+    async def check_and_set_has_mailing_atribute(self, user: User) -> bool:
         """
         Присваивает пользователю атрибут has_mailing, для получения почтовой
         рассылки на задания после выбора категорий. Предварительно
         осуществляется проверка, установлен ли этот атрибут у пользователя
         ранее.
-        """
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
-        if not user.has_mailing:
-            await self._user_repository.set_mailing(user, True)
 
-    async def get_by_telegram_id(self, telegram_id: int) -> User:
-        """Оборачивает одноименную функцию из UserRepository."""
-        user = await self._user_repository.get_by_telegram_id(telegram_id)
-        return user
+        Returns: True если значение has_mailing изменилось.
+        """
+        if user.has_mailing:
+            return False
+        await self._user_repository.set_mailing(user, True)
+        return True
 
     async def get_by_user_id(self, user_id: int) -> User:
         """Возвращает пользователя (или None) по user_id."""

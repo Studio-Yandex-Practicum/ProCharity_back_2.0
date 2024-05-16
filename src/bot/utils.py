@@ -9,6 +9,7 @@ from telegram.ext import ContextTypes
 from src.bot.keyboards import get_unregistered_user_keyboard
 from src.bot.services import ExternalSiteUserService
 from src.core.depends import Container
+from src.core.enums import UserRoles
 
 ReturnType = TypeVar("ReturnType")
 ParameterTypes = ParamSpec("ParameterTypes")
@@ -37,7 +38,8 @@ def delete_previous_message(coroutine: FuncT[ParameterTypes, ReturnType]) -> Fun
 def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> FuncT[ParameterTypes, ReturnType]:
     """Декоратор для обработчиков событий, проверяющий что текущий пользователь авторизован.
 
-    Если пользователь авторизован (т.е. для него имеется запись в таблице external_site_users),
+    Если пользователь авторизован (т.е. для него имеется запись в таблице external_site_users
+    с допустимым значением в поле role),
     то вызывается обработчик (он получает дополнительный аргумент ext_site_user: ExternalSiteUser),
     в противном случае выводится сообщение о необходимости регистрации и обработчик не вызывается.
     Если обработчик вызван с аргументом (id_hash), то запись в таблице external_site_users ищется по нему,
@@ -62,7 +64,7 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
             if id_hash
             else await ext_site_user_service.get_by_telegram_id(telegram_user.id)
         )
-        if ext_site_user:
+        if ext_site_user and ext_site_user.role in list(UserRoles):
             await handler(update, context, ext_site_user, *args, **kwargs)
         else:
             keyboard = await get_unregistered_user_keyboard()

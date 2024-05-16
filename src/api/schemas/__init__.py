@@ -1,4 +1,3 @@
-from .admin import AdminUserRequest
 from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCancelingStatistics
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
@@ -16,10 +15,10 @@ from .notification import (
 )
 from .tasks import TaskRequest, TaskResponse, TasksRequest
 from .token_schemas import TokenCheckResponse
+from .users import UserResponse, UsersPaginatedResponse
 
 __all__ = (
     "ActiveTasks",
-    "AdminUserRequest",
     "AllUsersStatistic",
     "Analytic",
     "RequestBase",
@@ -46,4 +45,6 @@ __all__ = (
     "TasksRequest",
     "TokenCheckResponse",
     "FeedbackSchema",
+    "UserResponse",
+    "UsersPaginatedResponse",
 )

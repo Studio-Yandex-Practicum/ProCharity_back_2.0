@@ -24,11 +24,15 @@ class TelegramNotificationService:
         """Отправляет сообщение указанной группе пользователей"""
         match notifications.mode.upper():
             case TelegramNotificationUsersGroups.ALL.name:
-                users = await self._session.scalars(select(User))
+                users = await self._session.scalars(select(User).where(User.banned.is_(False)))
             case TelegramNotificationUsersGroups.SUBSCRIBED.name:
-                users = await self._session.scalars(select(User).where(User.has_mailing == True))  # noqa
+                users = await self._session.scalars(
+                    select(User).where(User.has_mailing.is_(True) & User.banned.is_(False))
+                )
             case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
-                users = await self._session.scalars(select(User).where(User.has_mailing == False))  # noqa
+                users = await self._session.scalars(
+                    select(User).where(User.has_mailing.is_(False) & User.banned.is_(False))
+                )
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
     async def send_message_to_user(self, id_hash: str, message: str) -> tuple[bool, str]:
@@ -40,18 +44,26 @@ class TelegramNotificationService:
             return False, "Телеграм пользователя не найден."
         return await self.telegram_notification.send_message(user_id=site_user.user.telegram_id, message=message)
 
-    async def send_messages_to_subscribed_users(self, notifications, category_id):
-        """Отправляет сообщение пользователям, подписанным на определенные категории"""
+    async def send_messages_to_subscribed_users(self, notifications, category_id, reply_markup=None):
+        """Отправляет сообщение всем пользователям, подписанным на заданную категорию.
+
+        Args:
+            notifications: Текст сообщения.
+            category_id: Идентификатор заданной категории, подписчикам на которую отправится сообщение.
+            reply_markup: Объект клавиатуры под сообщением рассылки.
+        """
         qr = await self._session.scalars(
             select(Category)
             .join(Category.users)
             .options(contains_eager(Category.users))
-            .where(User.has_mailing)
+            .where(User.has_mailing.is_(True) & User.banned.is_(False))
             .where(Category.id == category_id)
         )
         if (category := qr.first()) is None:
             return
-        await self.telegram_notification.send_messages(message=notifications, users=category.users)
+        await self.telegram_notification.send_messages(
+            message=notifications, users=category.users, reply_markup=reply_markup
+        )
 
     def count_rate(self, respond: bool, msg: str, rate: InfoRate):
         errors_sending = ErrorsSending()
