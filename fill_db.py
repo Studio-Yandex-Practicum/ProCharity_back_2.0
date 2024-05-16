@@ -158,11 +158,12 @@ TEST_TASKS = [
     },
 ]
 TEST_UNSUBSCRIBE_REASON = [
-    "Нехватка времени",
-    "Переезд",
-    "Большая загруженность",
-    "Отсутствие мотивации",
-    "Другое",
+    "to_much_messages",
+    "no_time",
+    "no_match",
+    "uncomfortable",
+    "funds_dont_choose",
+    "other",
 ]
 USERS_TABLE_ROWS = 30
 
