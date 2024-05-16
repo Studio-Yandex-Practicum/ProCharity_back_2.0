@@ -44,7 +44,7 @@ class HealthCheckService:
             commit_status: CommitStatus = {
                 "last_commit": str(master.commit)[:7],
                 "commit_date": commit_date.strftime(DATE_TIME_FORMAT),
-                "git_tags": repo.tags,
+                "git_tags": [str(tag) for tag in repo.tags],
             }
             return commit_status
         except (ImportError, NameError, TypeError) as exc:
