@@ -4,7 +4,7 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
 from src.bot.constants import callback_data
-from src.bot.keyboards import get_task_info_keyboard, tasks_again_get_back_menu, view_more_tasks_keyboard
+from src.bot.keyboards import get_back_menu, get_task_info_keyboard, tasks_again_get_back_menu, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message
 from src.core.depends import Container
@@ -39,6 +39,7 @@ async def view_task_callback(
     )
 
     if not tasks_to_show and page_number == 1:
+        keyboard = await get_back_menu()
         keyboard = await tasks_again_get_back_menu()
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -69,7 +70,7 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
         keyboard = await view_more_tasks_keyboard()
     else:
         text = "Ты просмотрел все актуальные задания на сегодня."
-        keyboard = await tasks_again_get_back_menu()
+        keyboard = await get_back_menu()
         context.user_data["viewed_all"] = True
 
     await context.bot.send_message(

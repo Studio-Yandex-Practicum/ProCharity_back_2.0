@@ -89,6 +89,8 @@ async def confirm_categories_callback(update: Update, context: ContextTypes.DEFA
         text_format=text_format,
         set_has_mailing_attribute=True,
     )
+    context.user_data["viewed_all"] = False
+    context.user_data["page_number"] = 1
 
 
 @logger_decor
