@@ -107,7 +107,7 @@ class Settings(BaseSettings):
 
     @field_validator("ROOT_PATH")
     @classmethod
-    def check_prefix_not_end_with_slash(cls, v: str) -> str:
+    def check_prefix_not_ends_with_slash(cls, v: str) -> str:
         """Проверить и убрать слэш в конце префикса для APIRouter."""
         if v and v[-1] == "/":
             return v[:-1]
@@ -115,7 +115,7 @@ class Settings(BaseSettings):
 
     @field_validator("APPLICATION_URL")
     @classmethod
-    def check_domain_startswith_https_or_add_https(cls, v: str) -> str:
+    def check_domain_starts_with_https_or_add_https(cls, v: str) -> str:
         """Добавить 'https://' к домену, если он не содержит протокол."""
         if v.startswith("https://") or v.startswith("http://"):
             return v
