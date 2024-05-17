@@ -9,6 +9,7 @@ from faker import Faker
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from src.bot.constants import enum
 from src.core.db import get_session
 from src.core.db.models import Category, ExternalSiteUser, Task, UnsubscribeReason, User
 from src.core.enums import UserRoles
@@ -157,13 +158,6 @@ TEST_TASKS = [
         ],
     },
 ]
-TEST_UNSUBSCRIBE_REASON = [
-    "Нехватка времени",
-    "Переезд",
-    "Большая загруженность",
-    "Отсутствие мотивации",
-    "Другое",
-]
 USERS_TABLE_ROWS = 30
 
 
@@ -295,7 +289,7 @@ async def filling_unsubscribe_reason_in_db(
     for _ in range(1, int(USERS_TABLE_ROWS / 3) + 1):
         unsubscribe_reason = UnsubscribeReason(
             user_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
-            unsubscribe_reason=choice(TEST_UNSUBSCRIBE_REASON),
+            unsubscribe_reason=choice([reason.name for reason in enum.REASONS]),
             created_at=user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now()),
         )
         session.add(unsubscribe_reason)
