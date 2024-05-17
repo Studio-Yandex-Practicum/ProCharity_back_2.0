@@ -113,7 +113,7 @@ class AbstractRepository(abc.ABC, Generic[DatabaseModel]):
         self, page: int, limit: int, column_name: str = "created_at"
     ) -> Sequence[DatabaseModel]:
         """
-        Получает данные ограниченные параметрами page и limit,
+        Получает данные, ограниченные параметрами page и limit
         и отсортированные по полю column_name в порядке убывания.
         """
         offset = (page - 1) * limit
