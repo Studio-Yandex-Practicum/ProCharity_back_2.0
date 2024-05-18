@@ -129,7 +129,7 @@ class UserService(BaseUserService):
         осуществляется проверка, установлен ли этот атрибут у пользователя
         ранее.
 
-        Returns: True если значение has_mailing изменилось.
+        Returns: True, если значение has_mailing изменилось.
         """
         if user.has_mailing:
             return False

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Annotated
 from urllib.parse import urljoin
 
-from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, field_validator, validator
+from pydantic import AnyHttpUrl, BeforeValidator, EmailStr, TypeAdapter, field_validator
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -97,18 +97,27 @@ class Settings(BaseSettings):
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"
     ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY: str = ""
 
-    @field_validator("PROCHARITY_URL", "HELP_PROCHARITY_URL")
-    def check_last_slash_url(cls, v) -> str:
-        """Кастомный валидатор-добавлятор последнего слэша в константе URL."""
-
-        if v[-1] != "/":
-            return urljoin(v, "/")
+    @field_validator("APPLICATION_URL", "PROCHARITY_URL", "HELP_PROCHARITY_URL", "STATIC_URL")
+    @classmethod
+    def check_last_slash_url(cls, v: str) -> str:
+        """Проверить и добавить последний слэш в константе URL."""
+        if not v or v[-1] != "/":
+            return f"{v}/"
         return v
 
-    @validator("APPLICATION_URL")
-    def check_domain_startswith_https_or_add_https(cls, v) -> str:
-        """Добавить 'https://' к домену."""
-        if "https://" in v or "http://" in v:
+    @field_validator("ROOT_PATH")
+    @classmethod
+    def check_prefix_not_ends_with_slash(cls, v: str) -> str:
+        """Проверить и убрать слэш в конце префикса для APIRouter."""
+        if v and v[-1] == "/":
+            return v[:-1]
+        return v
+
+    @field_validator("APPLICATION_URL")
+    @classmethod
+    def check_domain_starts_with_https_or_add_https(cls, v: str) -> str:
+        """Добавить 'https://' к домену, если он не содержит протокол."""
+        if v.startswith("https://") or v.startswith("http://"):
             return v
         return urljoin("https://", f"//{v}")
 
@@ -127,7 +136,7 @@ class Settings(BaseSettings):
 
     @property
     def static_url(self) -> str:
-        return urljoin(self.APPLICATION_URL, settings.STATIC_URL)
+        return urljoin(self.APPLICATION_URL, self.STATIC_URL)
 
     @property
     def telegram_webhook_url(self) -> str:
@@ -182,7 +191,7 @@ class Settings(BaseSettings):
     @property
     def procharity_tasks_url(self) -> str:
         """Получить url-ссылку на страницу с заданиями."""
-        return urljoin(self.PROCHARITY_URL, "tasks")
+        return urljoin(self.PROCHARITY_URL, "tasks/")
 
     @property
     def procharity_send_user_categories_api_url(self) -> str:

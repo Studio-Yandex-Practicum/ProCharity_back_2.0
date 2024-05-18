@@ -102,7 +102,7 @@ class EmailProvider:
         """
         token_expiration = self._settings.TOKEN_EXPIRATION
         template_body = {
-            "link": f"{self._settings.APPLICATION_URL}/admin/#/{path}/{token}",
+            "link": f"{self._settings.APPLICATION_URL}admin/#/{path}/{token}",
             "expiration": token_expiration,
         }
         return template_body
