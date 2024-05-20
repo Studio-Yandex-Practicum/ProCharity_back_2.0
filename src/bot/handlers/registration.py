@@ -12,6 +12,7 @@ from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.services.procharity_api import ProcharityAPI
 
 
 @logger_decor
@@ -23,18 +24,20 @@ async def start_command(
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+    fund_auth_url: str = Provide[Container.settings.provided.procharity_fund_auth_url],
 ):
     telegram_user = update.effective_user or Never
-    await user_service.register_user(ext_site_user, telegram_user)
-    keyboard = await get_start_keyboard()
+    user = await user_service.register_user(ext_site_user, telegram_user)
+    auth_url = volunteer_auth_url if user.is_volunteer else fund_auth_url
+
     await context.bot.send_message(
         chat_id=telegram_user.id,
         text="<b>Авторизация прошла успешно!</b>\n\n"
         "Теперь оповещения будут приходить сюда. "
-        f'Изменить настройку уведомлений можно в <a href="{volunteer_auth_url}">личном кабинете</a>.\n\n'
+        f'Изменить настройку уведомлений можно в <a href="{auth_url}">личном кабинете</a>.\n\n'
         "Навигация по боту запускается командой /menu.",
         parse_mode=ParseMode.HTML,
-        reply_markup=keyboard,
+        reply_markup=await get_start_keyboard(user),
         disable_web_page_preview=True,
     )
 
@@ -45,6 +48,7 @@ async def on_chat_member_update(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Обновление статуса пользователя."""
     my_chat_member = update.my_chat_member or Never
@@ -57,11 +61,14 @@ async def on_chat_member_update(
 
     if not user:
         return None
-
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
-        return await user_service.bot_banned(user)
+        await user_service.bot_banned(user)
+        await procharity_api.send_user_bot_status(user)
+        return user
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
-        return await user_service.bot_unbanned(user)
+        await user_service.bot_unbanned(user)
+        await procharity_api.send_user_bot_status(user)
+        return user
 
 
 def registration_handlers(app: Application):

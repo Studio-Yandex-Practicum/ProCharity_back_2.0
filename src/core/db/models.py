@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
 
+from src.core.enums import UserRoles
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 MAX_USER_ROLE_NAME_LENGTH = 20
@@ -66,6 +68,10 @@ class User(Base):
     external_user: Mapped["ExternalSiteUser"] = relationship(back_populates="user")
 
     @property
+    def is_volunteer(self) -> bool:
+        return self.role == UserRoles.VOLUNTEER
+
+    @property
     def telegram_link(self) -> str | None:
         base_url = "https://t.me/"
         if self.username:
@@ -114,6 +120,7 @@ class Task(ContentBase):
     fund_city: Mapped[str] = mapped_column(nullable=True)
     fund_rating: Mapped[float] = mapped_column(nullable=True)
     fund_site: Mapped[str] = mapped_column(nullable=True)
+    fund_link: Mapped[str] = mapped_column(nullable=True)
     yb_link: Mapped[str] = mapped_column(nullable=True)
     vk_link: Mapped[str] = mapped_column(nullable=True)
     fund_sections: Mapped[str] = mapped_column(nullable=True)

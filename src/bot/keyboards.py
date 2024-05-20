@@ -34,9 +34,12 @@ def get_personal_account_button(
 
 
 def get_notification_settings_button(
+    user: User,
     volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+    fund_auth_url: str = Provide[Container.settings.provided.procharity_fund_auth_url],
 ) -> list[InlineKeyboardButton]:
-    return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=volunteer_auth_url)]
+    url = volunteer_auth_url if user.is_volunteer else fund_auth_url
+    return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=url)]
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -95,7 +98,7 @@ async def get_subcategories_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
-async def support_service_keyboard(user: User) -> InlineKeyboardMarkup:
+async def get_support_service_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
         get_support_service_button(user),
         [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)],
@@ -104,13 +107,20 @@ async def support_service_keyboard(user: User) -> InlineKeyboardMarkup:
 
 
 async def get_menu_keyboard(user: User) -> InlineKeyboardMarkup:
-    keyboard = [
-        VIEW_TASKS_BUTTON,
-        SUPPORT_SERVICE_BUTTON,
-        UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
-        VIEW_CATEGORIES_BUTTON,
-        get_notification_settings_button(),
-    ]
+    keyboard = (
+        [
+            VIEW_TASKS_BUTTON,
+            SUPPORT_SERVICE_BUTTON,
+            UNSUBSCRIBE_BUTTON if user.has_mailing else SUBSCRIBE_BUTTON,
+            VIEW_CATEGORIES_BUTTON,
+            get_notification_settings_button(user),
+        ]
+        if user.is_volunteer
+        else [
+            SUPPORT_SERVICE_BUTTON,
+            get_notification_settings_button(user),
+        ]
+    )
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -125,9 +135,9 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-async def get_start_keyboard() -> InlineKeyboardMarkup:
+async def get_start_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
-        CHECK_CATEGORIES_BUTTON,
+        CHECK_CATEGORIES_BUTTON if user.is_volunteer else [],
         OPEN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)

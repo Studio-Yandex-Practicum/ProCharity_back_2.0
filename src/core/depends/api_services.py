@@ -9,6 +9,7 @@ from src.api.services import (
     HealthCheckService,
     TaskService,
     TelegramNotificationService,
+    UserService,
 )
 
 
@@ -56,4 +57,8 @@ class APIServicesContainer(containers.DeclarativeContainer):
     admin_token_request_service = providers.Factory(
         AdminTokenRequestService,
         admin_token_request_repository=repositories.admin_token_request_repository,
+    )
+    user_service = providers.Factory(
+        UserService,
+        user_repository=repositories.user_repository,
     )

@@ -1,9 +1,10 @@
 import abc
-from typing import Sequence, TypeVar
+from typing import Generic, Sequence, TypeVar
 
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import DuplicateColumnError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import desc
 from structlog import get_logger
 
 from src.api.constants import DATE_FORMAT_FOR_STATISTICS
@@ -15,7 +16,7 @@ DatabaseModel = TypeVar("DatabaseModel")
 DATE_TIME_FORMAT_LAST_UPDATE = "YYYY-MM-DD HH24:MI:SS"
 
 
-class AbstractRepository(abc.ABC):
+class AbstractRepository(abc.ABC, Generic[DatabaseModel]):
     """Абстрактный класс, для реализации паттерна Repository."""
 
     def __init__(self, session: AsyncSession, model: DatabaseModel) -> None:
@@ -107,6 +108,19 @@ class AbstractRepository(abc.ABC):
             .order_by(column)
         )
         return dict(db_data.fetchall())
+
+    async def get_objects_by_page(
+        self, page: int, limit: int, column_name: str = "created_at"
+    ) -> Sequence[DatabaseModel]:
+        """
+        Получает данные ограниченные параметрами page и limit,
+        и отсортированные по полю column_name в порядке убывания.
+        """
+        offset = (page - 1) * limit
+        objects = await self._session.scalars(
+            (select(self._model).limit(limit).offset(offset).order_by(desc(column_name)))
+        )
+        return objects.all()
 
 
 class ContentRepository(AbstractRepository, abc.ABC):
