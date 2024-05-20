@@ -40,7 +40,6 @@ async def view_task_callback(
 
     if not tasks_to_show and page_number == 1:
         keyboard = await get_back_menu()
-        keyboard = await tasks_again_get_back_menu()
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Актуальных заданий по твоим компетенциям на сегодня нет.",
@@ -71,6 +70,7 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
     else:
         text = "Ты просмотрел все актуальные задания на сегодня."
         keyboard = await get_back_menu()
+        keyboard = await tasks_again_get_back_menu()
         context.user_data["viewed_all"] = True
 
     await context.bot.send_message(
