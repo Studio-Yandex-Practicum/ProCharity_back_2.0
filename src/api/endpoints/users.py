@@ -29,7 +29,7 @@ async def get_all_users(
     user_paginate: UserPaginator = Depends(Provide[Container.api_paginate_container.user_paginate]),
 ) -> UsersPaginatedResponse:
     users = await user_service.get_users_by_page(page, limit)
-    return await user_paginate.paginate(users, page, limit, settings.users_url)
+    return await user_paginate.paginate(users, page, limit, user_router.url_path_for("get_all_users"))
 
 
 @user_router.get(
