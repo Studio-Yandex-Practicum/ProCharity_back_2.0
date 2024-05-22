@@ -51,25 +51,25 @@ jobs:
       packages: write
     steps:
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: develop
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Sanitize repo slug
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: repo_slug
         with:
           result-encoding: string
           script: return 'ghcr.io/${{ github.repository }}'.toLowerCase()
       - name: Push Stage to GitHub Container Registry
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: "{{defaultContext}}"
           push: true
@@ -83,7 +83,7 @@ jobs:
       name: ${{ inputs.environment }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Copy docker-compose and nginx files
         uses: appleboy/scp-action@master
