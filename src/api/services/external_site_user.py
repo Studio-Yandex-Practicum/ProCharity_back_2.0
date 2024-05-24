@@ -33,3 +33,6 @@ class ExternalSiteUserService:
 
             await self._user_repository.update(user.id, user)
             await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
+
+    async def archive(self, external_id: int):
+        await self._site_user_repository.get_by_external_id(external_id)
