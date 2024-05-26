@@ -91,7 +91,7 @@ class Settings(BaseSettings):
 
     # Ключевые поля, изменение которых вызывает рассылку обновленного задания
     # Изменение ключевых полей может потребовать изменения формата сообщения в src.core.messages.display_task()
-    TRIGGER_MAILING_FIELDS: list[str] = ["deadline"]
+    TRIGGER_MAILING_FIELDS: list[str] = ["title", "deadline", "category_id", "bonus"]
 
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
