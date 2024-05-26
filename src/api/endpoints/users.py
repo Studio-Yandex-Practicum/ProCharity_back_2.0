@@ -1,5 +1,5 @@
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 
 from src.api.fastapi_admin_users import fastapi_admin_users
 from src.api.pagination import UserPaginator
@@ -23,13 +23,14 @@ user_router = APIRouter(
 )
 @inject
 async def get_all_users(
+    request: Request,
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=20, ge=1),
     user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
     user_paginate: UserPaginator = Depends(Provide[Container.api_paginate_container.user_paginate]),
 ) -> UsersPaginatedResponse:
     users = await user_service.get_users_by_page(page, limit)
-    return await user_paginate.paginate(users, page, limit, user_router.url_path_for("get_all_users"))
+    return await user_paginate.paginate(users, page, limit, request.url_for("get_all_users"))
 
 
 @user_router.get(
