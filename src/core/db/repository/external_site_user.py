@@ -12,9 +12,12 @@ class ExternalSiteUserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, ExternalSiteUser)
 
-    async def get_by_id_hash(self, id_hash: str) -> ExternalSiteUser | None:
+    async def get_by_id_hash(self, id_hash: str, with_archived=False) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по id_hash."""
-        return await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
+        statement = select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash)
+        if not with_archived:
+            statement = statement.where(self._model.is_archived == false())
+        return await self._session.scalar(statement)
 
     async def get_or_create_by_id_hash(self, id_hash: str) -> tuple[ExternalSiteUser, bool]:
         """Возвращает или создает пользователя по id_hash."""
