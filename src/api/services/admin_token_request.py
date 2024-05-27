@@ -34,6 +34,7 @@ class AdminTokenRequestService:
         await self._repository.create_invitation_token(
             email=email, token=token, token_expiration_date=token_expiration_date
         )
+        await log.ainfo(f'Registration: The invitation "{token}" generated for {email}.')
         return token
 
     async def remove(self, instance: AdminTokenRequest) -> None:
