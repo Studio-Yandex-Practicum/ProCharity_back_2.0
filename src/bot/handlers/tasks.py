@@ -25,15 +25,15 @@ async def view_task_callback(
 ):
     telegram_id = context._user_id
     page_number = context.user_data.get("page_number", 1)
-    viewed_all = context.user_data.get("viewed_all", False)
-    if viewed_all:
-        keyboard = await tasks_again_get_back_menu()
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Ты просмотрел все актуальные задания на сегодня.",
-            reply_markup=keyboard,
-        )
-        return
+    # viewed_all = context.user_data.get("viewed_all", False)
+    # if viewed_all:
+    #     keyboard = await tasks_again_get_back_menu()
+    #     await context.bot.send_message(
+    #         chat_id=update.effective_chat.id,
+    #         text="Ты просмотрел все актуальные задания на сегодня.",
+    #         reply_markup=keyboard,
+    #     )
+    #     return
 
     tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
         page_number,
@@ -48,10 +48,11 @@ async def view_task_callback(
             text="Актуальных заданий по твоим компетенциям на сегодня нет.",
             reply_markup=keyboard,
         )
-        context.user_data["viewed_all"] = True
+        # context.user_data["viewed_all"] = True
         return
 
     for task in tasks_to_show:
+        print(task.id)
         message = display_task(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -74,7 +75,8 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
         text = "Ты просмотрел все актуальные задания на сегодня."
         keyboard = await get_back_menu()
         keyboard = await tasks_again_get_back_menu()
-        context.user_data["viewed_all"] = True
+        # context.user_data["viewed_all"] = True
+        context.user_data["page_number"] = page_number + 1
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -87,7 +89,7 @@ async def view_tasks_again_callback(
     update: Update,
     context: CallbackContext,
 ):
-    context.user_data["viewed_all"] = False
+    # context.user_data["viewed_all"] = False
     context.user_data["page_number"] = 1
     await view_task_callback(
         update, context, limit=3, task_service=Provide[Container.bot_services_container.bot_task_service]
