@@ -86,4 +86,4 @@ async def delete_task(
     task_id: int,
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> None:
-    await task_service.get(task_id)
+    await task_service.archive(task_id)
