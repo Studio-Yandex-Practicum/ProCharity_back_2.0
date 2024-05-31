@@ -173,6 +173,7 @@ class AdminTokenRequest(Base):
     __tablename__ = "admin_token_requests"
 
     email: Mapped[str] = mapped_column(String(48))
+    is_superuser: Mapped[bool] = mapped_column(server_default=expression.false())
     token: Mapped[str] = mapped_column(String(128))
     token_expiration_date: Mapped[datetime]
 
