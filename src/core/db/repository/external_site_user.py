@@ -41,6 +41,7 @@ class ExternalSiteUserRepository(AbstractRepository):
         return instance
 
     async def archive(self, external_id: int) -> None:
+        """Архивирует пользователя сайта и удаляет его связь с ботом."""
         instance = await self.get_by_external_id(external_id)
         instance.is_archived = True
         instance.user = None
