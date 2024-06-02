@@ -93,17 +93,17 @@ class EmailProvider:
         except Exception as e:
             logger.exception(e)
 
-    async def create_temp_body(self, path: str, token: str) -> dict:
+    def create_temp_body(self, path: str, token: str) -> dict:
         """Создает тело шаблона со ссылкой с токеном для отправки
         пригласительной ссылки или сброса пароля.
         Args:
             path (str): маршрут ссылки
             token (str): секретный токен
         """
-        token_expiration = self._settings.TOKEN_EXPIRATION
+        token_expiration_hours = self._settings.TOKEN_EXPIRATION // 3600
         template_body = {
             "link": f"{self._settings.APPLICATION_URL}admin/#/{path}/{token}",
-            "expiration": token_expiration,
+            "expiration": token_expiration_hours,
         }
         return template_body
 
@@ -113,7 +113,7 @@ class EmailProvider:
             email (str): email получателя
             token (str): секретный токен
         """
-        template_body = self.create_temp_body("invitation_link", token)
+        template_body = self.create_temp_body("register", token)
         recipients = [email]
         email_obj = EmailSchema(recipients=recipients, template_body=template_body)
         await self.__send_mail(
