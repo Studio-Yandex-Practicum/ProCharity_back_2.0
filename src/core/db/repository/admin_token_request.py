@@ -19,12 +19,11 @@ class AdminTokenRequestRepository(AbstractRepository):
 
     async def create_invitation_token(self, email: str, token: str, token_expiration_date: datetime) -> None:
         """При отсутствии записи в БД создает пользователя с созданным токеном."""
-        record = AdminTokenRequest.query.filter_by(email=email).first()
+        record = await self._session.scalar(select(self._model).where(self._model.email == email))
         if record:
             record.token = token
             record.token_expiration_date = token_expiration_date
-            await self.session.commit()
+            await self._session.commit()
         else:
-            user = AdminTokenRequest(email=email, token=token, token_expiration_date=token_expiration_date)
-            await self.session.add(user)
-            await self.session.commit()
+            user_record = AdminTokenRequest(email=email, token=token, token_expiration_date=token_expiration_date)
+            await self.create(user_record)
