@@ -1,8 +1,8 @@
 """add_field_is_superuser_to_admin_token
 
-Revision ID: c0950b136dc7
-Revises: 6eb0ef45ad86
-Create Date: 2024-05-31 12:53:39.161200
+Revision ID: c47841afb855
+Revises: 03553b3c5019
+Create Date: 2024-06-03 12:33:57.254531
 
 """
 
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "c0950b136dc7"
-down_revision = "6eb0ef45ad86"
+revision = "c47841afb855"
+down_revision = "03553b3c5019"
 branch_labels = None
 depends_on = None
 
