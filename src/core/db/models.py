@@ -104,6 +104,9 @@ class ExternalSiteUser(Base):
     source: Mapped[str | None] = mapped_column(nullable=True)
 
     user: Mapped["User | None"] = relationship(back_populates="external_user", lazy="joined")
+    task_responses: Mapped[list["Task"]] = relationship(
+        secondary="task_response_volunteer", back_populates="responded_volunteers"
+    )
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
@@ -129,6 +132,9 @@ class Task(ContentBase):
 
     category_id: Mapped[int | None] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category | None"] = relationship(back_populates="tasks")
+    responded_volunteers: Mapped[list["ExternalSiteUser"]] = relationship(
+        secondary="task_response_volunteer", back_populates="task_responses"
+    )
 
     bonus: Mapped[int]
     location: Mapped[str]
@@ -206,3 +212,16 @@ class Notification(Base):
 
     def __repr__(self):
         return f"<Notifications {self.message}>"
+
+
+class TaskResponseVolunteer(Base):
+    """Модель откликов волонтеров."""
+
+    __tablename__ = "task_response_volunteer"
+
+    id = None
+    task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), primary_key=True)
+    external_site_user_id: Mapped[int] = mapped_column(ForeignKey("external_site_users.id"), primary_key=True)
+
+    def __repr__(self):
+        return f"<Response - Task {self.task_id} - Volunteer {self.external_site_user_id}>"
