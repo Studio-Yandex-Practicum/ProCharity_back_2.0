@@ -11,7 +11,7 @@ from src.settings import settings
 
 invitation_router = APIRouter(
     dependencies=[
-        Depends(fastapi_admin_users.current_user(optional=settings.DEBUG)),
+        Depends(fastapi_admin_users.current_user(optional=settings.DEBUG, superuser=True)),
     ]
 )
 
@@ -20,6 +20,7 @@ class InvitationManager(UserManager):
     async def create_invitation(
         self,
         email: str,
+        is_superuser: bool,
         email_provider: EmailProvider = Depends(Provide[Container.core_services_container.email_provider]),
         admin_token_request_service: AdminTokenRequestService = Depends(
             Provide[Container.api_services_container.admin_token_request_service]
@@ -28,7 +29,7 @@ class InvitationManager(UserManager):
         existing_user = await self.user_db.get_by_email(email)
         if existing_user:
             raise UserAlreadyExists()
-        invitation_token = await admin_token_request_service.create_invitation_token(email)
+        invitation_token = await admin_token_request_service.create_invitation_token(email, is_superuser)
         await email_provider.send_invitation_link(email, invitation_token)
 
 
@@ -45,5 +46,5 @@ async def send_invitation_email_route(
     Отправляет приглашение по электронной почте.
     """
 
-    await invitation_manager.create_invitation(invitation_create.email)
+    await invitation_manager.create_invitation(invitation_create.email, invitation_create.is_superuser)
     return {"detail": "Invitation e-mail has been sent successfully."}

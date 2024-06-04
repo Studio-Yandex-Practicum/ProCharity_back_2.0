@@ -25,14 +25,14 @@ class AdminTokenRequestService:
             raise InvalidInvitationToken
         return registration_record
 
-    async def create_invitation_token(self, email: str) -> str:
+    async def create_invitation_token(self, email: str, is_superuser: bool) -> str:
         """Генерирует токен и передает данные в репозиторий."""
         token_expiration = settings.TOKEN_EXPIRATION
         token_expiration_date = datetime.now() + timedelta(seconds=token_expiration)
         token = str(uuid.uuid4())
 
         await self._repository.create_invitation_token(
-            email=email, token=token, token_expiration_date=token_expiration_date
+            email=email, is_superuser=is_superuser, token=token, token_expiration_date=token_expiration_date
         )
         await log.ainfo(f'Registration: The invitation "{token}" generated for {email}.')
         return token
