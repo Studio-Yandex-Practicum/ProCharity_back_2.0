@@ -33,7 +33,7 @@ class BaseExternalSiteUserRequest(RequestBase):
             return value
         except KeyError as exc:
             raise ValueError(
-                "Для передачи статуса пользователя используйте предусмотренные символьные коды (WAIT, MODERATED и т.д.)"
+                "Для передачи статуса пользователя используйте предусмотренные варианты: WAIT, MODERATED и т.д."
             ) from exc
 
 
