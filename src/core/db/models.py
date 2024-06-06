@@ -102,6 +102,7 @@ class ExternalSiteUser(Base):
     last_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
     specializations: Mapped[list[int] | None] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str | None] = mapped_column(nullable=True)
+    moderation_status: Mapped[str] = mapped_column(nullable=True)
 
     user: Mapped["User | None"] = relationship(back_populates="external_user", lazy="joined")
     task_responses: Mapped[list["Task"]] = relationship(
