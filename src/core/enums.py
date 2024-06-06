@@ -22,7 +22,7 @@ class UserRoles(StrEnum):
 
 
 class UserStatus(StrEnum):
-    """Класс с доступными статусами пользователей"""
+    """Класс с доступными статусами модерации пользователей"""
 
     NEW_VOL = "new"
     NEW_FUND = "new"
