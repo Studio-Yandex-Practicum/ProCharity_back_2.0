@@ -64,11 +64,10 @@ class UserRepository(AbstractRepository):
 
     async def set_categories_to_user(self, user_id: int, categories_ids: list[int] | None) -> None:
         """Присваивает или удаляет список категорий."""
-        await self._session.commit()
-        async with self._session.begin():
-            await self._session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
+        async with self._session as session:
+            await session.execute(delete(UsersCategories).where(UsersCategories.user_id == user_id))
             if categories_ids:
-                await self._session.execute(
+                await session.execute(
                     insert(UsersCategories).values(
                         [{"user_id": user_id, "category_id": category_id} for category_id in categories_ids]
                     )
