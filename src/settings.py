@@ -91,7 +91,7 @@ class Settings(BaseSettings):
 
     # Ключевые поля, изменение которых вызывает рассылку обновленного задания
     # Изменение ключевых полей может потребовать изменения формата сообщения в src.core.messages.display_task()
-    TRIGGER_MAILING_FIELDS: list[str] = ["deadline"]
+    TRIGGER_MAILING_FIELDS: list[str] = ["title", "deadline", "category_id", "bonus"]
 
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
@@ -143,11 +143,6 @@ class Settings(BaseSettings):
     def telegram_webhook_url(self) -> str:
         """Получить url-ссылку на эндпоинт для работы telegram в режиме webhook."""
         return urljoin(self.api_url, "telegram/webhook")
-
-    @property
-    def users_url(self) -> str:
-        """Получить url-ссылку на эндпоинт Users."""
-        return urljoin(self.ROOT_PATH + "/", "users")
 
     @property
     def feedback_form_template_url(self) -> str:

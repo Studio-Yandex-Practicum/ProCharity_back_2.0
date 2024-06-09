@@ -66,3 +66,8 @@ class TaskRepository(ContentRepository):
         """Получить список задач по ids c привязанными полями категорий."""
         tasks = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
         return tasks.all()
+
+    async def archive(self, id: int) -> None:
+        instance = await self.get(id, is_archived=False)
+        instance.is_archived = True
+        await self.update(instance.id, instance)

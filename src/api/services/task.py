@@ -13,11 +13,11 @@ class TaskService(ContentService):
     def __init__(self, task_repository: TaskRepository, session: AsyncSession) -> None:
         super().__init__(task_repository, session)
 
-    async def get(self, id: int) -> Task:
+    async def get(self, id: int, *, is_archived: bool | None = None) -> Task:
         """Получает задачу по её ID.
         В случае отсутствия задачи с таким ID возбуждает NotFoundException.
         """
-        return await self._repository.get(id)
+        return await self._repository.get(id, is_archived=is_archived)
 
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         return await self._repository.get_tasks_for_user(user_id)
@@ -44,3 +44,6 @@ class TaskService(ContentService):
         changed = any(attrs.get(name) and attrs.get(name) != old_task_dict.get(name) for name in trigger_fields)
         await self._repository.update(task.id, Task(**attrs))
         return changed
+
+    async def archive(self, id: int) -> None:
+        await self._repository.archive(id)

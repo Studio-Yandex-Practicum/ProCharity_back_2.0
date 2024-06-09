@@ -12,11 +12,12 @@ from src.core.db.models import Task
 from src.core.depends import Container
 from src.core.messages import display_task
 
-task_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
-task_detail_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+tasks_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+task_read_router = APIRouter()
+task_write_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
-@task_router.post("", description="Актуализирует список задач.")
+@tasks_router.post("", description="Актуализирует список задач.")
 @inject
 async def actualize_tasks(
     tasks: TasksRequest,
@@ -36,7 +37,7 @@ async def actualize_tasks(
         )
 
 
-@task_router.get(
+@tasks_router.get(
     "/{user_id}",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
@@ -50,7 +51,7 @@ async def get_tasks_for_user(
     return await task_service.get_tasks_for_user(user_id)
 
 
-@task_router.get(
+@tasks_router.get(
     "",
     response_model=list[TaskResponse],
     response_model_exclude_none=True,
@@ -63,11 +64,11 @@ async def get_all_tasks(
     return await task_service.get_all()
 
 
-@task_detail_router.get(
+@task_read_router.get(
     "/{task_id}",
     response_model=TaskResponse,
     response_model_exclude_none=True,
-    description="Получает данные по выбранной задаче.",
+    description="Получает данные по указанной задаче.",
 )
 @inject
 async def get_task_detail(
@@ -77,7 +78,7 @@ async def get_task_detail(
     return await task_service.get(task_id)
 
 
-@task_detail_router.post("", description="Добавление новой задачи.", status_code=status.HTTP_201_CREATED)
+@task_write_router.post("", description="Добавление новой задачи.", status_code=status.HTTP_201_CREATED)
 @inject
 async def create_task(
     task: TaskRequest,
@@ -102,7 +103,7 @@ async def create_task(
         )
 
 
-@task_detail_router.put("", description="Обновление существующей задачи.", status_code=status.HTTP_200_OK)
+@task_write_router.put("", description="Обновление существующей задачи.", status_code=status.HTTP_200_OK)
 @inject
 async def update_task(
     task: TaskRequest,
@@ -127,3 +128,16 @@ async def update_task(
             task_obj.category_id,
             reply_markup=get_task_info_keyboard(task_obj),
         )
+
+
+@task_write_router.delete(
+    "/{task_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Удаляет указанную задачу из БД бота.",
+)
+@inject
+async def delete_task(
+    task_id: int,
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
+) -> None:
+    await task_service.archive(task_id)

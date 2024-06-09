@@ -48,3 +48,16 @@ class OAuth2PasswordRequestForm:
         self.scopes = scope.split()
         self.client_id = client_id
         self.client_secret = client_secret
+
+
+class InvitationCreateSchema(BaseModel):
+    email: EmailStr
+    is_superuser: bool | None = Field(False)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "is_superuser": "False",
+            }
+        }
