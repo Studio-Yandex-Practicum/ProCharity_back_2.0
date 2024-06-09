@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db.models import ExternalSiteUser
+from src.core.db.models import ExternalSiteUser, Task, TaskResponseVolunteer
 from src.core.db.repository.base import AbstractRepository
 
 
@@ -21,3 +21,11 @@ class ExternalSiteUserRepository(AbstractRepository):
         if instance is not None:
             return (instance, False)
         return await self.create(ExternalSiteUser(id_hash=id_hash)), True
+
+    async def user_responded_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
+        response = await self._session.scalar(
+            select(TaskResponseVolunteer)
+            .where(TaskResponseVolunteer.external_site_user_id == site_user.id)
+            .where(TaskResponseVolunteer.task_id == task.id)
+        )
+        return response is not None

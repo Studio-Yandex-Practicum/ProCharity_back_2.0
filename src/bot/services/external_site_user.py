@@ -1,4 +1,4 @@
-from src.core.db.models import ExternalSiteUser
+from src.core.db.models import ExternalSiteUser, Task
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 
 
@@ -28,3 +28,6 @@ class ExternalSiteUserService:
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         if user and user.external_id is not None:
             return await self._repository.get_or_none(user.external_id)
+
+    async def user_responded_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
+        return await self._repository.user_responded_to_task(site_user, task)

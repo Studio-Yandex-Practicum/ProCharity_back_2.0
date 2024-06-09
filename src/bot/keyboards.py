@@ -2,8 +2,9 @@ from dependency_injector.wiring import Provide
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from src.bot.constants import callback_data, enum
+from src.bot.services import ExternalSiteUserService
 from src.bot.web_apps import get_feedback_web_app_info, get_task_web_app_info
-from src.core.db.models import Category, Task, User
+from src.core.db.models import Category, ExternalSiteUser, Task, User
 from src.core.depends import Container
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
@@ -43,6 +44,13 @@ def get_notification_settings_button(
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
     return [InlineKeyboardButton("✍ Написать в службу поддержки", web_app=get_feedback_web_app_info(user))]
+
+
+def get_response_to_task_button(task: Task, cancel: bool) -> list[InlineKeyboardButton]:
+    text, callback_data_prefix = (
+        ("Отменить отклик", "dont_respond_to_task_") if cancel else ("Откликнуться", "respond_to_task_")
+    )
+    return [InlineKeyboardButton(text, callback_data=f"{callback_data_prefix}{task.id}")]
 
 
 async def get_checked_categories_keyboard(
@@ -165,7 +173,15 @@ def get_no_mailing_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_task_info_keyboard(task: Task) -> InlineKeyboardMarkup:
-    """Клавиатура с кнопкой для отображения подробной информации о задании и фонде"""
-    keyboard = [[InlineKeyboardButton("ℹ️ Посмотреть задание", web_app=get_task_web_app_info(task))]]
-    return InlineKeyboardMarkup(keyboard)
+async def get_task_info_keyboard(
+    task: Task,
+    site_user: ExternalSiteUser,
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+) -> InlineKeyboardMarkup:
+    """Клавиатура, помещаемая под кратким описанием задачи"""
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("ℹ️ Посмотреть задание", web_app=get_task_web_app_info(task))],
+            get_response_to_task_button(task, await site_user_service.user_responded_to_task(site_user, task)),
+        ]
+    )

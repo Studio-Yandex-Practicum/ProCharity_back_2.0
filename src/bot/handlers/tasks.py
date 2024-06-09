@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
-from src.bot.constants import callback_data
+from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
 from src.bot.services.task import TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
@@ -48,7 +48,7 @@ async def view_task_callback(
             text=message,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
-            reply_markup=get_task_info_keyboard(task),
+            reply_markup=await get_task_info_keyboard(task, ext_site_user),
         )
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
     await show_next_tasks(update, context, page_number, remaining_tasks)
@@ -70,5 +70,25 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
     )
 
 
+@logger_decor
+@registered_user_required
+# @delete_previous_message
+async def respond_to_task_callback(
+    update: Update,
+    context: CallbackContext,
+    ext_site_user: ExternalSiteUser,
+    # task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+):
+    # telegram_id = context._user_id
+    query = update.callback_query
+    task_id = context.match.group(1)
+    await context.bot.answer_callback_query(query.id, text=f"Ты откликнулся на задание №{task_id}", show_alert=True)
+    # await context.bot.send_message(
+    #     chat_id=update.effective_chat.id,
+    #     text=f"Ты откликнулся на задание №{task_id}",
+    # )
+
+
 def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
+    app.add_handler(CallbackQueryHandler(respond_to_task_callback, pattern=patterns.RESPOND_TO_TASK))
