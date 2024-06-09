@@ -1,6 +1,5 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
 
 from src.api.auth import check_header_contains_token
 from src.api.schemas import TaskResponse, TasksRequest
@@ -78,34 +77,13 @@ async def get_task_detail(
     return await task_service.get(task_id)
 
 
-@task_write_router.post("", description="Добавление новой задачи.", status_code=status.HTTP_201_CREATED)
+@task_write_router.post(
+    "",
+    status_code=status.HTTP_200_OK,
+    description="Добавление новой или обновление существующей задачи.",
+)
 @inject
-async def create_task(
-    task: TaskRequest,
-    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
-    telegram_notification_service: TelegramNotificationService = Depends(
-        Provide[Container.api_services_container.message_service]
-    ),
-):
-    if await task_service.get_user_task_id(task.id):
-        return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
-            content={"message": "Task with given id already exists"},
-        )
-    await task_service.create(**task.model_dump())
-    task_with_category = await task_service.get_user_task_id(task.id)
-    if task_with_category:
-        message = display_task(task_with_category)
-        await telegram_notification_service.send_messages_to_subscribed_users(
-            message,
-            task_with_category.category_id,
-            reply_markup=get_task_info_keyboard(task_with_category),
-        )
-
-
-@task_write_router.put("", description="Обновление существующей задачи.", status_code=status.HTTP_200_OK)
-@inject
-async def update_task(
+async def create_update_task(
     task: TaskRequest,
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
     telegram_notification_service: TelegramNotificationService = Depends(
@@ -114,20 +92,24 @@ async def update_task(
     trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ):
     task_obj = await task_service.get_user_task_id(task.id)
-    if not task_obj:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"message": "Task with given id not found"},
-        )
-    trigger_fields_changed = await task_service.update(task_obj, trigger_mailing_fields, **task.model_dump())
-    if trigger_fields_changed:
-        task_obj = await task_service.get_user_task_id(task_obj.id)
-        message = display_task(task_obj)
-        await telegram_notification_service.send_messages_to_subscribed_users(
-            message,
-            task_obj.category_id,
-            reply_markup=get_task_info_keyboard(task_obj),
-        )
+    trigger_fields_changed, new_task = False, False
+    if task_obj:
+        # обновление существующей задачи
+        trigger_fields_changed = await task_service.update(task_obj, trigger_mailing_fields, **task.model_dump())
+    else:
+        # создание новой задачи
+        await task_service.create(**task.model_dump())
+        new_task = True
+    # рассылка уведомлений, при необходимости
+    if trigger_fields_changed or new_task:
+        task_with_category = await task_service.get_user_task_id(task.id)
+        if task_with_category:
+            message = display_task(task_with_category, updated_task=not new_task)
+            await telegram_notification_service.send_messages_to_subscribed_users(
+                message,
+                task_with_category.category_id,
+                reply_markup=get_task_info_keyboard(task_with_category),
+            )
 
 
 @task_write_router.delete(
