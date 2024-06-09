@@ -6,6 +6,28 @@ from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
 
 
+class TaskDescriptionMain(RequestBase, ResponseBase):
+    """Описание поля для элементов task.description_main."""
+
+    title: str = Field(..., examples=["Подзаголовок 1"], description="Подзаголовок.")
+    value: str = Field(..., examples=["Текст под подзаголовком 1"], description="Текст под подзаголовком.")
+
+
+class TaskDescriptionLinks(RequestBase, ResponseBase):
+    """Описание поля для элементов task.description_links."""
+
+    name: str = Field(None, examples=["Название ссылки 1"], description="Название ссылки.")
+    link: str = Field(None, examples=["https://example_link_1.ru"], description="Ссылка.")
+
+
+class TaskDescriptionFiles(RequestBase, ResponseBase):
+    """Описание поля для элементов task.description_files."""
+
+    file_name: str = Field(None, examples=["Название файла 1"], description="Название файла.")
+    file_link: str = Field(None, examples=["procharity.ru/file_link_1.extension_1"], description="Ссылка на файл.")
+    file_size: float = Field(None, examples=["12345"], description="Размер файла.")
+
+
 class TaskCommonFieldsMixin:
     """Набор общих полей для схем модели Task."""
 
@@ -32,7 +54,13 @@ class TaskCommonFieldsMixin:
     bonus: PositiveInt = Field(..., ge=1, le=10, examples=[5], description="Количество бонусов за выполнение задачи.")
     location: str = Field(..., examples=["Task Location"], description="Место выполнения задачи.")
     link: str = Field(..., examples=["https://mainsite.com/tasks/1234"], description="Ссылка на страницу задачи.")
-    description: str = Field(..., examples=["Task description"], description="Описание задачи.")
+    description: str | None = Field(..., examples=["Task description"], description="Описание задачи.")
+    description_main: list[TaskDescriptionMain] | None = Field(..., description="Описание задачи.")
+    description_links: list[TaskDescriptionLinks] | None = Field(..., description="Ссылки описания задачи.")
+    description_files: list[TaskDescriptionFiles] | None = Field(..., description="Файлы описания задачи.")
+    description_bonus: str | None = Field(
+        ..., examples=["Описание дополнительного бонуса"], description="Описание дополнительного бонуса ."
+    )
 
 
 class TaskRequest(RequestBase, TaskCommonFieldsMixin):
