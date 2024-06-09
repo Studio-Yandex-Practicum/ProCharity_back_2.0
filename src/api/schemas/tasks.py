@@ -54,12 +54,12 @@ class TaskCommonFieldsMixin:
     bonus: PositiveInt = Field(..., ge=1, le=10, examples=[5], description="Количество бонусов за выполнение задачи.")
     location: str = Field(..., examples=["Task Location"], description="Место выполнения задачи.")
     link: str = Field(..., examples=["https://mainsite.com/tasks/1234"], description="Ссылка на страницу задачи.")
-    description: str | None = Field(..., examples=["Task description"], description="Описание задачи.")
-    description_main: list[TaskDescriptionMain] | None = Field(..., description="Описание задачи.")
-    description_links: list[TaskDescriptionLinks] | None = Field(..., description="Ссылки описания задачи.")
-    description_files: list[TaskDescriptionFiles] | None = Field(..., description="Файлы описания задачи.")
+    description: str | None = Field(None, examples=["Task description"], description="Описание задачи.")
+    description_main: list[TaskDescriptionMain] | None = Field(None, description="Описание задачи.")
+    description_links: list[TaskDescriptionLinks] | None = Field(None, description="Ссылки описания задачи.")
+    description_files: list[TaskDescriptionFiles] | None = Field(None, description="Файлы описания задачи.")
     description_bonus: str | None = Field(
-        ..., examples=["Описание дополнительного бонуса"], description="Описание дополнительного бонуса ."
+        None, examples=["Описание дополнительного бонуса"], description="Описание дополнительного бонуса ."
     )
 
 
