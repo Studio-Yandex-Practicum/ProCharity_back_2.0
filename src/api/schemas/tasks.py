@@ -7,25 +7,25 @@ from src.api.schemas.base import RequestBase, ResponseBase
 
 
 class TaskDescriptionMain(RequestBase, ResponseBase):
-    """Описание поля для элементов task.description_main."""
+    """Описание полей task.description_main."""
 
     title: str = Field(..., examples=["Подзаголовок 1"], description="Подзаголовок.")
     value: str = Field(..., examples=["Текст под подзаголовком 1"], description="Текст под подзаголовком.")
 
 
 class TaskDescriptionLinks(RequestBase, ResponseBase):
-    """Описание поля для элементов task.description_links."""
+    """Описание полей task.description_links."""
 
-    name: str = Field(None, examples=["Название ссылки 1"], description="Название ссылки.")
-    link: str = Field(None, examples=["https://example_link_1.ru"], description="Ссылка.")
+    name: str = Field(..., examples=["Название ссылки 1"], description="Название ссылки.")
+    link: str = Field(..., examples=["https://example_link_1.ru"], description="Ссылка.")
 
 
 class TaskDescriptionFiles(RequestBase, ResponseBase):
-    """Описание поля для элементов task.description_files."""
+    """Описание полей task.description_files."""
 
-    file_name: str = Field(None, examples=["Название файла 1"], description="Название файла.")
-    file_link: str = Field(None, examples=["procharity.ru/file_link_1.extension_1"], description="Ссылка на файл.")
-    file_size: float = Field(None, examples=["12345"], description="Размер файла.")
+    file_name: str = Field(..., examples=["Название файла 1"], description="Название файла.")
+    file_link: str = Field(..., examples=["procharity.ru/file_link_1.extension_1"], description="Ссылка на файл.")
+    file_size: int = Field(..., examples=["12345"], description="Размер файла в байтах.")
 
 
 class TaskCommonFieldsMixin:
