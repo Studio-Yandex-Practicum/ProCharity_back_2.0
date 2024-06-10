@@ -1,4 +1,4 @@
-"""add description_ fields ito Task
+"""add description fields into Task
 
 Revision ID: 01031c0ab38e
 Revises: 03ea379fb5c9
