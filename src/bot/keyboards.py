@@ -47,10 +47,11 @@ def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
 
 
 def get_response_to_task_button(task: Task, cancel: bool) -> list[InlineKeyboardButton]:
-    text, callback_data_prefix = (
-        ("Отменить отклик", "dont_respond_to_task_") if cancel else ("Откликнуться", "respond_to_task_")
-    )
-    return [InlineKeyboardButton(text, callback_data=f"{callback_data_prefix}{task.id}")]
+    """Возвращает кнопку для отклика на заданную задачу или для отмены отклика,
+    в зависимости от значения параметра cancel.
+    """
+    text, action = ("Отменить отклик", "-") if cancel else ("Откликнуться", "+")
+    return [InlineKeyboardButton(text, callback_data=f"{action}respond_to_task_{task.id}")]
 
 
 async def get_checked_categories_keyboard(

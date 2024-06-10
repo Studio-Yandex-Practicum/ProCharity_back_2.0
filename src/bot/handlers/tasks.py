@@ -5,7 +5,7 @@ from telegram.ext import Application, CallbackContext, CallbackQueryHandler
 
 from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
-from src.bot.services.task import TaskService
+from src.bot.services import ExternalSiteUserService, TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
@@ -72,21 +72,37 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
 
 @logger_decor
 @registered_user_required
-# @delete_previous_message
 async def respond_to_task_callback(
     update: Update,
     context: CallbackContext,
-    ext_site_user: ExternalSiteUser,
-    # task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+    site_user: ExternalSiteUser,
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
 ):
-    # telegram_id = context._user_id
     query = update.callback_query
-    task_id = context.match.group(1)
-    await context.bot.answer_callback_query(query.id, text=f"Ты откликнулся на задание №{task_id}", show_alert=True)
-    # await context.bot.send_message(
-    #     chat_id=update.effective_chat.id,
-    #     text=f"Ты откликнулся на задание №{task_id}",
-    # )
+    action = context.match.group(1)
+    task = await task_service.get_or_none(int(context.match.group(2)))
+    if task is None:
+        return
+
+    if task.is_archived:
+        await context.bot.answer_callback_query(
+            query.id, text="Задание уже отдано в работу другому волонтеру.", show_alert=True
+        )
+        return
+
+    if action == "+":
+        if not await site_user_service.create_user_response_to_task(site_user, task):
+            await context.bot.answer_callback_query(
+                query.id, text="Ты уже откликнулся на это задание.", show_alert=True
+            )
+    else:
+        if not await site_user_service.delete_user_response_to_task(site_user, task):
+            await context.bot.answer_callback_query(
+                query.id, text="Ты уже отменил отклик на это задание.", show_alert=True
+            )
+
+    await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
 
 
 def registration_handlers(app: Application):
