@@ -141,7 +141,7 @@ class Task(ContentBase):
     bonus: Mapped[int]
     location: Mapped[str]
     link: Mapped[str]
-    description: Mapped[str]
+    description: Mapped[str | None] = mapped_column(nullable=True)
     description_main: Mapped[list[dict]] = mapped_column(nullable=True, type_=JSONB)
     description_links: Mapped[list[dict]] = mapped_column(nullable=True, type_=JSONB)
     description_files: Mapped[list[dict]] = mapped_column(nullable=True, type_=JSONB)
