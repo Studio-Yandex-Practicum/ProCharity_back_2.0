@@ -2,9 +2,9 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.services.base import ContentService
+from src.api.services import ContentService
 from src.core.db.models import Task
-from src.core.db.repository.task import TaskRepository
+from src.core.db.repository import TaskRepository
 
 
 class TaskService(ContentService):
