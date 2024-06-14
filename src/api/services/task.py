@@ -19,6 +19,9 @@ class TaskService(ContentService):
         """
         return await self._repository.get(id, is_archived=is_archived)
 
+    async def get_or_none(self, task_id: int) -> Optional[Task]:
+        return await self._repository.get_or_none(task_id)
+
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         return await self._repository.get_tasks_for_user(user_id)
 
@@ -35,7 +38,7 @@ class TaskService(ContentService):
         """Создание новой задачи."""
         return await self._repository.create(Task(**attrs))
 
-    async def update(self, task: Task, trigger_fields: list[str] | None = None, **attrs) -> bool:
+    async def update(self, task: Task, trigger_fields: list[str] = [], **attrs) -> bool:
         """Обновление задачи значениями attrs.
         Returns:
             True, если изменилось хотя бы одно из полей, указанных в trigger_fields

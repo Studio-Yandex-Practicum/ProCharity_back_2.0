@@ -2,8 +2,7 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, status
 
 from src.api.auth import check_header_contains_token
-from src.api.schemas import TaskResponse, TasksRequest
-from src.api.schemas.tasks import TaskRequest
+from src.api.schemas import TaskRequest, TaskResponse, TasksRequest
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.keyboards import get_task_info_keyboard
@@ -91,16 +90,15 @@ async def create_update_task(
     ),
     trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ):
-    task_obj = await task_service.get_user_task_id(task.id)
+    task_obj = await task_service.get_or_none(task.id)
     trigger_fields_changed, new_task = False, False
     if task_obj:
-        # обновление существующей задачи
-        trigger_fields_changed = await task_service.update(task_obj, trigger_mailing_fields, **task.model_dump())
+        trigger_fields_changed = await task_service.update(
+            task_obj, trigger_mailing_fields, **task.model_dump(), is_archived=False
+        )
     else:
-        # создание новой задачи
         await task_service.create(**task.model_dump())
         new_task = True
-    # рассылка уведомлений, при необходимости
     if trigger_fields_changed or new_task:
         task_with_category = await task_service.get_user_task_id(task.id)
         if task_with_category:

@@ -59,7 +59,7 @@ class TaskRepository(ContentRepository):
         )
 
     async def get_user_task_id(self, task_id) -> Optional[Task]:
-        """Получить задачу по id с привязанными полями категорий."""
+        """Получить задачу по id с привязанными полями категории."""
         return await self._session.scalar(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
 
     async def get_user_tasks_ids(self, ids: list[int]) -> Sequence[Task]:
