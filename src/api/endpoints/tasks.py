@@ -2,7 +2,7 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, status
 
 from src.api.auth import check_header_contains_token
-from src.api.schemas import TaskResponse, TasksRequest
+from src.api.schemas import TaskRequest, TaskResponse, TasksRequest
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.keyboards import get_task_info_keyboard
@@ -74,6 +74,40 @@ async def get_task_detail(
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> TaskResponse:
     return await task_service.get(task_id)
+
+
+@task_write_router.post(
+    "",
+    status_code=status.HTTP_200_OK,
+    description="Добавление новой или обновление существующей задачи.",
+)
+@inject
+async def create_update_task(
+    task: TaskRequest,
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
+    trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
+):
+    task_obj = await task_service.get_or_none(task.id)
+    trigger_fields_changed, new_task = False, False
+    if task_obj:
+        trigger_fields_changed = await task_service.update(
+            task_obj, trigger_mailing_fields, **task.model_dump(), is_archived=False
+        )
+    else:
+        await task_service.create(**task.model_dump())
+        new_task = True
+    if trigger_fields_changed or new_task:
+        task_with_category = await task_service.get_user_task_id(task.id)
+        if task_with_category:
+            message = display_task(task_with_category, updated_task=not new_task)
+            await telegram_notification_service.send_messages_to_subscribed_users(
+                message,
+                task_with_category.category_id,
+                reply_markup=get_task_info_keyboard(task_with_category),
+            )
 
 
 @task_write_router.delete(

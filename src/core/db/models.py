@@ -27,6 +27,9 @@ class Base(DeclarativeBase):
     )
     __name__: Mapped[str]
 
+    def to_dict(self):
+        return {field.name: getattr(self, field.name) for field in self.__table__.c}
+
 
 class ContentBase(AbstractConcreteBase, Base):
     """Базовый класс для контента (категорий и задач)."""
