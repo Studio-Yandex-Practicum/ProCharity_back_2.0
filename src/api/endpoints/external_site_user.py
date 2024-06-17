@@ -38,16 +38,3 @@ async def external_fund_registration(
     site_user_service: ExternalSiteUserService = Depends(Provide[Container.api_services_container.site_user_service]),
 ) -> None:
     await site_user_service.register(site_user)
-
-
-@site_user_router.delete(
-    "/external_fund_registration/{user_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    description="Удаляет данные пользователя сайта ProCharity из БД бота.",
-)
-@inject
-async def external_fund_delete(
-    user_id: int,
-    site_user_service: ExternalSiteUserService = Depends(Provide[Container.api_services_container.site_user_service]),
-) -> None:
-    await site_user_service.archive(user_id)
