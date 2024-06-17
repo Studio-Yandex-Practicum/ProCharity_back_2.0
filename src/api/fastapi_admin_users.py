@@ -65,6 +65,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
         user_dict["email"] = email
+        user_dict["is_superuser"] = registration_record.is_superuser
 
         try:
             created_user = await self.user_db.create(user_dict)

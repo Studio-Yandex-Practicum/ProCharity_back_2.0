@@ -19,3 +19,14 @@ class UserRoles(StrEnum):
 
     FUND = "fund"
     VOLUNTEER = "volunteer"
+
+
+class UserStatus(StrEnum):
+    """Класс с доступными статусами модерации пользователей"""
+
+    NEW_VOL = "new"
+    NEW_FUND = "new"
+    WAIT = "wait"
+    MODERATED = "moderated"
+    NO_MODERATED = "no_moderated"
+    BLOCKED = "blocked"
