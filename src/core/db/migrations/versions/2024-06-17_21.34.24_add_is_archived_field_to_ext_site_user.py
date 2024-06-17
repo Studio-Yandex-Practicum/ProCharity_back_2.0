@@ -1,8 +1,8 @@
-"""add field is_archived to external_site_users
+"""add is_archived field to ext_site_user
 
-Revision ID: e7ac78853018
-Revises: 6eb0ef45ad86
-Create Date: 2024-05-24 20:54:50.250707
+Revision ID: a58802257c7e
+Revises: 54c666ae68f1
+Create Date: 2024-06-17 21:34:24.170666
 
 """
 
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "e7ac78853018"
-down_revision = "6eb0ef45ad86"
+revision = "a58802257c7e"
+down_revision = "54c666ae68f1"
 branch_labels = None
 depends_on = None
 
