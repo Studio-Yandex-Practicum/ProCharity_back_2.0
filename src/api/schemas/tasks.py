@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import Field, PositiveInt, RootModel, StrictFloat, field_validator
+from pydantic import BaseModel, Field, PositiveInt, RootModel, StrictFloat, field_validator
 
 from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
@@ -28,7 +28,7 @@ class TaskDescriptionFiles(RequestBase, ResponseBase):
     file_size: int = Field(..., examples=["12345"], description="Размер файла в байтах.")
 
 
-class TaskCommonFieldsMixin:
+class TaskCommonFieldsMixin(BaseModel):
     """Набор общих полей для схем модели Task."""
 
     title: str = Field(..., examples=["Example Task"], description="Название задачи.")
