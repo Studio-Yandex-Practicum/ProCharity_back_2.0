@@ -4,6 +4,7 @@ from typing import Never
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from passlib.context import CryptContext
 from sqlalchemy import ARRAY, BigInteger, ForeignKey, Integer, String
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, backref, mapped_column, relationship
 from sqlalchemy.sql import expression, func
@@ -25,6 +26,9 @@ class Base(DeclarativeBase):
         onupdate=func.current_timestamp(),
     )
     __name__: Mapped[str]
+
+    def to_dict(self):
+        return {field.name: getattr(self, field.name) for field in self.__table__.c}
 
 
 class ContentBase(AbstractConcreteBase, Base):
@@ -140,7 +144,11 @@ class Task(ContentBase):
     bonus: Mapped[int]
     location: Mapped[str]
     link: Mapped[str]
-    description: Mapped[str]
+    description: Mapped[str | None] = mapped_column(nullable=True)
+    description_main: Mapped[list[dict]] = mapped_column(nullable=True, type_=JSONB)
+    description_links: Mapped[list[dict]] = mapped_column(nullable=True, type_=JSONB)
+    description_files: Mapped[list[dict]] = mapped_column(nullable=True, type_=JSONB)
+    description_bonus: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<Task {self.title}>"
