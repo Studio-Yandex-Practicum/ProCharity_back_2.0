@@ -36,13 +36,20 @@ class TelegramNotificationService:
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
     async def send_message_to_user(self, id_hash: str, message: str) -> tuple[bool, str]:
-        """Отправляет сообщение указанному по telegram_id пользователю"""
+        """Отправляет сообщение пользователю по указанному id_hash"""
         site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
         if site_user is None:
-            return False, "Пользователя не найден."
+            return False, "Пользователь не найден."
         if site_user.user is None:
             return False, "Телеграм пользователя не найден."
         return await self.telegram_notification.send_message(user_id=site_user.user.telegram_id, message=message)
+
+    async def send_message_by_telegram_id(self, telegram_id: int, message: str) -> tuple[bool, str]:
+        """Отправляет сообщение пользователю по указанному telegram_id"""
+        user = await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
+        if user is None:
+            return False, "Пользователь не найден."
+        return await self.telegram_notification.send_message(user_id=user.telegram_id, message=message)
 
     async def send_messages_to_subscribed_users(self, notifications, category_id, reply_markup=None):
         """Отправляет сообщение всем пользователям, подписанным на заданную категорию.
