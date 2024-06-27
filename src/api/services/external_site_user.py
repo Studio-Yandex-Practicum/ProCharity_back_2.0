@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import ExternalSiteFundRequest, ExternalSiteVolunteerRequest
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
+from src.core.exceptions import BadRequestException
 
 
 class ExternalSiteUserService:
@@ -18,9 +19,14 @@ class ExternalSiteUserService:
         self._session: AsyncSession = session
 
     async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
-        site_user = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash)
+        """Создаёт в БД нового пользователя сайта или обновляет данные существующего."""
+        site_user = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash, with_archived=True)
         if site_user:
+            if site_user.is_archived:
+                raise BadRequestException("Пользователь удален. Обновление невозможно.")
+
             site_user = await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
+
         else:
             site_user = await self._site_user_repository.create(site_user_schema.to_orm())
 
@@ -33,3 +39,7 @@ class ExternalSiteUserService:
 
             await self._user_repository.update(user.id, user)
             await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
+
+    async def archive(self, external_id: int) -> None:
+        """Архивирует пользователя сайта и удаляет его связь с ботом."""
+        await self._site_user_repository.archive(external_id)

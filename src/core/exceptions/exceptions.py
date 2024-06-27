@@ -23,8 +23,8 @@ class NotFoundException(ApplicationException):
         if object_id is not None:
             self.detail = f"Объект {object_name} с id: {object_id} не найден"
         else:
-            object_kwargs_str = ", ".join(map(lambda k, v: f"{k}={v}"))
-            self.detail = f"Объект {object_name} ({object_kwargs_str}) не найден"
+            object_kwargs_str = ", ".join([f"{k}={v}" for k, v in object_kwargs.items()])
+            self.detail = f"Объект {object_name}({object_kwargs_str}) не найден"
 
 
 class AlreadyExistsException(ApplicationException):
