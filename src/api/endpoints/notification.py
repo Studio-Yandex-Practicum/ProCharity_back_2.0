@@ -24,7 +24,7 @@ async def send_telegram_notification(
     ),
 ) -> InfoRate:
     """Отправляет сообщение указанной группе пользователей"""
-    result = await telegram_notification_service.send_messages_to_group_of_users(notifications)
+    result = await telegram_notification_service.send_messages_to_filtered_users(notifications)
     rate = InfoRate()
     rate = telegram_notification_service.collect_respond_and_status(result, rate)
     return rate
@@ -44,7 +44,9 @@ async def send_messages_to_group_of_users(
     await log.ainfo("Начало отправки сообщений для группы пользователей")
     rate = InfoRate()
     for message in message_list.messages:
-        status, msg = await telegram_notification_service.send_message_to_user(message.id_hash, message.message)
+        status, msg = await telegram_notification_service.send_message_to_user_by_id_hash(
+            message.id_hash, message.message
+        )
         rate = telegram_notification_service.count_rate(status, msg, rate)
     await log.ainfo("Конец отправки сообщений для группы пользователей")
     return rate
