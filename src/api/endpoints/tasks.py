@@ -30,7 +30,7 @@ async def actualize_tasks(
     mailing_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids + updated_tasks_ids)
     for task in mailing_category_tasks:
         message = display_task(task, task.id in updated_tasks_ids_set)
-        await telegram_notification_service.send_messages_to_subscribed_users(
+        await telegram_notification_service.send_task_to_users_with_category(
             message, task.category_id, reply_markup=get_task_info_keyboard(task)
         )
 
@@ -103,7 +103,7 @@ async def create_update_task(
         task_with_category = await task_service.get_user_task_id(task.id)
         if task_with_category:
             message = display_task(task_with_category, updated_task=not new_task)
-            await telegram_notification_service.send_messages_to_subscribed_users(
+            await telegram_notification_service.send_task_to_users_with_category(
                 message,
                 task_with_category.category_id,
                 reply_markup=get_task_info_keyboard(task_with_category),

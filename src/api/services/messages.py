@@ -51,7 +51,7 @@ class TelegramNotificationService:
             return False, "Пользователь не найден."
         return await self.telegram_notification.send_message(user_id=user.telegram_id, message=message)
 
-    async def send_messages_to_subscribed_users(self, notifications, category_id, reply_markup=None):
+    async def send_task_to_users_with_category(self, notifications, category_id, reply_markup=None):
         """Отправляет сообщение всем пользователям, подписанным на заданную категорию.
 
         Args:
@@ -63,7 +63,7 @@ class TelegramNotificationService:
             select(Category)
             .join(Category.users)
             .options(contains_eager(Category.users))
-            .where(User.has_mailing.is_(True) & User.banned.is_(False))
+            .where(User.has_mailing.is_(True) & User.banned.is_(False) & User.external_id.is_not(None))
             .where(Category.id == category_id)
         )
         if (category := qr.first()) is None:
