@@ -5,7 +5,7 @@ import structlog
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import JSONResponse
-from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
+from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin, models, schemas
 from fastapi_users.authentication import AuthenticationBackend, Authenticator
 from fastapi_users.manager import UserManagerDependency
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
@@ -21,12 +21,15 @@ from src.core.admin_auth.cookie_backend import auth_cookie_backend
 from src.core.db.models import AdminUser
 from src.core.depends import Container
 from src.core.exceptions.exceptions import BadRequestException, UserAlreadyExists
+from src.core.services.email import EmailProvider
 from src.settings import settings
 
 log = structlog.get_logger()
 
 engine = create_async_engine(settings.database_url)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+SECRET = "SECRET"
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -39,6 +42,9 @@ async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
+    reset_password_token_secret = SECRET
+    verification_token_secret = SECRET
+
     async def create_with_token(
         self,
         user_create: schemas.UC,
@@ -92,8 +98,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
 
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
+    async def on_after_forgot_password(
+        self,
+        user: AdminUser,
+        token: str,
+        request: Request | None = None,
+        email_provider: EmailProvider = Depends(Provide[Container.core_services_container.email_provider]),
+    ) -> None:
+        email_provider.send_restore_password_link(user.email, token)
 
-class CustomFastAPIUsers(Generic[models.UP, models.ID]):
+
+class CustomFastAPIUsers(Generic[models.UP, models.ID], FastAPIUsers[models.UP, models.ID]):
     authenticator: Authenticator
 
     def __init__(
