@@ -25,11 +25,11 @@ class TaskService(ContentService):
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         return await self._repository.get_tasks_for_user(user_id)
 
-    async def get_user_task_id(self, task_id: int) -> Optional[Task]:
-        return await self._repository.get_user_task_id(task_id)
+    async def get_task_with_category_by_task_id(self, task_id: int) -> Optional[Task]:
+        return await self._repository.get_task_with_category_by_task_id(task_id)
 
-    async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
-        return await self._repository.get_user_tasks_ids(ids)
+    async def get_tasks_with_categories_by_tasks_ids(self, ids: list[int]) -> list[Task]:
+        return await self._repository.get_tasks_with_categories_by_tasks_ids(ids)
 
     async def get_tasks_by_filter(self, **filter_by) -> list[Task]:
         return await self._repository.get_tasks_by_filter(**filter_by)

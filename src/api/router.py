@@ -6,7 +6,8 @@ from src.api.endpoints import (
     category_router,
     feedback_router,
     health_check_router,
-    notification_router,
+    notification_router_by_admin,
+    notification_router_by_token,
     site_user_router,
     task_read_router,
     task_write_router,
@@ -21,7 +22,8 @@ api_router = APIRouter(prefix=settings.ROOT_PATH)
 api_router.include_router(analytic_router, prefix="/analytics", tags=["Analytic"])
 api_router.include_router(category_router, prefix="/categories", tags=["Content"])
 api_router.include_router(health_check_router, prefix="/health_check", tags=["Healthcheck"])
-api_router.include_router(notification_router, prefix="/messages", tags=["Messages"])
+api_router.include_router(notification_router_by_admin, prefix="/messages", tags=["Messages"])
+api_router.include_router(notification_router_by_token, prefix="/messages", tags=["Messages"])
 api_router.include_router(tasks_router, prefix="/tasks", tags=["Content"])
 api_router.include_router(task_read_router, prefix="/task", tags=["Content"])
 api_router.include_router(task_write_router, prefix="/task", tags=["Content"])

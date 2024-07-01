@@ -20,7 +20,7 @@ class TelegramNotificationService:
         self._session = session
         self.telegram_notification = telegram_notification
 
-    async def send_messages_to_group_of_users(self, notifications):
+    async def send_messages_to_filtered_users(self, notifications):
         """Отправляет сообщение указанной группе пользователей"""
         match notifications.mode.upper():
             case TelegramNotificationUsersGroups.ALL.name:
@@ -35,23 +35,23 @@ class TelegramNotificationService:
                 )
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
-    async def send_message_to_user(self, id_hash: str, message: str) -> tuple[bool, str]:
+    async def send_message_to_user_by_id_hash(self, id_hash: str, message: str) -> tuple[bool, str]:
         """Отправляет сообщение пользователю по указанному id_hash"""
         site_user = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
         if site_user is None:
             return False, "Пользователь не найден."
         if site_user.user is None:
             return False, "Телеграм пользователя не найден."
-        return await self.telegram_notification.send_message(user_id=site_user.user.telegram_id, message=message)
+        return await self.telegram_notification.send_message(telegram_id=site_user.user.telegram_id, message=message)
 
     async def send_message_by_telegram_id(self, telegram_id: int, message: str) -> tuple[bool, str]:
         """Отправляет сообщение пользователю по указанному telegram_id"""
         user = await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
         if user is None:
             return False, "Пользователь не найден."
-        return await self.telegram_notification.send_message(user_id=user.telegram_id, message=message)
+        return await self.telegram_notification.send_message(telegram_id=user.telegram_id, message=message)
 
-    async def send_messages_to_subscribed_users(self, notifications, category_id, reply_markup=None):
+    async def send_task_to_users_with_category(self, notifications, category_id, reply_markup=None):
         """Отправляет сообщение всем пользователям, подписанным на заданную категорию.
 
         Args:
@@ -63,7 +63,7 @@ class TelegramNotificationService:
             select(Category)
             .join(Category.users)
             .options(contains_eager(Category.users))
-            .where(User.has_mailing.is_(True) & User.banned.is_(False))
+            .where(User.has_mailing.is_(True) & User.banned.is_(False) & User.external_id.is_not(None))
             .where(Category.id == category_id)
         )
         if (category := qr.first()) is None:
