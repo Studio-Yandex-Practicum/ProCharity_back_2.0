@@ -64,6 +64,8 @@ async def send_user_message(
     ),
 ) -> InfoRate:
     rate = InfoRate()
-    status, notifications.message = await telegram_notification_service.send_message_to_user(telegram_id, notifications)
+    status, notifications.message = await telegram_notification_service.send_message_by_telegram_id(
+        telegram_id, notifications.message
+    )
     rate = telegram_notification_service.count_rate(status, notifications.message, rate)
     return rate

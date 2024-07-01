@@ -93,7 +93,7 @@ class User(Base):
         return f"<User {self.telegram_id}>"
 
 
-class ExternalSiteUser(Base):
+class ExternalSiteUser(ContentBase):
     """Модель пользователя с сайта ProCharity."""
 
     __tablename__ = "external_site_users"
