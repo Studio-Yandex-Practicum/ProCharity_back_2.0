@@ -9,7 +9,7 @@ from telegram.ext import ContextTypes
 from src.bot.keyboards import get_unregistered_user_keyboard
 from src.bot.services import ExternalSiteUserService
 from src.core.depends import Container
-from src.core.enums import UserRoles
+from src.core.enums import UserRoles, UserStatus
 
 ReturnType = TypeVar("ReturnType")
 ParameterTypes = ParamSpec("ParameterTypes")
@@ -64,7 +64,11 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
             if id_hash
             else await ext_site_user_service.get_by_telegram_id(telegram_user.id)
         )
-        if ext_site_user and ext_site_user.role in list(UserRoles):
+        if (
+            ext_site_user
+            and ext_site_user.role in set(UserRoles)
+            and ext_site_user.moderation_status in set(UserStatus)
+        ):
             await handler(update, context, ext_site_user, *args, **kwargs)
         else:
             keyboard = await get_unregistered_user_keyboard()
