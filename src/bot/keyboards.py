@@ -24,6 +24,7 @@ SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё зада
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
 ]
+VIEW_TASKS_AGAIN = [InlineKeyboardButton("Посмотреть задания еще раз", callback_data=callback_data.VIEW_TASKS_AGAIN)]
 
 
 def get_personal_account_button(
@@ -43,6 +44,14 @@ def get_notification_settings_button(
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
     return [InlineKeyboardButton("✍ Написать в службу поддержки", web_app=get_feedback_web_app_info(user))]
+
+
+async def tasks_again_get_back_menu():
+    keyboard = [
+        VIEW_TASKS_AGAIN,
+        RETURN_MENU_BUTTON,
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
 
 async def get_checked_categories_keyboard(
