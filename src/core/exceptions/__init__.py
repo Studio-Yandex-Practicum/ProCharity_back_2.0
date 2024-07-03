@@ -1,17 +1,31 @@
 from .exceptions import (
     AlreadyExistsException,
+    ApplicationException,
     BadRequestException,
+    CredentialsException,
     EmailSendError,
+    InvalidInvitationToken,
+    InvalidPassword,
     InvalidToken,
     NotFoundException,
     TokenNotProvided,
+    UnauthorizedError,
+    UserAlreadyExists,
+    WebhookOnError,
 )
 
 __all__ = (
     "AlreadyExistsException",
+    "ApplicationException",
     "BadRequestException",
+    "CredentialsException",
     "NotFoundException",
+    "EmailSendError",
+    "InvalidInvitationToken",
+    "InvalidPassword",
     "InvalidToken",
     "TokenNotProvided",
-    "EmailSendError",
+    "UnauthorizedError",
+    "UserAlreadyExists",
+    "WebhookOnError",
 )

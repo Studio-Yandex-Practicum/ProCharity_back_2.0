@@ -20,7 +20,7 @@ from src.core.admin_auth.backend import auth_backend
 from src.core.admin_auth.cookie_backend import auth_cookie_backend
 from src.core.db.models import AdminUser
 from src.core.depends import Container
-from src.core.exceptions.exceptions import BadRequestException, UserAlreadyExists
+from src.core.exceptions import BadRequestException, UserAlreadyExists
 from src.settings import settings
 
 log = structlog.get_logger()
