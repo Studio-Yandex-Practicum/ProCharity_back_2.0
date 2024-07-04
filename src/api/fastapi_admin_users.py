@@ -29,8 +29,6 @@ log = structlog.get_logger()
 engine = create_async_engine(settings.database_url)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-SECRET = "SECRET"
-
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
@@ -42,8 +40,7 @@ async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
-    reset_password_token_secret = SECRET
-    verification_token_secret = SECRET
+    reset_password_token_secret = settings.SECRET_KEY
 
     async def create_with_token(
         self,
@@ -105,7 +102,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         request: Request | None = None,
         email_provider: EmailProvider = Depends(Provide[Container.core_services_container.email_provider]),
     ) -> None:
-        email_provider.send_restore_password_link(user.email, token)
+        await email_provider.send_restore_password_link(user.email, token)
 
 
 class CustomFastAPIUsers(Generic[models.UP, models.ID], FastAPIUsers[models.UP, models.ID]):
