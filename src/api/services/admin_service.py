@@ -2,7 +2,7 @@ from jose import JWTError, jwt
 
 from src.core.db.models import AdminUser
 from src.core.db.repository.admin_repository import AdminUserRepository
-from src.core.exceptions.exceptions import CredentialsException
+from src.core.exceptions import CredentialsException
 from src.settings import settings
 
 

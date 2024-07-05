@@ -9,7 +9,7 @@ from fastapi_users.router.common import ErrorModel
 from src.api.schemas import TokenCheckResponse
 from src.api.services import AdminTokenRequestService
 from src.core.depends import Container
-from src.core.exceptions.exceptions import InvalidInvitationToken, InvalidPassword, UserAlreadyExists
+from src.core.exceptions import InvalidInvitationToken, InvalidPassword, UserAlreadyExists
 
 
 def get_register_router(
