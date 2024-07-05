@@ -5,7 +5,7 @@ import structlog
 
 from src.core.db.models import AdminTokenRequest
 from src.core.db.repository.admin_token_request import AdminTokenRequestRepository
-from src.core.exceptions.exceptions import InvalidInvitationToken
+from src.core.exceptions import InvalidInvitationToken
 from src.settings import settings
 
 log = structlog.get_logger()
