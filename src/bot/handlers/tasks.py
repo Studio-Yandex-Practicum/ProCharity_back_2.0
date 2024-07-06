@@ -79,6 +79,9 @@ async def respond_to_task_callback(
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
 ):
+    """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик'
+    под сообщением с информацией о задании.
+    """
     query = update.callback_query
     action = context.match.group(1)
     task = await task_service.get_or_none(int(context.match.group(2)))

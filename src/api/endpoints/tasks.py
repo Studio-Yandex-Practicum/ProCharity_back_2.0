@@ -24,6 +24,9 @@ class TaskInfoMessageTemplate(TelegramMessageTemplate):
         self.text = display_task(task, updated_task)
 
     async def render(self, user: User) -> dict:
+        """Возвращает словарь с атрибутами text и reply_markup телеграм-сообщения
+        с информацией о задаче, предназначенного для заданного пользователя.
+        """
         site_user = user.external_user
         if site_user is None:
             return {}
