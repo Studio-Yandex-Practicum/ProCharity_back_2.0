@@ -43,8 +43,8 @@ class ExternalSiteUserRepository(AbstractRepository):
         return await self.get_user_response_to_task_or_none(site_user, task) is not None
 
     async def create_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
-        """Создаёт отклик заданного пользователя на заданную задачу и возвращает True,
-        если такого отклика ещё нет в БД, иначе просто возвращает False.
+        """Создаёт отклик заданного пользователя на заданную задачу и возвращает True.
+        А если такой отклик уже есть в БД, просто возвращает False.
         """
         await self._session.commit()
         async with self._session.begin():
@@ -59,8 +59,8 @@ class ExternalSiteUserRepository(AbstractRepository):
             return False
 
     async def delete_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
-        """Удаляет отклик заданного пользователя на заданную задачу и возвращает True,
-        если такой отклик есть в БД, иначе просто возвращает False.
+        """Удаляет отклик заданного пользователя на заданную задачу и возвращает True.
+        А такого отклика нет в БД, просто возвращает False.
         """
         await self._session.commit()
         async with self._session.begin():

@@ -36,13 +36,13 @@ class ExternalSiteUserService:
         return await self._repository.user_responded_to_task(site_user, task)
 
     async def create_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
-        """Создаёт отклик заданного пользователя на заданную задачу и возвращает True,
-        если такого отклика ещё нет в БД, иначе просто возвращает False.
+        """Создаёт отклик заданного пользователя на заданную задачу и возвращает True.
+        А если такой отклик уже есть в БД, просто возвращает False.
         """
         return await self._repository.create_user_response_to_task(site_user, task)
 
     async def delete_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
-        """Удаляет отклик заданного пользователя на заданную задачу и возвращает True,
-        если такой отклик есть в БД, иначе просто возвращает False.
+        """Удаляет отклик заданного пользователя на заданную задачу и возвращает True.
+        А если такого отклика нет в БД, просто возвращает False.
         """
         return await self._repository.delete_user_response_to_task(site_user, task)
