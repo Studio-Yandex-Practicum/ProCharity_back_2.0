@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.db.models import ExternalSiteUser, Task, TaskResponseVolunteer
 from src.core.db.repository.base import AbstractRepository
 from src.core.exceptions import NotFoundException
+from src.core.utils import auto_commit
 
 
 class ExternalSiteUserRepository(AbstractRepository):
@@ -42,34 +43,32 @@ class ExternalSiteUserRepository(AbstractRepository):
         """
         return await self.get_user_response_to_task_or_none(site_user, task) is not None
 
+    @auto_commit
     async def create_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
         """Создаёт отклик заданного пользователя на заданную задачу и возвращает True.
         А если такой отклик уже есть в БД, просто возвращает False.
         """
-        await self._session.commit()
-        async with self._session.begin():
-            if not await self.user_responded_to_task(site_user, task):
-                response = TaskResponseVolunteer(
-                    external_site_user_id=site_user.id,
-                    task_id=task.id,
-                )
-                self._session.add(response)
-                return True
+        if not await self.user_responded_to_task(site_user, task):
+            response = TaskResponseVolunteer(
+                external_site_user_id=site_user.id,
+                task_id=task.id,
+            )
+            self._session.add(response)
+            return True
 
-            return False
+        return False
 
+    @auto_commit
     async def delete_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
         """Удаляет отклик заданного пользователя на заданную задачу и возвращает True.
-        А такого отклика нет в БД, просто возвращает False.
+        А если такого отклика нет в БД, просто возвращает False.
         """
-        await self._session.commit()
-        async with self._session.begin():
-            response = await self.get_user_response_to_task_or_none(site_user, task)
-            if response is not None:
-                await self._session.delete(response)
-                return True
+        response = await self.get_user_response_to_task_or_none(site_user, task)
+        if response is not None:
+            await self._session.delete(response)
+            return True
 
-            return False
+        return False
 
     async def get_by_external_id_or_none(
         self, external_id: int, with_archived: bool = False
