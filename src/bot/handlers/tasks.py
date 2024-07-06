@@ -1,7 +1,7 @@
 from dependency_injector.wiring import Provide
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackContext, CallbackQueryHandler
+from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
@@ -18,7 +18,7 @@ from src.core.messages import display_task
 @delete_previous_message
 async def view_task_callback(
     update: Update,
-    context: CallbackContext,
+    context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
@@ -54,7 +54,7 @@ async def view_task_callback(
     await show_next_tasks(update, context, page_number, remaining_tasks)
 
 
-async def show_next_tasks(update: Update, context: CallbackContext, page_number: int, remaining_tasks: int):
+async def show_next_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE, page_number: int, remaining_tasks: int):
     if remaining_tasks > 0:
         text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
         context.user_data["page_number"] = page_number + 1
@@ -74,7 +74,7 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
 @registered_user_required
 async def respond_to_task_callback(
     update: Update,
-    context: CallbackContext,
+    context: ContextTypes.DEFAULT_TYPE,
     site_user: ExternalSiteUser,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
