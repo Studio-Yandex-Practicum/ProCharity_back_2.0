@@ -60,7 +60,7 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
         telegram_user = update.effective_user or Never
         id_hash = context.args[0] if context.args and len(context.args) == 1 else None
         ext_site_user = (
-            await ext_site_user_service.get_by_id_hash(id_hash)
+            await ext_site_user_service.get_by_id_hash(id_hash, False)
             if id_hash
             else await ext_site_user_service.get_by_telegram_id(telegram_user.id)
         )
