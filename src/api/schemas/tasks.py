@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field, PositiveInt, RootModel, StrictFloat, field_validator
 
@@ -85,4 +86,14 @@ class TasksRequest(RootModel[list[TaskRequest]]):
 class TaskResponse(ResponseBase, TaskCommonFieldsMixin):
     """Схема ответа для модели Task."""
 
+    deadline: Optional[
+        Annotated[
+            date, Field(..., format=DATE_FORMAT, examples=["23.11.2024"], description="Дедлайн выполнения задачи.")
+        ]
+    ]
+    category_id: Optional[
+        Annotated[
+            PositiveInt, Field(..., examples=[1], description="ID дочерней категории, к которой относится задача.")
+        ]
+    ]
     is_archived: bool = Field(..., examples=[False], description="Является ли задача архивной.")
