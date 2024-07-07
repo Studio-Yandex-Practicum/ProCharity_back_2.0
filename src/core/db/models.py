@@ -32,7 +32,7 @@ class Base(DeclarativeBase):
 
 
 class ArchivableBase(AbstractConcreteBase, Base):
-    """Базовый класс для архивных данных."""
+    """Базовый класс для данных, которые можно заархивировать."""
 
     is_archived: Mapped[bool] = mapped_column(server_default=expression.false())
 
