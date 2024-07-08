@@ -12,10 +12,10 @@ class ExternalSiteUserRepository(ArchivableRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, ExternalSiteUser)
 
-    async def get_by_id_hash(self, id_hash: str, archived: bool | None = None) -> ExternalSiteUser | None:
+    async def get_by_id_hash(self, id_hash: str, is_archived: bool | None = None) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по id_hash."""
         statement = select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash)
-        return await self._session.scalar(self._add_archiveness_test_to_select(statement, archived))
+        return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
 
     async def get_or_create_by_id_hash(self, id_hash: str) -> tuple[ExternalSiteUser, bool]:
         """Возвращает или создает пользователя по id_hash."""
@@ -25,17 +25,17 @@ class ExternalSiteUserRepository(ArchivableRepository):
         return await self.create(ExternalSiteUser(id_hash=id_hash)), True
 
     async def get_by_external_id_or_none(
-        self, external_id: int, archived: bool | None = None
+        self, external_id: int, is_archived: bool | None = None
     ) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по external_id."""
         statement = select(self._model).where(self._model.external_id == external_id)
-        return await self._session.scalar(self._add_archiveness_test_to_select(statement, archived))
+        return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
 
-    async def get_by_external_id(self, external_id: int, archived: bool | None = None) -> ExternalSiteUser:
+    async def get_by_external_id(self, external_id: int, is_archived: bool | None = None) -> ExternalSiteUser:
         """Возвращает пользователя по external_id, а в случае его отсутствия
         возбуждает исключение NotFoundException.
         """
-        instance = await self.get_by_external_id_or_none(external_id, archived)
+        instance = await self.get_by_external_id_or_none(external_id, is_archived)
         if instance is None:
             raise NotFoundException(object_name=self._model.__name__, external_id=external_id)
         return instance
