@@ -124,7 +124,7 @@ class AbstractRepository(abc.ABC, Generic[DatabaseModel]):
 
 
 class ArchivableRepository(AbstractRepository):
-    """Абстрактный класс для данных, которые можно заархивировать."""
+    """Абстрактный класс для репозитория с данными, которые можно архивировать."""
 
     def _add_archiveness_test_to_select(self, statement: Select, is_archived: bool | None) -> Select:
         """Добавляет к оператору SELECT проверку значения в столбце is_archived."""
