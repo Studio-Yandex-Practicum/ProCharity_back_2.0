@@ -12,7 +12,7 @@ class ExternalSiteUserRepository(ArchivableRepository):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, ExternalSiteUser)
 
-    async def get_by_id_hash(self, id_hash: str, is_archived: bool | None = None) -> ExternalSiteUser | None:
+    async def get_by_id_hash(self, id_hash: str, is_archived: bool | None = False) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по id_hash."""
         statement = select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash)
         return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
