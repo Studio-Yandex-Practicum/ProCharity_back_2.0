@@ -12,7 +12,7 @@ from src.settings import settings
 notification_router_by_token = APIRouter(dependencies=[Depends(check_header_contains_token)])
 notification_router_by_admin = APIRouter(
     dependencies=[
-        Depends(fastapi_admin_users.current_user(optional=settings.DEBUG, superuser=True)),
+        Depends(fastapi_admin_users.current_user(optional=settings.DEBUG)),
     ]
 )
 log = structlog.get_logger()
