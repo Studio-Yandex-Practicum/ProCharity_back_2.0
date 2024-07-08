@@ -15,7 +15,7 @@ class ExternalSiteUserService:
             return (None, False)
         return await self._repository.get_or_create_by_id_hash(id_hash)
 
-    async def get_by_id_hash(self, id_hash: str, is_archived: bool | None) -> ExternalSiteUser | None:
+    async def get_by_id_hash(self, id_hash: str, is_archived: bool | None = False) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по id_hash."""
         return await self._repository.get_by_id_hash(id_hash, is_archived)
 
