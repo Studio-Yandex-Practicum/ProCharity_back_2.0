@@ -5,7 +5,7 @@ from fastapi_users import schemas
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from src.api.constants import PASSWORD_POLICY
-from src.core.exceptions.exceptions import InvalidPassword
+from src.core.exceptions import InvalidPassword
 
 
 class AdminUserCreate(schemas.CreateUpdateDictModel):
