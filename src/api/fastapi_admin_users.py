@@ -1,19 +1,16 @@
 from datetime import date
-from typing import AsyncGenerator, Generic, Sequence, Type
+from typing import AsyncGenerator, Generic, Type
 
 import structlog
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import JSONResponse
-from fastapi_users import BaseUserManager, IntegerIDMixin, models, schemas
-from fastapi_users.authentication import AuthenticationBackend, Authenticator
-from fastapi_users.manager import UserManagerDependency
+from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin, models, schemas
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.api.endpoints.admin_routers.auth import get_auth_router
 from src.api.endpoints.admin_routers.register import get_register_router
 from src.api.services import AdminTokenRequestService
 from src.core.admin_auth.backend import auth_backend
@@ -93,28 +90,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
-class CustomFastAPIUsers(Generic[models.UP, models.ID]):
-    authenticator: Authenticator
-
-    def __init__(
-        self,
-        get_user_manager: UserManagerDependency[models.UP, models.ID],
-        auth_backends: Sequence[AuthenticationBackend],
-    ):
-        self.authenticator = Authenticator(auth_backends, get_user_manager)
-        self.get_user_manager = get_user_manager
-        self.current_user = self.authenticator.current_user
-
+class CustomFastAPIUsers(FastAPIUsers, Generic[models.UP, models.ID]):
     def get_register_router(self, user_schema: Type[schemas.U], user_create_schema: Type[schemas.UC]) -> APIRouter:
         return get_register_router(self.get_user_manager, user_schema, user_create_schema)
-
-    def get_auth_router(self, backend: AuthenticationBackend, requires_verification: bool = False) -> APIRouter:
-        return get_auth_router(
-            backend,
-            self.get_user_manager,
-            self.authenticator,
-            requires_verification,
-        )
 
 
 async def get_user_manager(admin_db=Depends(get_admin_db)):
