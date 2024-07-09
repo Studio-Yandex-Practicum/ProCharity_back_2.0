@@ -17,21 +17,14 @@ class ExternalSiteUserRepository(ArchivableRepository):
         statement = select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash)
         return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
 
-    async def get_or_create_by_id_hash(self, id_hash: str) -> tuple[ExternalSiteUser, bool]:
-        """Возвращает или создает пользователя по id_hash."""
-        instance = await self._session.scalar(select(ExternalSiteUser).where(ExternalSiteUser.id_hash == id_hash))
-        if instance is not None:
-            return (instance, False)
-        return await self.create(ExternalSiteUser(id_hash=id_hash)), True
-
     async def get_by_external_id_or_none(
-        self, external_id: int, is_archived: bool | None = None
+        self, external_id: int, is_archived: bool | None = False
     ) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по external_id."""
         statement = select(self._model).where(self._model.external_id == external_id)
         return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
 
-    async def get_by_external_id(self, external_id: int, is_archived: bool | None = None) -> ExternalSiteUser:
+    async def get_by_external_id(self, external_id: int, is_archived: bool | None = False) -> ExternalSiteUser:
         """Возвращает пользователя по external_id, а в случае его отсутствия
         возбуждает исключение NotFoundException.
         """
