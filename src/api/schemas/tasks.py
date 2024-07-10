@@ -86,12 +86,12 @@ class TasksRequest(RootModel[list[TaskRequest]]):
 class TaskResponse(ResponseBase, TaskCommonFieldsMixin):
     """Схема ответа для модели Task."""
 
-    deadline: Optional[
+    deadline: date | None = Field(
+        ..., format=DATE_FORMAT, examples=["23.11.2024"], description="Дедлайн выполнения задачи."
+    )
+    category_id: Optional[
         Annotated[
-            date, Field(..., format=DATE_FORMAT, examples=["23.11.2024"], description="Дедлайн выполнения задачи.")
+            PositiveInt, Field(..., examples=[1], description="ID дочерней категории, к которой относится задача.")
         ]
     ]
-    category_id: PositiveInt | None = Field(
-        ..., examples=[1], description="ID дочерней категории, к которой относится задача."
-    )
     is_archived: bool = Field(..., examples=[False], description="Является ли задача архивной.")
