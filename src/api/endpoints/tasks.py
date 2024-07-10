@@ -90,7 +90,7 @@ async def create_update_task(
     ),
     trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ):
-    task_obj = await task_service.get_or_none(task.id)
+    task_obj = await task_service.get_or_none(task.id, None)
     trigger_fields_changed, new_task = False, False
     if task_obj:
         trigger_fields_changed = await task_service.update(

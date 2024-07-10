@@ -19,8 +19,8 @@ class TaskService(ContentService):
         """
         return await self._repository.get(id, is_archived=is_archived)
 
-    async def get_or_none(self, task_id: int) -> Optional[Task]:
-        return await self._repository.get_or_none(task_id)
+    async def get_or_none(self, task_id: int, is_archived: bool | None = False) -> Optional[Task]:
+        return await self._repository.get_or_none(task_id, is_archived=is_archived)
 
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         return await self._repository.get_tasks_for_user(user_id)

@@ -133,12 +133,12 @@ class ArchivableRepository(AbstractRepository):
 
         return statement
 
-    async def get_or_none(self, id: int, *, is_archived: bool | None = None) -> DatabaseModel | None:
+    async def get_or_none(self, id: int, *, is_archived: bool | None = False) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия объекта возвращает None."""
         statement = select(self._model).where(self._model.id == id)
         return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
 
-    async def get(self, id: int, *, is_archived: bool | None = None) -> DatabaseModel:
+    async def get(self, id: int, *, is_archived: bool | None = False) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта возбуждает NotFoundException."""
         db_obj = await self.get_or_none(id, is_archived=is_archived)
         if db_obj is None:

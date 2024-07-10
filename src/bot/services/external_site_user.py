@@ -13,12 +13,12 @@ class ExternalSiteUserService:
         """Возвращает пользователя (или None) по id_hash."""
         return await self._repository.get_by_id_hash(id_hash, is_archived)
 
-    async def get_by_id(self, id: int) -> ExternalSiteUser | None:
+    async def get_by_id(self, id: int, is_archived: bool | None = False) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по id."""
-        return await self._repository.get_or_none(id)
+        return await self._repository.get_or_none(id, is_archived=is_archived)
 
-    async def get_by_telegram_id(self, telegram_id: int) -> ExternalSiteUser | None:
+    async def get_by_telegram_id(self, telegram_id: int, is_archived: bool | None = False) -> ExternalSiteUser | None:
         """Возвращает пользователя (или None) по telegram_id."""
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         if user and user.external_id is not None:
-            return await self._repository.get_or_none(user.external_id)
+            return await self._repository.get_or_none(user.external_id, is_archived=is_archived)
