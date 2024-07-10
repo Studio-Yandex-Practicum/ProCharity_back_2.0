@@ -102,7 +102,7 @@ ProCharity (НКО Фонд Друзья).
     docker exec -it procharity_bot_backend sh -c "alembic upgrade head && python3 fill_db.py with_fake_users"
     ```
 
-  Если тестовая база данных должна содержать только задания и не должна содержать таблицу пользователей, то необходимо выполнить команду:
+    Если тестовая база данных должна содержать только задания и не должна содержать таблицу пользователей, то необходимо выполнить команду:
 
     ```shell
     docker exec -it procharity_bot_backend sh -c "alembic upgrade head && python3 fill_db.py"
