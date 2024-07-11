@@ -5,11 +5,11 @@ from sqlalchemy.orm import contains_eager
 from src.api.schemas import ErrorsSending, InfoRate
 from src.core.db.models import Category, ExternalSiteUser, User
 from src.core.enums import TelegramNotificationUsersGroups
-from src.core.services.notification import TelegramNotification
+from src.core.services.notification import TelegramMessageTemplate, TelegramNotification
 
 
 class TelegramNotificationService:
-    """Класс описывающий функционал передачи сообщения
+    """Класс, описывающий функционал передачи сообщения
     определенному пользователю"""
 
     def __init__(
@@ -51,26 +51,25 @@ class TelegramNotificationService:
             return False, "Пользователь не найден."
         return await self.telegram_notification.send_message(user_id=user.telegram_id, message=message)
 
-    async def send_messages_to_subscribed_users(self, notifications, category_id, reply_markup=None):
-        """Отправляет сообщение всем пользователям, подписанным на заданную категорию.
+    async def send_messages_to_subscribed_users(self, category_id: int, template: TelegramMessageTemplate):
+        """Отправляет сообщение всем зарегистрированным пользователям, подписанным на заданную категорию.
 
         Args:
-            notifications: Текст сообщения.
-            category_id: Идентификатор заданной категории, подписчикам на которую отправится сообщение.
-            reply_markup: Объект клавиатуры под сообщением рассылки.
+            category_id: идентификатор категории, подписчикам которой отправится сообщение;
+            template: шаблон сообщения.
         """
         qr = await self._session.scalars(
             select(Category)
             .join(Category.users)
-            .options(contains_eager(Category.users))
+            .join(User.external_user)
+            .options(contains_eager(Category.users).contains_eager(User.external_user))
+            .where(User.external_user is not None)
             .where(User.has_mailing.is_(True) & User.banned.is_(False))
             .where(Category.id == category_id)
         )
         if (category := qr.first()) is None:
             return
-        await self.telegram_notification.send_messages(
-            message=notifications, users=category.users, reply_markup=reply_markup
-        )
+        await self.telegram_notification.send_messages_by_template(category.users, template)
 
     def count_rate(self, respond: bool, msg: str, rate: InfoRate):
         errors_sending = ErrorsSending()

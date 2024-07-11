@@ -29,6 +29,7 @@ class TaskService(ContentService):
         return await self._repository.get_user_task_id(task_id)
 
     async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
+        """Получить список задач по списку их ID."""
         return await self._repository.get_user_tasks_ids(ids)
 
     async def get_tasks_by_filter(self, **filter_by) -> list[Task]:

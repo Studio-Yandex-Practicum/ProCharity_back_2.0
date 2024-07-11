@@ -11,6 +11,17 @@ from src.core.db.models import User
 log = structlog.get_logger(module=__name__)
 
 
+class TelegramMessageTemplate:
+    """Базовый класс шаблонов телеграм-сообщений."""
+
+    async def render(user: User) -> dict:
+        """Возвращает словарь с атрибутами телеграм-сообщения, предназначенного
+        для заданного пользователя.
+        Ключи словаря соответствуют параметрам функции Bot.send_message().
+        """
+        raise NotImplementedError
+
+
 class TelegramNotification:
     def __init__(self, telegram_bot: Application):
         self.__bot_application = telegram_bot
@@ -19,13 +30,13 @@ class TelegramNotification:
     async def __send_message(
         self,
         user_id: int,
-        message: str,
+        text: str,
         reply_markup: TelegramObject | None = None,
     ) -> tuple[bool, str]:
         try:
             await self.__bot.send_message(
                 chat_id=user_id,
-                text=message,
+                text=text,
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
                 reply_markup=reply_markup,
@@ -54,6 +65,15 @@ class TelegramNotification:
         send_message_tasks = [self.__send_message(user.telegram_id, message, reply_markup) for user in users]
         result = await asyncio.gather(*send_message_tasks)
         return result
+
+    async def send_messages_by_template(
+        self,
+        users: list[User],
+        template: TelegramMessageTemplate,
+    ) -> list[tuple[bool, str]]:
+        """Отправляет пользователям users сообщения на основе шаблона template."""
+        send_message_tasks = [self.__send_message(user.telegram_id, **(await template.render(user))) for user in users]
+        return await asyncio.gather(*send_message_tasks)
 
     async def send_message(
         self,
