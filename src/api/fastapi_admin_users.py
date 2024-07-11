@@ -1,5 +1,5 @@
 from datetime import date
-from typing import AsyncGenerator, Generic, Type
+from typing import AsyncGenerator, Type
 
 import structlog
 from dependency_injector.wiring import Provide
@@ -90,7 +90,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
 
 
-class CustomFastAPIUsers(FastAPIUsers, Generic[models.UP, models.ID]):
+class CustomFastAPIUsers(FastAPIUsers[models.UP, models.ID]):
     def get_register_router(self, user_schema: Type[schemas.U], user_create_schema: Type[schemas.UC]) -> APIRouter:
         return get_register_router(self.get_user_manager, user_schema, user_create_schema)
 
