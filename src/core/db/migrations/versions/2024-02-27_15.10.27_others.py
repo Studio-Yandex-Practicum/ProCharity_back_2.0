@@ -108,7 +108,7 @@ def downgrade() -> None:
     op.drop_column("tasks", "fund_rating")
     op.drop_column("tasks", "fund_city")
     op.drop_column("tasks", "legal_address")
-    op.drop_constraint(None, "external_site_users", type_="unique")
+    # op.drop_constraint(None, "external_site_users", type_="unique")
     op.drop_index(op.f("ix_external_site_users_external_id"), table_name="external_site_users")
     op.alter_column(
         "external_site_users",

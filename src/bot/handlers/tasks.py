@@ -1,11 +1,11 @@
 from dependency_injector.wiring import Provide
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackContext, CallbackQueryHandler
+from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
-from src.bot.constants import callback_data
+from src.bot.constants import callback_data, patterns
 from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
-from src.bot.services.task import TaskService
+from src.bot.services import ExternalSiteUserService, TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
@@ -18,7 +18,7 @@ from src.core.messages import display_task
 @delete_previous_message
 async def view_task_callback(
     update: Update,
-    context: CallbackContext,
+    context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
@@ -48,13 +48,13 @@ async def view_task_callback(
             text=message,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
-            reply_markup=get_task_info_keyboard(task),
+            reply_markup=await get_task_info_keyboard(task, ext_site_user),
         )
     remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
     await show_next_tasks(update, context, page_number, remaining_tasks)
 
 
-async def show_next_tasks(update: Update, context: CallbackContext, page_number: int, remaining_tasks: int):
+async def show_next_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE, page_number: int, remaining_tasks: int):
     if remaining_tasks > 0:
         text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
         context.user_data["page_number"] = page_number + 1
@@ -70,5 +70,44 @@ async def show_next_tasks(update: Update, context: CallbackContext, page_number:
     )
 
 
+@logger_decor
+@registered_user_required
+async def respond_to_task_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    site_user: ExternalSiteUser,
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+):
+    """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик'
+    под сообщением с информацией о задании.
+    """
+    query = update.callback_query
+    action = context.match.group(1)
+    task = await task_service.get_or_none(int(context.match.group(2)))
+    if task is None:
+        return
+
+    if task.is_archived:
+        await context.bot.answer_callback_query(
+            query.id, text="Задание уже отдано в работу другому волонтеру.", show_alert=True
+        )
+        return
+
+    if action == "+":
+        if not await site_user_service.create_user_response_to_task(site_user, task):
+            await context.bot.answer_callback_query(
+                query.id, text="Ты уже откликнулся на это задание.", show_alert=True
+            )
+    else:
+        if not await site_user_service.delete_user_response_to_task(site_user, task):
+            await context.bot.answer_callback_query(
+                query.id, text="Ты уже отменил отклик на это задание.", show_alert=True
+            )
+
+    await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
+
+
 def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
+    app.add_handler(CallbackQueryHandler(respond_to_task_callback, pattern=patterns.RESPOND_TO_TASK))

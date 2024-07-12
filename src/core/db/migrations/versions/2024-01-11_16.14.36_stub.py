@@ -86,6 +86,7 @@ def downgrade() -> None:
     op.drop_constraint(constraint_name="users_categories_telegram_id_fkey", table_name="users_categories")
     op.drop_constraint(constraint_name="users_pkey", table_name="users")
     op.create_primary_key(constraint_name="users_pkey", table_name="users", columns=["telegram_id"])
+    op.create_primary_key("external_site_users_pkey", "external_site_users", ["external_id"])
     op.drop_constraint(constraint_name="users_telegram_id_key", table_name="users")
     op.create_foreign_key(
         constraint_name="users_categories_telegram_id_fkey",
@@ -121,11 +122,7 @@ def downgrade() -> None:
         "admin_users", "hashed_password", new_column_name="password", type_=sa.String(length=128), nullable=False
     )
     op.alter_column(
-        "admin_users",
-        "email",
-        existing_type=sa.String(length=320),
-        type_=sa.VARCHAR(length=48),
-        nullable=False,
+        "admin_users", "email", existing_type=sa.String(length=320), type_=sa.VARCHAR(length=48), nullable=False
     )
     op.create_unique_constraint("admin_users_email_key", "admin_users", ["email"])
     op.drop_index(op.f("ix_admin_users_email"), "admin_users")

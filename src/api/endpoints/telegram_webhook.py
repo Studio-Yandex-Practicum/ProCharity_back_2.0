@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from telegram import Update
 
-from src.core.exceptions.exceptions import UnauthorizedError, WebhookOnError
+from src.core.exceptions import UnauthorizedError, WebhookOnError
 from src.settings import settings
 
 telegram_webhook_router = APIRouter()
