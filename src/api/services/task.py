@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.services import ContentService
@@ -19,13 +17,13 @@ class TaskService(ContentService):
         """
         return await self._repository.get(id, is_archived=is_archived)
 
-    async def get_or_none(self, task_id: int) -> Optional[Task]:
+    async def get_or_none(self, task_id: int) -> Task | None:
         return await self._repository.get_or_none(task_id)
 
     async def get_tasks_for_user(self, user_id: int) -> list[Task]:
         return await self._repository.get_tasks_for_user(user_id)
 
-    async def get_user_task_id(self, task_id: int) -> Optional[Task]:
+    async def get_user_task_id(self, task_id: int) -> Task | None:
         return await self._repository.get_user_task_id(task_id)
 
     async def get_user_tasks_ids(self, ids: list[int]) -> list[Task]:
