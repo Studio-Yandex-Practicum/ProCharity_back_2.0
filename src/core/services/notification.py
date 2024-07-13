@@ -29,23 +29,23 @@ class TelegramNotification:
 
     async def __send_message(
         self,
-        user_id: int,
+        telegram_id: int,
         text: str,
         reply_markup: TelegramObject | None = None,
     ) -> tuple[bool, str]:
         try:
             await self.__bot.send_message(
-                chat_id=user_id,
+                chat_id=telegram_id,
                 text=text,
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
                 reply_markup=reply_markup,
             )
-            msg = f"Отправлено оповещение пользователю {user_id}"
+            msg = f"Отправлено оповещение пользователю {telegram_id}"
             await log.adebug(msg)
             return True, msg
         except TelegramError as exc:
-            msg = f"Ошибка отправки сообщения пользователю {user_id}."
+            msg = f"Ошибка отправки сообщения пользователю {telegram_id}."
             match exc:
                 case BadRequest():
                     msg += " Некорректный id."
@@ -78,8 +78,8 @@ class TelegramNotification:
     async def send_message(
         self,
         message: str,
-        user_id: int,
+        telegram_id: int,
         reply_markup: TelegramObject | None = None,
     ) -> tuple[bool, str]:
-        """Отправляет сообщение message конкретному пользователю user."""
-        return await self.__send_message(user_id, message, reply_markup)
+        """Отправляет сообщение message пользователю с указанным telegram_id."""
+        return await self.__send_message(telegram_id, message, reply_markup)
