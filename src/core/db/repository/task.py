@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from typing import Optional
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,11 +57,11 @@ class TaskRepository(ContentRepository):
             .where(Task.is_archived == false())
         )
 
-    async def get_user_task_id(self, task_id) -> Optional[Task]:
+    async def get_task_with_category_by_task_id(self, task_id) -> Task | None:
         """Получить задачу по id с привязанными полями категории."""
         return await self._session.scalar(select(Task).options(joinedload(Task.category)).where(Task.id == task_id))
 
-    async def get_user_tasks_ids(self, ids: list[int]) -> Sequence[Task]:
+    async def get_tasks_with_categories_by_tasks_ids(self, ids: list[int]) -> Sequence[Task]:
         """Получить список задач по ids c привязанными полями категорий."""
         tasks = await self._session.scalars(select(Task).options(joinedload(Task.category)).where(Task.id.in_(ids)))
         return tasks.all()

@@ -1,4 +1,4 @@
-from src.core.db.models import ExternalSiteUser
+from src.core.db.models import ExternalSiteUser, Task
 from src.core.db.repository import ExternalSiteUserRepository, UserRepository
 
 
@@ -22,3 +22,21 @@ class ExternalSiteUserService:
         user = await self._user_repository.get_by_telegram_id(telegram_id)
         if user and user.external_id is not None:
             return await self._repository.get_or_none(user.external_id, is_archived=is_archived)
+
+    async def user_responded_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
+        """Возвращает True, если в БД имеется отклик заданного пользователя
+        на заданную задачу, иначе False.
+        """
+        return await self._repository.user_responded_to_task(site_user, task)
+
+    async def create_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
+        """Создаёт отклик заданного пользователя на заданную задачу и возвращает True.
+        А если такой отклик уже есть в БД, просто возвращает False.
+        """
+        return await self._repository.create_user_response_to_task(site_user, task)
+
+    async def delete_user_response_to_task(self, site_user: ExternalSiteUser, task: Task) -> bool:
+        """Удаляет отклик заданного пользователя на заданную задачу и возвращает True.
+        А если такого отклика нет в БД, просто возвращает False.
+        """
+        return await self._repository.delete_user_response_to_task(site_user, task)
