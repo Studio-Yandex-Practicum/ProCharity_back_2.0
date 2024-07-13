@@ -13,7 +13,7 @@ class TaskService(ContentService):
     def __init__(self, task_repository: TaskRepository, session: AsyncSession) -> None:
         super().__init__(task_repository, session)
 
-    async def get(self, id: int, *, is_archived: bool | None = None) -> Task:
+    async def get(self, id: int, *, is_archived: bool | None = False) -> Task:
         """Получает задачу по её ID.
         В случае отсутствия задачи с таким ID возбуждает NotFoundException.
         """
