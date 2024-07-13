@@ -6,13 +6,35 @@ from src.api.schemas import TaskRequest, TaskResponse, TasksRequest
 from src.api.services import TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.keyboards import get_task_info_keyboard
-from src.core.db.models import Task
+from src.core.db.models import Task, User
 from src.core.depends import Container
 from src.core.messages import display_task
+from src.core.services.notification import TelegramMessageTemplate
 
 tasks_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 task_read_router = APIRouter()
 task_write_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+
+
+class TaskInfoMessageTemplate(TelegramMessageTemplate):
+    """Шаблон телеграм-сообщения с информацией о задаче."""
+
+    def __init__(self, task: Task, updated_task: bool):
+        self.task = task
+        self.text = display_task(task, updated_task)
+
+    async def render(self, user: User) -> dict:
+        """Возвращает словарь с атрибутами text и reply_markup телеграм-сообщения
+        с информацией о задаче, предназначенного для заданного пользователя.
+        """
+        site_user = user.external_user
+        if site_user is None:
+            return {}
+
+        return dict(
+            text=self.text,
+            reply_markup=await get_task_info_keyboard(self.task, site_user),
+        )
 
 
 @tasks_router.post("", description="Актуализирует список задач.")
@@ -27,11 +49,12 @@ async def actualize_tasks(
 ) -> None:
     new_tasks_ids, updated_tasks_ids = await task_service.actualize_objects(tasks.root, Task, trigger_mailing_fields)
     updated_tasks_ids_set = set(updated_tasks_ids)
-    mailing_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids + updated_tasks_ids)
+    mailing_category_tasks = await task_service.get_tasks_with_categories_by_tasks_ids(
+        new_tasks_ids + updated_tasks_ids
+    )
     for task in mailing_category_tasks:
-        message = display_task(task, task.id in updated_tasks_ids_set)
-        await telegram_notification_service.send_messages_to_subscribed_users(
-            message, task.category_id, reply_markup=get_task_info_keyboard(task)
+        await telegram_notification_service.send_task_to_users_with_category(
+            task.category_id, TaskInfoMessageTemplate(task, task.id in updated_tasks_ids_set)
         )
 
 
@@ -100,13 +123,11 @@ async def create_update_task(
         await task_service.create(**task.model_dump())
         new_task = True
     if trigger_fields_changed or new_task:
-        task_with_category = await task_service.get_user_task_id(task.id)
+        task_with_category = await task_service.get_task_with_category_by_task_id(task.id)
         if task_with_category:
-            message = display_task(task_with_category, updated_task=not new_task)
-            await telegram_notification_service.send_messages_to_subscribed_users(
-                message,
+            await telegram_notification_service.send_task_to_users_with_category(
                 task_with_category.category_id,
-                reply_markup=get_task_info_keyboard(task_with_category),
+                TaskInfoMessageTemplate(task_with_category, not new_task),
             )
 
 
