@@ -27,4 +27,4 @@ class TaskService:
         return remaining_tasks
 
     async def get_task_by_id(self, task_id: int) -> Optional[Task]:
-        return await self._task_repository.get_user_task_id(task_id)
+        return await self._task_repository.get_task_with_category_by_task_id(task_id)
