@@ -1,5 +1,3 @@
-from typing import Optional
-
 from src.core.db.models import Task
 from src.core.db.repository.task import TaskRepository
 from src.core.db.repository.user import UserRepository
@@ -26,5 +24,5 @@ class TaskService:
         remaining_tasks = total_tasks - (offset + limit)
         return remaining_tasks
 
-    async def get_task_by_id(self, task_id: int) -> Optional[Task]:
+    async def get_task_by_id(self, task_id: int) -> Task | None:
         return await self._task_repository.get_task_with_category_by_task_id(task_id)
