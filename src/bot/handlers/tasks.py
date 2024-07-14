@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dependency_injector.wiring import Provide
 from telegram import Update
 from telegram.constants import ParseMode
@@ -23,16 +25,13 @@ async def view_task_callback(
     limit: int = 3,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
-    telegram_id = context._user_id
-    page_number = context.user_data.get("page_number", 1)
+    user = ext_site_user.user
+    after_id = context.user_data.get("after_id", 0)
+    after_datetime = context.user_data.get("after_datetime", datetime(year=2000, month=1, day=1))
+    selected_rows = await task_service.get_user_tasks_actualized_after(user, after_datetime, after_id, limit)
+    print(f"\n******\n{selected_rows=}\n******\n")
 
-    tasks_to_show, offset, page_number = await task_service.get_user_tasks_by_page(
-        page_number,
-        limit,
-        telegram_id,
-    )
-
-    if not tasks_to_show and page_number == 1:
+    if not selected_rows:
         keyboard = await get_back_menu()
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -41,7 +40,7 @@ async def view_task_callback(
         )
         return
 
-    for task in tasks_to_show:
+    for task, actualizing_time in selected_rows:
         message = display_task(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -50,14 +49,17 @@ async def view_task_callback(
             disable_web_page_preview=True,
             reply_markup=await get_task_info_keyboard(task, ext_site_user),
         )
-    remaining_tasks = await task_service.get_remaining_user_tasks_count(limit, offset, telegram_id)
-    await show_next_tasks(update, context, page_number, remaining_tasks)
+    else:
+        context.user_data["after_id"] = task.id
+        context.user_data["after_datetime"] = actualizing_time
+        remaining_tasks_count = await task_service.count_user_tasks_actualized_after(user, actualizing_time, task.id)
+        await show_remaining_tasks_count(update, context, remaining_tasks_count)
 
 
-async def show_next_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE, page_number: int, remaining_tasks: int):
-    if remaining_tasks > 0:
-        text = f"Есть ещё задания, показать? Осталось: {remaining_tasks}"
-        context.user_data["page_number"] = page_number + 1
+async def show_remaining_tasks_count(update: Update, context: ContextTypes.DEFAULT_TYPE, remaining_tasks_count: int):
+    """Отправляет в чат сообщение о количестве ещё не показанных заданий."""
+    if remaining_tasks_count > 0:
+        text = f"Есть ещё задания, показать? Осталось: {remaining_tasks_count}"
         keyboard = await view_more_tasks_keyboard()
     else:
         text = "Ты просмотрел все актуальные задания на сегодня."
