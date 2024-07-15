@@ -96,7 +96,7 @@ async def get_task_detail(
     task_id: int,
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> TaskResponse:
-    return await task_service.get(task_id)
+    return await task_service.get(task_id, is_archived=None)
 
 
 @task_write_router.post(
