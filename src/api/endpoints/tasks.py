@@ -49,9 +49,11 @@ async def actualize_tasks(
 ) -> None:
     new_tasks_ids, updated_tasks_ids = await task_service.actualize_objects(tasks.root, Task, trigger_mailing_fields)
     updated_tasks_ids_set = set(updated_tasks_ids)
-    mailing_category_tasks = await task_service.get_user_tasks_ids(new_tasks_ids + updated_tasks_ids)
+    mailing_category_tasks = await task_service.get_tasks_with_categories_by_tasks_ids(
+        new_tasks_ids + updated_tasks_ids
+    )
     for task in mailing_category_tasks:
-        await telegram_notification_service.send_messages_to_subscribed_users(
+        await telegram_notification_service.send_task_to_users_with_category(
             task.category_id, TaskInfoMessageTemplate(task, task.id in updated_tasks_ids_set)
         )
 
@@ -121,9 +123,9 @@ async def create_update_task(
         await task_service.create(**task.model_dump())
         new_task = True
     if trigger_fields_changed or new_task:
-        task_with_category = await task_service.get_user_task_id(task.id)
+        task_with_category = await task_service.get_task_with_category_by_task_id(task.id)
         if task_with_category:
-            await telegram_notification_service.send_messages_to_subscribed_users(
+            await telegram_notification_service.send_task_to_users_with_category(
                 task_with_category.category_id,
                 TaskInfoMessageTemplate(task_with_category, not new_task),
             )
