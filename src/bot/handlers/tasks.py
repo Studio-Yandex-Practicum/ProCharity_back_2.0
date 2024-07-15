@@ -6,7 +6,12 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
-from src.bot.keyboards import get_back_menu, get_task_info_keyboard, view_more_tasks_keyboard
+from src.bot.keyboards import (
+    get_back_menu,
+    get_task_info_keyboard,
+    get_tasks_list_end_keyboard,
+    view_more_tasks_keyboard,
+)
 from src.bot.services import ExternalSiteUserService, TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
@@ -18,7 +23,28 @@ from src.core.messages import display_task
 @logger_decor
 @registered_user_required
 @delete_previous_message
-async def view_task_callback(
+async def view_tasks_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
+):
+    await _view_tasks(update, context, ext_site_user)
+
+
+@logger_decor
+@registered_user_required
+@delete_previous_message
+async def view_tasks_again_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
+):
+    del context.user_data["after_id"]
+    del context.user_data["after_datetime"]
+    await _view_tasks(update, context, ext_site_user)
+
+
+async def _view_tasks(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
@@ -53,17 +79,17 @@ async def view_task_callback(
         context.user_data["after_id"] = task.id
         context.user_data["after_datetime"] = actualizing_time
         remaining_tasks_count = await task_service.count_user_tasks_actualized_after(user, actualizing_time, task.id)
-        await show_remaining_tasks_count(update, context, remaining_tasks_count)
+        await _show_remaining_tasks_count(update, context, remaining_tasks_count)
 
 
-async def show_remaining_tasks_count(update: Update, context: ContextTypes.DEFAULT_TYPE, remaining_tasks_count: int):
+async def _show_remaining_tasks_count(update: Update, context: ContextTypes.DEFAULT_TYPE, remaining_tasks_count: int):
     """Отправляет в чат сообщение о количестве ещё не показанных заданий."""
     if remaining_tasks_count > 0:
         text = f"Есть ещё задания, показать? Осталось: {remaining_tasks_count}"
         keyboard = await view_more_tasks_keyboard()
     else:
         text = "Ты просмотрел все актуальные задания на сегодня."
-        keyboard = await get_back_menu()
+        keyboard = await get_tasks_list_end_keyboard()
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -111,5 +137,6 @@ async def respond_to_task_callback(
 
 
 def registration_handlers(app: Application):
-    app.add_handler(CallbackQueryHandler(view_task_callback, pattern=callback_data.VIEW_TASKS))
+    app.add_handler(CallbackQueryHandler(view_tasks_callback, pattern=callback_data.VIEW_TASKS))
+    app.add_handler(CallbackQueryHandler(view_tasks_again_callback, pattern=callback_data.VIEW_TASKS_AGAIN))
     app.add_handler(CallbackQueryHandler(respond_to_task_callback, pattern=patterns.RESPOND_TO_TASK))
