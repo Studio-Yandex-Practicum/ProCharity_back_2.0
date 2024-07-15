@@ -19,6 +19,8 @@ from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.messages import display_task
 
+INITIAL_AFTER_DATETIME = datetime(year=2000, month=1, day=1)
+
 
 @logger_decor
 @registered_user_required
@@ -53,24 +55,26 @@ async def _view_tasks(
 ):
     user = ext_site_user.user
     after_id = context.user_data.get("after_id", 0)
-    after_datetime = context.user_data.get("after_datetime", datetime(year=2000, month=1, day=1))
+    after_datetime = context.user_data.get("after_datetime", INITIAL_AFTER_DATETIME)
     selected_rows = await task_service.get_user_tasks_actualized_after(user, after_datetime, after_id, limit)
     print(f"\n******\n{selected_rows=}\n******\n")
 
     if not selected_rows:
-        keyboard = await get_back_menu()
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Актуальных заданий по твоим компетенциям на сегодня нет.",
-            reply_markup=keyboard,
-        )
+        if after_datetime > INITIAL_AFTER_DATETIME:
+            await _show_remaining_tasks_count(update, context, 0)
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Актуальных заданий по твоим компетенциям на сегодня нет.",
+                reply_markup=await get_back_menu(),
+            )
+
         return
 
     for task, actualizing_time in selected_rows:
-        message = display_task(task)
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=message,
+            text=display_task(task),
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
             reply_markup=await get_task_info_keyboard(task, ext_site_user),
