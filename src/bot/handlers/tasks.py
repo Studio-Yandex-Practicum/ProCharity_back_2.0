@@ -84,7 +84,7 @@ async def respond_to_task_callback(
     """
     query = update.callback_query
     action = context.match.group(1)
-    task = await task_service.get_or_none(int(context.match.group(2)))
+    task = await task_service.get_or_none(int(context.match.group(2)), None)
     if task is None:
         return
 

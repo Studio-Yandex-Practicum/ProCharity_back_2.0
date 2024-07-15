@@ -123,7 +123,9 @@ class AbstractRepository(abc.ABC, Generic[DatabaseModel]):
         return objects.all()
 
 
-class ContentRepository(AbstractRepository, abc.ABC):
+class ArchivableRepository(AbstractRepository):
+    """Абстрактный класс для репозитория с данными, которые можно архивировать."""
+
     def _add_archiveness_test_to_select(self, statement: Select, is_archived: bool | None) -> Select:
         """Добавляет к оператору SELECT проверку значения в столбце is_archived."""
         if is_archived is not None:
@@ -131,17 +133,21 @@ class ContentRepository(AbstractRepository, abc.ABC):
 
         return statement
 
-    async def get_or_none(self, id: int, *, is_archived: bool | None = None) -> DatabaseModel | None:
+    async def get_or_none(self, id: int, *, is_archived: bool | None = False) -> DatabaseModel | None:
         """Получает из базы объект модели по ID. В случае отсутствия объекта возвращает None."""
         statement = select(self._model).where(self._model.id == id)
         return await self._session.scalar(self._add_archiveness_test_to_select(statement, is_archived))
 
-    async def get(self, id: int, *, is_archived: bool | None = None) -> DatabaseModel:
+    async def get(self, id: int, *, is_archived: bool | None = False) -> DatabaseModel:
         """Получает объект модели по ID. В случае отсутствия объекта возбуждает NotFoundException."""
         db_obj = await self.get_or_none(id, is_archived=is_archived)
         if db_obj is None:
             raise NotFoundException(object_name=self._model.__name__, object_id=id)
         return db_obj
+
+
+class ContentRepository(ArchivableRepository):
+    """Абстрактный класс, для контента."""
 
     @auto_commit
     async def archive_by_ids(self, ids: Sequence[int]) -> None:

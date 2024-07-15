@@ -96,7 +96,7 @@ async def get_task_detail(
     task_id: int,
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> TaskResponse:
-    return await task_service.get(task_id)
+    return await task_service.get(task_id, is_archived=None)
 
 
 @task_write_router.post(
@@ -113,7 +113,7 @@ async def create_update_task(
     ),
     trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ):
-    task_obj = await task_service.get_or_none(task.id)
+    task_obj = await task_service.get_or_none(task.id, None)
     trigger_fields_changed, new_task = False, False
     if task_obj:
         trigger_fields_changed = await task_service.update(
