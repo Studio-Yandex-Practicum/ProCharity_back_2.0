@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from src.api.endpoints.admin_routers.invitation import invitation_router
 from src.api.fastapi_admin_users import auth_backend, auth_cookie_backend, fastapi_admin_users
-from src.api.schemas.admin import AdminUserCreate, AdminUserRead
+from src.api.schemas.admin import AdminUserCreate, AdminUserRead, AdminUserUpdate
 
 admin_user_router = APIRouter()
 
@@ -13,5 +13,7 @@ admin_user_router.include_router(
     fastapi_admin_users.get_auth_router(auth_cookie_backend),
     prefix="/cookies",
 )
-
-admin_user_router.include_router(invitation_router, prefix="", tags=["AdminUser"])
+admin_user_router.include_router(
+    fastapi_admin_users.get_users_router(AdminUserRead, AdminUserUpdate), prefix="/admins", tags=["Admins"]
+)
+admin_user_router.include_router(invitation_router, prefix="", tags=["AdminAuth"])

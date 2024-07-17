@@ -1,4 +1,5 @@
 import re
+from typing import NoReturn
 
 from fastapi.param_functions import Form
 from fastapi_users import schemas
@@ -24,6 +25,18 @@ class AdminUserCreate(schemas.CreateUpdateDictModel):
 
 class AdminUserRead(schemas.BaseUser[int]):
     pass
+
+
+class AdminUserUpdate(schemas.BaseUserUpdate):
+    first_name: str | None = Field(None, max_length=64, description="User's First Name.")
+    last_name: str | None = Field(None, max_length=64, description="User's Last Name.")
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str | NoReturn:
+        if re.match(PASSWORD_POLICY, value) is None:
+            raise InvalidPassword
+        return value
 
 
 class CustomBearerResponse(BaseModel):
