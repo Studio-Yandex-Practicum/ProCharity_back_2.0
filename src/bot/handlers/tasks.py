@@ -9,6 +9,7 @@ from src.bot.services import ExternalSiteUserService, TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
+from src.core.enums import UserStatus
 from src.core.logging.utils import logger_decor
 from src.core.messages import display_task
 
@@ -90,20 +91,37 @@ async def respond_to_task_callback(
 
     if task.is_archived:
         await context.bot.answer_callback_query(
-            query.id, text="Задание уже отдано в работу другому волонтеру.", show_alert=True
+            query.id, text="Задание больше не актуально, ты не можешь на него откликнуться.", show_alert=True
         )
         return
-
+    # site_user = await site_user_service.get_by_id(site_user.id)  # почему-то не работает :/
     if action == "+":
-        if not await site_user_service.create_user_response_to_task(site_user, task):
-            await context.bot.answer_callback_query(
-                query.id, text="Ты уже откликнулся на это задание.", show_alert=True
-            )
+        if site_user.moderation_status == UserStatus.WAIT:
+            if await site_user_service.create_user_response_to_task(site_user, task):
+                popup_text = "Фонд увидит отклик, когда твой профиль пройдет модерацию."
+            else:
+                popup_text = "Ты уже откликнулся на это задание."
+        elif site_user.moderation_status == UserStatus.MODERATED:
+            if await site_user_service.create_user_response_to_task(site_user, task):
+                popup_text = "Твоя заявка принята. Дадим знать, когда фонд выберет тебя исполнителем."
+            else:
+                popup_text = "Ты уже откликнулся на это задание."
+        else:
+            # moderation_status: (None, NEW_VOL, NO_MODERATED, BLOCKED)
+            popup_text = "Ты не можешь оставлять отклики, пока не отредактируешь профиль и не пройдешь модерацию."
+        await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
-        if not await site_user_service.delete_user_response_to_task(site_user, task):
+        if task.is_archived:
             await context.bot.answer_callback_query(
-                query.id, text="Ты уже отменил отклик на это задание.", show_alert=True
+                query.id, text="Это задание уже в работе / в архиве.", show_alert=True
             )
+            return
+
+        if await site_user_service.delete_user_response_to_task(site_user, task):
+            popup_text = "Ты отменил свой отклик на задание."
+        else:
+            popup_text = "Ты уже отменил отклик на это задание."
+        await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
 
     await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
 
