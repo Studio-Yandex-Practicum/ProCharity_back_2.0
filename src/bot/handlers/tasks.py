@@ -19,7 +19,7 @@ from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.messages import display_task
 
-INITIAL_AFTER_DATETIME = datetime(year=2000, month=1, day=1)
+INITIAL_LAST_VIEWED_ACTUALIZING_TIME = datetime(year=2000, month=1, day=1)
 
 
 @logger_decor
@@ -41,8 +41,8 @@ async def view_tasks_again_callback(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
 ):
-    del context.user_data["after_id"]
-    del context.user_data["after_datetime"]
+    context.user_data["last_viewed_id"] = 0
+    context.user_data["last_viewed_actualizing_time"] = INITIAL_LAST_VIEWED_ACTUALIZING_TIME
     await _view_tasks(update, context, ext_site_user)
 
 
@@ -54,13 +54,12 @@ async def _view_tasks(
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
 ):
     user = ext_site_user.user
-    after_id = context.user_data.get("after_id", 0)
-    after_datetime = context.user_data.get("after_datetime", INITIAL_AFTER_DATETIME)
+    after_id = context.user_data.get("last_viewed_id", 0)
+    after_datetime = context.user_data.get("last_viewed_actualizing_time", INITIAL_LAST_VIEWED_ACTUALIZING_TIME)
     selected_rows = await task_service.get_user_tasks_actualized_after(user, after_datetime, after_id, limit)
-    print(f"\n******\n{selected_rows=}\n******\n")
 
     if not selected_rows:
-        if after_datetime > INITIAL_AFTER_DATETIME:
+        if after_datetime > INITIAL_LAST_VIEWED_ACTUALIZING_TIME:
             await _show_remaining_tasks_count(update, context, 0)
         else:
             await context.bot.send_message(
@@ -80,8 +79,8 @@ async def _view_tasks(
             reply_markup=await get_task_info_keyboard(task, ext_site_user),
         )
     else:
-        context.user_data["after_id"] = task.id
-        context.user_data["after_datetime"] = actualizing_time
+        context.user_data["last_viewed_id"] = task.id
+        context.user_data["last_viewed_actualizing_time"] = actualizing_time
         remaining_tasks_count = await task_service.count_user_tasks_actualized_after(user, actualizing_time, task.id)
         await _show_remaining_tasks_count(update, context, remaining_tasks_count)
 
