@@ -1,5 +1,5 @@
 import re
-from typing import NoReturn
+from typing import Never
 
 from fastapi.param_functions import Form
 from fastapi_users import schemas
@@ -33,7 +33,7 @@ class AdminUserUpdate(schemas.BaseUserUpdate):
 
     @field_validator("password")
     @classmethod
-    def validate_password(cls, value: str) -> str | NoReturn:
+    def validate_password(cls, value: str) -> str | Never:
         if re.match(PASSWORD_POLICY, value) is None:
             raise InvalidPassword
         return value
