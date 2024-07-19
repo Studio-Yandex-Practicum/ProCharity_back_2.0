@@ -10,8 +10,8 @@ class TaskService:
         self._task_repository = task_repository
         self._user_repository = user_repository
 
-    async def get_or_none(self, task_id: int) -> Task | None:
-        return await self._task_repository.get_or_none(task_id)
+    async def get_or_none(self, task_id: int, is_archived: bool | None = False) -> Task | None:
+        return await self._task_repository.get_or_none(task_id, is_archived=is_archived)
 
     async def get_user_tasks_by_page(self, page_number: int, limit: int, telegram_id: int) -> list[Task]:
         offset = (page_number - 1) * limit
