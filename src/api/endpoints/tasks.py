@@ -151,11 +151,6 @@ async def change_user_response_to_task(
     user_response_to_task: UserResponseToTaskRequest,
     site_user_service: ExternalSiteUserService = Depends(Provide[Container.api_services_container.site_user_service]),
 ) -> None:
-    if user_response_to_task.status:
-        await site_user_service.create_user_response_to_task(
-            user_response_to_task.user_id, user_response_to_task.task_id
-        )
-    else:
-        await site_user_service.delete_user_response_to_task(
-            user_response_to_task.user_id, user_response_to_task.task_id
-        )
+    await site_user_service.change_user_response_to_task(
+        user_response_to_task.user_id, user_response_to_task.task_id, user_response_to_task.status
+    )

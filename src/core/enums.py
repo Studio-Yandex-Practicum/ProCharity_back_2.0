@@ -20,9 +20,6 @@ class UserResponseAction(StrEnum):
     RESPOND = "respond"
     UNRESPOND = "cancel_respond"
 
-    def __bool__(self):
-        return self.name == "RESPOND"
-
 
 class UserRoles(StrEnum):
     """Роли пользователя в системе.
