@@ -97,6 +97,8 @@ class TaskResponse(ResponseBase, TaskCommonFieldsMixin):
 
 
 class UserResponseToTaskRequest(RequestBase):
+    """Схема запроса на изменение отклика пользователя на задачу."""
+
     user_id: int
     task_id: int
     status: UserResponseAction
