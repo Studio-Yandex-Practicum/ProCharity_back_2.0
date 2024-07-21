@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, PositiveInt, RootModel, StrictFloat, fiel
 
 from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
+from src.core.enums import UserResponseAction
 
 
 class TaskDescriptionMain(RequestBase, ResponseBase):
@@ -93,3 +94,9 @@ class TaskResponse(ResponseBase, TaskCommonFieldsMixin):
         PositiveInt | None, Field(..., examples=[1], description="ID дочерней категории, к которой относится задача.")
     ]
     is_archived: bool = Field(..., examples=[False], description="Является ли задача архивной.")
+
+
+class UserResponseToTaskRequest(RequestBase):
+    user_id: int
+    task_id: int
+    status: UserResponseAction
