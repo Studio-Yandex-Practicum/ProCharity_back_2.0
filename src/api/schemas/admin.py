@@ -6,7 +6,7 @@ from fastapi_users import schemas
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from src.api.constants import PASSWORD_POLICY
-from src.core.exceptions import InvalidPassword
+from src.core.exceptions import InvalidPassword, NoEmailProvided
 
 
 class AdminUserCreate(schemas.CreateUpdateDictModel):
@@ -34,8 +34,15 @@ class AdminUserUpdate(schemas.BaseUserUpdate):
     @field_validator("password")
     @classmethod
     def validate_password(cls, value: str) -> str | Never:
-        if re.match(PASSWORD_POLICY, value) is None:
+        if not value or re.match(PASSWORD_POLICY, value) is None:
             raise InvalidPassword
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value: str) -> str | Never:
+        if not value:
+            raise NoEmailProvided
         return value
 
 

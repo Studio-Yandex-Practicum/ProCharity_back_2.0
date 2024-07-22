@@ -40,6 +40,11 @@ class EmailSendError(ApplicationException):
         self.detail = f"Возникла ошибка {exc} при отправке email на адрес {recipients}."
 
 
+class NoEmailProvided(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+    detail = "Email не может быть null."
+
+
 class UnauthorizedError(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.UNAUTHORIZED
     detail = "У Вас нет прав для просмотра запрошенной страницы."
