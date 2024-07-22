@@ -78,11 +78,11 @@ async def _view_tasks(
             disable_web_page_preview=True,
             reply_markup=await get_task_info_keyboard(task, ext_site_user),
         )
-    else:
-        context.user_data["last_viewed_id"] = task.id
-        context.user_data["last_viewed_actualizing_time"] = actualizing_time
-        remaining_tasks_count = await task_service.count_user_tasks_actualized_after(user, actualizing_time, task.id)
-        await _show_remaining_tasks_count(update, context, remaining_tasks_count)
+
+    context.user_data["last_viewed_id"] = task.id
+    context.user_data["last_viewed_actualizing_time"] = actualizing_time
+    remaining_tasks_count = await task_service.count_user_tasks_actualized_after(user, actualizing_time, task.id)
+    await _show_remaining_tasks_count(update, context, remaining_tasks_count)
 
 
 async def _show_remaining_tasks_count(update: Update, context: ContextTypes.DEFAULT_TYPE, remaining_tasks_count: int):
