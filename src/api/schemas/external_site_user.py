@@ -88,12 +88,12 @@ class ExternalSiteFundRequest(ExternalSiteUserRequest):
 
 
 class ExternalSiteVolunteerPartialUpdate(BaseExternalSiteUser, BaseExternalSiteUserVolunteer):
-    """Класс схемы обновлния для ExternalSiteUser (Volunteer)."""
+    """Класс схемы обновления для ExternalSiteUser (Volunteer)."""
 
     pass
 
 
 class ExternalSiteFundPartialUpdate(BaseExternalSiteUser):
-    """Класс схемы обновлния для ExternalSiteUser (Fund)."""
+    """Класс схемы обновления для ExternalSiteUser (Fund)."""
 
     pass
