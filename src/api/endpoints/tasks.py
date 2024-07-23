@@ -134,7 +134,7 @@ async def create_update_task(
 @task_write_router.delete(
     "/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    description="Удаляет указанную задачу из БД бота.",
+    description="Архивирует указанную задачу в БД бота.",
 )
 @inject
 async def delete_task(
