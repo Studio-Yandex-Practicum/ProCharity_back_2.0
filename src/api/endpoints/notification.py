@@ -18,6 +18,7 @@ log = structlog.get_logger()
     "",
     response_model=InfoRate,
     description="Сообщение для группы пользователей",
+    responses={"401": {"description": "Inactive user"}},
 )
 @inject
 async def send_telegram_notification(
@@ -59,6 +60,7 @@ async def send_messages_to_group_of_users(
     "/{telegram_id}",
     response_model=InfoRate,
     description="Отправляет сообщение определенному пользователю.",
+    responses={"401": {"description": "Inactive user"}},
 )
 @inject
 async def send_user_message(

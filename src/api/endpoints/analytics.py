@@ -12,7 +12,11 @@ from src.core.depends import Container
 analytic_router = APIRouter(dependencies=[Depends(is_active_user)])
 
 
-@analytic_router.get("", description="Возращает статистику сервиса.")
+@analytic_router.get(
+    "",
+    description="Возращает статистику сервиса.",
+    responses={"401": {"description": "Inactive user"}},
+)
 @inject
 async def get_analytics(
     date_limit: date = Query(date.today(), example=f"{date.today()}"),

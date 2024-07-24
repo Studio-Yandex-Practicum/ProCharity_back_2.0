@@ -15,6 +15,7 @@ user_router = APIRouter(dependencies=[Depends(is_active_user)])
     response_model=UsersPaginatedResponse,
     response_model_exclude_none=True,
     description="Получает список всех пользователей.",
+    responses={"401": {"description": "Inactive user"}},
 )
 @inject
 async def get_all_users(
@@ -33,6 +34,7 @@ async def get_all_users(
     response_model=UserResponse | None,
     response_model_exclude_none=True,
     description="Получает пользователя по его telegram_id.",
+    responses={"401": {"description": "Inactive user"}},
 )
 @inject
 async def get_by_telegram_id(

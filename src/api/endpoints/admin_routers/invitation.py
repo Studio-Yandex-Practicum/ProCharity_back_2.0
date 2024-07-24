@@ -33,7 +33,11 @@ def get_invitation_manager(admin_db=Depends(get_admin_db)):
     yield InvitationManager(admin_db)
 
 
-@invitation_router.post("/invitation", name="auth:invitation")
+@invitation_router.post(
+    "/invitation",
+    name="auth:invitation",
+    responses={"401": {"description": "Inactive user or not superuser"}},
+)
 async def send_invitation_email_route(
     invitation_create: InvitationCreateSchema,
     invitation_manager: InvitationManager = Depends(get_invitation_manager),
