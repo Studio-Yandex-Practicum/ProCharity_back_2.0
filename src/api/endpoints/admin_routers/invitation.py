@@ -1,19 +1,15 @@
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends
 
-from src.api.fastapi_admin_users import UserManager, fastapi_admin_users, get_admin_db
+from src.api.fastapi_admin_users import UserManager, get_admin_db
+from src.api.permissions import is_active_superuser
 from src.api.schemas.admin import InvitationCreateSchema
 from src.api.services.admin_token_request import AdminTokenRequestService
 from src.core.depends.container import Container
 from src.core.exceptions import UserAlreadyExists
 from src.core.services.email import EmailProvider
-from src.settings import settings
 
-invitation_router = APIRouter(
-    dependencies=[
-        Depends(fastapi_admin_users.current_user(optional=settings.DEBUG, superuser=True)),
-    ]
-)
+invitation_router = APIRouter(dependencies=[Depends(is_active_superuser)])
 
 
 class InvitationManager(UserManager):
