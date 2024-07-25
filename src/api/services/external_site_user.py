@@ -20,7 +20,7 @@ class ExternalSiteUserService:
 
     async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
         """Создаёт в БД нового пользователя сайта или обновляет данные существующего."""
-        site_user = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash, with_archived=True)
+        site_user = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash, None)
         if site_user:
             if site_user.is_archived:
                 raise BadRequestException("Пользователь удален. Обновление невозможно.")
