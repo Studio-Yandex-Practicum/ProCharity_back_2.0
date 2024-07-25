@@ -2,12 +2,11 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query, Request
 
 from src.api.pagination import UserPaginator
-from src.api.permissions import is_active_user
 from src.api.schemas import UserResponse, UsersPaginatedResponse
 from src.api.services import UserService
 from src.core.depends import Container
 
-user_router = APIRouter(dependencies=[Depends(is_active_user)])
+user_router = APIRouter()
 
 
 @user_router.get(
@@ -15,7 +14,6 @@ user_router = APIRouter(dependencies=[Depends(is_active_user)])
     response_model=UsersPaginatedResponse,
     response_model_exclude_none=True,
     description="Получает список всех пользователей.",
-    responses={"401": {"description": "Inactive user"}},
 )
 @inject
 async def get_all_users(
@@ -34,7 +32,6 @@ async def get_all_users(
     response_model=UserResponse | None,
     response_model_exclude_none=True,
     description="Получает пользователя по его telegram_id.",
-    responses={"401": {"description": "Inactive user"}},
 )
 @inject
 async def get_by_telegram_id(

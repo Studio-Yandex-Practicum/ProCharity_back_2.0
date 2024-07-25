@@ -3,20 +3,15 @@ from datetime import date
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query
 
-from src.api.permissions import is_active_user
 from src.api.schemas import ActiveTasks, AllUsersStatistic, Analytic, DBStatus, ReasonCancelingStatistics
 from src.api.services import HealthCheckService
 from src.api.services.analytics import AnalyticsService
 from src.core.depends import Container
 
-analytic_router = APIRouter(dependencies=[Depends(is_active_user)])
+analytic_router = APIRouter()
 
 
-@analytic_router.get(
-    "",
-    description="Возращает статистику сервиса.",
-    responses={"401": {"description": "Inactive user"}},
-)
+@analytic_router.get("", description="Возращает статистику сервиса.")
 @inject
 async def get_analytics(
     date_limit: date = Query(date.today(), example=f"{date.today()}"),
