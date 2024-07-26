@@ -38,7 +38,7 @@ class AdminUserUpdate(schemas.BaseUserUpdate):
             raise InvalidPassword
         return value
 
-    @field_validator("*", mode="before")
+    @field_validator("password", "email", "is_superuser", "is_active", "is_verified", mode="before")
     @classmethod
     def validate_all(cls, value, info: ValidationInfo):
         if value is None:
