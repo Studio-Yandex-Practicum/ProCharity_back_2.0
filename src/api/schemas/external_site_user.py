@@ -32,9 +32,11 @@ class BaseExternalSiteUserVolunteer(RequestBase):
 
     @field_validator("specializations", mode="before")
     @classmethod
-    def specializations_str_validation(cls, value: str) -> list[int] | None:
+    def specializations_str_validation(cls, value: str | list[int]) -> list[int] | None:
         if not isinstance(value, str):
             return value
+        if value == "":
+            return []
         try:
             new_value = [int(value) for value in value.replace(" ", "").split(",")]
             return new_value
