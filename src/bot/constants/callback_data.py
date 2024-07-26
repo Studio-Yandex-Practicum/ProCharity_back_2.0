@@ -1,4 +1,5 @@
-VIEW_TASKS = "view_tasks"
+VIEW_TASKS = "view_tasks!"
+VIEW_TASKS_AGAIN = "view_tasks_again!"
 CHANGE_CATEGORY = "change_category"
 JOB_SUBSCRIPTION = "job_subscription"
 GET_CATEGORIES = "categories_callback"

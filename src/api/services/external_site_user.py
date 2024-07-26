@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import ExternalSiteFundRequest, ExternalSiteVolunteerRequest
-from src.core.db.repository import ExternalSiteUserRepository, UserRepository
+from src.core.db.repository import ExternalSiteUserRepository, TaskRepository, UserRepository
+from src.core.enums import UserResponseAction
 from src.core.exceptions import BadRequestException
 
 
@@ -12,10 +13,12 @@ class ExternalSiteUserService:
         self,
         user_repository: UserRepository,
         site_user_repository: ExternalSiteUserRepository,
+        task_repository: TaskRepository,
         session: AsyncSession,
     ) -> None:
         self._user_repository: UserRepository = user_repository
         self._site_user_repository: ExternalSiteUserRepository = site_user_repository
+        self._task_repository: TaskRepository = task_repository
         self._session: AsyncSession = session
 
     async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
@@ -43,3 +46,12 @@ class ExternalSiteUserService:
     async def archive(self, external_id: int) -> None:
         """Архивирует пользователя сайта и удаляет его связь с ботом."""
         await self._site_user_repository.archive(external_id)
+
+    async def change_user_response_to_task(self, site_user_id: int, task_id: int, action: UserResponseAction) -> None:
+        """Изменяет отклик заданного пользователя на заданную задачу."""
+        site_user = await self._site_user_repository.get_by_external_id(site_user_id)
+        task = await self._task_repository.get(task_id)
+        if action is UserResponseAction.RESPOND:
+            await self._site_user_repository.create_user_response_to_task(site_user, task)
+        else:
+            await self._site_user_repository.delete_user_response_to_task(site_user, task)
