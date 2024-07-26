@@ -40,9 +40,11 @@ class EmailSendError(ApplicationException):
         self.detail = f"Возникла ошибка {exc} при отправке email на адрес {recipients}."
 
 
-class NoEmailProvided(ApplicationException):
+class NullException(ApplicationException):
     status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
-    detail = "Email не может быть null."
+
+    def __init__(self, field):
+        self.detail = f"Поле {field} не может быть null."
 
 
 class UnauthorizedError(ApplicationException):
