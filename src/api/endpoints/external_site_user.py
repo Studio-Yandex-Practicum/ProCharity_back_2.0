@@ -55,7 +55,7 @@ async def external_fund_partial_update(
 @site_user_router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    description="Удаляет данные пользователя сайта ProCharity из БД бота.",
+    description="Архивирует данные пользователя сайта ProCharity в БД бота.",
 )
 @inject
 async def external_user_delete(

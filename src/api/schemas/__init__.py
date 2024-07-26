@@ -19,7 +19,7 @@ from .notification import (
     TelegramNotificationUsersGroups,
     TelegramNotificationUsersRequest,
 )
-from .tasks import TaskRequest, TaskResponse, TasksRequest
+from .tasks import TaskRequest, TaskResponse, TasksRequest, UserResponseToTaskRequest
 from .token_schemas import TokenCheckResponse
 from .users import UserResponse, UsersPaginatedResponse
 
@@ -54,5 +54,6 @@ __all__ = (
     "TokenCheckResponse",
     "FeedbackSchema",
     "UserResponse",
+    "UserResponseToTaskRequest",
     "UsersPaginatedResponse",
 )
