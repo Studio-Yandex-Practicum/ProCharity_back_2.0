@@ -14,6 +14,7 @@ from src.core.enums import UserRoles
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 MAX_USER_ROLE_NAME_LENGTH = 20
+MAX_LENGTH_BOT_MESSAGE = 4096
 
 
 class Base(DeclarativeBase):
@@ -234,3 +235,15 @@ class TaskResponseVolunteer(Base):
 
     def __repr__(self):
         return f"<Response - Task {self.task_id} - Volunteer {self.external_site_user_id}>"
+
+
+class BotMessage(ArchivableBase):
+    """Модель для хранения технических сообщений для админов бота."""
+
+    __tablename__ = "bot_message"
+
+    text: Mapped[str] = mapped_column(String(length=MAX_LENGTH_BOT_MESSAGE))
+    was_read: Mapped[bool] = mapped_column(server_default=expression.false())
+
+    def __repr__(self):
+        return f"<Bot message - Text {self.text} - Was read {self.was_read}>"
