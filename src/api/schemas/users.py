@@ -1,8 +1,11 @@
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import Field
+from fastapi import Query
+from pydantic import BaseModel, Field
 
 from src.api.schemas.base import PaginateBase, ResponseBase
+from src.core.enums import UserRoleFilterValues, UserStatusFilterValues
 
 
 class UserResponse(ResponseBase):
@@ -36,3 +39,31 @@ class UsersPaginatedResponse(PaginateBase):
     """Класс схемы постраничного ответа для User."""
 
     result: list[UserResponse] | None
+
+
+class UserFilter(BaseModel):
+    """Поля для фильтрации пользователей."""
+
+    role: Annotated[
+        UserRoleFilterValues | None,
+        Query(None, title="роль пользователя", description="Фильтрация на основе поля role в users"),
+    ] = None
+    status: Annotated[
+        UserStatusFilterValues | None,
+        Query(
+            None,
+            title="Статус модерации пользователя",
+            description=(
+                "Фильтрация на основе поля moderation_status в связанном с данным пользователем user"
+                "пользователе сайта external_site_user"
+            ),
+        ),
+    ] = None
+    authorization: Annotated[
+        bool | None,
+        Query(
+            None,
+            title="Признак авторизации пользователя",
+            description="Фильтрация на основе связи пользователей user с пользователем сайта external_site_user",
+        ),
+    ] = None
