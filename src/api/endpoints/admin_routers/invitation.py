@@ -12,7 +12,7 @@ from src.core.services.email import EmailProvider
 invitation_router = APIRouter(
     dependencies=[Depends(is_active_superuser)],
     responses={
-        "401": {"description": "Inactive user"},
+        "401": {"description": "Missing token or inactive user"},
         "403": {"description": "Not superuser"},
     },
 )

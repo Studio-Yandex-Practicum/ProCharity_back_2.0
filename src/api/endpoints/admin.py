@@ -10,7 +10,7 @@ from src.api.schemas.admin import AdminUserCreate, AdminUserRead
 
 admin_router = APIRouter(
     dependencies=[Depends(is_active_user)],
-    responses={"401": {"description": "Inactive user"}},
+    responses={"401": {"description": "Missing token or inactive user"}},
 )
 admin_router.include_router(analytic_router, prefix="/analytics", tags=["Analytic"])
 admin_router.include_router(notification_router_by_admin, prefix="/messages", tags=["Messages"])
@@ -23,4 +23,4 @@ admin_user_router.include_router(
     fastapi_admin_users.get_auth_router(auth_cookie_backend),
     prefix="/cookies",
 )
-admin_user_router.include_router(invitation_router, prefix="", tags=["AdminUser"])
+admin_user_router.include_router(invitation_router)
