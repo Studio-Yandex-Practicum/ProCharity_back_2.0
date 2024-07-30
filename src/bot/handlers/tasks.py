@@ -80,35 +80,38 @@ async def respond_to_task_callback(
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
 ):
-    """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик'
-    под сообщением с информацией о задании.
+    """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик' под сообщением с информацией о задании.
+
+    Волонтёр не может откликаться на задание, если от сайта приходит статус модерации NEW_VOL, NO_MODERATED, BLOCKED
+    или отсутствует.
     """
     query = update.callback_query
     action = context.match.group(1)
     task = await task_service.get_or_none(int(context.match.group(2)), None)
     if task is None:
         return
-
+    status_changed = False
     if task.is_archived:
         await context.bot.answer_callback_query(
             query.id, text="Задание больше не актуально, ты не можешь на него откликнуться.", show_alert=True
         )
         return
-    # site_user = await site_user_service.get_by_id(site_user.id)  # почему-то не работает :/
     if action == "+":
-        if site_user.moderation_status == UserStatus.WAIT:
-            if await site_user_service.create_user_response_to_task(site_user, task):
-                popup_text = "Фонд увидит отклик, когда твой профиль пройдет модерацию."
-            else:
-                popup_text = "Ты уже откликнулся на это задание."
-        elif site_user.moderation_status == UserStatus.MODERATED:
-            if await site_user_service.create_user_response_to_task(site_user, task):
-                popup_text = "Твоя заявка принята. Дадим знать, когда фонд выберет тебя исполнителем."
-            else:
-                popup_text = "Ты уже откликнулся на это задание."
-        else:
-            # moderation_status: (None, NEW_VOL, NO_MODERATED, BLOCKED)
-            popup_text = "Ты не можешь оставлять отклики, пока не отредактируешь профиль и не пройдешь модерацию."
+        match site_user.moderation_status:
+            case UserStatus.WAIT:
+                if await site_user_service.create_user_response_to_task(site_user, task):
+                    popup_text = "Фонд увидит отклик, когда твой профиль пройдет модерацию."
+                    status_changed = True
+                else:
+                    popup_text = "Ты уже откликнулся на это задание."
+            case UserStatus.MODERATED:
+                if await site_user_service.create_user_response_to_task(site_user, task):
+                    popup_text = "Твоя заявка принята. Дадим знать, когда фонд выберет тебя исполнителем."
+                    status_changed = True
+                else:
+                    popup_text = "Ты уже откликнулся на это задание."
+            case _:
+                popup_text = "Ты не можешь оставлять отклики, пока не отредактируешь профиль и не пройдешь модерацию."
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
         if task.is_archived:
@@ -116,14 +119,14 @@ async def respond_to_task_callback(
                 query.id, text="Это задание уже в работе / в архиве.", show_alert=True
             )
             return
-
         if await site_user_service.delete_user_response_to_task(site_user, task):
             popup_text = "Ты отменил свой отклик на задание."
+            status_changed = True
         else:
             popup_text = "Ты уже отменил отклик на это задание."
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
-
-    await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
+    if status_changed:
+        await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
 
 
 def registration_handlers(app: Application):
