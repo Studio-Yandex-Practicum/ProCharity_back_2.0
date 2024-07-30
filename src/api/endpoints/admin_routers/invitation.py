@@ -20,7 +20,7 @@ class InvitationManager(UserManager):
     async def create_invitation(
         self,
         email: str,
-        is_superuser: bool,
+        is_superuser: bool = False,
         email_provider: EmailProvider = Depends(Provide[Container.core_services_container.email_provider]),
         admin_token_request_service: AdminTokenRequestService = Depends(
             Provide[Container.api_services_container.admin_token_request_service]
@@ -29,6 +29,10 @@ class InvitationManager(UserManager):
         existing_user = await self.user_db.get_by_email(email)
         if existing_user:
             raise UserAlreadyExists()
+
+        if is_superuser is None:
+            is_superuser = False
+
         invitation_token = await admin_token_request_service.create_invitation_token(email, is_superuser)
         await email_provider.send_invitation_link(email, invitation_token)
 
