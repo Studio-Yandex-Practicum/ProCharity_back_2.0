@@ -1,4 +1,4 @@
-from .admin import admin_router, admin_user_router
+from .admin import admin_auth_router, admin_router, admin_user_router
 from .analytics import analytic_router
 from .categories import category_router
 from .external_site_user import site_user_router
@@ -22,6 +22,7 @@ __all__ = (
     "notification_router_by_admin",
     "notification_router_by_token",
     "site_user_router",
+    "admin_auth_router",
     "admin_router",
     "admin_user_router",
     "feedback_router",

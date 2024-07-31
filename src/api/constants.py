@@ -71,11 +71,12 @@ API_DESCRIPTION = """
 OPENAPI_TAGS = [
     {"name": "Analytic"},
     {"name": "Content"},
+    {"name": "ExternalSiteUser"},
     {"name": "Healthcheck"},
     {"name": "Messages"},
     {"name": "Telegram"},
-    {"name": "AdminUser"},
-    {"name": "ExternalSiteUser"},
+    {"name": "AdminAuth"},
+    {"name": "Admins"},
     {"name": "User"},
     {"name": "Feedback Form"},
 ]
