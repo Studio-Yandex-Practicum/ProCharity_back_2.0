@@ -1,7 +1,13 @@
 from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCancelingStatistics
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
-from .external_site_user import ExternalSiteFundRequest, ExternalSiteUser, ExternalSiteVolunteerRequest
+from .external_site_user import (
+    ExternalSiteFundPartialUpdate,
+    ExternalSiteFundRequest,
+    ExternalSiteUser,
+    ExternalSiteVolunteerPartialUpdate,
+    ExternalSiteVolunteerRequest,
+)
 from .feedback import FeedbackSchema
 from .health_check import BotStatus, CommitStatus, DBStatus, HealthCheck
 from .notification import (
@@ -28,6 +34,8 @@ __all__ = (
     "ExternalSiteUser",
     "ExternalSiteVolunteerRequest",
     "ExternalSiteFundRequest",
+    "ExternalSiteFundPartialUpdate",
+    "ExternalSiteVolunteerPartialUpdate",
     "BotStatus",
     "CommitStatus",
     "DBStatus",
