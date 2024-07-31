@@ -11,7 +11,7 @@ from src.core.depends import Container
 analytic_router = APIRouter()
 
 
-@analytic_router.get("", description="Возращает статистику сервиса.")
+@analytic_router.get("", description="Возвращает статистику сервиса.")
 @inject
 async def get_analytics(
     date_limit: date = Query(date.today(), example=f"{date.today()}"),
