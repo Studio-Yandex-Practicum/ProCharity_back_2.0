@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends
 
-from src.api.endpoints.admin_routers.invitation import invitation_router
 from src.api.endpoints.analytics import analytic_router
 from src.api.endpoints.notification import notification_router_by_admin
 from src.api.endpoints.users import user_router
 from src.api.fastapi_admin_users import auth_backend, auth_cookie_backend, fastapi_admin_users
 from src.api.permissions import is_active_user
 from src.api.schemas.admin import AdminUserCreate, AdminUserRead, AdminUserUpdate
+
+from .invitation import invitation_router
 
 admin_router = APIRouter(
     dependencies=[Depends(is_active_user)],
