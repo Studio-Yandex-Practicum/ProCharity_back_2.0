@@ -29,6 +29,7 @@ class APIServicesContainer(containers.DeclarativeContainer):
         ExternalSiteUserService,
         user_repository=repositories.user_repository,
         site_user_repository=repositories.site_user_repository,
+        task_repository=repositories.task_repository,
         session=data_base_connection.session,
     )
     category_service = providers.Factory(
