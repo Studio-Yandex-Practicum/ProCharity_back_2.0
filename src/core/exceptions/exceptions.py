@@ -23,8 +23,8 @@ class NotFoundException(ApplicationException):
         if object_id is not None:
             self.detail = f"Объект {object_name} с id: {object_id} не найден"
         else:
-            object_kwargs_str = ", ".join(map(lambda k, v: f"{k}={v}"))
-            self.detail = f"Объект {object_name} ({object_kwargs_str}) не найден"
+            object_kwargs_str = ", ".join([f"{k}={v}" for k, v in object_kwargs.items()])
+            self.detail = f"Объект {object_name}({object_kwargs_str}) не найден"
 
 
 class AlreadyExistsException(ApplicationException):
@@ -38,6 +38,13 @@ class EmailSendError(ApplicationException):
 
     def __init__(self, recipients: EmailStr | list[EmailStr], exc: Exception):
         self.detail = f"Возникла ошибка {exc} при отправке email на адрес {recipients}."
+
+
+class NullException(ApplicationException):
+    status_code: HTTPStatus = HTTPStatus.BAD_REQUEST
+
+    def __init__(self, field):
+        self.detail = f"Поле {field} не может быть null."
 
 
 class UnauthorizedError(ApplicationException):

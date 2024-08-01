@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import Field, model_validator
 
 from src.api.schemas.base import RequestBase, ResponseBase
@@ -10,7 +8,7 @@ class CategoryRequest(RequestBase):
 
     id: int = Field(..., example=1, description="Уникальный идентификатор категории.")
     name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
-    parent_id: Optional[int] = Field(
+    parent_id: int | None = Field(
         None,
         example=1,
         description="Принадлежность к родительской категории. Если null, то это родительская категория.",
@@ -38,7 +36,7 @@ class CategoryResponse(ResponseBase):
 
     id: int = Field(..., example=1, description="Уникальный идентификатор категории.")
     name: str = Field(..., min_length=2, max_length=100, example="Category Name", description="Название категории.")
-    parent_id: Optional[int] = Field(
+    parent_id: int | None = Field(
         None,
         example=1,
         description="Принадлежность к родительской категории. Если null, то это родительская категория.",

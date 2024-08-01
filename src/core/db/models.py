@@ -27,9 +27,12 @@ class Base(DeclarativeBase):
     )
     __name__: Mapped[str]
 
+    def to_dict(self):
+        return {field.name: getattr(self, field.name) for field in self.__table__.c}
 
-class ContentBase(AbstractConcreteBase, Base):
-    """Базовый класс для контента (категорий и задач)."""
+
+class ArchivableBase(AbstractConcreteBase, Base):
+    """Базовый класс для данных, которые можно заархивировать."""
 
     is_archived: Mapped[bool] = mapped_column(server_default=expression.false())
 
@@ -90,7 +93,7 @@ class User(Base):
         return f"<User {self.telegram_id}>"
 
 
-class ExternalSiteUser(Base):
+class ExternalSiteUser(ArchivableBase):
     """Модель пользователя с сайта ProCharity."""
 
     __tablename__ = "external_site_users"
@@ -114,7 +117,7 @@ class ExternalSiteUser(Base):
         return f"<SiteUser {self.id}>"
 
 
-class Task(ContentBase):
+class Task(ArchivableBase):
     """Модель задач."""
 
     __tablename__ = "tasks"
@@ -151,7 +154,7 @@ class Task(ContentBase):
         return f"<Task {self.title}>"
 
 
-class Category(ContentBase):
+class Category(ArchivableBase):
     """Модель категорий."""
 
     __tablename__ = "categories"

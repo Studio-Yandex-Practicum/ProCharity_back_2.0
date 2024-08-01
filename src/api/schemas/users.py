@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import Field
 
-from src.api.schemas.base import ResponseBase
+from src.api.schemas.base import PaginateBase, ResponseBase
 
 
 class UserResponse(ResponseBase):
@@ -32,14 +32,7 @@ class UserResponse(ResponseBase):
         }
 
 
-class UsersPaginatedResponse(ResponseBase):
+class UsersPaginatedResponse(PaginateBase):
     """Класс схемы постраничного ответа для User."""
 
-    total: int | None
-    pages: int | None
-    current_page: int | None
-    next_page: int | None
-    previous_page: int | None
-    next_url: str | None
-    previous_url: str | None
     result: list[UserResponse] | None

@@ -1,9 +1,11 @@
 from datetime import date, datetime
+from typing import Annotated
 
-from pydantic import Field, PositiveInt, RootModel, StrictFloat, field_validator
+from pydantic import BaseModel, Field, PositiveInt, RootModel, StrictFloat, field_validator
 
 from src.api.constants import DATE_FORMAT, DATE_FORMAT_FOR_TASK_SCHEMA
 from src.api.schemas.base import RequestBase, ResponseBase
+from src.core.enums import UserResponseAction
 
 
 class TaskDescriptionMain(RequestBase, ResponseBase):
@@ -28,7 +30,7 @@ class TaskDescriptionFiles(RequestBase, ResponseBase):
     file_size: int = Field(..., examples=["12345"], description="Размер файла в байтах.")
 
 
-class TaskCommonFieldsMixin:
+class TaskCommonFieldsMixin(BaseModel):
     """Набор общих полей для схем модели Task."""
 
     title: str = Field(..., examples=["Example Task"], description="Название задачи.")
@@ -85,4 +87,18 @@ class TasksRequest(RootModel[list[TaskRequest]]):
 class TaskResponse(ResponseBase, TaskCommonFieldsMixin):
     """Схема ответа для модели Task."""
 
+    deadline: date | None = Field(
+        ..., format=DATE_FORMAT, examples=["23.11.2024"], description="Дедлайн выполнения задачи."
+    )
+    category_id: Annotated[
+        PositiveInt | None, Field(..., examples=[1], description="ID дочерней категории, к которой относится задача.")
+    ]
     is_archived: bool = Field(..., examples=[False], description="Является ли задача архивной.")
+
+
+class UserResponseToTaskRequest(RequestBase):
+    """Схема запроса на изменение отклика пользователя на задачу."""
+
+    user_id: int
+    task_id: int
+    status: UserResponseAction
