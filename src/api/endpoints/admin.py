@@ -13,5 +13,4 @@ admin_user_router.include_router(
     fastapi_admin_users.get_auth_router(auth_cookie_backend),
     prefix="/cookies",
 )
-
-admin_user_router.include_router(invitation_router, prefix="", tags=["AdminUser"])
+admin_user_router.include_router(invitation_router, prefix="")
