@@ -237,13 +237,13 @@ class TaskResponseVolunteer(Base):
         return f"<Response - Task {self.task_id} - Volunteer {self.external_site_user_id}>"
 
 
-class BotMessage(ArchivableBase):
+class TechMessage(ArchivableBase):
     """Модель для хранения технических сообщений для админов бота."""
 
-    __tablename__ = "bot_message"
+    __tablename__ = "tech_messages"
 
     text: Mapped[str] = mapped_column(String(length=MAX_LENGTH_BOT_MESSAGE))
     was_read: Mapped[bool] = mapped_column(server_default=expression.false())
 
     def __repr__(self):
-        return f"<Bot message - Text {self.text} - Was read {self.was_read}>"
+        return f"<Tech message - Text {self.text} - Was read {self.was_read}>"
