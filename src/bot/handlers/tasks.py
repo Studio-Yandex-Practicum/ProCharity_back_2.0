@@ -92,9 +92,12 @@ async def respond_to_task_callback(
         return
     status_changed = False
     if task.is_archived:
-        await context.bot.answer_callback_query(
-            query.id, text="Задание больше не актуально, ты не можешь на него откликнуться.", show_alert=True
+        popup_text = (
+            "Задание больше не актуально, ты не можешь на него откликнуться."
+            if action == "+"
+            else "Это задание уже в работе / в архиве."
         )
+        await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
         return
     if action == "+":
         match site_user.moderation_status:
@@ -114,11 +117,6 @@ async def respond_to_task_callback(
                 popup_text = "Ты не можешь оставлять отклики, пока не отредактируешь профиль и не пройдешь модерацию."
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
-        if task.is_archived:
-            await context.bot.answer_callback_query(
-                query.id, text="Это задание уже в работе / в архиве.", show_alert=True
-            )
-            return
         if await site_user_service.delete_user_response_to_task(site_user, task):
             popup_text = "Ты отменил свой отклик на задание."
             status_changed = True
