@@ -1,19 +1,13 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query, Request
 
-from src.api.fastapi_admin_users import fastapi_admin_users
 from src.api.pagination import UserPaginator
 from src.api.schemas import UserResponse, UsersPaginatedResponse
 from src.api.schemas.users import UserFilter
 from src.api.services import UserService
 from src.core.depends import Container
-from src.settings import settings
 
-user_router = APIRouter(
-    dependencies=[
-        Depends(fastapi_admin_users.current_user(optional=settings.DEBUG)),
-    ]
-)
+user_router = APIRouter()
 
 
 @user_router.get(
