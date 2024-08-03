@@ -12,8 +12,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.api.endpoints.admin_routers.auth import get_auth_router
-from src.api.endpoints.admin_routers.register import get_register_router
+from src.api.endpoints.admin.auth import get_auth_router
+from src.api.endpoints.admin.register import get_register_router
 from src.api.services import AdminTokenRequestService
 from src.core.admin_auth.backend import auth_backend
 from src.core.admin_auth.cookie_backend import auth_cookie_backend

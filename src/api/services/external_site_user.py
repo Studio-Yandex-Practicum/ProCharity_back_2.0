@@ -1,8 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.schemas import ExternalSiteFundRequest, ExternalSiteVolunteerRequest
+from src.api.schemas import (
+    ExternalSiteFundPartialUpdate,
+    ExternalSiteFundRequest,
+    ExternalSiteVolunteerPartialUpdate,
+    ExternalSiteVolunteerRequest,
+)
+from src.core.db.models import ExternalSiteUser
 from src.core.db.repository import ExternalSiteUserRepository, TaskRepository, UserRepository
-from src.core.enums import UserResponseAction
+from src.core.enums import UserResponseAction, UserRoles
 from src.core.exceptions import BadRequestException
 
 
@@ -42,6 +48,27 @@ class ExternalSiteUserService:
 
             await self._user_repository.update(user.id, user)
             await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
+
+    async def partial_update(
+        self, external_id: int, site_user_schema: ExternalSiteVolunteerPartialUpdate | ExternalSiteFundPartialUpdate
+    ) -> None:
+        """Обновляет данные/часть данных существующего пользователя сайта."""
+        data_for_update = site_user_schema.model_dump(exclude_none=True)
+        site_user = await self._site_user_repository.get_by_external_id(external_id, None)
+        if site_user and site_user.is_archived:
+            raise BadRequestException("Пользователь удален. Обновление невозможно.")
+
+        await self._site_user_repository.update(site_user.id, ExternalSiteUser(**data_for_update))
+
+        user = await self._user_repository.get_by_external_id(site_user.id)
+        if user:
+            for attr, value in data_for_update.items():
+                setattr(user, attr, value)
+
+            await self._user_repository.update(user.id, user)
+
+            if site_user.role == UserRoles.VOLUNTEER:
+                await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
 
     async def archive(self, external_id: int) -> None:
         """Архивирует пользователя сайта и удаляет его связь с ботом."""

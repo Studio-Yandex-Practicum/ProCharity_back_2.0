@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 from fastapi import FastAPI
 
+from src.api.constants import OPENAPI_TAGS
 from src.api.main import init_fastapi
 from src.bot import create_bot
 from src.bot.main import init_bot
@@ -20,6 +21,6 @@ class ApplicationsContainer(containers.DeclarativeContainer):
     )
     fastapi_app = providers.Singleton(
         init_fastapi,
-        fastapi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG),
+        fastapi_app=providers.Singleton(FastAPI, debug=settings.provided.DEBUG, openapi_tags=OPENAPI_TAGS),
         settings=settings,
     )
