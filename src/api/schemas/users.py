@@ -54,7 +54,7 @@ class UserFilter(BaseModel):
             None,
             title="Статус модерации пользователя",
             description=(
-                "Фильтрация на основе поля moderation_status в связанном с данным пользователем user"
+                "Фильтрация на основе поля moderation_status в связанном с данным пользователем user "
                 "пользователе сайта external_site_user"
             ),
         ),
