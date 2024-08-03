@@ -10,6 +10,17 @@ class TelegramNotificationUsersGroups(StrEnum):
     UNSUBSCRIBED = "unsubscribed"
 
 
+class UserResponseAction(StrEnum):
+    """Типы действий с откликом пользователя на задачу.
+
+    - respond: создать отклик;
+    - unrespond: удалить отклик.
+    """
+
+    RESPOND = "respond"
+    UNRESPOND = "cancel_respond"
+
+
 class UserRoles(StrEnum):
     """Роли пользователя в системе.
 
