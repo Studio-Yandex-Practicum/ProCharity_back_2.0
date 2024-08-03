@@ -1,5 +1,6 @@
 import abc
-from typing import Generic, Sequence, TypeVar
+from abc import abstractmethod
+from typing import Any, Generic, Sequence, TypeVar
 
 from sqlalchemy import Select, false, func, select, true, update
 from sqlalchemy.exc import DuplicateColumnError
@@ -168,3 +169,15 @@ class ContentRepository(ArchivableRepository):
         """Возвращает id объектов модели из базы данных по указанному фильтру полей."""
         filtered_ids = await self._session.scalars(select(self._model.id).filter_by(**filter_by))
         return filtered_ids.all()
+
+
+class FilterableRepository(AbstractRepository):
+    """Абстрактный класс для репозитория с данными, которые можно фильтровать."""
+
+    @abstractmethod
+    async def count_by_filter(self, filter_by: dict[str, Any]) -> int:
+        """Возвращает количество записей, удовлетворяющих фильтру"""
+
+    @abstractmethod
+    def apply_filter(self, statement: Select, filter_by: dict[str, Any]) -> Select:
+        """Применяет фильтрацию по заданным в filter_by полям."""
