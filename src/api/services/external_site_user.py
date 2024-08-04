@@ -30,10 +30,6 @@ class ExternalSiteUserService:
     async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
         """Создаёт в БД нового пользователя сайта или обновляет данные существующего."""
         site_user = await self._site_user_repository.get_by_external_id_or_none(site_user_schema.user_id, None)
-        site_user_by_id_hash = await self._site_user_repository.get_by_id_hash(site_user_schema.id_hash)
-
-        if site_user_by_id_hash not in (None, site_user):
-            raise BadRequestException("Пользователь с таким id_hash уже существует.")
 
         if site_user:
             if site_user.is_archived:
@@ -42,9 +38,13 @@ class ExternalSiteUserService:
             if site_user.id_hash not in (None, site_user_schema.id_hash):
                 raise BadRequestException("Пользователь с таким user_id уже существует.")
 
+            if site_user.id_hash is None:
+                await self._error_if_exists_by_id_hash(site_user_schema.id_hash)
+
             site_user = await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
 
         else:
+            await self._error_if_exists_by_id_hash(site_user_schema.id_hash)
             site_user = await self._site_user_repository.create(site_user_schema.to_orm())
 
         user = await self._user_repository.get_by_external_id(site_user.id)
@@ -90,3 +90,8 @@ class ExternalSiteUserService:
             await self._site_user_repository.create_user_response_to_task(site_user, task)
         else:
             await self._site_user_repository.delete_user_response_to_task(site_user, task)
+
+    async def _error_if_exists_by_id_hash(self, id_hash: str) -> None:
+        site_user = await self._site_user_repository.get_by_id_hash(id_hash)
+        if site_user is not None:
+            raise BadRequestException("Пользователь с таким id_hash уже существует.")
