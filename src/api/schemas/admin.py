@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from typing import Never
 
 from fastapi.param_functions import Form
@@ -24,7 +25,9 @@ class AdminUserCreate(schemas.CreateUpdateDictModel):
 
 
 class AdminUserRead(schemas.BaseUser[int]):
-    pass
+    first_name: str
+    last_name: str
+    last_login: date
 
 
 class AdminUserUpdate(schemas.BaseUserUpdate):
