@@ -121,7 +121,6 @@ async def respond_to_task_callback(
     task = await task_service.get_or_none(int(context.match.group(2)), None)
     if task is None:
         return
-    status_changed = False
     if task.is_archived:
         popup_text = (
             "Задание больше не актуально, ты не можешь на него откликнуться."
@@ -130,27 +129,26 @@ async def respond_to_task_callback(
         )
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
         return
+    status_changed = True
     if action == "+":
         match site_user.moderation_status:
             case UserStatus.WAIT:
                 if await site_user_service.create_user_response_to_task(site_user, task):
                     popup_text = "Фонд увидит отклик, когда твой профиль пройдет модерацию."
-                    status_changed = True
                 else:
                     popup_text = "Ты уже откликнулся на это задание."
             case UserStatus.MODERATED:
                 if await site_user_service.create_user_response_to_task(site_user, task):
                     popup_text = "Твоя заявка принята. Дадим знать, когда фонд выберет тебя исполнителем."
-                    status_changed = True
                 else:
                     popup_text = "Ты уже откликнулся на это задание."
             case _:
                 popup_text = "Ты не можешь оставлять отклики, пока не отредактируешь профиль и не пройдешь модерацию."
+                status_changed = False
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
         if await site_user_service.delete_user_response_to_task(site_user, task):
             popup_text = "Ты отменил свой отклик на задание."
-            status_changed = True
         else:
             popup_text = "Ты уже отменил отклик на это задание."
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
