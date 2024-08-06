@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ProCharity Bot</title>
-    <link rel="stylesheet" href="./pages/task_info_page.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
-    />
-    <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
-  </head>
-  <body>
-    <main>
-      <h5>Полученные параметры запроса</h5>
-    </main>
-    <script defer src="./scripts/task_info_page.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProCharity Bot</title>
+  <link rel="stylesheet" href="./pages/task_info_page.css">
+  <link href="https://fonts.cdnfonts.com/css/pt-root-ui" rel="stylesheet">
+  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div id="task_info"></div>
+    <div id="description_links"></div>
+    <div id="description_files"></div>
+    <div id="description_bonus"></div>
+  </main>
+  <script defer src="./scripts/task_info_page.js"></script>
+</body>
 </html>
