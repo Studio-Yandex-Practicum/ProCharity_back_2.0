@@ -1,17 +1,19 @@
 from collections.abc import Sequence
+from typing import Any
 
-from sqlalchemy import delete, false, insert, orm, select
+from sqlalchemy import Select, and_, delete, desc, false, func, insert, or_, orm, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
-from src.core.db.models import Category, User, UsersCategories
-from src.core.db.repository.base import AbstractRepository
+from src.core.db.models import Category, ExternalSiteUser, User, UsersCategories
+from src.core.db.repository.base import FilterableRepository
+from src.core.enums import UserRoleFilterValues, UserStatusFilterValues
 from src.core.utils import auto_commit
 
 logger = get_logger()
 
 
-class UserRepository(AbstractRepository):
+class UserRepository(FilterableRepository):
     """Репозиторий для работы с моделью User."""
 
     def __init__(self, session: AsyncSession) -> None:
@@ -105,3 +107,59 @@ class UserRepository(AbstractRepository):
         """
         user.has_mailing = has_mailing
         await self.update(user.id, user)
+
+    def _add_filter_by_role_to_select(self, statement: Select, role: str | None) -> Select:
+        """Добавляет к оператору SELECT проверку значения в поле role."""
+        if role == str(UserRoleFilterValues.UNKNOWN):
+            return statement.where(User.role.is_(None))
+        if role is not None:
+            return statement.where(User.role == role)
+        return statement
+
+    def _add_filter_by_external_id_to_select(self, statement: Select, external_id_exists: bool | None) -> Select:
+        """Добавляет к оператору SELECT проверку привязки к external_site_users в поле external_id."""
+        if external_id_exists is True:
+            return statement.where(User.external_id.is_not(None))
+        if external_id_exists is False:
+            return statement.where(User.external_id.is_(None))
+        return statement
+
+    def _add_filter_by_moderation_status(self, statement: Select, status: str | None) -> Select:
+        """Добавляет к оператору SELECT проверку статуса external_site_users.moderation_status."""
+        if status == UserStatusFilterValues.UNKNOWN:
+            return statement.where(or_(ExternalSiteUser.id.is_(None), ExternalSiteUser.moderation_status.is_(None)))
+        if status is not None:
+            return statement.where(and_(ExternalSiteUser.id.is_not(None), ExternalSiteUser.moderation_status == status))
+        return statement
+
+    def apply_filter(self, statement: Select, filter_by: dict[str, Any]) -> Select:
+        """Применяет фильтрацию по заданным в filter_by полям."""
+        filter_select_updaters = {
+            "role": self._add_filter_by_role_to_select,
+            "authorization": self._add_filter_by_external_id_to_select,
+            "status": self._add_filter_by_moderation_status,
+        }
+        for filter_field, executor in filter_select_updaters.items():
+            statement = executor(statement, filter_by.get(filter_field))
+        return statement
+
+    async def count_by_filter(self, filter_by: dict[str, Any]) -> int:
+        """Возвращает количество записей, удовлетворяющих фильтру"""
+        statement = select(func.count()).select_from(User).join(User.external_user, isouter=True)
+        statement = self.apply_filter(statement, filter_by)
+        return await self._session.scalar(statement)
+
+    async def get_filtered_objects_by_page(
+        self, filter_by: dict[str, Any], page: int, limit: int, column_name: str = "created_at"
+    ) -> Sequence[User]:
+        """
+        Получает отфильтрованные данные, ограниченные параметрами page и limit
+        и отсортированные по полю column_name в порядке убывания.
+        """
+        offset = (page - 1) * limit
+        statement = self.apply_filter(
+            select(User).join(User.external_user, isouter=True),
+            filter_by,
+        )
+        objects = await self._session.scalars(statement.limit(limit).offset(offset).order_by(desc(column_name)))
+        return objects.all()

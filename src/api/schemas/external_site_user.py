@@ -49,7 +49,7 @@ class BaseExternalSiteUserVolunteer(RequestBase):
 class ExternalSiteUserRequest(BaseExternalSiteUser):
     """Класс схемы запроса для ExternalSiteUser."""
 
-    user_id: int = Field(...)
+    user_id: int = Field(..., gt=0)
     id_hash: str = Field(..., max_length=256)
     first_name: str = Field(..., max_length=64)
     last_name: str = Field(..., max_length=64)
