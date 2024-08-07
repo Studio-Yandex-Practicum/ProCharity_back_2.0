@@ -2,12 +2,15 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query, Request
 
 from src.api.pagination import UserPaginator
+from src.api.permissions import is_active_user
 from src.api.schemas import UserResponse, UsersPaginatedResponse
 from src.api.schemas.users import UserFilter
 from src.api.services import UserService
 from src.core.depends import Container
 
-user_router = APIRouter()
+user_router = APIRouter(
+    dependencies=[Depends(is_active_user)],
+)
 
 
 @user_router.get(
