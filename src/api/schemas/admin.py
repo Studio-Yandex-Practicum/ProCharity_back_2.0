@@ -9,6 +9,8 @@ from pydantic import BaseModel, EmailStr, Field, ValidationInfo, field_validator
 from src.api.constants import PASSWORD_POLICY
 from src.core.exceptions import InvalidPassword, NullException
 
+from .base import PaginateBase
+
 
 class AdminUserCreate(schemas.CreateUpdateDictModel):
     token: str = Field(..., description="Invitation token.")
@@ -25,9 +27,13 @@ class AdminUserCreate(schemas.CreateUpdateDictModel):
 
 
 class AdminUserRead(schemas.BaseUser[int]):
-    first_name: str
-    last_name: str
-    last_login: date
+    first_name: str | None
+    last_name: str | None
+    last_login: date | None
+
+
+class AdminUsersPaginatedRead(PaginateBase):
+    result: list[AdminUserRead] | None
 
 
 class AdminUserUpdate(schemas.BaseUserUpdate):

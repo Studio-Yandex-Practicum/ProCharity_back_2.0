@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from jose import JWTError, jwt
 
 from src.core.db.models import AdminUser
@@ -14,8 +12,8 @@ class AdminService:
     def __init__(self, admin_repository: AdminUserRepository) -> None:
         self._repository: AdminUserRepository = admin_repository
 
-    async def get_all(self) -> Sequence[AdminUser]:
-        return await self._repository.get_all()
+    async def get_admin_users_by_page(self, page: int, limit: int) -> dict:
+        return await self._repository.get_objects_by_page(page, limit)
 
     async def authenticate_user(self, email: str, password: str) -> AdminUser | None:
         user = await self._repository.get_by_email(email)
