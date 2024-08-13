@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 
 from src.api.endpoints.admin.auth import get_auth_router
 from src.api.endpoints.admin.register import get_register_router
-from src.api.services import AdminTokenRequestService
+from src.api.services import AdminService, AdminTokenRequestService
 from src.core.admin_auth.backend import auth_backend
 from src.core.admin_auth.cookie_backend import auth_cookie_backend
 from src.core.db.models import AdminUser
@@ -90,6 +90,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         await self.user_db.update(user, {"last_login": date.today()})
 
         await log.ainfo(f"Login: The User '{user.email}' successfully logged in. Token has been generate")
+
+    async def delete(
+        self,
+        user: AdminUser,
+        request: Request | None = None,
+        admin_service: AdminService = Depends(Provide[Container.api_services_container.admin_service]),
+    ) -> None:
+        await admin_service.soft_delete(user)
 
 
 class CustomFastAPIUsers(FastAPIUsers[models.UP, models.ID]):
