@@ -1,11 +1,11 @@
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, and_, delete, desc, false, func, insert, or_, orm, select
+from sqlalchemy import Select, and_, delete, desc, func, insert, or_, orm, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
-from src.core.db.models import Category, ExternalSiteUser, User, UsersCategories
+from src.core.db.models import ExternalSiteUser, User, UsersCategories
 from src.core.db.repository.base import FilterableRepository
 from src.core.enums import UserRoleFilterValues, UserStatusFilterValues
 from src.core.utils import auto_commit
@@ -85,20 +85,6 @@ class UserRepository(FilterableRepository):
             .where(UsersCategories.user_id == user.id)
             .where(UsersCategories.category_id == category_id)
         )
-
-    async def get_user_categories(self, user: User, with_archived=False) -> Sequence[Category]:
-        """Возвращает список категорий пользователя.
-        Если with_archived=True, возвращаются все категории, включая архивные.
-        """
-        if with_archived:
-            user_categories = await self._session.scalars(
-                select(Category).join(User.categories).where(User.id == user.id)
-            )
-        else:
-            user_categories = await self._session.scalars(
-                select(Category).join(User.categories).where(User.id == user.id).where(Category.is_archived == false())
-            )
-        return user_categories.all()
 
     async def set_mailing(self, user: User, has_mailing: bool) -> None:
         """

@@ -73,6 +73,7 @@ async def view_categories(
                 await procharity_api.send_user_bot_status(user)
 
 
+@logger_decor
 @registered_user_required
 async def view_current_categories_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE, ext_site_user: ExternalSiteUser
@@ -86,6 +87,7 @@ async def view_current_categories_callback(
     )
 
 
+@logger_decor
 @registered_user_required
 async def confirm_categories_callback(
     update: Update, context: ContextTypes.DEFAULT_TYPE, ext_site_user: ExternalSiteUser
