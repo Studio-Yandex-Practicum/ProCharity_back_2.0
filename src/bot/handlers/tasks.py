@@ -16,9 +16,10 @@ from src.bot.services import ExternalSiteUserService, TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
-from src.core.enums import UserStatus
+from src.core.enums import UserResponseAction, UserStatus
 from src.core.logging.utils import logger_decor
 from src.core.messages import display_task
+from src.core.services.procharity_api import ProcharityAPI
 
 INITIAL_LAST_VIEWED_ACTUALIZING_TIME = datetime(year=2000, month=1, day=1)
 
@@ -110,6 +111,7 @@ async def respond_to_task_callback(
     site_user: ExternalSiteUser,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик' под сообщением с информацией о задании.
 
@@ -130,16 +132,19 @@ async def respond_to_task_callback(
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
         return
     status_changed = True
+    respond_status = None
     if action == "+":
         match site_user.moderation_status:
             case UserStatus.WAIT:
                 if await site_user_service.create_user_response_to_task(site_user, task):
                     popup_text = "Фонд увидит отклик, когда твой профиль пройдет модерацию."
+                    respond_status = UserResponseAction.RESPOND
                 else:
                     popup_text = "Ты уже откликнулся на это задание."
             case UserStatus.MODERATED:
                 if await site_user_service.create_user_response_to_task(site_user, task):
                     popup_text = "Твоя заявка принята. Дадим знать, когда фонд выберет тебя исполнителем."
+                    respond_status = UserResponseAction.RESPOND
                 else:
                     popup_text = "Ты уже откликнулся на это задание."
             case _:
@@ -149,9 +154,12 @@ async def respond_to_task_callback(
     else:
         if await site_user_service.delete_user_response_to_task(site_user, task):
             popup_text = "Ты отменил свой отклик на задание."
+            respond_status = UserResponseAction.UNRESPOND
         else:
             popup_text = "Ты уже отменил отклик на это задание."
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
+    if respond_status:
+        await procharity_api.send_task_respond_status(site_user.external_id, task.id, respond_status)
     if status_changed:
         await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
 
