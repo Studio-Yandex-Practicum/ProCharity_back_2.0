@@ -30,3 +30,8 @@ class AdminService:
         if not user:
             raise CredentialsException("There is no user in db with such email")
         return user
+
+    async def soft_delete(self, user: AdminUser) -> None:
+        """Мягкое удаление админа: is_active = False"""
+        user.is_active = False
+        await self._repository.update(user.id, user)

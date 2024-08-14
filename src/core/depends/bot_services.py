@@ -19,6 +19,7 @@ class BotServicesContainer(containers.DeclarativeContainer):
         BotUserService,
         user_repository=repositories.user_repository,
         ext_user_repository=repositories.site_user_repository,
+        category_repository=repositories.category_repository,
     )
     bot_task_service = providers.Factory(
         BotTaskService,
