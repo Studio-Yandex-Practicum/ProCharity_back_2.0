@@ -36,7 +36,7 @@ class ExternalSiteUserService:
                 raise BadRequestException("Пользователь удален. Обновление невозможно.")
 
             if site_user.id_hash not in (None, site_user_schema.id_hash):
-                raise BadRequestException("Пользователь с таким user_id уже существует.")
+                raise BadRequestException("Изменение id_hash у существующего пользователя запрещено.")
 
             if site_user.id_hash is None:
                 await self._error_if_exists_by_id_hash(site_user_schema.id_hash)
