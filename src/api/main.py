@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.api.constants import API_DESCRIPTION
+from src.api.utils import create_token_for_super_user
 from src.core.logging.middleware import LoggingMiddleware
 from src.core.logging.setup import setup_logging
 from src.settings import Settings
@@ -35,6 +36,7 @@ def set_events(fastapi_app: FastAPI, run_bot: bool):
         from .events import startup
 
         await startup(fastapi_app, run_bot)
+        await create_token_for_super_user()
 
     @fastapi_app.on_event("shutdown")
     async def on_shutdown():
