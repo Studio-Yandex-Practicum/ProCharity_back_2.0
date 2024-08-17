@@ -204,6 +204,11 @@ class Settings(BaseSettings):
         """Получить url-ссылку на страницу отправки статуса бота для фонда."""
         return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_status_fund/")
 
+    @property
+    def procharity_send_bot_respond_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки статуса отклика на задачу."""
+        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_respond/")
+
 
 @lru_cache()
 def get_settings():

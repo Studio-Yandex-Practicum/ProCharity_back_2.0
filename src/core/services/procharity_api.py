@@ -2,7 +2,8 @@ import aiohttp
 from structlog import get_logger
 
 from src.core.db.models import User
-from src.core.schemas.procharity_api import SiteBotStatusRequest, SiteUserCategoriesRequest
+from src.core.enums import UserResponseAction
+from src.core.schemas.procharity_api import SiteBotRespondRequest, SiteBotStatusRequest, SiteUserCategoriesRequest
 from src.settings import Settings
 
 logger = get_logger(module=__name__)
@@ -83,3 +84,19 @@ class ProcharityAPI:
                 user_id=user_id,
                 log_description="статус бота",
             )
+
+    async def send_task_respond_status(self, user_id: int, task_id: int, status: UserResponseAction):
+        """Отправляет запрос на сайт с обновленным откликом пользователя на задачу.
+
+        Args:
+            user_id: Идентификатор пользователя.
+            task_id: Идентификатор задачи.
+            status: Статус отклика на задачу.
+        """
+        body_schema = SiteBotRespondRequest(user_id=user_id, task_id=task_id, status=status)
+        await self._site_post(
+            url=self._settings.procharity_send_bot_respond_api_url,
+            data=body_schema.model_dump_json(),
+            user_id=user_id,
+            log_description="статус отклика",
+        )
