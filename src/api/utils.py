@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 
 from sqlalchemy import select
-from structlog import get_logger
 
 from src.api.services.admin_token_request import AdminTokenRequestService
 from src.core.db import get_session
@@ -9,8 +8,6 @@ from src.core.db.models import AdminUser
 from src.core.db.repository.admin_token_request import AdminTokenRequestRepository
 from src.core.services.email import EmailProvider
 from src.settings import settings
-
-logger = get_logger()
 
 
 async def create_token_for_super_user() -> None:
@@ -25,7 +22,3 @@ async def create_token_for_super_user() -> None:
 
             email_provider = EmailProvider(session, settings)
             await email_provider.send_invitation_link(settings.EMAIL_ADMIN, token)
-
-            await logger.ainfo(
-                f'Super user registration: The invitation "{token}" generated for {settings.EMAIL_ADMIN}.'
-            )
