@@ -108,6 +108,12 @@ ProCharity (НКО Фонд Друзья).
     docker exec -it procharity_bot_backend sh -c "alembic upgrade head && python3 fill_db.py"
     ```
 
+    Если в тестовую базу нужно добавить пользователей-админов, то необходимо выполнить команду:
+
+    ```shell
+    docker exec -it procharity_bot_backend sh -c "alembic upgrade head && python3 fill_db.py add_fake_admins"
+    ```
+
 ## Для разработки
 
 ### Установка и настройка приложения
@@ -191,6 +197,12 @@ ProCharity (НКО Фонд Друзья).
 
     ```shell
     python3 fill_db.py with_fake_users
+    ```
+
+    Генерация тестовых данных c таблицей пользователей и таблицей админов
+
+    ```shell
+    python3 fill_db.py with_fake_users add_fake_admins
     ```
 
 4. Запустить сервер приложения.

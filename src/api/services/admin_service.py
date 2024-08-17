@@ -12,6 +12,9 @@ class AdminService:
     def __init__(self, admin_repository: AdminUserRepository) -> None:
         self._repository: AdminUserRepository = admin_repository
 
+    async def get_admin_users_by_page(self, page: int, limit: int) -> dict:
+        return await self._repository.get_objects_by_page(page, limit)
+
     async def authenticate_user(self, email: str, password: str) -> AdminUser | None:
         user = await self._repository.get_by_email(email)
         if user and user.check_password(password):
