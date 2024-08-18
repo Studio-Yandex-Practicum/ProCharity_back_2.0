@@ -4,18 +4,21 @@ from structlog import get_logger
 from src.core.db.models import User
 from src.core.enums import UserResponseAction
 from src.core.schemas.procharity_api import SiteBotRespondRequest, SiteBotStatusRequest, SiteUserCategoriesRequest
-from src.core.services.email import EmailProvider
 from src.settings import Settings
+
+from .email import EmailProvider
+from .tech_message import TechMessageService
 
 logger = get_logger(module=__name__)
 
 
 class ProcharityAPI:
-    """Класс для отправки сообщений на API сайта."""
+    """Сервис для отправки сообщений на сайт."""
 
-    def __init__(self, settings: Settings, email_provider: EmailProvider):
+    def __init__(self, settings: Settings, email_provider: EmailProvider, tech_message_service: TechMessageService):
         self._settings = settings
         self._email_provider = email_provider
+        self._tech_message_service = tech_message_service
 
     @property
     def token_header_dict(self) -> dict[str, str]:
@@ -35,7 +38,7 @@ class ProcharityAPI:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url=url, data=data, headers=self.token_header_dict) as response:
                     if response.status != 200:
-                        await self._make_site_post_error_nitification(
+                        await self._make_site_post_error_notification(
                             user_id, log_description, f"status = {response.status}"
                         )
                     else:
@@ -44,16 +47,17 @@ class ProcharityAPI:
                             f"Успешная передача данных из бота: {log_description} пользователя {user_id}. Ответ: {data}"
                         )
         except aiohttp.ClientResponseError as e:
-            await self._make_site_post_error_nitification(
+            await self._make_site_post_error_notification(
                 user_id, log_description, f"Неверный ответ от сервера ({e.message})."
             )
         except Exception as e:
             await logger.aexception(e)
 
-    async def _make_site_post_error_nitification(self, user_id: str, log_description: str, reason: str) -> None:
+    async def _make_site_post_error_notification(self, user_id: str, log_description: str, reason: str) -> None:
         message = f"Ошибка передачи данных из бота: {log_description} пользователя {user_id}. {reason}"
         await logger.ainfo(message)
         await self._email_provider.send_outcoming_request_error_notification(message, self._settings.EMAIL_ADMIN)
+        await self._tech_message_service.create(message)
 
     async def send_user_categories(self, user_id: int, user_categories: list[int]):
         """Отправляет запрос на сайт с обновленными категориями пользователя.
