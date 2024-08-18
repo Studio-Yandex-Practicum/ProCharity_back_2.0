@@ -10,4 +10,4 @@ class CoreServicesContainer(containers.DeclarativeContainer):
 
     email_provider = providers.Factory(EmailProvider, sessionmaker=sessionmaker, settings=settings)
     telegram_notification = providers.Factory(TelegramNotification, telegram_bot=telegram_bot)
-    procharity_api = providers.Factory(ProcharityAPI, settings=settings)
+    procharity_api = providers.Factory(ProcharityAPI, settings=settings, email_provider=email_provider)
