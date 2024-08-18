@@ -1,6 +1,7 @@
 import aiohttp
 from structlog import get_logger
 
+from src.bot.constants.enum import CANCEL_RESPOND_REASONS
 from src.core.db.models import User
 from src.core.enums import UserResponseAction
 from src.core.schemas.procharity_api import SiteBotRespondRequest, SiteBotStatusRequest, SiteUserCategoriesRequest
@@ -85,18 +86,27 @@ class ProcharityAPI:
                 log_description="статус бота",
             )
 
-    async def send_task_respond_status(self, user_id: int, task_id: int, status: UserResponseAction):
+    async def send_task_respond_status(
+        self,
+        user_id: int,
+        task_id: int,
+        status: UserResponseAction,
+        cancel_reason: CANCEL_RESPOND_REASONS | None = None,
+    ):
         """Отправляет запрос на сайт с обновленным откликом пользователя на задачу.
 
         Args:
             user_id: Идентификатор пользователя.
             task_id: Идентификатор задачи.
             status: Статус отклика на задачу.
+            cancel_reason: Причина отмены отклика.
         """
-        body_schema = SiteBotRespondRequest(user_id=user_id, task_id=task_id, status=status)
+        body_schema = SiteBotRespondRequest(
+            user_id=user_id, task_id=task_id, status=status, cancel_reason=cancel_reason
+        )
         await self._site_post(
             url=self._settings.procharity_send_bot_respond_api_url,
-            data=body_schema.model_dump_json(),
+            data=body_schema.model_dump_json(exclude_none=True),
             user_id=user_id,
             log_description="статус отклика",
         )

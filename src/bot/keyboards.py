@@ -197,3 +197,13 @@ async def get_task_info_keyboard(
             get_response_to_task_button(task, await site_user_service.user_responded_to_task(site_user, task)),
         ]
     )
+
+
+def get_cancel_respond_reason_keyboard(task: Task) -> InlineKeyboardMarkup:
+    """Клавиатура с причинами отмены отклика на задание"""
+    keyboard = [
+        [InlineKeyboardButton(reason, callback_data=f"cancel_respond_to_task_{task.id}_reason_{reason.name}")]
+        for reason in enum.CANCEL_RESPOND_REASONS
+    ]
+    keyboard.append([InlineKeyboardButton("↩️ Не отменять отклик", callback_data=f"keep_respond_to_task_{task.id}")])
+    return InlineKeyboardMarkup(keyboard)
