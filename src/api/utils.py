@@ -16,9 +16,11 @@ async def create_token_for_super_user() -> None:
     async with session_manager() as session:
         admin = await session.scalar(select(AdminUser).where(AdminUser.email == settings.EMAIL_ADMIN))
 
-        if admin is None:
-            admin_token_service = AdminTokenRequestService(AdminTokenRequestRepository(session))
-            token = await admin_token_service.create_invitation_token(settings.EMAIL_ADMIN, True)
+        if admin:
+            return
 
-            email_provider = EmailProvider(session, settings)
-            await email_provider.send_invitation_link(settings.EMAIL_ADMIN, token)
+        admin_token_service = AdminTokenRequestService(AdminTokenRequestRepository(session))
+        token = await admin_token_service.create_invitation_token(settings.EMAIL_ADMIN, True)
+
+        email_provider = EmailProvider(session, settings)
+        await email_provider.send_invitation_link(settings.EMAIL_ADMIN, token)
