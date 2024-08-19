@@ -81,6 +81,9 @@ class Settings(BaseSettings):
     # Адреса электронной почты администраторов
     EMAIL_ADMIN: EmailStr
 
+    # Уведомлять ли администратора по почте об ошибках передачи данных их бота
+    EMAIL_TO_ADMIN_OF_DATA_TRANSFER_ERROR: bool = False
+
     # Время жизни токена
     TOKEN_EXPIRATION: int = 60 * 60 * 24
 

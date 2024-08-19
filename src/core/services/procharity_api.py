@@ -61,8 +61,9 @@ class ProcharityAPI:
         """
         message = f"Ошибка передачи данных на сайт: {log_description} пользователя {user_id}. {reason}"
         await logger.ainfo(message)
-        await self._email_provider.notify_admin_of_data_transfer_error(message, self._settings.EMAIL_ADMIN)
         await self._tech_message_service.create(message)
+        if self._settings.EMAIL_TO_ADMIN_OF_DATA_TRANSFER_ERROR:
+            await self._email_provider.notify_admin_of_data_transfer_error(message, self._settings.EMAIL_ADMIN)
 
     async def send_user_categories(self, user_id: int, user_categories: list[int]):
         """Отправляет запрос на сайт с обновленными категориями пользователя.
