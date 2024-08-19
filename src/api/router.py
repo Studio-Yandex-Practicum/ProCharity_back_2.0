@@ -20,7 +20,7 @@ from src.settings import settings
 api_router = APIRouter(prefix=settings.ROOT_PATH)
 
 # Порядок следующих двух строк важен для правильной обработки путей!
-api_router.include_router(notification_router_by_token, prefix="/messages", tags=["Messages"])
+api_router.include_router(notification_router_by_token, prefix="/send_telegram_notification", tags=["Messages"])
 api_router.include_router(admin_router)
 api_router.include_router(category_router, prefix="/categories", tags=["Content"])
 api_router.include_router(health_check_router, prefix="/health_check", tags=["Healthcheck"])

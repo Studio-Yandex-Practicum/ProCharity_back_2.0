@@ -17,7 +17,7 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
     """Класс формирования параметров запроса для отправки
     сообщения определенной группе пользователей."""
 
-    mode: TelegramNotificationUsersGroups
+    has_mailing: TelegramNotificationUsersGroups
 
 
 class Message(TelegramNotificationRequest):
