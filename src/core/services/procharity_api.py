@@ -38,25 +38,30 @@ class ProcharityAPI:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url=url, data=data, headers=self.token_header_dict) as response:
                     if response.status != 200:
-                        await self._make_site_post_error_notification(
+                        await self._notify_of_data_transfer_error(
                             user_id, log_description, f"status = {response.status}"
                         )
                     else:
                         data = await response.json()
                         await logger.adebug(
-                            f"Успешная передача данных из бота: {log_description} пользователя {user_id}. Ответ: {data}"
+                            f"Успешная передача данных на сайт: {log_description} пользователя {user_id}. Ответ: {data}"
                         )
         except aiohttp.ClientResponseError as e:
-            await self._make_site_post_error_notification(
-                user_id, log_description, f"Неверный ответ от сервера ({e.message})."
+            await self._notify_of_data_transfer_error(
+                user_id, log_description, f"Неверный ответ от сайта ({e.message})."
             )
         except Exception as e:
             await logger.aexception(e)
 
-    async def _make_site_post_error_notification(self, user_id: str, log_description: str, reason: str) -> None:
-        message = f"Ошибка передачи данных из бота: {log_description} пользователя {user_id}. {reason}"
+    async def _notify_of_data_transfer_error(self, user_id: str, log_description: str, reason: str) -> None:
+        """Сообщает об ошибке передачи данных на сайт, используя следующие способы:
+        - в лог;
+        - на почту админу;
+        - техническое сообщение админу.
+        """
+        message = f"Ошибка передачи данных на сайт: {log_description} пользователя {user_id}. {reason}"
         await logger.ainfo(message)
-        await self._email_provider.send_outcoming_request_error_notification(message, self._settings.EMAIL_ADMIN)
+        await self._email_provider.notify_admin_of_data_transfer_error(message, self._settings.EMAIL_ADMIN)
         await self._tech_message_service.create(message)
 
     async def send_user_categories(self, user_id: int, user_categories: list[int]):

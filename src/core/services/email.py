@@ -161,8 +161,8 @@ class EmailProvider:
         except Exception as e:
             logger.exception(e)
 
-    async def send_outcoming_request_error_notification(self, text: str, to_email: EmailStr) -> None:
-        """Отправляет уведомление об ошибке отправки данных на сайт."""
+    async def notify_admin_of_data_transfer_error(self, text: str, to_email: EmailStr) -> None:
+        """Отправляет администратору уведомление об ошибке передачи данных на сайт."""
         recipients = [to_email]
         email_obj = EmailSchema(recipients=recipients, template_body=None)
         subject = "Уведомление об ошибке передачи данных на сайт"
