@@ -92,6 +92,11 @@ class ExternalSiteUserService:
             await self._site_user_repository.delete_user_response_to_task(site_user, task)
 
     async def _error_if_exists_by_id_hash(self, id_hash: str) -> None:
-        site_user = await self._site_user_repository.get_by_id_hash(id_hash)
+        """Возбуждает BadRequestException, если в БД есть запись с указанным id_hash (архивная или нет)."""
+        site_user = await self._site_user_repository.get_by_id_hash(id_hash, is_archived=None)
         if site_user is not None:
-            raise BadRequestException("Пользователь с таким id_hash уже существует.")
+            raise BadRequestException(
+                "Указанный id_hash не может быть установлен."
+                if site_user.is_archived
+                else "Пользователь с таким id_hash уже существует."
+            )
