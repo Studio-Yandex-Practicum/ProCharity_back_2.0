@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from src.bot.constants import enum
 from src.core.db import get_session
 from src.core.db.models import Category, ExternalSiteUser, Task, UnsubscribeReason, User
-from src.core.enums import UserRoles
+from src.core.enums import UserRoles, UserStatus
 
 CHARACTERS = string.ascii_uppercase + string.digits
 CATEGORIES_FILL_DATA = []
@@ -236,22 +236,24 @@ async def filling_user_and_external_site_user_in_db(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
     """Filling the database with test data: Users, ExternalSiteUser."""
+    moderation_statuses = [*UserStatus, None]
+    roles = [*UserRoles, None]
     user_fake = Faker(locale="ru_RU")
     external_id_fake = Faker()
     days_period = 90
     for id in range(1, USERS_TABLE_ROWS + 1):
-        role = choice([UserRoles.FUND, UserRoles.VOLUNTEER])
-        role_field = choice([None, role])
+        role = choice(roles)
+        moderation_status = choice(moderation_statuses)
         email = choice([None, user_fake.unique.email()])
         external_id = external_id_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS)
-        if role_field is None:
+        if role is None:
             external_id = choice([None, external_id])
 
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
         specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3)) if role == UserRoles.VOLUNTEER else None
         user = User(
             telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
-            role=role_field,
+            role=role,
             username=user_fake.unique.user_name(),
             email=email,
             external_id=external_id,
@@ -265,7 +267,8 @@ async def filling_user_and_external_site_user_in_db(
         if user.external_id is not None:
             external_user = ExternalSiteUser(
                 external_id=external_id,
-                role=role_field,
+                role=role,
+                moderation_status=moderation_status,
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=email,

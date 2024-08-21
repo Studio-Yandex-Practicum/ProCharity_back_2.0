@@ -3,7 +3,7 @@ from typing import Sequence
 from sqlalchemy import false, func, null, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.db.models import Category
+from src.core.db.models import Category, User
 from src.core.db.repository.base import ContentRepository
 
 
@@ -33,3 +33,9 @@ class CategoryRepository(ContentRepository):
             .join(parent_and_children_count_subquery, Category.id == parent_and_children_count_subquery.c.parent_id)
         )
         return parents_with_children_count.all()
+
+    async def get_user_categories(self, user: User, is_archived: bool | None = False) -> Sequence[Category]:
+        """Возвращает список категорий пользователя."""
+        statement = select(Category).join(User.categories).where(User.id == user.id)
+        user_categories = await self._session.scalars(self._add_archiveness_test_to_select(statement, is_archived))
+        return user_categories.all()
