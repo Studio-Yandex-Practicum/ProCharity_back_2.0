@@ -2,6 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from src.bot.constants.enum import CANCEL_RESPOND_REASONS
 from src.core.enums import UserResponseAction
 
 
@@ -37,6 +38,7 @@ class SiteBotRespondRequest(BaseModel):
         example="respond",
         description="Статус отклика на задачу ('respond' - отклик, 'cancel_respond' - отмена отклика).",
     )
+    cancel_reason: CANCEL_RESPOND_REASONS | None = Field(None, example="Другое", description="Причина отмены отклика")
 
     class Config:
         json_schema_extra = {"example": {"user_id": 123, "task_id": 1424222, "status": "respond"}}
