@@ -155,7 +155,7 @@ async def respond_to_task_callback(
         await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
         if await site_user_service.user_responded_to_task(site_user, task):
-            text = "<b><i>Пожалуйста, укажи причину, по которой хочешь отменить отклик на задание</i></b>"
+            text = "Пожалуйста, укажи причину, по которой хочешь отменить отклик на задание"
             await query.message.edit_text(
                 text=text,
                 parse_mode=ParseMode.HTML,
@@ -201,6 +201,7 @@ async def cancel_respond_reason_callback(
     await query.message.edit_text(
         text=display_task(task),
         parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
         reply_markup=await get_task_info_keyboard(task, ext_site_user),
     )
 
@@ -221,6 +222,7 @@ async def keep_task_respond_callback(
     await query.message.edit_text(
         text=display_task(task),
         parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
         reply_markup=await get_task_info_keyboard(task, ext_site_user),
     )
     return
