@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from typing import Never
 
 from fastapi.param_functions import Form
@@ -7,6 +8,8 @@ from pydantic import BaseModel, EmailStr, Field, ValidationInfo, field_validator
 
 from src.api.constants import PASSWORD_POLICY
 from src.core.exceptions import InvalidPassword, NullException
+
+from .base import PaginateBase
 
 
 class AdminUserCreate(schemas.CreateUpdateDictModel):
@@ -24,7 +27,13 @@ class AdminUserCreate(schemas.CreateUpdateDictModel):
 
 
 class AdminUserRead(schemas.BaseUser[int]):
-    pass
+    first_name: str | None
+    last_name: str | None
+    last_login: date | None
+
+
+class AdminUsersPaginatedRead(PaginateBase):
+    result: list[AdminUserRead] | None
 
 
 class AdminUserUpdate(schemas.BaseUserUpdate):

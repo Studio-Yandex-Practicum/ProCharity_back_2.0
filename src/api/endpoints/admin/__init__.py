@@ -8,6 +8,7 @@ from src.api.permissions import is_active_user
 from src.api.schemas.admin import AdminUserCreate, AdminUserRead, AdminUserUpdate
 
 from .invitation import invitation_router
+from .list import admin_user_list_router
 
 admin_router = APIRouter(
     dependencies=[Depends(is_active_user)],
@@ -16,6 +17,8 @@ admin_router = APIRouter(
 admin_router.include_router(analytic_router, prefix="/analytics", tags=["Analytic"])
 admin_router.include_router(notification_router_by_admin, prefix="/messages", tags=["Messages"])
 admin_router.include_router(user_router, prefix="/users", tags=["User"])
+admin_router.include_router(admin_user_list_router, prefix="/admins", tags=["Admins"])
+
 
 admin_auth_router = APIRouter()
 admin_auth_router.include_router(fastapi_admin_users.get_auth_router(auth_backend))
