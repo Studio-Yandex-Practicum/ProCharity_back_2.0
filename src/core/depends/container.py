@@ -27,6 +27,7 @@ class Container(containers.DeclarativeContainer):
 
     core_services_container = providers.Container(
         CoreServicesContainer,
+        repositories=repositories_container,
         sessionmaker=database_connection_container.sessionmaker,
         settings=settings,
         telegram_bot=applications_container.telegram_bot,

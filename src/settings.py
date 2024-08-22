@@ -81,6 +81,9 @@ class Settings(BaseSettings):
     # Адреса электронной почты администраторов
     EMAIL_ADMIN: EmailStr
 
+    # Уведомлять ли администратора по почте об ошибках передачи данных из бота
+    EMAIL_TO_ADMIN_OF_DATA_TRANSFER_ERROR: bool = False
+
     # Время жизни токена
     TOKEN_EXPIRATION: int = 60 * 60 * 24
 
@@ -203,6 +206,11 @@ class Settings(BaseSettings):
     def procharity_send_bot_status_fund_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки статуса бота для фонда."""
         return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_status_fund/")
+
+    @property
+    def procharity_send_bot_respond_api_url(self) -> str:
+        """Получить url-ссылку на страницу отправки статуса отклика на задачу."""
+        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_respond/")
 
 
 @lru_cache()

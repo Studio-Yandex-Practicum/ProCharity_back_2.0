@@ -1,8 +1,8 @@
 import math
 from typing import Any, Generic, TypeVar
 
-from src.core.db.models import User
-from src.core.db.repository import AbstractRepository, UserRepository
+from src.core.db.models import AdminUser, User
+from src.core.db.repository import AbstractRepository, AdminUserRepository, UserRepository
 from src.core.db.repository.base import FilterableRepository
 
 DatabaseModel = TypeVar("DatabaseModel")
@@ -53,6 +53,13 @@ class FilterablePaginator(BasePaginator, Generic[DatabaseModel]):
     ) -> dict:
         total_objects_count = await self.repository.count_by_filter(filter_by)
         return self._get_paginated_dict(total_objects_count, objects, page, limit, url)
+
+
+class AdminUserPaginator(BasePaginator[AdminUser]):
+    """Класс для пагинации данных из модели AdminUser."""
+
+    def __init__(self, repository: AdminUserRepository) -> None:
+        super().__init__(repository)
 
 
 class UserPaginator(FilterablePaginator[User]):

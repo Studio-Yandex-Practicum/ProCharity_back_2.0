@@ -1,3 +1,4 @@
+from .admin import AdminUserRead, AdminUsersPaginatedRead
 from .analytics import ActiveTasks, AllUsersStatistic, Analytic, ReasonCancelingStatistics
 from .base import RequestBase, ResponseBase
 from .categories import CategoryRequest, CategoryResponse
@@ -25,6 +26,8 @@ from .users import UserResponse, UsersPaginatedResponse
 
 __all__ = (
     "ActiveTasks",
+    "AdminUserRead",
+    "AdminUsersPaginatedRead",
     "AllUsersStatistic",
     "Analytic",
     "RequestBase",
