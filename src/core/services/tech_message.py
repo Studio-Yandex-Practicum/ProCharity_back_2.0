@@ -13,7 +13,9 @@ class TechMessageService:
     async def create(self, message: str) -> TechMessage:
         return await self._repository.create(TechMessage(text=message))
 
-    async def get_filtered_tech_messages_by_page(self, filter_by: dict[str:Any], page: int, limit: int) -> dict:
+    async def get_filtered_tech_messages_by_page(
+        self, filter_by: dict[str:Any], page: int, limit: int
+    ) -> list[TechMessage]:
         return await self._repository.get_filtered_tech_messages_by_page(filter_by, page, limit)
 
     async def get(self, id: int) -> TechMessage:
