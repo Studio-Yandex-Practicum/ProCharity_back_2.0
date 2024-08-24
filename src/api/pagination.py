@@ -1,8 +1,8 @@
 import math
 from typing import Any, Generic, TypeVar
 
-from src.core.db.models import AdminUser, User
-from src.core.db.repository import AbstractRepository, AdminUserRepository, UserRepository
+from src.core.db.models import AdminUser, TechMessage, User
+from src.core.db.repository import AbstractRepository, AdminUserRepository, TechMessageRepository, UserRepository
 from src.core.db.repository.base import FilterableRepository
 
 DatabaseModel = TypeVar("DatabaseModel")
@@ -67,3 +67,10 @@ class UserPaginator(FilterablePaginator[User]):
 
     def __init__(self, user_repository: UserRepository) -> None:
         super().__init__(user_repository)
+
+
+class TechMessagePaginator(FilterablePaginator[TechMessage]):
+    """Класс для пагинации и фильтрации данных из модели TechMessage."""
+
+    def __init__(self, repository: TechMessageRepository) -> None:
+        super().__init__(repository)
