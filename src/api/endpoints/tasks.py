@@ -130,20 +130,19 @@ async def create_task(
 @inject
 async def update_task(
     task: TaskRequest,
+    task_id: int,
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
     trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ):
-    task_obj = await task_service.get_or_none(task.id, None)
-    trigger_fields_changed = False
-    if task_obj:
-        trigger_fields_changed = await task_service.update(
-            task_obj, trigger_mailing_fields, **task.model_dump(), is_archived=False
-        )
+    task_obj = await task_service.get(task_id, is_archived=None)
+    trigger_fields_changed = await task_service.update(
+        task_obj, trigger_mailing_fields, **task.model_dump(), is_archived=False
+    )
     if trigger_fields_changed:
-        task_with_category = await task_service.get_task_with_category_by_task_id(task.id)
+        task_with_category = await task_service.get_task_with_category_by_task_id(task_id)
         if task_with_category:
             await telegram_notification_service.send_task_to_users_with_category(
                 task_with_category.category_id,
