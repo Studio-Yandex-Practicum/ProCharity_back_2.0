@@ -10,7 +10,7 @@ from src.core.services.email import EmailProvider
 from src.settings import settings
 
 
-async def create_token_for_super_user() -> None:
+async def create_token_for_main_admin() -> None:
     """Создаёт токен и отправляет его на почту администратора"""
     session_manager = asynccontextmanager(get_session)
     async with session_manager() as session:
@@ -22,5 +22,6 @@ async def create_token_for_super_user() -> None:
         admin_token_service = AdminTokenRequestService(AdminTokenRequestRepository(session))
         token = await admin_token_service.create_invitation_token(settings.EMAIL_ADMIN, True)
 
-        email_provider = EmailProvider(session, settings)
-        await email_provider.send_invitation_link(settings.EMAIL_ADMIN, token)
+        if all([settings.EMAIL_ADMIN, settings.MAIL_LOGIN, settings.MAIL_PASSWORD]):
+            email_provider = EmailProvider(session, settings)
+            await email_provider.send_invitation_link(settings.EMAIL_ADMIN, token)
