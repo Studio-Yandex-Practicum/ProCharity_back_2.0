@@ -112,10 +112,10 @@ class ExternalSiteUser(ArchivableBase):
     task_responses: Mapped[list["Task"]] = relationship(
         secondary="task_response_volunteer", back_populates="responded_volunteers"
     )
-    has_mailing_new_tasks: Mapped[bool] = mapped_column(server_default=expression.false())
-    has_mailing_profile: Mapped[bool] = mapped_column(server_default=expression.false())
-    has_mailing_my_tasks: Mapped[bool] = mapped_column(server_default=expression.false())
-    has_mailing_procharity: Mapped[bool] = mapped_column(server_default=expression.false())
+    has_mailing_new_tasks: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_profile: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_my_tasks: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_procharity: Mapped[bool] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
