@@ -6,8 +6,10 @@ from telegram.constants import ParseMode
 from telegram.ext import Application, CallbackQueryHandler, ContextTypes
 
 from src.bot.constants import callback_data, patterns
+from src.bot.constants.enum import CANCEL_RESPOND_REASONS
 from src.bot.keyboards import (
     get_back_menu,
+    get_cancel_respond_reason_keyboard,
     get_task_info_keyboard,
     get_tasks_list_end_keyboard,
     view_more_tasks_keyboard,
@@ -16,8 +18,10 @@ from src.bot.services import ExternalSiteUserService, TaskService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
+from src.core.enums import UserResponseAction, UserStatus
 from src.core.logging.utils import logger_decor
 from src.core.messages import display_task
+from src.core.services.procharity_api import ProcharityAPI
 
 INITIAL_LAST_VIEWED_ACTUALIZING_TIME = datetime(year=2000, month=1, day=1)
 
@@ -109,37 +113,124 @@ async def respond_to_task_callback(
     site_user: ExternalSiteUser,
     task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
-    """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик'
-    под сообщением с информацией о задании.
+    """Обрабатывает нажатие на кнопки 'Откликнуться'/'Отменить отклик' под сообщением с информацией о задании.
+
+    Волонтёр не может откликаться на задание, если от сайта приходит статус модерации NEW_VOL, NO_MODERATED, BLOCKED
+    или отсутствует.
     """
     query = update.callback_query
     action = context.match.group(1)
     task = await task_service.get_or_none(int(context.match.group(2)), None)
     if task is None:
         return
-
     if task.is_archived:
-        await context.bot.answer_callback_query(
-            query.id, text="Задание уже отдано в работу другому волонтеру.", show_alert=True
+        popup_text = (
+            "Задание больше не актуально, ты не можешь на него откликнуться."
+            if action == "+"
+            else "Это задание уже в работе / в архиве."
         )
+        await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
         return
-
+    status_changed = True
+    respond_status = None
     if action == "+":
-        if not await site_user_service.create_user_response_to_task(site_user, task):
-            await context.bot.answer_callback_query(
-                query.id, text="Ты уже откликнулся на это задание.", show_alert=True
-            )
+        match site_user.moderation_status:
+            case UserStatus.WAIT:
+                if await site_user_service.create_user_response_to_task(site_user, task):
+                    popup_text = "Фонд увидит отклик, когда твой профиль пройдет модерацию."
+                    respond_status = UserResponseAction.RESPOND
+                else:
+                    popup_text = "Ты уже откликнулся на это задание."
+            case UserStatus.MODERATED:
+                if await site_user_service.create_user_response_to_task(site_user, task):
+                    popup_text = "Твоя заявка принята. Дадим знать, когда фонд выберет тебя исполнителем."
+                    respond_status = UserResponseAction.RESPOND
+                else:
+                    popup_text = "Ты уже откликнулся на это задание."
+            case _:
+                popup_text = "Ты не можешь оставлять отклики, пока не отредактируешь профиль и не пройдешь модерацию."
+                status_changed = False
+        await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
-        if not await site_user_service.delete_user_response_to_task(site_user, task):
-            await context.bot.answer_callback_query(
-                query.id, text="Ты уже отменил отклик на это задание.", show_alert=True
+        if await site_user_service.user_responded_to_task(site_user, task):
+            text = "Пожалуйста, укажи причину, по которой хочешь отменить отклик на задание"
+            await query.message.edit_text(
+                text=text,
+                parse_mode=ParseMode.HTML,
+                reply_markup=get_cancel_respond_reason_keyboard(task),
             )
+            return
+        else:
+            popup_text = "Ты уже отменил отклик на это задание."
+        await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
+    if respond_status:
+        await procharity_api.send_task_respond_status(site_user.external_id, task.id, respond_status)
+    if status_changed:
+        await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
 
-    await query.message.edit_reply_markup(reply_markup=await get_task_info_keyboard(task, site_user))
+
+@logger_decor
+@registered_user_required
+async def cancel_respond_reason_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
+):
+    """Обработка причины отмены отклика на задание."""
+    query = update.callback_query
+    task_id = int(context.match.group(1))
+    task = await task_service.get_task_by_id(task_id)
+    if task is None:
+        return
+    reason = context.match.group(2)
+    reason_text = CANCEL_RESPOND_REASONS[reason].value
+    if await site_user_service.delete_user_response_to_task(ext_site_user, task):
+        await procharity_api.send_task_respond_status(
+            ext_site_user.external_id, task_id, UserResponseAction.UNRESPOND, cancel_reason=reason_text
+        )
+        popup_text = "Ты отменил свой отклик на задание."
+    else:
+        popup_text = "Ты уже отменил отклик на это задание."
+    await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
+    # Восстанавливаем исходное сообщение о задании в чате
+    await query.message.edit_text(
+        text=display_task(task),
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+        reply_markup=await get_task_info_keyboard(task, ext_site_user),
+    )
+
+
+@logger_decor
+@registered_user_required
+async def keep_task_respond_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    ext_site_user: ExternalSiteUser,
+    task_service: TaskService = Provide[Container.bot_services_container.bot_task_service],
+):
+    """Отказ от отмены отклика на задание."""
+    query = update.callback_query
+    task = await task_service.get_task_by_id(int(context.match.group(1)))
+    if task is None:
+        return
+    await query.message.edit_text(
+        text=display_task(task),
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True,
+        reply_markup=await get_task_info_keyboard(task, ext_site_user),
+    )
+    return
 
 
 def registration_handlers(app: Application):
     app.add_handler(CallbackQueryHandler(view_tasks_callback, pattern=callback_data.VIEW_TASKS))
     app.add_handler(CallbackQueryHandler(view_tasks_again_callback, pattern=callback_data.VIEW_TASKS_AGAIN))
     app.add_handler(CallbackQueryHandler(respond_to_task_callback, pattern=patterns.RESPOND_TO_TASK))
+    app.add_handler(CallbackQueryHandler(cancel_respond_reason_callback, pattern=patterns.CANCEL_RESPOND_REASON))
+    app.add_handler(CallbackQueryHandler(keep_task_respond_callback, pattern=patterns.KEEP_TASK_RESPOND))
