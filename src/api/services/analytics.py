@@ -1,8 +1,7 @@
 from datetime import timedelta
 
 from src.api.constants import DAYS_NUMBER_FOR_USERS_STATISTIC
-from src.core.db.repository import UnsubscribeReasonRepository, UserRepository
-from src.core.db.repository.external_site_user import ExternalSiteUserRepository
+from src.core.db.repository import ExternalSiteUserRepository, UnsubscribeReasonRepository, UserRepository
 
 
 class AnalyticsService:
