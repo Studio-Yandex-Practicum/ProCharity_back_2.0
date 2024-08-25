@@ -108,11 +108,14 @@ class ExternalSiteUser(ArchivableBase):
     specializations: Mapped[list[int] | None] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str | None] = mapped_column(nullable=True)
     moderation_status: Mapped[str] = mapped_column(nullable=True)
-
     user: Mapped["User | None"] = relationship(back_populates="external_user", lazy="joined")
     task_responses: Mapped[list["Task"]] = relationship(
         secondary="task_response_volunteer", back_populates="responded_volunteers"
     )
+    has_mailing_new_tasks: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_profile: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_my_tasks: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_procharity: Mapped[bool] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
