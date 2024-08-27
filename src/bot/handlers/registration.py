@@ -29,13 +29,12 @@ async def start_command(
     telegram_user = update.effective_user or Never
     user = await user_service.register_user(ext_site_user, telegram_user)
     auth_url = volunteer_auth_url if user.is_volunteer else fund_auth_url
-
+    you_authorized_phrase = "Ты авторизовался" if user.is_volunteer else "Вы авторизовались"
     await context.bot.send_message(
         chat_id=telegram_user.id,
-        text="<b>Авторизация прошла успешно!</b>\n\n"
-        "Теперь оповещения будут приходить сюда. "
-        f'Изменить настройку уведомлений можно в <a href="{auth_url}">личном кабинете</a>.\n\n'
-        "Навигация по боту запускается командой /menu.",
+        text=f"<b>{you_authorized_phrase} в боте ProCharity</b>\n\n"
+        "Теперь оповещения будут приходить сюда. Изменить настройку уведомлений можно "
+        f'в меню бота или в <a href="{auth_url}">личном кабинете</a>.\n\n',
         parse_mode=ParseMode.HTML,
         reply_markup=await get_start_keyboard(user),
         disable_web_page_preview=True,
