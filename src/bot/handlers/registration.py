@@ -68,9 +68,7 @@ async def on_chat_member_update(
         await user_service.bot_unbanned(user)
         await procharity_api.send_user_bot_status(user)
         unblock_text = (
-            "<b>Вы разблокировали бот ProCharity</b>\n\n"
-            if user.is_volunteer
-            else "<b>Ты разблокировал бот ProCharity</b>\n\n"
+            "<b>Ты разблокировал бот ProCharity</b>" if user.is_volunteer else "<b>Вы разблокировали бот ProCharity</b>"
         )
         await context.bot.send_message(
             chat_id=effective_user.id,
