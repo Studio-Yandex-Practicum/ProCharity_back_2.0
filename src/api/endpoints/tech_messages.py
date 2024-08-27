@@ -2,12 +2,12 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query, Request, status
 
 from src.api.pagination import TechMessagePaginator
-from src.api.permissions import is_active_superuser, is_active_user
+from src.api.permissions import is_active_superuser
 from src.api.schemas import TechMessagePaginateResponse, TechMessageRequest, TechMessageResponce
 from src.core.depends import Container
 from src.core.services import TechMessageService
 
-tech_message_router = APIRouter(dependencies=[Depends(is_active_user)])
+tech_message_router = APIRouter()
 
 
 @tech_message_router.get(
