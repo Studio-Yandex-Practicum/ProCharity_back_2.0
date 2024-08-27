@@ -63,20 +63,21 @@ async def on_chat_member_update(
         return None
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
         await user_service.bot_banned(user)
+        await procharity_api.send_user_bot_status(user)
     elif my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
         await user_service.bot_unbanned(user)
-    await procharity_api.send_user_bot_status(user)
-    unblock_text = (
-        "<b>Вы разблокировали бот ProCharity</b>\n\n"
-        if user.is_volunteer
-        else "<b>Ты разблокировал бот ProCharity</b>\n\n"
-    )
-    await context.bot.send_message(
-        chat_id=effective_user.id,
-        text=unblock_text,
-        parse_mode=ParseMode.HTML,
-        disable_web_page_preview=True,
-    )
+        await procharity_api.send_user_bot_status(user)
+        unblock_text = (
+            "<b>Вы разблокировали бот ProCharity</b>\n\n"
+            if user.is_volunteer
+            else "<b>Ты разблокировал бот ProCharity</b>\n\n"
+        )
+        await context.bot.send_message(
+            chat_id=effective_user.id,
+            text=unblock_text,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+        )
     return user
 
 
