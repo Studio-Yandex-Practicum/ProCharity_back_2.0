@@ -1,8 +1,9 @@
 import math
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
-from src.core.db.models import User
-from src.core.db.repository import AbstractRepository, UserRepository
+from src.core.db.models import AdminUser, User
+from src.core.db.repository import AbstractRepository, AdminUserRepository, UserRepository
+from src.core.db.repository.base import FilterableRepository
 
 DatabaseModel = TypeVar("DatabaseModel")
 
@@ -16,17 +17,17 @@ class BasePaginator(Generic[DatabaseModel]):
     ) -> None:
         self.repository = repository
 
-    async def paginate(self, objects: list[DatabaseModel], page: int, limit: int, url: str) -> dict:
-        count_objects = await self.repository.count_all()
-
-        pages = math.ceil(count_objects / limit)
+    def _get_paginated_dict(
+        self, total_objects_count, objects: list[DatabaseModel], page: int, limit: int, url: str
+    ) -> dict:
+        pages = math.ceil(total_objects_count / limit)
         next_page = page + 1 if page < pages else None
         previous_page = page - 1 if page > 1 else None
         next_url = f"{url}?page={next_page}&limit={limit}" if next_page else None
         previous_url = f"{url}?page={previous_page}&limit={limit}" if previous_page else None
 
         return {
-            "total": count_objects,
+            "total": total_objects_count,
             "pages": pages,
             "current_page": page,
             "next_page": next_page,
@@ -36,9 +37,33 @@ class BasePaginator(Generic[DatabaseModel]):
             "result": objects,
         }
 
+    async def paginate(self, objects: list[DatabaseModel], page: int, limit: int, url: str) -> dict:
+        total_objects_count = await self.repository.count_all()
+        return self._get_paginated_dict(total_objects_count, objects, page, limit, url)
 
-class UserPaginator(BasePaginator[User]):
-    """Класс для пагинации данных из модели User."""
+
+class FilterablePaginator(BasePaginator, Generic[DatabaseModel]):
+    """Класс для пагинации с фильтрацией."""
+
+    def __init__(self, repository: FilterableRepository) -> None:
+        super().__init__(repository)
+
+    async def paginate(
+        self, objects: list[DatabaseModel], page: int, limit: int, url: str, filter_by: dict[str:Any]
+    ) -> dict:
+        total_objects_count = await self.repository.count_by_filter(filter_by)
+        return self._get_paginated_dict(total_objects_count, objects, page, limit, url)
+
+
+class AdminUserPaginator(BasePaginator[AdminUser]):
+    """Класс для пагинации данных из модели AdminUser."""
+
+    def __init__(self, repository: AdminUserRepository) -> None:
+        super().__init__(repository)
+
+
+class UserPaginator(FilterablePaginator[User]):
+    """Класс для пагинации и фильтрации данных из модели User."""
 
     def __init__(self, user_repository: UserRepository) -> None:
         super().__init__(user_repository)

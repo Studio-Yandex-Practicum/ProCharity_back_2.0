@@ -14,6 +14,7 @@ from src.core.enums import UserRoles
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 MAX_USER_ROLE_NAME_LENGTH = 20
+MAX_LENGTH_BOT_MESSAGE = 4096
 
 
 class Base(DeclarativeBase):
@@ -107,11 +108,14 @@ class ExternalSiteUser(ArchivableBase):
     specializations: Mapped[list[int] | None] = mapped_column(ARRAY(Integer), nullable=True)
     source: Mapped[str | None] = mapped_column(nullable=True)
     moderation_status: Mapped[str] = mapped_column(nullable=True)
-
     user: Mapped["User | None"] = relationship(back_populates="external_user", lazy="joined")
     task_responses: Mapped[list["Task"]] = relationship(
         secondary="task_response_volunteer", back_populates="responded_volunteers"
     )
+    has_mailing_new_tasks: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_profile: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_my_tasks: Mapped[bool] = mapped_column(nullable=True)
+    has_mailing_procharity: Mapped[bool] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"
@@ -234,3 +238,15 @@ class TaskResponseVolunteer(Base):
 
     def __repr__(self):
         return f"<Response - Task {self.task_id} - Volunteer {self.external_site_user_id}>"
+
+
+class TechMessage(ArchivableBase):
+    """Модель для хранения технических сообщений для админов бота."""
+
+    __tablename__ = "tech_messages"
+
+    text: Mapped[str] = mapped_column(String(length=MAX_LENGTH_BOT_MESSAGE))
+    was_read: Mapped[bool] = mapped_column(server_default=expression.false())
+
+    def __repr__(self):
+        return f"<Tech message - Text {self.text} - Was read {self.was_read}>"
