@@ -20,7 +20,7 @@ task_response_router = APIRouter(dependencies=[Depends(check_header_contains_tok
 class TaskInfoMessageTemplate(TelegramMessageTemplate):
     """Шаблон телеграм-сообщения с информацией о задаче."""
 
-    def __init__(self, task: Task, updated_task: bool):
+    def __init__(self, task: Task, updated_task: bool = False):
         self.task = task
         self.text = display_task(task, updated_task)
 
@@ -102,33 +102,51 @@ async def get_task_detail(
 
 @task_write_router.post(
     "",
-    status_code=status.HTTP_200_OK,
-    description="Добавление новой или обновление существующей задачи.",
+    status_code=status.HTTP_201_CREATED,
+    description="Добавление новой задачи.",
 )
 @inject
-async def create_update_task(
+async def create_task(
     task: TaskRequest,
+    task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
+):
+    await task_service.create(**task.model_dump())
+    task_with_category = await task_service.get_task_with_category_by_task_id(task.id)
+    if task_with_category:
+        await telegram_notification_service.send_task_to_users_with_category(
+            task_with_category.category_id,
+            TaskInfoMessageTemplate(task_with_category),
+        )
+
+
+@task_write_router.patch(
+    "/{task_id}",
+    status_code=status.HTTP_200_OK,
+    description="Обновление существующей задачи.",
+)
+@inject
+async def update_task(
+    task: TaskRequest,
+    task_id: int,
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
     trigger_mailing_fields: str = Depends(Provide[Container.settings.provided.TRIGGER_MAILING_FIELDS]),
 ):
-    task_obj = await task_service.get_or_none(task.id, None)
-    trigger_fields_changed, new_task = False, False
-    if task_obj:
-        trigger_fields_changed = await task_service.update(
-            task_obj, trigger_mailing_fields, **task.model_dump(), is_archived=False
-        )
-    else:
-        await task_service.create(**task.model_dump())
-        new_task = True
-    if trigger_fields_changed or new_task:
-        task_with_category = await task_service.get_task_with_category_by_task_id(task.id)
+    task_obj = await task_service.get(task_id, is_archived=None)
+    trigger_fields_changed = await task_service.update(
+        task_obj, trigger_mailing_fields, **task.model_dump(), is_archived=False
+    )
+    if trigger_fields_changed:
+        task_with_category = await task_service.get_task_with_category_by_task_id(task_id)
         if task_with_category:
             await telegram_notification_service.send_task_to_users_with_category(
                 task_with_category.category_id,
-                TaskInfoMessageTemplate(task_with_category, not new_task),
+                TaskInfoMessageTemplate(task_with_category, updated_task=True),
             )
 
 
