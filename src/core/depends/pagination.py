@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from src.api.pagination import AdminUserPaginator, UserPaginator
+from src.api.pagination import AdminUserPaginator, TechMessagePaginator, UserPaginator
 
 
 class PaginateContainer(containers.DeclarativeContainer):
@@ -16,4 +16,9 @@ class PaginateContainer(containers.DeclarativeContainer):
     admin_user_paginate = providers.Factory(
         AdminUserPaginator,
         repository=repositories.admin_repository,
+    )
+
+    tech_message_paginate = providers.Factory(
+        TechMessagePaginator,
+        repository=repositories.tech_message_repository,
     )
