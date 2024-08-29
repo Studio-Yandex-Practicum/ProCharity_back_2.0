@@ -25,6 +25,9 @@ SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё зада
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
 ]
+VIEW_TASKS_AGAIN_BUTTON = [
+    InlineKeyboardButton("Посмотреть задания еще раз", callback_data=callback_data.VIEW_TASKS_AGAIN)
+]
 
 
 def get_personal_account_button(
@@ -135,6 +138,14 @@ async def get_back_menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
+async def get_tasks_list_end_keyboard():
+    keyboard = [
+        VIEW_TASKS_AGAIN_BUTTON,
+        RETURN_MENU_BUTTON,
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 async def get_start_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
         CHECK_CATEGORIES_BUTTON if user.is_volunteer else [],
@@ -186,3 +197,13 @@ async def get_task_info_keyboard(
             get_response_to_task_button(task, await site_user_service.user_responded_to_task(site_user, task)),
         ]
     )
+
+
+def get_cancel_respond_reason_keyboard(task: Task) -> InlineKeyboardMarkup:
+    """Клавиатура с причинами отмены отклика на задание"""
+    keyboard = [
+        [InlineKeyboardButton(reason, callback_data=f"cancel_respond_to_task_{task.id}_reason_{reason.name}")]
+        for reason in enum.CANCEL_RESPOND_REASONS
+    ]
+    keyboard.append([InlineKeyboardButton("↩️ Не отменять отклик", callback_data=f"keep_respond_to_task_{task.id}")])
+    return InlineKeyboardMarkup(keyboard)

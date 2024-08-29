@@ -10,6 +10,17 @@ class TelegramNotificationUsersGroups(StrEnum):
     UNSUBSCRIBED = "unsubscribed"
 
 
+class UserResponseAction(StrEnum):
+    """Типы действий с откликом пользователя на задачу.
+
+    - respond: создать отклик;
+    - unrespond: удалить отклик.
+    """
+
+    RESPOND = "respond"
+    UNRESPOND = "cancel_respond"
+
+
 class UserRoles(StrEnum):
     """Роли пользователя в системе.
 
@@ -40,3 +51,22 @@ class UserStatus(StrEnum):
     MODERATED = "moderated"
     NO_MODERATED = "no_moderated"
     BLOCKED = "blocked"
+
+
+class UserRoleFilterValues(StrEnum):
+    """Значения фильтра для параметра фильтрации role."""
+
+    FUND = "fund"
+    VOLUNTEER = "volunteer"
+    UNKNOWN = "unknown"
+
+
+class UserStatusFilterValues(StrEnum):
+    """Значения фильтра для параметра фильтрации status."""
+
+    NEW = "new"
+    WAIT = "wait"
+    MODERATED = "moderated"
+    NO_MODERATED = "no_moderated"
+    BLOCKED = "blocked"
+    UNKNOWN = "unknown"

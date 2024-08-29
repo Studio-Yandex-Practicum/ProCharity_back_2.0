@@ -2,8 +2,8 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, status
 
 from src.api.auth import check_header_contains_token
-from src.api.schemas import TaskRequest, TaskResponse, TasksRequest
-from src.api.services import TaskService
+from src.api.schemas import TaskRequest, TaskResponse, TasksRequest, UserResponseToTaskRequest
+from src.api.services import ExternalSiteUserService, TaskService
 from src.api.services.messages import TelegramNotificationService
 from src.bot.keyboards import get_task_info_keyboard
 from src.core.db.models import Task, User
@@ -14,6 +14,7 @@ from src.core.services.notification import TelegramMessageTemplate
 tasks_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 task_read_router = APIRouter()
 task_write_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
+task_response_router = APIRouter(dependencies=[Depends(check_header_contains_token)])
 
 
 class TaskInfoMessageTemplate(TelegramMessageTemplate):
@@ -134,7 +135,7 @@ async def create_update_task(
 @task_write_router.delete(
     "/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    description="Удаляет указанную задачу из БД бота.",
+    description="Архивирует указанную задачу в БД бота.",
 )
 @inject
 async def delete_task(
@@ -142,3 +143,14 @@ async def delete_task(
     task_service: TaskService = Depends(Provide[Container.api_services_container.task_service]),
 ) -> None:
     await task_service.archive(task_id)
+
+
+@task_response_router.post("", description="Изменяет отклик пользователя на задачу.")
+@inject
+async def change_user_response_to_task(
+    user_response_to_task: UserResponseToTaskRequest,
+    site_user_service: ExternalSiteUserService = Depends(Provide[Container.api_services_container.site_user_service]),
+) -> None:
+    await site_user_service.change_user_response_to_task(
+        user_response_to_task.user_id, user_response_to_task.task_id, user_response_to_task.status
+    )

@@ -68,3 +68,15 @@ API_DESCRIPTION = """
 
 Задачу можно добавить только к существующей дочерней категории.
 """
+OPENAPI_TAGS = [
+    {"name": "Analytic"},
+    {"name": "Content"},
+    {"name": "ExternalSiteUser"},
+    {"name": "Healthcheck"},
+    {"name": "Messages"},
+    {"name": "Telegram"},
+    {"name": "AdminAuth"},
+    {"name": "Admins"},
+    {"name": "User"},
+    {"name": "Feedback Form"},
+]

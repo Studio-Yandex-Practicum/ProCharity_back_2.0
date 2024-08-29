@@ -12,6 +12,9 @@ class AdminService:
     def __init__(self, admin_repository: AdminUserRepository) -> None:
         self._repository: AdminUserRepository = admin_repository
 
+    async def get_admin_users_by_page(self, page: int, limit: int) -> dict:
+        return await self._repository.get_objects_by_page(page, limit)
+
     async def authenticate_user(self, email: str, password: str) -> AdminUser | None:
         user = await self._repository.get_by_email(email)
         if user and user.check_password(password):
@@ -30,3 +33,8 @@ class AdminService:
         if not user:
             raise CredentialsException("There is no user in db with such email")
         return user
+
+    async def soft_delete(self, user: AdminUser) -> None:
+        """Мягкое удаление админа: is_active = False"""
+        user.is_active = False
+        await self._repository.update(user.id, user)

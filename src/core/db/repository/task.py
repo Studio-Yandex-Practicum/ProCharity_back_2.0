@@ -1,16 +1,19 @@
 from collections.abc import Sequence
+from datetime import datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.expression import false
+from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.sql.expression import ColumnElement, and_, false, or_
 
-from src.core.db.models import Category, Task, User
+from src.core.db.models import Category, Task, User, UsersCategories
 from src.core.db.repository.base import ContentRepository
 
 
 class TaskRepository(ContentRepository):
     """Репозиторий для работы с моделью Task."""
+
+    _actualizing_time = func.greatest(UsersCategories.updated_at, Task.updated_at)
 
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Task)
@@ -26,6 +29,59 @@ class TaskRepository(ContentRepository):
             .offset(offset)
         )
         return tasks.all()
+
+    async def get_user_tasks_actualized_after(
+        self, user: User, after_datetime: datetime, after_id: int, limit: int
+    ) -> list[tuple[Task, datetime]]:
+        """Возвращает первые limit заданий, доступных пользователю user и актуализированных
+        после заданного момента времени after_datetime.
+        За время актуализации задачи принимается наибольшее из времён: изменения задачи и назначения
+        заданному пользователю категории, к которой относится задача.
+        Задачи, время актуализации которых совпадает с заданным, но их id > after_id, также
+        принимаются в расчёт.
+        Возвращаемое значение - список пар (задача, время её актуализации).
+        """
+        select_statement = (
+            select(Task, self._actualizing_time)
+            .select_from(Task)
+            .join(Category)
+            .join(UsersCategories)
+            .options(contains_eager(Task.category))
+            .where(UsersCategories.user_id == user.id)
+            .where(Task.is_archived == false())
+            .where(self._get_condition_of_tasks_actualized_after(after_datetime, after_id))
+            .order_by(self._actualizing_time, Task.id)
+            .limit(limit)
+        )
+        tasks = await self._session.execute(select_statement)
+        return tasks.all()
+
+    async def count_user_tasks_actualized_after(self, user: User, after_datetime: datetime, after_id: int) -> int:
+        """Возвращает количество заданий, доступных пользователю user и актуализированных
+        после заданного момента времени after_datetime.
+        За время актуализации задачи принимается наибольшее из времён: изменения задачи и назначения
+        заданному пользователю категории, к которой относится задача.
+        Задачи, время актуализации которых совпадает с заданным, но их id > after_id, также
+        принимаются в расчёт.
+        """
+        select_statement = (
+            select(func.count(Task.id))
+            .join(Category)
+            .join(UsersCategories)
+            .where(UsersCategories.user_id == user.id)
+            .where(Task.is_archived == false())
+            .where(self._get_condition_of_tasks_actualized_after(after_datetime, after_id))
+        )
+        return await self._session.scalar(select_statement)
+
+    def _get_condition_of_tasks_actualized_after(self, after_datetime: datetime, after_id: int) -> ColumnElement[bool]:
+        """Возвращает условие, что задача актуализирована после заданного момента времени after_datetime
+        для использования в методе where.
+        """
+        return or_(
+            self._actualizing_time > after_datetime,
+            and_(self._actualizing_time == after_datetime, Task.id > after_id),
+        )
 
     async def get_all_user_tasks(self) -> Sequence[Task]:
         """Получить список задач из категорий на которые подписан пользователь."""

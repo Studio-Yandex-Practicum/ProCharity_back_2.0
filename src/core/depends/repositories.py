@@ -6,6 +6,7 @@ from src.core.db.repository import (
     CategoryRepository,
     ExternalSiteUserRepository,
     TaskRepository,
+    TechMessageRepository,
     UnsubscribeReasonRepository,
     UserRepository,
 )
@@ -41,5 +42,9 @@ class RepositoriesContainer(containers.DeclarativeContainer):
     )
     admin_token_request_repository = providers.Factory(
         AdminTokenRequestRepository,
+        session=data_base_connection.session,
+    )
+    tech_message_repository = providers.Factory(
+        TechMessageRepository,
         session=data_base_connection.session,
     )

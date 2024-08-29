@@ -4,6 +4,7 @@ from .base import AbstractRepository, ContentRepository
 from .category import CategoryRepository
 from .external_site_user import ExternalSiteUserRepository
 from .task import TaskRepository
+from .tech_message import TechMessageRepository
 from .unsubscribe_reason import UnsubscribeReasonRepository
 from .user import UserRepository
 
@@ -12,6 +13,7 @@ __all__ = (
     "ContentRepository",
     "CategoryRepository",
     "TaskRepository",
+    "TechMessageRepository",
     "UserRepository",
     "ExternalSiteUserRepository",
     "UnsubscribeReasonRepository",
