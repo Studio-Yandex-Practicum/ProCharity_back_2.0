@@ -18,6 +18,18 @@ from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.services.procharity_api import ProcharityAPI
 
+text_chose_category = (
+    "Чтобы мне было понятнее, с какими задачами ты готов помогать фондам, "
+    "отметь свои профессиональные компетенции (можно выбрать несколько). "
+    'После этого нажми "Готово 👌"'
+)
+
+text_chose_subcategory = (
+    "Чтобы мне было понятнее, с какими задачами ты готов помогать фондам, "
+    "отметь свои профессиональные компетенции (можно выбрать несколько). "
+    'После этого нажми "Назад ⬅️"'
+)
+
 
 @logger_decor
 @registered_user_required
@@ -34,9 +46,7 @@ async def categories_callback(
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Чтобы я знал, с какими задачами ты готов помогать, "
-        "выбери свои профессиональные компетенции (можно выбрать "
-        'несколько). После этого, нажми на пункт "Готово 👌"',
+        text=text_chose_category,
         reply_markup=await get_checked_categories_keyboard(categories, selected_categories_with_parents),
     )
 
@@ -123,9 +133,7 @@ async def subcategories_callback(
     selected_categories = await user_service.get_user_categories(update.effective_user.id)
 
     await query.message.edit_text(
-        "Чтобы я знал, с какими задачами ты готов помогать, "
-        "выбери свои профессиональные компетенции (можно выбрать "
-        'несколько). После этого, нажми на пункт "Готово 👌"',
+        text_chose_subcategory,
         reply_markup=await get_subcategories_keyboard(parent_id, subcategories, selected_categories),
     )
 
@@ -158,9 +166,7 @@ async def select_subcategory_callback(
     parent_id = context.user_data["parent_id"]
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
     await query.message.edit_text(
-        "Чтобы я знал, с какими задачами ты готов помогать, "
-        "выбери свои профессиональные компетенции (можно выбрать "
-        'несколько). После этого, нажми на пункт "Готово 👌"',
+        text_chose_subcategory,
         reply_markup=await get_subcategories_keyboard(parent_id, subcategories, selected_categories),
     )
 
@@ -179,9 +185,7 @@ async def back_subcategory_callback(
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
 
     await query.message.edit_text(
-        "Чтобы я знал, с какими задачами ты готов помогать, "
-        "выбери свои профессиональные компетенции (можно выбрать "
-        'несколько). После этого, нажми на пункт "Готово 👌"',
+        text_chose_category,
         reply_markup=await get_checked_categories_keyboard(categories, selected_categories_with_parents),
     )
 

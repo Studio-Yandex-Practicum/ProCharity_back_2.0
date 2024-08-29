@@ -63,11 +63,19 @@ async def on_chat_member_update(
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
         await user_service.bot_banned(user)
         await procharity_api.send_user_bot_status(user)
-        return user
-    if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
+    elif my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
         await user_service.bot_unbanned(user)
         await procharity_api.send_user_bot_status(user)
-        return user
+        unblock_text = (
+            "<b>Ты разблокировал бот ProCharity</b>" if user.is_volunteer else "<b>Вы разблокировали бот ProCharity</b>"
+        )
+        await context.bot.send_message(
+            chat_id=effective_user.id,
+            text=unblock_text,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+        )
+    return user
 
 
 def registration_handlers(app: Application):

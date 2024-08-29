@@ -31,6 +31,7 @@ class CategoryRepository(ContentRepository):
             select(Category.name, Category.id, parent_and_children_count_subquery.c.children_count)
             .select_from(Category)
             .join(parent_and_children_count_subquery, Category.id == parent_and_children_count_subquery.c.parent_id)
+            .order_by(Category.name)
         )
         return parents_with_children_count.all()
 
