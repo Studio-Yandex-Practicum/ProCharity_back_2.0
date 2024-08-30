@@ -146,6 +146,13 @@ class ArchivableRepository(AbstractRepository):
             raise NotFoundException(object_name=self._model.__name__, object_id=id)
         return db_obj
 
+    async def archive(self, id: int) -> DatabaseModel:
+        """Архивирует объект модели"""
+        db_obj = await self.get(id)
+        db_obj.is_archived = True
+        db_obj = await self.update(id, db_obj)
+        return db_obj
+
 
 class ContentRepository(ArchivableRepository):
     """Абстрактный класс, для контента."""
