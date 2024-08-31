@@ -15,61 +15,51 @@ log = structlog.get_logger()
 
 @notification_router_by_admin.post(
     "",
-    response_model=InfoRate,
-    description="Сообщение для группы пользователей",
+    description="Отправляет сообщение пользователям, соответствующим заданному критерию.",
 )
 @inject
-async def send_telegram_notification(
+async def send_message(
     notifications: TelegramNotificationUsersRequest,
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
 ) -> InfoRate:
-    """Отправляет сообщение указанной группе пользователей"""
-    result = await telegram_notification_service.send_messages_to_filtered_users(notifications)
-    rate = InfoRate()
-    rate = telegram_notification_service.collect_respond_and_status(result, rate)
-    return rate
+    results = await telegram_notification_service.send_messages_to_filtered_users(notifications)
+    return InfoRate.from_results(results)
 
 
 @notification_router_by_token.post(
     "/group",
-    description="Сообщения для разных пользователей",
+    description="Отправляет сообщения различным пользователям.",
 )
 @inject
-async def send_messages_to_group_of_users(
+async def send_messages_to_users(
     message_list: MessageList,
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
 ) -> InfoRate:
     await log.ainfo("Начало отправки сообщений для группы пользователей")
-    rate = InfoRate()
-    for message in message_list.messages:
-        status, msg = await telegram_notification_service.send_message_to_user_by_id_hash(
-            message.id_hash, message.message
-        )
-        rate = telegram_notification_service.count_rate(status, msg, rate)
+    results = (
+        await telegram_notification_service.send_message_to_user_by_id_hash(message.id_hash, message.message)
+        for message in message_list.messages
+    )
+    response = await InfoRate.from_results_async(results)
     await log.ainfo("Конец отправки сообщений для группы пользователей")
-    return rate
+    return response
 
 
 @notification_router_by_admin.post(
     "/{telegram_id}",
-    response_model=InfoRate,
-    description="Отправляет сообщение определенному пользователю.",
+    description="Отправляет сообщение заданному пользователю.",
 )
 @inject
-async def send_user_message(
+async def send_message_to_user(
     telegram_id: int,
-    notifications: TelegramNotificationRequest,
+    notification: TelegramNotificationRequest,
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
 ) -> InfoRate:
-    rate = InfoRate()
-    status, notifications.message = await telegram_notification_service.send_message_by_telegram_id(
-        telegram_id, notifications.message
-    )
-    rate = telegram_notification_service.count_rate(status, notifications.message, rate)
-    return rate
+    result = await telegram_notification_service.send_message_by_telegram_id(telegram_id, notification.message)
+    return InfoRate.from_results([result])

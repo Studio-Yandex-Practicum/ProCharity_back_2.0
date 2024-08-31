@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
-from src.api.schemas import ErrorsSending, InfoRate
+from src.api.schemas import TelegramNotificationUsersRequest
 from src.core.db.models import Category, ExternalSiteUser, User
 from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramMessageTemplate, TelegramNotification
@@ -20,7 +20,9 @@ class TelegramNotificationService:
         self._session = session
         self.telegram_notification = telegram_notification
 
-    async def send_messages_to_filtered_users(self, notifications):
+    async def send_messages_to_filtered_users(
+        self, notifications: TelegramNotificationUsersRequest
+    ) -> list[tuple[bool, str]]:
         """Отправляет сообщение указанной группе пользователей"""
         match notifications.mode.upper():
             case TelegramNotificationUsersGroups.ALL.name:
@@ -70,22 +72,3 @@ class TelegramNotificationService:
         if (category := qr.first()) is None:
             return
         await self.telegram_notification.send_messages_by_template(category.users, template)
-
-    def count_rate(self, respond: bool, msg: str, rate: InfoRate):
-        errors_sending = ErrorsSending()
-        if respond:
-            rate.successful_rate += 1
-            rate.messages.append(msg)
-        else:
-            rate.unsuccessful_rate += 1
-            errors_sending.message = msg
-            rate.errors.append(errors_sending)
-        return rate
-
-    def collect_respond_and_status(self, result, rate):
-        """
-        Функция для формирования отчета об отправке
-        """
-        for res in result:
-            rate = self.count_rate(res[0], res[1], rate)
-        return rate
