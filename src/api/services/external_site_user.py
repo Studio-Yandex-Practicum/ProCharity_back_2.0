@@ -29,7 +29,13 @@ class ExternalSiteUserService:
 
     async def register(self, site_user_schema: ExternalSiteVolunteerRequest | ExternalSiteFundRequest) -> None:
         """Создаёт в БД нового пользователя сайта или обновляет данные существующего."""
-        site_user = await self._site_user_repository.get_by_external_id_or_none(site_user_schema.user_id, None)
+        site_user_role = site_user_schema.get_role()
+        data_for_update = site_user_schema.model_dump(exclude_none=True)
+        data_for_update["role"] = site_user_role
+        if site_user_role == UserRoles.FUND:
+            data_for_update["specializations"] = None
+
+        site_user = await self._site_user_repository.get_by_external_id_or_none(site_user_schema.external_id, None)
 
         if site_user:
             if site_user.is_archived:
@@ -41,11 +47,11 @@ class ExternalSiteUserService:
             if site_user.id_hash is None:
                 await self._error_if_exists_by_id_hash(site_user_schema.id_hash)
 
-            site_user = await self._site_user_repository.update(site_user.id, site_user_schema.to_orm())
+            site_user = await self._site_user_repository.update(site_user.id, ExternalSiteUser(**data_for_update))
 
         else:
             await self._error_if_exists_by_id_hash(site_user_schema.id_hash)
-            site_user = await self._site_user_repository.create(site_user_schema.to_orm())
+            site_user = await self._site_user_repository.create(ExternalSiteUser(**data_for_update))
 
         user = await self._user_repository.get_by_external_id(site_user.id)
         if user:
@@ -53,6 +59,7 @@ class ExternalSiteUserService:
             user.first_name = site_user.first_name
             user.last_name = site_user.last_name
             user.role = site_user.role
+            user.has_mailing = site_user.has_mailing_new_tasks
 
             await self._user_repository.update(user.id, user)
             await self._user_repository.set_categories_to_user(user.id, site_user.specializations)
@@ -70,6 +77,7 @@ class ExternalSiteUserService:
 
         user = await self._user_repository.get_by_external_id(site_user.id)
         if user:
+            user.has_mailing = site_user.has_mailing_new_tasks
             for attr, value in data_for_update.items():
                 setattr(user, attr, value)
 
