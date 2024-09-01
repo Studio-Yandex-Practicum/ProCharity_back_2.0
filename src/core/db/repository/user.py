@@ -142,10 +142,13 @@ class UserRepository(FilterableRepository):
         Получает отфильтрованные данные, ограниченные параметрами page и limit
         и отсортированные по полю column_name в порядке убывания.
         """
-        offset = (page - 1) * limit
         statement = self.apply_filter(
             select(User).join(User.external_user, isouter=True),
             filter_by,
         )
-        objects = await self._session.scalars(statement.limit(limit).offset(offset).order_by(desc(column_name)))
+        if page > 0:
+            offset = (page - 1) * limit
+            statement = statement.limit(limit).offset(offset)
+
+        objects = await self._session.scalars(statement.order_by(desc(column_name)))
         return objects.all()
