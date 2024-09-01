@@ -54,7 +54,7 @@ class UserStatus(StrEnum):
 
 
 class UserRoleFilterValues(StrEnum):
-    """Значения фильтра для параметра фильтрации role."""
+    """Режимы фильтрации на основе поля role."""
 
     FUND = "fund"
     VOLUNTEER = "volunteer"
@@ -62,7 +62,7 @@ class UserRoleFilterValues(StrEnum):
 
 
 class UserStatusFilterValues(StrEnum):
-    """Значения фильтра для параметра фильтрации status."""
+    """Режимы фильтрации на основе поля moderation_status."""
 
     NEW = "new"
     WAIT = "wait"

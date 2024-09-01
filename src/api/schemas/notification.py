@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from src.api.schemas.base import RequestBase
 from src.core.enums import TelegramNotificationUsersGroups
 
+from .users import UserFilter
+
 
 class TelegramNotificationRequest(RequestBase):
     """
@@ -20,6 +22,14 @@ class TelegramNotificationUsersRequest(TelegramNotificationRequest):
     сообщения определенной группе пользователей."""
 
     mode: TelegramNotificationUsersGroups
+
+
+class TelegramNotificationByFilterRequest(TelegramNotificationRequest):
+    """Параметры запроса на отправку сообщения пользователям,
+    удовлетворяющим заданным критериям.
+    """
+
+    mode: UserFilter = Field(..., description="Критерии отбора пользователей для отправки сообщения")
 
 
 class Message(TelegramNotificationRequest):

@@ -41,7 +41,7 @@ class UsersPaginatedResponse(PaginateBase):
 
 
 class UserFilter(BaseModel):
-    """Поля для фильтрации пользователей."""
+    """Параметры фильтрации пользователей."""
 
     role: Annotated[
         UserRoleFilterValues | None,
@@ -63,6 +63,6 @@ class UserFilter(BaseModel):
         Field(
             None,
             title="Признак авторизации пользователя",
-            description="Фильтрация на основе связи пользователя user с пользователем сайта external_site_user",
+            description="Фильтрация на основе наличия связи пользователя user с пользователем сайта external_site_user",
         ),
     ] = None

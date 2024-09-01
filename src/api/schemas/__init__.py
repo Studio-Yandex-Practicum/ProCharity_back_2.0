@@ -11,7 +11,14 @@ from .external_site_user import (
 )
 from .feedback import FeedbackSchema
 from .health_check import BotStatus, CommitStatus, DBStatus, HealthCheck
-from .notification import InfoRate, Message, MessageList, TelegramNotificationRequest, TelegramNotificationUsersRequest
+from .notification import (
+    InfoRate,
+    Message,
+    MessageList,
+    TelegramNotificationByFilterRequest,
+    TelegramNotificationRequest,
+    TelegramNotificationUsersRequest,
+)
 from .tasks import TaskRequest, TaskResponse, TasksRequest, UserResponseToTaskRequest
 from .token_schemas import TokenCheckResponse
 from .users import UserResponse, UsersPaginatedResponse
@@ -39,9 +46,9 @@ __all__ = (
     "Message",
     "MessageList",
     "ReasonCancelingStatistics",
+    "TelegramNotificationByFilterRequest",
     "TelegramNotificationRequest",
     "TelegramNotificationUsersRequest",
-    # "TelegramNotificationUsersRequestNew",
     "TaskRequest",
     "TaskResponse",
     "TasksRequest",

@@ -3,7 +3,13 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from src.api.auth import check_header_contains_token
-from src.api.schemas import InfoRate, MessageList, TelegramNotificationRequest, TelegramNotificationUsersRequest
+from src.api.schemas import (
+    InfoRate,
+    MessageList,
+    TelegramNotificationByFilterRequest,
+    TelegramNotificationRequest,
+    TelegramNotificationUsersRequest,
+)
 from src.api.services.messages import TelegramNotificationService
 from src.core.depends import Container
 
@@ -19,13 +25,29 @@ log = structlog.get_logger()
 )
 @inject
 async def send_message(
-    notifications: TelegramNotificationUsersRequest,
+    notification: TelegramNotificationUsersRequest,
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
 ) -> InfoRate:
-    results = await telegram_notification_service.send_messages_to_filtered_users(notifications)
+    results = await telegram_notification_service.send_messages_to_filtered_users(notification)
     return InfoRate.from_results(results)
+
+
+@notification_router_by_admin.post(
+    "/new",
+    description="Отправляет сообщение пользователям, соответствующим заданным критериям.",
+)
+@inject
+async def send_message_to_users_by_filter(
+    notification: TelegramNotificationByFilterRequest,
+    telegram_notification_service: TelegramNotificationService = Depends(
+        Provide[Container.api_services_container.message_service]
+    ),
+) -> InfoRate:
+    # results = await telegram_notification_service.send_messages_to_filtered_users(notification)
+    # return InfoRate.from_results(results)
+    return InfoRate()
 
 
 @notification_router_by_token.post(
