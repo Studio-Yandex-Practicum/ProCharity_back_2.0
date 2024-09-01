@@ -10,7 +10,7 @@ from src.api.schemas import (
     TelegramNotificationRequest,
     TelegramNotificationUsersRequest,
 )
-from src.api.services.messages import TelegramNotificationService
+from src.api.services import TelegramNotificationService, UserService
 from src.core.depends import Container
 
 notification_router_by_token = APIRouter(dependencies=[Depends(check_header_contains_token)])
@@ -44,10 +44,11 @@ async def send_message_to_users_by_filter(
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
+    user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
 ) -> InfoRate:
-    # results = await telegram_notification_service.send_messages_to_filtered_users(notification)
-    # return InfoRate.from_results(results)
-    return InfoRate()
+    users = await user_service.get_filtered_users_by_page(notification.mode.model_dump(), 0, 0)
+    results = await telegram_notification_service.send_message_to_users(users, notification.message)
+    return InfoRate.from_results(results)
 
 
 @notification_router_by_token.post(

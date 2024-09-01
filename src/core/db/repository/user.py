@@ -138,9 +138,9 @@ class UserRepository(FilterableRepository):
     async def get_filtered_objects_by_page(
         self, filter_by: dict[str, Any], page: int, limit: int, column_name: str = "created_at"
     ) -> Sequence[User]:
-        """
-        Получает отфильтрованные данные, ограниченные параметрами page и limit
+        """Получает отфильтрованные данные, ограниченные параметрами page и limit
         и отсортированные по полю column_name в порядке убывания.
+        Если page < 1, то выдача не ограничивается.
         """
         statement = self.apply_filter(
             select(User).join(User.external_user, isouter=True),

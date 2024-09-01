@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
@@ -36,6 +38,10 @@ class TelegramNotificationService:
                     select(User).where(User.has_mailing.is_(False) & User.banned.is_(False))
                 )
         return await self.telegram_notification.send_messages(message=notifications.message, users=users)
+
+    async def send_message_to_users(self, users: Iterable[User], message: str) -> tuple[bool, str]:
+        """Отправляет сообщение указанным пользователям"""
+        return await self.telegram_notification.send_messages(users=users, message=message)
 
     async def send_message_to_user_by_id_hash(self, id_hash: str, message: str) -> tuple[bool, str]:
         """Отправляет сообщение пользователю по указанному id_hash"""
