@@ -17,14 +17,47 @@ class SiteUserCategoriesRequest(BaseModel):
         from_attributes = True
 
 
-class SiteBotStatusRequest(BaseModel):
-    """Класс модели запроса для bot_status_[fund|folunteer] сайта."""
+class SiteBotStatusFundRequest(BaseModel):
+    """Класс модели запроса для bot_status_fund сайта."""
 
     user_id: int = Field(..., example=1, description="Уникальный идентификатор пользователя.")
     bot_status: Literal["off", "on"] = Field(..., example="off", description="Статус рассылки бота.")
+    bot_blocked: bool = Field(..., description="Признак блокировки бота пользователем.")
+    has_mailing_profile: bool | None = Field(None, description="Признак рассылки .")
+    has_mailing_my_tasks: bool | None = Field(None, description="Признак рассылки .")
+    has_mailing_procharity: bool | None = Field(None, description="Признак рассылки .")
 
     class Config:
-        json_schema_extra = {"example": {"user_id": 1, "bot_status": "on"}}
+        json_schema_extra = {
+            "example": {
+                "user_id": 1,
+                "bot_status": "on",
+                "bot_blocked": "false",
+                "has_mailing_profile": "true",
+                "has_mailing_my_tasks": "true",
+                "has_mailing_procharity": "true",
+            }
+        }
+        from_attributes = True
+
+
+class SiteBotStatusVolunteerRequest(SiteBotStatusFundRequest):
+    """Класс модели запроса для bot_status_folunteer сайта."""
+
+    has_mailing_new_tasks: bool = Field(..., description="Включена ли рассылка на новые задания.")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "user_id": 1,
+                "bot_status": "on",
+                "bot_blocked": "false",
+                "has_mailing_new_tasks": "true",
+                "has_mailing_profile": "true",
+                "has_mailing_my_tasks": "true",
+                "has_mailing_procharity": "true",
+            }
+        }
         from_attributes = True
 
 
