@@ -52,6 +52,9 @@ async def set_mailing(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
+    unsubscribe_reason_service: UnsubscribeReasonService = Provide[
+        Container.bot_services_container.unsubscribe_reason_service
+    ],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     procharity_tasks_url: str = Provide[Container.settings.provided.procharity_tasks_url],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
@@ -61,6 +64,7 @@ async def set_mailing(
     user = await user_service.get_by_telegram_id(telegram_id)
     if not user.has_mailing:
         await user_service.toggle_mailing(user)
+        await unsubscribe_reason_service.delete_reason(telegram_id)
         text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
