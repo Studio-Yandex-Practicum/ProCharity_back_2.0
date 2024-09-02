@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import Select, and_, delete, desc, func, insert, or_, orm, select
+from sqlalchemy import Select, and_, delete, desc, func, insert, or_, orm, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
@@ -118,12 +118,17 @@ class UserRepository(FilterableRepository):
             return statement.where(and_(ExternalSiteUser.id.is_not(None), ExternalSiteUser.moderation_status == status))
         return statement
 
+    def _add_filter_by_banned(self, statement: Select, banned: bool | None) -> Select:
+        """Добавляет к оператору SELECT проверку поля banned."""
+        return statement.where(User.banned.is_(banned)) if banned is not None else statement
+
     def apply_filter(self, statement: Select, filter_by: dict[str, Any]) -> Select:
         """Применяет фильтрацию по заданным в filter_by полям."""
         filter_select_updaters = {
             "role": self._add_filter_by_role_to_select,
             "authorization": self._add_filter_by_external_id_to_select,
             "status": self._add_filter_by_moderation_status,
+            "banned": self._add_filter_by_banned,
         }
         for filter_field, executor in filter_select_updaters.items():
             statement = executor(statement, filter_by.get(filter_field))
@@ -136,7 +141,7 @@ class UserRepository(FilterableRepository):
         return await self._session.scalar(statement)
 
     async def get_filtered_objects_by_page(
-        self, filter_by: dict[str, Any], page: int, limit: int, column_name: str = "created_at"
+        self, filter_by: dict[str, Any], page: int, limit: int, column_name: str = "users.created_at"
     ) -> Sequence[User]:
         """Получает отфильтрованные данные, ограниченные параметрами page и limit
         и отсортированные по полю column_name в порядке убывания.
@@ -150,5 +155,5 @@ class UserRepository(FilterableRepository):
             offset = (page - 1) * limit
             statement = statement.limit(limit).offset(offset)
 
-        objects = await self._session.scalars(statement.order_by(desc(column_name)))
+        objects = await self._session.scalars(statement.order_by(desc(text(column_name))))
         return objects.all()

@@ -46,7 +46,9 @@ async def send_message_to_users_by_filter(
     ),
     user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
 ) -> InfoRate:
-    users = await user_service.get_filtered_users_by_page(notification.mode.model_dump(), 0, 0)
+    filters = notification.mode.model_dump()
+    filters.update(banned=False)
+    users = await user_service.get_filtered_users_by_page(filters, 0, 0)
     results = await telegram_notification_service.send_message_to_users(users, notification.message)
     return InfoRate.from_results(results)
 
