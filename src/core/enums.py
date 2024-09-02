@@ -9,6 +9,12 @@ class TelegramNotificationUsersGroups(StrEnum):
     SUBSCRIBED = "subscribed"
     UNSUBSCRIBED = "unsubscribed"
 
+    def to_bool_or_none(self) -> bool | None:
+        if self == self.__class__.SUBSCRIBED:
+            return True
+        if self == self.__class__.UNSUBSCRIBED:
+            return False
+
 
 class UserResponseAction(StrEnum):
     """Типы действий с откликом пользователя на задачу.

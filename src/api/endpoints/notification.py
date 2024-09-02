@@ -29,8 +29,11 @@ async def send_message(
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
+    user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
 ) -> InfoRate:
-    results = await telegram_notification_service.send_messages_to_filtered_users(notification)
+    filters = dict(has_mailing=notification.mode.to_bool_or_none(), banned=False)
+    users = await user_service.get_filtered_users_by_page(filters, 0, 0)
+    results = await telegram_notification_service.send_message_to_users(users, notification.message)
     return InfoRate.from_results(results)
 
 

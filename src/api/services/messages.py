@@ -4,9 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
-from src.api.schemas import TelegramNotificationUsersRequest
 from src.core.db.models import Category, ExternalSiteUser, User
-from src.core.enums import TelegramNotificationUsersGroups
 from src.core.services.notification import TelegramMessageTemplate, TelegramNotification
 
 
@@ -21,23 +19,6 @@ class TelegramNotificationService:
     ) -> None:
         self._session = session
         self.telegram_notification = telegram_notification
-
-    async def send_messages_to_filtered_users(
-        self, notifications: TelegramNotificationUsersRequest
-    ) -> list[tuple[bool, str]]:
-        """Отправляет сообщение указанной группе пользователей"""
-        match notifications.mode.upper():
-            case TelegramNotificationUsersGroups.ALL.name:
-                users = await self._session.scalars(select(User).where(User.banned.is_(False)))
-            case TelegramNotificationUsersGroups.SUBSCRIBED.name:
-                users = await self._session.scalars(
-                    select(User).where(User.has_mailing.is_(True) & User.banned.is_(False))
-                )
-            case TelegramNotificationUsersGroups.UNSUBSCRIBED.name:
-                users = await self._session.scalars(
-                    select(User).where(User.has_mailing.is_(False) & User.banned.is_(False))
-                )
-        return await self.telegram_notification.send_messages(message=notifications.message, users=users)
 
     async def send_message_to_users(self, users: Iterable[User], message: str) -> tuple[bool, str]:
         """Отправляет сообщение указанным пользователям"""

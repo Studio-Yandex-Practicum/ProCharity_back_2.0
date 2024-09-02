@@ -122,6 +122,10 @@ class UserRepository(FilterableRepository):
         """Добавляет к оператору SELECT проверку поля banned."""
         return statement.where(User.banned.is_(banned)) if banned is not None else statement
 
+    def _add_filter_by_mailing_status(self, statement: Select, has_mailing: bool | None) -> Select:
+        """Добавляет к оператору SELECT проверку поля has_mailing."""
+        return statement.where(User.has_mailing.is_(has_mailing)) if has_mailing is not None else statement
+
     def apply_filter(self, statement: Select, filter_by: dict[str, Any]) -> Select:
         """Применяет фильтрацию по заданным в filter_by полям."""
         filter_select_updaters = {
@@ -129,6 +133,7 @@ class UserRepository(FilterableRepository):
             "authorization": self._add_filter_by_external_id_to_select,
             "status": self._add_filter_by_moderation_status,
             "banned": self._add_filter_by_banned,
+            "has_mailing": self._add_filter_by_mailing_status,
         }
         for filter_field, executor in filter_select_updaters.items():
             statement = executor(statement, filter_by.get(filter_field))
