@@ -1,10 +1,11 @@
-from typing import Iterable
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
 from src.core.db.models import Category, ExternalSiteUser, User
+from src.core.db.repository import UserRepository
 from src.core.services.notification import TelegramMessageTemplate, TelegramNotification
 
 
@@ -16,13 +17,16 @@ class TelegramNotificationService:
         self,
         session: AsyncSession,
         telegram_notification: TelegramNotification,
+        user_repository: UserRepository,
     ) -> None:
         self._session = session
-        self.telegram_notification = telegram_notification
+        self._telegram_notification = telegram_notification
+        self._user_repository = user_repository
 
-    async def send_message_to_users(self, users: Iterable[User], message: str) -> tuple[bool, str]:
-        """Отправляет сообщение указанным пользователям"""
-        return await self.telegram_notification.send_messages(users=users, message=message)
+    async def send_message_to_users_by_filters(self, filters: dict[str, Any], message: str) -> tuple[bool, str]:
+        """Отправляет сообщение пользователям, соответствующим заданным критериям (фильтрам)"""
+        users = await self._user_repository.get_filtered_objects_by_page(filters, 0, 0)
+        return await self._telegram_notification.send_messages(users=users, message=message)
 
     async def send_message_to_user_by_id_hash(self, id_hash: str, message: str) -> tuple[bool, str]:
         """Отправляет сообщение пользователю по указанному id_hash"""

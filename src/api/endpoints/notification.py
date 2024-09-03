@@ -10,7 +10,7 @@ from src.api.schemas import (
     TelegramNotificationRequest,
     TelegramNotificationUsersRequest,
 )
-from src.api.services import TelegramNotificationService, UserService
+from src.api.services import TelegramNotificationService
 from src.core.depends import Container
 
 notification_router_by_token = APIRouter(dependencies=[Depends(check_header_contains_token)])
@@ -29,11 +29,9 @@ async def send_message(
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
-    user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
 ) -> InfoRate:
     filters = dict(has_mailing=notification.mode.to_bool_or_none(), banned=False)
-    users = await user_service.get_filtered_users_by_page(filters, 0, 0)
-    results = await telegram_notification_service.send_message_to_users(users, notification.message)
+    results = await telegram_notification_service.send_message_to_users_by_filters(filters, notification.message)
     return InfoRate.from_results(results)
 
 
@@ -42,17 +40,15 @@ async def send_message(
     description="Отправляет сообщение пользователям, соответствующим заданным критериям.",
 )
 @inject
-async def send_message_to_users_by_filter(
+async def send_message_to_users_by_filters(
     notification: TelegramNotificationByFilterRequest,
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
-    user_service: UserService = Depends(Provide[Container.api_services_container.user_service]),
 ) -> InfoRate:
     filters = notification.mode.model_dump()
     filters.update(banned=False)
-    users = await user_service.get_filtered_users_by_page(filters, 0, 0)
-    results = await telegram_notification_service.send_message_to_users(users, notification.message)
+    results = await telegram_notification_service.send_message_to_users_by_filters(filters, notification.message)
     return InfoRate.from_results(results)
 
 
