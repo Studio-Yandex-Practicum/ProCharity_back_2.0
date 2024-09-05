@@ -123,6 +123,4 @@ class TaskRepository(ContentRepository):
         return tasks.all()
 
     async def archive(self, id: int) -> None:
-        instance = await self.get(id)
-        instance.is_archived = True
-        await self.update(instance.id, instance)
+        return await self._archive(id)
