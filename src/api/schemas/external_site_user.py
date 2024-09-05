@@ -11,7 +11,6 @@ class BaseExternalSiteUser(RequestBase):
     last_name: str | None = Field(None, max_length=64)
     email: EmailStr | None = Field(None, max_length=48)
     moderation_status: str | None = Field(None)
-    has_mailing_new_tasks: bool | None = Field(None)
     has_mailing_profile: bool | None = Field(None)
     has_mailing_my_tasks: bool | None = Field(None)
     has_mailing_procharity: bool | None = Field(None)
@@ -31,7 +30,8 @@ class BaseExternalSiteUser(RequestBase):
 class BaseExternalSiteUserVolunteer(RequestBase):
     """Базовый класс схемы для ExternalSiteUser (Volunteer)."""
 
-    specializations: list[int] | None = None
+    specializations: list[int] | None = Field(None)
+    has_mailing_new_tasks: bool | None = Field(None)
 
     @field_validator("specializations", mode="before")
     @classmethod
