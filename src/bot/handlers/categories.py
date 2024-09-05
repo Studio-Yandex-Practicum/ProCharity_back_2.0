@@ -163,8 +163,9 @@ async def _display_chose_subcategories_message(
     parent = await category_service.get(parent_id, is_archived=None)
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
     await query.message.edit_text(
-        f'Ты выбрал категорию "{parent.name}". Отметь любое количество компетенций и нажми "Назад ⬅️"',
+        f'Ты выбрал категорию <b>"{parent.name}"</b>. Отметь любое количество компетенций и нажми "Назад ⬅️"',
         reply_markup=await get_subcategories_keyboard(parent_id, subcategories, selected_categories),
+        parse_mode=ParseMode.HTML,
     )
 
 
