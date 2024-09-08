@@ -148,6 +148,7 @@ async def select_subcategory_callback(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
+    """Выводит список подкатегорий для выбора волонтером."""
     query = update.callback_query
     subcategory_id = int(context.match.group(1))
     selected_categories = await user_service.get_user_categories(update.effective_user.id)
@@ -155,13 +156,12 @@ async def select_subcategory_callback(
     if subcategory_id not in selected_categories:
         selected_categories[subcategory_id] = None
         await user_service.add_category_to_user(update.effective_user.id, subcategory_id)
+    elif len(selected_categories) == 1:
+        popup_text = "Выбери хотя бы одну компетенцию"
+        return await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
         del selected_categories[subcategory_id]
         await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
-
-    user = await user_service.get_by_telegram_id(update.effective_user.id)
-    if user and user.external_user:
-        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
 
     parent_id = context.user_data["parent_id"]
     subcategories = await category_service.get_unarchived_subcategories(parent_id)
@@ -169,6 +169,10 @@ async def select_subcategory_callback(
         text_chose_subcategory,
         reply_markup=await get_subcategories_keyboard(parent_id, subcategories, selected_categories),
     )
+
+    user = await user_service.get_by_telegram_id(update.effective_user.id)
+    if user and user.external_user:
+        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
 
 
 @logger_decor
