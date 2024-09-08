@@ -11,6 +11,7 @@ from src.bot.utils import registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
+from src.core.services.procharity_api import ProcharityAPI
 
 text_notification_settings_volunteer = 'Выбери, какие уведомления хочешь получать в боте, и нажми кнопку "Готово 👌"'
 text_notification_settings_fund = 'Выберите, какие уведомления вы хотите получать в боте, и нажмите кнопку "Готово 👌"'
@@ -44,10 +45,12 @@ async def confirm_notification_settings(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     query = update.callback_query
     telegram_id = update.effective_user.id
     user = await user_service.get_by_telegram_id(telegram_id)
+    await procharity_api.send_user_bot_status(user)
     text = "Настройки уведомлений сохранены. "
     if user.is_volunteer:
         text += "Ты можешь изменить их в любой момент в меню бота или в личном кабинете"
