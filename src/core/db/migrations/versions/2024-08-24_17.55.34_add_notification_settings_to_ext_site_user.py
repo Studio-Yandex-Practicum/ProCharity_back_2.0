@@ -1,7 +1,7 @@
 """Add notification settings to ExternalSiteUser
 
 Revision ID: b155a83b9476
-Revises: 797114cc8d65
+Revises: 1277f5f5b2f1
 Create Date: 2024-08-24 17:55:34.695567
 
 """
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "b155a83b9476"
-down_revision = "797114cc8d65"
+down_revision = "1277f5f5b2f1"
 branch_labels = None
 depends_on = None
 
