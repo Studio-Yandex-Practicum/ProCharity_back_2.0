@@ -35,14 +35,14 @@ class TelegramNotificationService:
             return False, "Пользователь не найден."
         if site_user.user is None:
             return False, "Телеграм пользователя не найден."
-        return await self.telegram_notification.send_message(telegram_id=site_user.user.telegram_id, message=message)
+        return await self._telegram_notification.send_message(telegram_id=site_user.user.telegram_id, message=message)
 
     async def send_message_by_telegram_id(self, telegram_id: int, message: str) -> tuple[bool, str]:
         """Отправляет сообщение пользователю по указанному telegram_id"""
         user = await self._session.scalar(select(User).where(User.telegram_id == telegram_id))
         if user is None:
             return False, "Пользователь не найден."
-        return await self.telegram_notification.send_message(telegram_id=user.telegram_id, message=message)
+        return await self._telegram_notification.send_message(telegram_id=user.telegram_id, message=message)
 
     async def send_task_to_users_with_category(self, category_id: int, template: TelegramMessageTemplate):
         """Отправляет задание всем зарегистрированным пользователям, подписанным на заданную категорию.
@@ -62,4 +62,4 @@ class TelegramNotificationService:
         )
         if (category := qr.first()) is None:
             return
-        await self.telegram_notification.send_messages_by_template(category.users, template)
+        await self._telegram_notification.send_messages_by_template(category.users, template)
