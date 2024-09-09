@@ -13,14 +13,15 @@ from src.api.schemas import (
 from src.api.services import TelegramNotificationService
 from src.core.depends import Container
 
-notification_router_by_token = APIRouter(dependencies=[Depends(check_header_contains_token)])
+notification_router_by_token = APIRouter(prefix="/messages", dependencies=[Depends(check_header_contains_token)])
 notification_router_by_admin = APIRouter()
+messages_router_by_admin = APIRouter(prefix="/messages")
 
 log = structlog.get_logger()
 
 
 @notification_router_by_admin.post(
-    "",
+    "/send_telegram_notification",
     description="Отправляет сообщение пользователям, соответствующим заданному критерию.",
 )
 @inject
@@ -35,7 +36,7 @@ async def send_message(
     return InfoRate.from_results(results)
 
 
-@notification_router_by_admin.post(
+@messages_router_by_admin.post(
     "/new",
     description="Отправляет сообщение пользователям, соответствующим заданным критериям.",
 )
@@ -73,7 +74,7 @@ async def send_messages_to_users(
     return response
 
 
-@notification_router_by_admin.post(
+@messages_router_by_admin.post(
     "/{telegram_id}",
     description="Отправляет сообщение заданному пользователю.",
 )
