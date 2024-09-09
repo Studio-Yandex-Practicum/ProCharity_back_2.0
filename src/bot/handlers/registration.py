@@ -29,13 +29,12 @@ async def start_command(
     telegram_user = update.effective_user or Never
     user = await user_service.register_user(ext_site_user, telegram_user)
     auth_url = volunteer_auth_url if user.is_volunteer else fund_auth_url
-
+    you_authorized_phrase = "Ты авторизовался" if user.is_volunteer else "Вы авторизовались"
     await context.bot.send_message(
         chat_id=telegram_user.id,
-        text="<b>Авторизация прошла успешно!</b>\n\n"
-        "Теперь оповещения будут приходить сюда. "
-        f'Изменить настройку уведомлений можно в <a href="{auth_url}">личном кабинете</a>.\n\n'
-        "Навигация по боту запускается командой /menu.",
+        text=f"<b>{you_authorized_phrase} в боте ProCharity</b>\n\n"
+        "Теперь оповещения будут приходить сюда. Изменить настройку уведомлений можно "
+        f'в меню бота или в <a href="{auth_url}">личном кабинете</a>.\n\n',
         parse_mode=ParseMode.HTML,
         reply_markup=await get_start_keyboard(user),
         disable_web_page_preview=True,
@@ -64,11 +63,19 @@ async def on_chat_member_update(
     if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.BANNED:
         await user_service.bot_banned(user)
         await procharity_api.send_user_bot_status(user)
-        return user
-    if my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
+    elif my_chat_member.new_chat_member.status == my_chat_member.new_chat_member.MEMBER:
         await user_service.bot_unbanned(user)
         await procharity_api.send_user_bot_status(user)
-        return user
+        unblock_text = (
+            "<b>Ты разблокировал бот ProCharity</b>" if user.is_volunteer else "<b>Вы разблокировали бот ProCharity</b>"
+        )
+        await context.bot.send_message(
+            chat_id=effective_user.id,
+            text=unblock_text,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+        )
+    return user
 
 
 def registration_handlers(app: Application):

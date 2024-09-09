@@ -6,6 +6,7 @@ from .feedback import feedback_router
 from .health_check import health_check_router
 from .notification import notification_router_by_admin, notification_router_by_token
 from .tasks import task_read_router, task_response_router, task_write_router, tasks_router
+from .tech_messages import tech_message_router
 from .telegram_webhook import telegram_webhook_router
 from .users import user_router
 
@@ -27,4 +28,5 @@ __all__ = (
     "admin_user_router",
     "feedback_router",
     "user_router",
+    "tech_message_router",
 )
