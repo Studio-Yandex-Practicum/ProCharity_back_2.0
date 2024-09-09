@@ -8,7 +8,7 @@ from src.api.schemas import (
     MessageList,
     TelegramNotificationByFilterRequest,
     TelegramNotificationRequest,
-    TelegramNotificationUsersRequest,
+    TelegramNotificationToGroupRequest,
 )
 from src.api.services import TelegramNotificationService
 from src.core.depends import Container
@@ -26,12 +26,12 @@ log = structlog.get_logger()
 )
 @inject
 async def send_message(
-    notification: TelegramNotificationUsersRequest,
+    notification: TelegramNotificationToGroupRequest,
     telegram_notification_service: TelegramNotificationService = Depends(
         Provide[Container.api_services_container.message_service]
     ),
 ) -> InfoRate:
-    filters = dict(has_mailing=notification.mode.to_bool_or_none(), banned=False)
+    filters = dict(has_mailing=notification.has_mailing.to_bool_or_none(), banned=False)
     results = await telegram_notification_service.send_message_to_users_by_filters(filters, notification.message)
     return InfoRate.from_results(results)
 

@@ -9,19 +9,15 @@ from .users import UserFilter
 
 
 class TelegramNotificationRequest(RequestBase):
-    """
-    Класс формирования параметров запроса для отправки
-    сообщения определенному пользователю.
-    """
+    """Параметры запроса на отправку сообщения определенному пользователю."""
 
     message: str = Field(..., min_length=1)
 
 
-class TelegramNotificationUsersRequest(TelegramNotificationRequest):
-    """Класс формирования параметров запроса для отправки
-    сообщения определенной группе пользователей."""
+class TelegramNotificationToGroupRequest(TelegramNotificationRequest):
+    """Параметры запроса на отправку сообщения определенной группе пользователей."""
 
-    mode: TelegramNotificationUsersGroups
+    has_mailing: TelegramNotificationUsersGroups
 
 
 class TelegramNotificationByFilterRequest(TelegramNotificationRequest):

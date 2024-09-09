@@ -17,7 +17,7 @@ from .notification import (
     MessageList,
     TelegramNotificationByFilterRequest,
     TelegramNotificationRequest,
-    TelegramNotificationUsersRequest,
+    TelegramNotificationToGroupRequest,
 )
 from .tasks import TaskRequest, TaskResponse, TasksRequest, UserResponseToTaskRequest
 from .token_schemas import TokenCheckResponse
@@ -48,7 +48,7 @@ __all__ = (
     "ReasonCancelingStatistics",
     "TelegramNotificationByFilterRequest",
     "TelegramNotificationRequest",
-    "TelegramNotificationUsersRequest",
+    "TelegramNotificationToGroupRequest",
     "TaskRequest",
     "TaskResponse",
     "TasksRequest",
