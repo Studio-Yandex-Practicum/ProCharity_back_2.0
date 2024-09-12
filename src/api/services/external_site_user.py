@@ -59,7 +59,7 @@ class ExternalSiteUserService:
             user.first_name = site_user.first_name
             user.last_name = site_user.last_name
             user.role = site_user.role
-            if site_user.has_mailing_new_tasks:
+            if site_user.has_mailing_new_tasks is not None:
                 user.has_mailing = site_user.has_mailing_new_tasks
 
             await self._user_repository.update(user.id, user)
@@ -78,7 +78,7 @@ class ExternalSiteUserService:
 
         user = await self._user_repository.get_by_external_id(site_user.id)
         if user:
-            if site_user.has_mailing_new_tasks:
+            if site_user.has_mailing_new_tasks is not None:
                 user.has_mailing = site_user.has_mailing_new_tasks
             for attr, value in data_for_update.items():
                 setattr(user, attr, value)
