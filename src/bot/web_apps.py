@@ -25,13 +25,10 @@ def get_feedback_web_app_info(user: User) -> WebAppInfo:
 
 def get_task_web_app_info(task: Task) -> WebAppInfo:
     """WebApp для отображения подробной информации о задании и фонде."""
-    query_params = TaskInfoPageQueryParams(
-        id=task.id,
-        api_root_path=settings.ROOT_PATH,
-    )
+    query_params = TaskInfoPageQueryParams(task_id=task.id)
     return WebAppInfo(
         url=urljoin(
-            settings.task_info_page_template_url,
+            settings.procharity_task_url,
             query_params.as_url_query(),
         )
     )
