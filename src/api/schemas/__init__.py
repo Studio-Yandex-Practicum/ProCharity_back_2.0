@@ -5,7 +5,6 @@ from .categories import CategoryRequest, CategoryResponse
 from .external_site_user import (
     ExternalSiteFundPartialUpdate,
     ExternalSiteFundRequest,
-    ExternalSiteUser,
     ExternalSiteVolunteerPartialUpdate,
     ExternalSiteVolunteerRequest,
 )
