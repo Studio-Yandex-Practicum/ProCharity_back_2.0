@@ -14,8 +14,7 @@ from src.bot.keyboards import (
     get_support_service_keyboard,
     get_tasks_and_back_menu_keyboard,
 )
-from src.bot.services.unsubscribe_reason import UnsubscribeReasonService
-from src.bot.services.user import UserService
+from src.bot.services import ExternalSiteUserService, UnsubscribeReasonService, UserService
 from src.bot.utils import delete_previous_message, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
@@ -56,6 +55,7 @@ async def set_mailing(
         Container.bot_services_container.unsubscribe_reason_service
     ],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     procharity_tasks_url: str = Provide[Container.settings.provided.procharity_tasks_url],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
@@ -68,7 +68,8 @@ async def set_mailing(
         text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
-        await procharity_api.send_user_bot_status(user)
+        if await procharity_api.send_user_bot_status(user):
+            await site_user_service.set_mailing_new_tasks_status(ext_site_user, True)
     else:
         text = (
             "<b>Подписка остановлена!</b>\n\n"
@@ -98,6 +99,7 @@ async def unsubscription_reason_handler(
         Container.bot_services_container.unsubscribe_reason_service
     ],
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
     email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
@@ -116,7 +118,8 @@ async def unsubscription_reason_handler(
         to_email=email_admin,
     )
     asyncio.create_task(background_task)
-    await procharity_api.send_user_bot_status(user)
+    if await procharity_api.send_user_bot_status(user):
+        await site_user_service.set_mailing_new_tasks_status(ext_site_user, False)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "
         f"рассылки по причине: {reason}"
