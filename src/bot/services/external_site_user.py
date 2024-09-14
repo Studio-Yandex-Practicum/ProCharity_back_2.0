@@ -42,6 +42,11 @@ class ExternalSiteUserService:
         return await self._repository.delete_user_response_to_task(site_user, task)
 
     async def set_mailing_new_tasks_status(self, site_user: ExternalSiteUser, status: bool) -> ExternalSiteUser:
-        """Устанавливает заданное значение поля has_mailing_new_tasks у заданного пользователя."""
+        """Устанавливает новое значение поля has_mailing_new_tasks у заданного пользователя."""
         site_user.has_mailing_new_tasks = status
+        return await self._repository.update(site_user.id, site_user)
+
+    async def set_specializations(self, site_user: ExternalSiteUser, specializations: list[int]) -> ExternalSiteUser:
+        """Устанавливает новое значение поля specializations у заданного пользователя."""
+        site_user.specializations = specializations
         return await self._repository.update(site_user.id, site_user)

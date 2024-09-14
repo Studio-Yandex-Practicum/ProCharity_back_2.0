@@ -10,8 +10,7 @@ from src.bot.keyboards import (
     get_tasks_and_open_menu_keyboard,
     get_view_categories_keyboard,
 )
-from src.bot.services.category import CategoryService
-from src.bot.services.user import UserService
+from src.bot.services import CategoryService, ExternalSiteUserService, UserService
 from src.bot.utils import delete_previous_message, get_marked_list, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
@@ -132,6 +131,7 @@ async def select_subcategory_callback(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     subcategory_id = int(context.match.group(1))
@@ -144,9 +144,9 @@ async def select_subcategory_callback(
         del selected_categories[subcategory_id]
         await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
 
-    user = await user_service.get_by_telegram_id(update.effective_user.id)
-    if user and user.external_user:
-        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
+    selected_categories_ids = list(selected_categories)
+    if await procharity_api.send_user_categories(ext_site_user.external_id, selected_categories_ids):
+        await site_user_service.set_specializations(ext_site_user, selected_categories_ids)
 
     parent_id = context.user_data["parent_id"]
     await _display_chose_subcategories_message(update, parent_id, selected_categories)
