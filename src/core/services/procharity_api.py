@@ -46,11 +46,12 @@ class ProcharityAPI:
                         await self._notify_of_data_transfer_error(
                             user_id, log_description, f"status = {response.status}, message = {data}"
                         )
+                        return False
                     else:
                         await logger.adebug(
                             f"Успешная передача данных на сайт: {log_description} пользователя {user_id}. Ответ: {data}"
                         )
-                return True
+                        return True
         except aiohttp.ClientResponseError as e:
             await self._notify_of_data_transfer_error(
                 user_id, log_description, f"Неверный ответ от сайта ({e.message})."
