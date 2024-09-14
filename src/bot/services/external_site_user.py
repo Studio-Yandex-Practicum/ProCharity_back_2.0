@@ -47,9 +47,7 @@ class ExternalSiteUserService:
         site_user = await self._repository.get_by_external_id(site_user_id)
         match field:
             case HasMailingField.profile:
-                print(f"step1 {site_user.has_mailing_profile}")
                 await self._repository.set_has_mailing_profile(site_user, not site_user.has_mailing_profile)
-                print(f"after step1 {site_user.has_mailing_profile}")
             case HasMailingField.my_tasks:
                 await self._repository.set_has_mailing_my_tasks(site_user, not site_user.has_mailing_my_tasks)
             case HasMailingField.procharity:
