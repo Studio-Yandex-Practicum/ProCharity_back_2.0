@@ -37,7 +37,7 @@ async def send_message(
 
 
 @messages_router_by_admin.post(
-    "/new",
+    "",
     description="Отправляет сообщение пользователям, соответствующим заданным критериям.",
 )
 @inject
