@@ -41,12 +41,12 @@ class ProcharityAPI:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url=url, data=data, headers=self.token_header_dict) as response:
+                    data = await response.json()
                     if response.status != 200:
                         await self._notify_of_data_transfer_error(
-                            user_id, log_description, f"status = {response.status}"
+                            user_id, log_description, f"status = {response.status}, message = {data}"
                         )
                     else:
-                        data = await response.json()
                         await logger.adebug(
                             f"Успешная передача данных на сайт: {log_description} пользователя {user_id}. Ответ: {data}"
                         )
