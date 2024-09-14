@@ -19,9 +19,7 @@ UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от зад
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 OPEN_MENU_BUTTON = [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
 RETURN_MENU_BUTTON = [InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU)]
-CHECK_CATEGORIES_BUTTON = [
-    InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
-]
+CHECK_CATEGORIES_BUTTON = [InlineKeyboardButton("Проверить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
