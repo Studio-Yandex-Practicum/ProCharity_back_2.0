@@ -26,7 +26,7 @@ class ProcharityAPI:
         """Возвращает заголовок с токеном авторизации в виде словаря."""
         return {"token": self._settings.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY}
 
-    async def _site_post(self, url: str, data: str, user_id: str, log_description: str):
+    async def _site_post(self, url: str, data: str, user_id: str, log_description: str) -> bool:
         """Осуществляет post запрос на заданный url сайта.
 
         Args:
@@ -34,6 +34,9 @@ class ProcharityAPI:
             data: Данные запроса.
             user_id: Идентификатор пользователя (для логирования).
             log_description: Описание запроса (для логирования).
+        Return:
+            True: отправка выполнена успешно;
+            False: отправка выполнена неуспешно.
         """
         try:
             async with aiohttp.ClientSession() as session:
@@ -47,12 +50,15 @@ class ProcharityAPI:
                         await logger.adebug(
                             f"Успешная передача данных на сайт: {log_description} пользователя {user_id}. Ответ: {data}"
                         )
+                return True
         except aiohttp.ClientResponseError as e:
             await self._notify_of_data_transfer_error(
                 user_id, log_description, f"Неверный ответ от сайта ({e.message})."
             )
         except Exception as e:
             await logger.aexception(e)
+
+        return False
 
     async def _notify_of_data_transfer_error(self, user_id: str, log_description: str, reason: str) -> None:
         """Сообщает об ошибке передачи данных на сайт, используя следующие способы:
@@ -66,27 +72,34 @@ class ProcharityAPI:
         if self._settings.EMAIL_TO_ADMIN_OF_DATA_TRANSFER_ERROR:
             await self._email_provider.notify_admin_of_data_transfer_error(message, self._settings.EMAIL_ADMIN)
 
-    async def send_user_categories(self, user_id: int, user_categories: list[int]):
+    async def send_user_categories(self, user_id: int, user_categories: list[int]) -> bool:
         """Отправляет запрос на сайт с обновленными категориями пользователя.
 
         Args:
             user_id: идентификатор пользователя на сайте.
             user_categories: список идентификаторов выбранных категорий.
+        Return:
+            True: отправка выполнена успешно;
+            False: отправка выполнена неуспешно.
         """
         specializations = ", ".join(map(str, user_categories))
         body_schema = SiteUserCategoriesRequest(user_id=user_id, specializations=specializations)
-        await self._site_post(
+        return await self._site_post(
             url=self._settings.procharity_send_user_categories_api_url,
             data=body_schema.model_dump_json(),
             user_id=user_id,
             log_description="категории",
         )
 
-    async def send_user_bot_status(self, user: User):
+    async def send_user_bot_status(self, user: User) -> bool | None:
         """Отправляет запрос на сайт с обновленным статусом бота пользователя.
 
         Args:
             user: Модель пользователя.
+        Return:
+            True: отправка выполнена успешно;
+            False: отправка выполнена неуспешно;
+            None: отправка не выполнялась.
         """
         if user and user.external_user:
             user_id = user.external_user.external_id
@@ -97,7 +110,7 @@ class ProcharityAPI:
                 else self._settings.procharity_send_bot_status_fund_api_url
             )
             body_schema = SiteBotStatusRequest(user_id=user_id, bot_status=status)
-            await self._site_post(
+            return await self._site_post(
                 url=site_url,
                 data=body_schema.model_dump_json(),
                 user_id=user_id,
