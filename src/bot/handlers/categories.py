@@ -135,14 +135,15 @@ async def select_subcategory_callback(
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
 ):
     subcategory_id = int(context.match.group(1))
-    selected_categories = await user_service.get_user_categories(update.effective_user.id)
+    telegram_id = update.effective_user.id
+    selected_categories = await user_service.get_user_categories(telegram_id)
 
     if subcategory_id not in selected_categories:
         selected_categories[subcategory_id] = None
-        await user_service.add_category_to_user(update.effective_user.id, subcategory_id)
+        await user_service.add_category_to_user(telegram_id, subcategory_id)
     else:
         del selected_categories[subcategory_id]
-        await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
+        await user_service.delete_category_from_user(telegram_id, subcategory_id)
 
     selected_categories_ids = list(selected_categories)
     if await procharity_api.send_user_categories(ext_site_user.external_id, selected_categories_ids):
