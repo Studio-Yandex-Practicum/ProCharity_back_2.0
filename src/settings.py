@@ -155,7 +155,7 @@ class Settings(BaseSettings):
     @property
     def procharity_task_url(self) -> str:
         """Получить url-ссылку на страницу с информацией о задании."""
-        return urljoin(self.PROCHARITY_URL, "webapp/")
+        return urljoin(self.PROCHARITY_URL.replace("http://", "https://"), "webapp/")
 
     @property
     def procharity_registration_url(self) -> str:
