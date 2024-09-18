@@ -26,7 +26,7 @@ class ProcharityAPI:
         """Возвращает заголовок с токеном авторизации в виде словаря."""
         return {"token": self._settings.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY}
 
-    async def _site_post(self, url: str, data: str, user_id: str, log_description: str):
+    async def _site_post(self, url: str, data: str, user_id: int, log_description: str):
         """Осуществляет post запрос на заданный url сайта.
 
         Args:
@@ -54,7 +54,7 @@ class ProcharityAPI:
         except Exception as e:
             await logger.aexception(e)
 
-    async def _notify_of_data_transfer_error(self, user_id: str, log_description: str, reason: str) -> None:
+    async def _notify_of_data_transfer_error(self, user_id: int, log_description: str, reason: str) -> None:
         """Сообщает об ошибке передачи данных на сайт, используя следующие способы:
         - в лог;
         - на почту админу;
