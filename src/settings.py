@@ -153,9 +153,9 @@ class Settings(BaseSettings):
         return urljoin(self.static_url, "feedback_form/feedback_form.html")
 
     @property
-    def task_info_page_template_url(self) -> str:
-        """Получить url-ссылку на HTML шаблон страницы с информацией о задании."""
-        return urljoin(self.static_url, "task_info_page/task_info_page.html")
+    def procharity_task_url(self) -> str:
+        """Получить url-ссылку на страницу с информацией о задании."""
+        return urljoin(self.PROCHARITY_URL.replace("http://", "https://"), "webapp/")
 
     @property
     def procharity_registration_url(self) -> str:
