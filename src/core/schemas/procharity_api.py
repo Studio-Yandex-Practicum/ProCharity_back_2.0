@@ -23,9 +23,9 @@ class SiteBotStatusFundRequest(BaseModel):
     user_id: int = Field(..., example=1, description="Уникальный идентификатор пользователя.")
     bot_status: Literal["off", "on"] = Field(..., example="off", description="Статус рассылки бота.")
     bot_blocked: bool = Field(..., description="Признак блокировки бота пользователем.")
-    has_mailing_profile: bool | None = Field(None, description="Признак рассылки .")
-    has_mailing_my_tasks: bool | None = Field(None, description="Признак рассылки .")
-    has_mailing_procharity: bool | None = Field(None, description="Признак рассылки .")
+    has_mailing_profile: bool | None = Field(None, description="Признак рассылки о профиле")
+    has_mailing_my_tasks: bool | None = Field(None, description="Признак рассылки о текущих задачах")
+    has_mailing_procharity: bool | None = Field(None, description="Признак рассылки о ProCharity")
 
     class Config:
         json_schema_extra = {
