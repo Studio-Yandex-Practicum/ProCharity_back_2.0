@@ -3,10 +3,9 @@ import enum
 
 class REASONS(enum.StrEnum):
     to_much_messages = "Слишком много уведомлений"
-    no_time = "Нет времени на волонтёрство"
+    no_time = "Нет времени на волонтерство"
     no_match = "Нет подходящих заданий"
-    uncomfortable = "Бот мне неудобен"
-    funds_dont_choose = "Фонды меня не выбирают"
+    uncomfortable = "Неудобно пользоваться ботом"
     other = "Другое"
 
 
@@ -15,3 +14,9 @@ class CANCEL_RESPOND_REASONS(enum.StrEnum):
     no_time = "Взял в работу уже другие задания"
     by_mistake = "Оставил отклик на задание по ошибке"
     other = "Другое"
+
+
+class HasMailingField(enum.StrEnum):
+    profile = "profile"
+    my_tasks = "my_tasks"
+    procharity = "procharity"

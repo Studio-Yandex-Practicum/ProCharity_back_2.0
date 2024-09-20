@@ -65,16 +65,19 @@ async def set_mailing(
     if not user.has_mailing:
         await user_service.toggle_mailing(user)
         await unsubscribe_reason_service.delete_reason(telegram_id)
-        text = "*Подписка включена!*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
+        text = (
+            "*Ты подписан на задания*\n\nТеперь ты будешь получать новые задания от фондов по выбранным компетенциям."
+        )
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
         await procharity_api.send_user_bot_status(user)
     else:
         text = (
-            "<b>Подписка остановлена!</b>\n\n"
-            "Ты больше не будешь получать новые задания от фондов, но всегда сможешь найти их в меню бота или "
+            "<b>Ты отписался от заданий</b>\n\n"
+            "Ты больше не будешь получать здесь уведомления о новых заданиях фондов. "
+            "Просмотреть новые задания можно в меню бота или "
             f'<a href="{procharity_tasks_url}">на сайте</a>.\n\n'
-            "Поделись, пожалуйста, почему ты решил отписаться?"
+            "Пожалуйста, поделись, почему ты решил отписаться."
         )
         keyboard = get_no_mailing_keyboard()
         parse_mode = ParseMode.HTML
@@ -147,7 +150,7 @@ async def support_service_callback(
         "в будние дни по любым вопросам. Смело пиши{} нам!\n\n"
         "А пока мы изучаем {} запрос, може{} ознакомиться с "
         "популярными вопросами и ответами на них в нашей "
-        '<a href="{}">базе знаний.</a>'
+        '<a href="{}">базе знаний</a>.'
     ).format(*filling)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
