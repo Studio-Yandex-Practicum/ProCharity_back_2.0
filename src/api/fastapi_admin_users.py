@@ -1,5 +1,5 @@
 from datetime import date
-from typing import AsyncGenerator, Type
+from typing import AsyncGenerator, Generic, Type
 
 import structlog
 from dependency_injector.wiring import Provide
@@ -20,6 +20,7 @@ from src.core.admin_auth.cookie_backend import auth_cookie_backend
 from src.core.db.models import AdminUser
 from src.core.depends import Container
 from src.core.exceptions import BadRequestException, UserAlreadyExists
+from src.core.services.email import EmailProvider
 from src.settings import settings
 
 log = structlog.get_logger()
@@ -38,6 +39,8 @@ async def get_admin_db(session: AsyncSession = Depends(get_async_session)):
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
+    reset_password_token_secret = settings.SECRET_KEY
+
     async def create_with_token(
         self,
         user_create: schemas.UC,
@@ -78,6 +81,15 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
             content={"description": "Пользователь успешно зарегистрирован."}, status_code=status.HTTP_201_CREATED
         )
 
+    async def on_after_forgot_password(
+        self,
+        user: AdminUser,
+        token: str,
+        request: Request | None = None,
+        email_provider: EmailProvider = Depends(Provide[Container.core_services_container.email_provider]),
+    ) -> None:
+        await email_provider.send_restore_password_link(user.email, token)
+
     async def on_after_register(self, user: AdminUser, request: Request | None = None) -> None:
         await log.ainfo(f"Registration: User {user.email} is successfully registered.")
 
@@ -100,7 +112,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         await admin_service.soft_delete(user)
 
 
-class CustomFastAPIUsers(FastAPIUsers[models.UP, models.ID]):
+class CustomFastAPIUsers(Generic[models.UP, models.ID], FastAPIUsers[models.UP, models.ID]):
     def get_register_router(self, user_schema: Type[schemas.U], user_create_schema: Type[schemas.UC]) -> APIRouter:
         return get_register_router(self.get_user_manager, user_schema, user_create_schema)
 
