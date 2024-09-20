@@ -96,6 +96,9 @@ class Settings(BaseSettings):
     # Изменение ключевых полей может потребовать изменения формата сообщения в src.core.messages.display_task()
     TRIGGER_MAILING_FIELDS: list[str] = ["title", "deadline", "category_id", "bonus"]
 
+    # Отображать ли меню для настройки уведомлений
+    SHOW_NOTIFICATION_SETTINGS_MENU: bool = False
+
     # URLs проекта Procharity
     PROCHARITY_URL: Url = "https://procharity.ru"
     HELP_PROCHARITY_URL: Url = "https://help.procharity.ru/"

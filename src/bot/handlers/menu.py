@@ -150,7 +150,7 @@ async def support_service_callback(
         "в будние дни по любым вопросам. Смело пиши{} нам!\n\n"
         "А пока мы изучаем {} запрос, може{} ознакомиться с "
         "популярными вопросами и ответами на них в нашей "
-        '<a href="{}">базе знаний.</a>'
+        '<a href="{}">базе знаний</a>.'
     ).format(*filling)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
