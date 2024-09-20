@@ -1,9 +1,15 @@
 import aiohttp
 from structlog import get_logger
 
+from src.bot.constants.enum import CANCEL_RESPOND_REASONS
 from src.core.db.models import User
 from src.core.enums import UserResponseAction
-from src.core.schemas.procharity_api import SiteBotRespondRequest, SiteBotStatusRequest, SiteUserCategoriesRequest
+from src.core.schemas.procharity_api import (
+    SiteBotRespondRequest,
+    SiteBotStatusFundRequest,
+    SiteBotStatusVolunteerRequest,
+    SiteUserCategoriesRequest,
+)
 from src.settings import Settings
 
 from .email import EmailProvider
@@ -25,7 +31,7 @@ class ProcharityAPI:
         """Возвращает заголовок с токеном авторизации в виде словаря."""
         return {"token": self._settings.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY}
 
-    async def _site_post(self, url: str, data: str, user_id: str, log_description: str):
+    async def _site_post(self, url: str, data: str, user_id: int, log_description: str):
         """Осуществляет post запрос на заданный url сайта.
 
         Args:
@@ -53,7 +59,7 @@ class ProcharityAPI:
         except Exception as e:
             await logger.aexception(e)
 
-    async def _notify_of_data_transfer_error(self, user_id: str, log_description: str, reason: str) -> None:
+    async def _notify_of_data_transfer_error(self, user_id: int, log_description: str, reason: str) -> None:
         """Сообщает об ошибке передачи данных на сайт, используя следующие способы:
         - в лог;
         - на почту админу;
@@ -90,31 +96,56 @@ class ProcharityAPI:
         if user and user.external_user:
             user_id = user.external_user.external_id
             status = "off" if user.banned or (user.is_volunteer and not user.has_mailing) else "on"
-            site_url = (
-                self._settings.procharity_send_bot_status_volunteer_api_url
-                if user.is_volunteer
-                else self._settings.procharity_send_bot_status_fund_api_url
-            )
-            body_schema = SiteBotStatusRequest(user_id=user_id, bot_status=status)
+
+            if user.is_volunteer:
+                site_url = self._settings.procharity_send_bot_status_volunteer_api_url
+                body_schema = SiteBotStatusVolunteerRequest(
+                    user_id=user_id,
+                    bot_status=status,
+                    bot_blocked=user.banned,
+                    has_mailing_new_tasks=user.has_mailing,
+                    has_mailing_profile=user.external_user.has_mailing_profile,
+                    has_mailing_my_tasks=user.external_user.has_mailing_my_tasks,
+                    has_mailing_procharity=user.external_user.has_mailing_procharity,
+                )
+            else:
+                site_url = self._settings.procharity_send_bot_status_fund_api_url
+                body_schema = SiteBotStatusFundRequest(
+                    user_id=user_id,
+                    bot_status=status,
+                    bot_blocked=user.banned,
+                    has_mailing_profile=user.external_user.has_mailing_profile,
+                    has_mailing_my_tasks=user.external_user.has_mailing_my_tasks,
+                    has_mailing_procharity=user.external_user.has_mailing_procharity,
+                )
             await self._site_post(
                 url=site_url,
-                data=body_schema.model_dump_json(),
+                data=body_schema.model_dump_json(exclude_none=True),
                 user_id=user_id,
                 log_description="статус бота",
             )
 
-    async def send_task_respond_status(self, user_id: int, task_id: int, status: UserResponseAction):
+    async def send_task_respond_status(
+        self,
+        user_id: int,
+        task_id: int,
+        status: UserResponseAction,
+        cancel_reason: CANCEL_RESPOND_REASONS | None = None,
+    ):
         """Отправляет запрос на сайт с обновленным откликом пользователя на задачу.
 
         Args:
             user_id: Идентификатор пользователя.
             task_id: Идентификатор задачи.
             status: Статус отклика на задачу.
+            cancel_reason: Причина отмены отклика.
         """
-        body_schema = SiteBotRespondRequest(user_id=user_id, task_id=task_id, status=status)
+        body_schema = SiteBotRespondRequest(
+            user_id=user_id, task_id=task_id, status=status, cancel_reason=cancel_reason
+        )
         await self._site_post(
             url=self._settings.procharity_send_bot_respond_api_url,
-            data=body_schema.model_dump_json(),
+            data=body_schema.model_dump_json(exclude_none=True),
             user_id=user_id,
             log_description="статус отклика",
         )

@@ -6,6 +6,7 @@ from src.api.schemas import UserResponse, UsersPaginatedResponse
 from src.api.schemas.users import UserFilter
 from src.api.services import UserService
 from src.core.depends import Container
+from src.core.exceptions import NotFoundException
 
 user_router = APIRouter()
 
@@ -40,4 +41,6 @@ async def get_all_users(
 async def get_by_telegram_id(
     telegram_id: int, user_service: UserService = Depends(Provide[Container.api_services_container.user_service])
 ) -> UserResponse | None:
-    return await user_service.get_by_telegram_id(telegram_id)
+    if user := await user_service.get_by_telegram_id(telegram_id):
+        return user
+    raise NotFoundException(object_name="User", object_id=telegram_id)

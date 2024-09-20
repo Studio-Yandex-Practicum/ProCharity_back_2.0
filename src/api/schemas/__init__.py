@@ -5,7 +5,6 @@ from .categories import CategoryRequest, CategoryResponse
 from .external_site_user import (
     ExternalSiteFundPartialUpdate,
     ExternalSiteFundRequest,
-    ExternalSiteUser,
     ExternalSiteVolunteerPartialUpdate,
     ExternalSiteVolunteerRequest,
 )
@@ -21,6 +20,7 @@ from .notification import (
     TelegramNotificationUsersRequest,
 )
 from .tasks import TaskRequest, TaskResponse, TasksRequest, UserResponseToTaskRequest
+from .tech_messages import TechMessagePaginateResponse, TechMessageRequest, TechMessageResponce
 from .token_schemas import TokenCheckResponse
 from .users import UserResponse, UsersPaginatedResponse
 
@@ -59,4 +59,7 @@ __all__ = (
     "UserResponse",
     "UserResponseToTaskRequest",
     "UsersPaginatedResponse",
+    "TechMessageResponce",
+    "TechMessageRequest",
+    "TechMessagePaginateResponse",
 )
