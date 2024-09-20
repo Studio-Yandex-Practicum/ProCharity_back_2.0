@@ -158,7 +158,7 @@ class Settings(BaseSettings):
     @property
     def procharity_task_url(self) -> str:
         """Получить url-ссылку на страницу с информацией о задании."""
-        return urljoin(self.PROCHARITY_URL, "webapp/")
+        return urljoin(self.PROCHARITY_URL.replace("http://", "https://"), "webapp/")
 
     @property
     def procharity_registration_url(self) -> str:
@@ -198,22 +198,22 @@ class Settings(BaseSettings):
     @property
     def procharity_send_user_categories_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки категорий пользователя."""
-        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/user_categories/")
+        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/user_categories")
 
     @property
     def procharity_send_bot_status_volunteer_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки статуса бота для волонтера."""
-        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_status_volunteer/")
+        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_status_volunteer")
 
     @property
     def procharity_send_bot_status_fund_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки статуса бота для фонда."""
-        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_status_fund/")
+        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_status_fund")
 
     @property
     def procharity_send_bot_respond_api_url(self) -> str:
         """Получить url-ссылку на страницу отправки статуса отклика на задачу."""
-        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_respond/")
+        return urljoin(self.PROCHARITY_URL, f"api/{self.PROCHARITY_API_VERSION}/bot_respond")
 
 
 @lru_cache()
