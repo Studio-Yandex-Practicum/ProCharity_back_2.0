@@ -45,19 +45,22 @@ async def confirm_notification_settings(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
+    fund_auth_url: str = Provide[Container.settings.provided.procharity_fund_auth_url],
 ):
     query = update.callback_query
     telegram_id = update.effective_user.id
     user = await user_service.get_by_telegram_id(telegram_id)
-    text = "Настройки уведомлений сохранены. "
-    if user.is_volunteer:
-        text += "Ты можешь изменить их в любой момент в меню бота или в личном кабинете"
-    else:
-        text += "Вы можете изменить их в любой момент в меню бота или в личном кабинете"
+    filling = ("Ты можешь", volunteer_auth_url) if user.is_volunteer else ("Вы можете", fund_auth_url)
+    text = (
+        "Настройки уведомлений сохранены. {} изменить их в любой момент "
+        'в меню бота или в <a href="{}">личном кабинете</a>.'
+    ).format(*filling)
     await query.message.edit_text(
         text=text,
-        parse_mode=ParseMode.MARKDOWN,
+        parse_mode=ParseMode.HTML,
         reply_markup=await get_back_menu(),
+        disable_web_page_preview=True,
     )
 
 

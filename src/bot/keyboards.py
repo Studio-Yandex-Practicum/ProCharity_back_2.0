@@ -50,7 +50,6 @@ def get_notification_settings_button(
 
 
 def get_notification_settings_keyboard(user: User) -> list[InlineKeyboardButton]:
-    # "О профиле", "О текущих задачах", "О ProCharity", "Готово 👌"
     mark_profile = "✅ " if user.external_user.has_mailing_profile else ""
     mark_my_tasks = "✅ " if user.external_user.has_mailing_my_tasks else ""
     mark_procharity = "✅ " if user.external_user.has_mailing_procharity else ""
