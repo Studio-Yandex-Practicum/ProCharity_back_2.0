@@ -45,7 +45,10 @@ class UserService(BaseUserService):
         do_update_or_create = False
         if user:
             if user.telegram_id != telegram_id:
-                await self._update_or_create(user, external_id=None)
+                print(user.external_id, user.external_user)
+                # await self._update_or_create(user, external_id=None)
+                await self._update_or_create(user, external_user=None)
+                print(user.external_id, user.external_user)
                 user = user_by_telegram_id
                 do_update_or_create = True
 
@@ -54,16 +57,19 @@ class UserService(BaseUserService):
             do_update_or_create = True
 
         if do_update_or_create:
+            print(user.external_id, user.external_user)
             user = await self._update_or_create(
                 user,
                 telegram_id=telegram_id,
-                external_id=ext_site_user.id,
+                # external_id=ext_site_user.id,
+                external_user=ext_site_user,
                 first_name=ext_site_user.first_name or telegram_user.first_name,
                 last_name=ext_site_user.last_name or telegram_user.last_name,
                 username=telegram_user.username,
                 email=ext_site_user.email,
                 role=ext_site_user.role,
             )
+            print(user.external_id, user.external_user)
             await logger.ainfo(f"Обновлены данные пользователя {user=}")
             await self.set_categories_to_user(user.id, ext_site_user.specializations)
 

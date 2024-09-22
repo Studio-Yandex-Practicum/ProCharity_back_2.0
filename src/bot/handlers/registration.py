@@ -28,6 +28,10 @@ async def start_command(
 ):
     telegram_user = update.effective_user or Never
     user = await user_service.register_user(ext_site_user, telegram_user)
+    print("user.external_user.external_id", user.external_user.external_id)
+    print("user.external_id", user.external_id)
+    print("ext_site_user.external_id", ext_site_user.external_id)
+    print("user.first_name", user.first_name)
     auth_url = volunteer_auth_url if user.is_volunteer else fund_auth_url
     you_authorized_phrase = "Ты авторизовался" if user.is_volunteer else "Вы авторизовались"
     await context.bot.send_message(
