@@ -1,3 +1,4 @@
+import re
 from datetime import date
 from typing import AsyncGenerator, Type
 
@@ -5,7 +6,7 @@ import structlog
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import JSONResponse
-from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin, models, schemas
+from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin, InvalidPasswordException, models, schemas
 from fastapi_users.authentication import AuthenticationBackend
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.exc import SQLAlchemyError
@@ -22,6 +23,8 @@ from src.core.depends import Container
 from src.core.exceptions import BadRequestException, UserAlreadyExists
 from src.core.services.email import EmailProvider
 from src.settings import settings
+
+from .constants import PASSWORD_POLICY, PASSWORD_POLICY_EXPLANATION
 
 log = structlog.get_logger()
 
@@ -80,6 +83,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
         return JSONResponse(
             content={"description": "Пользователь успешно зарегистрирован."}, status_code=status.HTTP_201_CREATED
         )
+
+    async def validate_password(self, password: str, user: AdminUser) -> None:
+        if re.match(PASSWORD_POLICY, password) is None:
+            raise InvalidPasswordException(reason=f"Пароль не соответствует требованиям. {PASSWORD_POLICY_EXPLANATION}")
 
     async def on_after_forgot_password(
         self,
