@@ -6,6 +6,7 @@ from src.bot.services import ExternalSiteUserService
 from src.bot.web_apps import get_feedback_web_app_info, get_task_web_app_info
 from src.core.db.models import Category, ExternalSiteUser, Task, User
 from src.core.depends import Container
+from src.settings import settings
 
 VIEW_TASKS_BUTTON = [InlineKeyboardButton("🔎 Посмотреть актуальные задания", callback_data=callback_data.VIEW_TASKS)]
 VIEW_CURRENT_TASKS_BUTTON = [
@@ -18,9 +19,7 @@ UNSUBSCRIBE_BUTTON = [InlineKeyboardButton("⏸ Отписаться от зад
 SUBSCRIBE_BUTTON = [InlineKeyboardButton("▶️ Подписаться на задания", callback_data=callback_data.JOB_SUBSCRIPTION)]
 OPEN_MENU_BUTTON = [InlineKeyboardButton("Открыть меню", callback_data=callback_data.MENU)]
 RETURN_MENU_BUTTON = [InlineKeyboardButton("Вернуться в меню", callback_data=callback_data.MENU)]
-CHECK_CATEGORIES_BUTTON = [
-    InlineKeyboardButton("Перепроверить компетенции", callback_data=callback_data.CONFIRM_CATEGORIES)
-]
+CHECK_CATEGORIES_BUTTON = [InlineKeyboardButton("Проверить компетенции", callback_data=callback_data.VIEW_CATEGORIES)]
 SHOW_MORE_TASKS_BUTTON = [InlineKeyboardButton("Показать ещё задания", callback_data=callback_data.VIEW_TASKS)]
 SUPPORT_SERVICE_BUTTON = [
     InlineKeyboardButton("✍ Написать в службу поддержки", callback_data=callback_data.SUPPORT_SERVICE)
@@ -41,8 +40,40 @@ def get_notification_settings_button(
     volunteer_auth_url: str = Provide[Container.settings.provided.procharity_volunteer_auth_url],
     fund_auth_url: str = Provide[Container.settings.provided.procharity_fund_auth_url],
 ) -> list[InlineKeyboardButton]:
-    url = volunteer_auth_url if user.is_volunteer else fund_auth_url
-    return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=url)]
+    if settings.SHOW_NOTIFICATION_SETTINGS_MENU:
+        return [
+            InlineKeyboardButton("🚪 Изменить настройку уведомлений", callback_data=callback_data.NOTIFICATION_SETTINGS)
+        ]
+    else:
+        url = volunteer_auth_url if user.is_volunteer else fund_auth_url
+        return [InlineKeyboardButton("🚪 Изменить настройку уведомлений", url=url)]
+
+
+def get_notification_settings_keyboard(user: User) -> list[InlineKeyboardButton]:
+    mark_profile = "✅ " if user.external_user.has_mailing_profile else ""
+    mark_my_tasks = "✅ " if user.external_user.has_mailing_my_tasks else ""
+    mark_procharity = "✅ " if user.external_user.has_mailing_procharity else ""
+    buttons = [
+        [
+            InlineKeyboardButton(
+                f"{mark_profile}О профиле", callback_data=f"notification_{enum.HasMailingField.profile}_callback"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                f"{mark_my_tasks}О текущих задачах",
+                callback_data=f"notification_{enum.HasMailingField.my_tasks}_callback",
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                f"{mark_procharity}О ProCharity",
+                callback_data=f"notification_{enum.HasMailingField.procharity}_callback",
+            )
+        ],
+        [InlineKeyboardButton("Готово 👌", callback_data=callback_data.CONFIRM_NOTIFICATION_SETTINGS)],
+    ]
+    return InlineKeyboardMarkup(buttons)
 
 
 def get_support_service_button(user: User) -> list[InlineKeyboardButton]:
@@ -104,7 +135,7 @@ async def get_subcategories_keyboard(
 async def get_support_service_keyboard(user: User) -> InlineKeyboardMarkup:
     keyboard = [
         get_support_service_button(user),
-        [InlineKeyboardButton(text="Вернуться в меню", callback_data=callback_data.MENU)],
+        RETURN_MENU_BUTTON,
     ]
     return InlineKeyboardMarkup(keyboard)
 
