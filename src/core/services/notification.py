@@ -1,4 +1,5 @@
 import asyncio
+from typing import Iterable
 
 import structlog
 from telegram import TelegramObject
@@ -58,7 +59,7 @@ class TelegramNotification:
     async def send_messages(
         self,
         message: str,
-        users: list[User],
+        users: Iterable[User],
         reply_markup: TelegramObject | None = None,
     ) -> list[tuple[bool, str]]:
         """Делает массовую рассылку сообщения message пользователям users."""
