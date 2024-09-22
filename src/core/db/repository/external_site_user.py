@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db.models import ExternalSiteUser, Task, TaskResponseVolunteer
@@ -99,4 +99,9 @@ class ExternalSiteUserRepository(ArchivableRepository):
     async def set_has_mailing_procharity(self, site_user: ExternalSiteUser, has_mailing_procharity: bool) -> None:
         """Изменяет настройку уведомлений о ProCharity."""
         site_user.has_mailing_procharity = has_mailing_procharity
+        await self.update(site_user.id, site_user)
+
+    async def update_last_interaction(self, site_user: ExternalSiteUser) -> None:
+        """Обновляет статус ExternalSiteUser.last_interaction текущим временем."""
+        site_user.last_interaction = func.now()
         await self.update(site_user.id, site_user)
