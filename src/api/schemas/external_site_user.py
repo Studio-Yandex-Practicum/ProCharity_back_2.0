@@ -33,20 +33,26 @@ class BaseExternalSiteUserVolunteer(RequestBase):
     specializations: list[int] | None = Field(None)
     has_mailing_new_tasks: bool = None
 
+    @classmethod
+    def validate_unique_values(cls, values: list[int]) -> list[int]:
+        if len(set(values)) != len(values):
+            raise ValueError("В поле specializations не должно быть дублирующихся значений")
+        return values
+
     @field_validator("specializations", mode="before")
     @classmethod
-    def specializations_str_validation(cls, value: str | list[int]) -> list[int] | None:
+    def specializations_validation(cls, value: str | list[int]) -> list[int] | None:
         if not isinstance(value, str):
-            return value
+            return cls.validate_unique_values(value)
         if value == "":
             return []
         try:
             new_value = [int(value) for value in value.replace(" ", "").split(",")]
-            return new_value
         except ValueError as exc:
             raise ValueError(
                 'Для передачи строки с числами в поле specializations используйте формат: "1, 2, 3"'
             ) from exc
+        return cls.validate_unique_values(new_value)
 
 
 class ExternalSiteUserRequest(BaseExternalSiteUser):
