@@ -133,7 +133,7 @@ async def select_subcategory_callback(
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
-    allways_synchronize_ext_site_user: str = Provide[Container.settings.provided.allways_synchronize_ext_site_user],
+    always_synchronize_ext_site_user: str = Provide[Container.settings.provided.always_synchronize_ext_site_user],
 ):
     subcategory_id = int(context.match.group(1))
     telegram_id = update.effective_user.id
@@ -149,7 +149,7 @@ async def select_subcategory_callback(
     selected_categories_ids = list(selected_categories)
     if (
         await procharity_api.send_user_categories(ext_site_user.external_id, selected_categories_ids)
-        or allways_synchronize_ext_site_user
+        or always_synchronize_ext_site_user
     ):
         await site_user_service.set_specializations(ext_site_user, selected_categories_ids)
 

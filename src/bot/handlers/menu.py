@@ -58,7 +58,7 @@ async def set_mailing(
     site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     procharity_tasks_url: str = Provide[Container.settings.provided.procharity_tasks_url],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
-    allways_synchronize_ext_site_user: str = Provide[Container.settings.provided.allways_synchronize_ext_site_user],
+    always_synchronize_ext_site_user: str = Provide[Container.settings.provided.always_synchronize_ext_site_user],
 ):
     """Включение/выключение подписки пользователя на почтовую рассылку."""
     telegram_id = update.effective_user.id
@@ -71,7 +71,7 @@ async def set_mailing(
         )
         keyboard = await get_tasks_and_back_menu_keyboard()
         parse_mode = ParseMode.MARKDOWN
-        if await procharity_api.send_user_bot_status(user) or allways_synchronize_ext_site_user:
+        if await procharity_api.send_user_bot_status(user) or always_synchronize_ext_site_user:
             await site_user_service.set_mailing_new_tasks_status(ext_site_user, True)
     else:
         text = (
@@ -107,7 +107,7 @@ async def unsubscription_reason_handler(
     email_admin: str = Provide[Container.settings.provided.EMAIL_ADMIN],
     email_provider: EmailProvider = Provide[Container.core_services_container.email_provider],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
-    allways_synchronize_ext_site_user: str = Provide[Container.settings.provided.allways_synchronize_ext_site_user],
+    always_synchronize_ext_site_user: str = Provide[Container.settings.provided.always_synchronize_ext_site_user],
 ):
     """Выключение подписки пользователя и отправка сообщения с причиной на почту."""
     telegram_id = update.effective_user.id
@@ -123,7 +123,7 @@ async def unsubscription_reason_handler(
         to_email=email_admin,
     )
     asyncio.create_task(background_task)
-    if await procharity_api.send_user_bot_status(user) or allways_synchronize_ext_site_user:
+    if await procharity_api.send_user_bot_status(user) or always_synchronize_ext_site_user:
         await site_user_service.set_mailing_new_tasks_status(ext_site_user, False)
     await log.ainfo(
         f"Пользователь {update.effective_user.username} ({update.effective_user.id}) отписался от "

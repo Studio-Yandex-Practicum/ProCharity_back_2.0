@@ -129,7 +129,7 @@ class Settings(BaseSettings):
         return urljoin("https://", f"//{v}")
 
     @property
-    def allways_synchronize_ext_site_user(self) -> bool:
+    def always_synchronize_ext_site_user(self) -> bool:
         return not self.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY
 
     @property
