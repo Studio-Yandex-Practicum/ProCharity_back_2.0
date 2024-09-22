@@ -82,6 +82,8 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
                 parse_mode=ParseMode.HTML,
                 reply_markup=keyboard,
             )
+        if ext_site_user:
+            await ext_site_user_service.update_last_interaction(ext_site_user)
 
     return decorated_handler
 
