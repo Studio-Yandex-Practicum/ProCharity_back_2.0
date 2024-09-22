@@ -143,7 +143,7 @@ async def select_subcategory_callback(
         selected_categories[subcategory_id] = None
         await user_service.add_category_to_user(update.effective_user.id, subcategory_id)
     elif len(selected_categories) == 1:
-        popup_text = "Выбери хотя бы одну компетенцию"
+        popup_text = "Выбери хотя бы одну компетенцию."
         return await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
         del selected_categories[subcategory_id]
