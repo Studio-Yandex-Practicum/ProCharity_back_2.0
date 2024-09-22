@@ -14,3 +14,9 @@ class CANCEL_RESPOND_REASONS(enum.StrEnum):
     no_time = "Взял в работу уже другие задания"
     by_mistake = "Оставил отклик на задание по ошибке"
     other = "Другое"
+
+
+class HasMailingField(enum.StrEnum):
+    profile = "profile"
+    my_tasks = "my_tasks"
+    procharity = "procharity"

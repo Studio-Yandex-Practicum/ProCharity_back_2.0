@@ -85,3 +85,18 @@ class ExternalSiteUserRepository(ArchivableRepository):
         instance.is_archived = True
         instance.user = None
         await self.update(instance.id, instance)
+
+    async def set_has_mailing_profile(self, site_user: ExternalSiteUser, has_mailing_profile: bool) -> None:
+        """Изменяет настройку уведомлений о профиле."""
+        site_user.has_mailing_profile = has_mailing_profile
+        await self.update(site_user.id, site_user)
+
+    async def set_has_mailing_my_tasks(self, site_user: ExternalSiteUser, has_mailing_my_tasks: bool) -> None:
+        """Изменяет настройку уведомлений о заданиях."""
+        site_user.has_mailing_my_tasks = has_mailing_my_tasks
+        await self.update(site_user.id, site_user)
+
+    async def set_has_mailing_procharity(self, site_user: ExternalSiteUser, has_mailing_procharity: bool) -> None:
+        """Изменяет настройку уведомлений о ProCharity."""
+        site_user.has_mailing_procharity = has_mailing_procharity
+        await self.update(site_user.id, site_user)
