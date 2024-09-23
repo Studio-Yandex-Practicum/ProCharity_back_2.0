@@ -86,7 +86,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[AdminUser, int]):
 
     async def validate_password(self, password: str, user: AdminUser) -> None:
         if re.match(PASSWORD_POLICY, password) is None:
-            raise InvalidPasswordException(reason=f"Пароль не соответствует требованиям. {PASSWORD_POLICY_EXPLANATION}")
+            raise InvalidPasswordException(
+                reason=f"Введенный пароль не соответствует политике паролей. {PASSWORD_POLICY_EXPLANATION}"
+            )
 
     async def on_after_forgot_password(
         self,
