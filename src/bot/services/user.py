@@ -45,7 +45,7 @@ class UserService(BaseUserService):
         do_update_or_create = False
         if user:
             if user.telegram_id != telegram_id:
-                await self._update_or_create(user, external_id=None)
+                await self._update_or_create(user, external_user=None)
                 user = user_by_telegram_id
                 do_update_or_create = True
 
@@ -57,7 +57,7 @@ class UserService(BaseUserService):
             user = await self._update_or_create(
                 user,
                 telegram_id=telegram_id,
-                external_id=ext_site_user.id,
+                external_user=ext_site_user,
                 first_name=ext_site_user.first_name or telegram_user.first_name,
                 last_name=ext_site_user.last_name or telegram_user.last_name,
                 username=telegram_user.username,
