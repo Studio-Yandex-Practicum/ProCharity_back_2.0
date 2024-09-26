@@ -147,7 +147,7 @@ class ArchivableRepository(AbstractRepository):
         return db_obj
 
     async def archive(self, id: int) -> DatabaseModel:
-        """Архивирует объект модели"""
+        """Архивирует объект модели по ID и возвращает его."""
         db_obj = await self.get(id)
         db_obj.is_archived = True
         db_obj = await self.update(id, db_obj)
