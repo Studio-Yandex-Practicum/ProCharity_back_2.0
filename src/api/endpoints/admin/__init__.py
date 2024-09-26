@@ -26,6 +26,7 @@ admin_auth_router = APIRouter()
 admin_auth_router.include_router(fastapi_admin_users.get_auth_router(auth_backend))
 admin_auth_router.include_router(fastapi_admin_users.get_register_router(AdminUserRead, AdminUserCreate))
 admin_auth_router.include_router(fastapi_admin_users.get_auth_router(auth_cookie_backend), prefix="/cookies")
+admin_auth_router.include_router(fastapi_admin_users.get_reset_password_router(), prefix="", tags=["Reset Password"])
 admin_auth_router.include_router(invitation_router)
 
 admin_user_router = APIRouter()
