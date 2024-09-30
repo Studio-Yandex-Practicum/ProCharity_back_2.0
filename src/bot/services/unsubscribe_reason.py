@@ -22,3 +22,9 @@ class UnsubscribeReasonService:
             await self._unsubscribe_reason_repository.create(
                 UnsubscribeReason(user_id=user.id, unsubscribe_reason=reason)
             )
+
+    async def delete_reason(self, telegram_id: int) -> None:
+        user = await self._user_repository.get_by_telegram_id(telegram_id)
+        reason_obj = await self._unsubscribe_reason_repository.get_by_user(user)
+        if reason_obj is not None:
+            await self._unsubscribe_reason_repository.remove(reason_obj)

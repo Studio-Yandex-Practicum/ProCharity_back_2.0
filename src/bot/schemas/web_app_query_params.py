@@ -23,5 +23,4 @@ class FeedbackFormQueryParams(QueryParams):
 class TaskInfoPageQueryParams(QueryParams):
     """Параметры запроса для страницы с информацией о задании."""
 
-    id: NonNegativeInt
-    api_root_path: str
+    task_id: NonNegativeInt
