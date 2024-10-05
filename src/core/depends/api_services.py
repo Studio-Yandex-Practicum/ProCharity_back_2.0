@@ -52,7 +52,6 @@ class APIServicesContainer(containers.DeclarativeContainer):
         AnalyticsService,
         user_repository=repositories.user_repository,
         unsubscribe_reason_repository=repositories.unsubscribe_reason_repository,
-        site_user_repository=repositories.site_user_repository,
     )
     health_check_service = providers.Factory(
         HealthCheckService,
