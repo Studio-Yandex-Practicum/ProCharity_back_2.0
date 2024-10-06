@@ -144,3 +144,14 @@ class UserService(BaseUserService):
         """Возвращает пользователя (или None) по user_id."""
         user = await self._user_repository.get_by_user_id(user_id)
         return user
+
+    async def get_by_telegram_id(self, telegram_id: int) -> User:
+        """Возвращает пользователя (или None) по telegram_id."""
+        user = await self._user_repository.get_by_telegram_id(telegram_id)
+        return user
+
+    async def update_last_interaction(self, user: User) -> None:
+        """Обновляет last_interaction для user."""
+        if not user:
+            return
+        await self._user_repository.update_last_interaction(user)

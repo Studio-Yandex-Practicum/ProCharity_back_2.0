@@ -7,7 +7,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from src.bot.keyboards import get_unregistered_user_keyboard
-from src.bot.services import ExternalSiteUserService
+from src.bot.services import ExternalSiteUserService, UserService
 from src.core.depends import Container
 from src.core.enums import UserRoles, UserStatus
 
@@ -54,6 +54,7 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
         ext_site_user_service: ExternalSiteUserService = Provide[
             Container.bot_services_container.bot_site_user_service
         ],
+        user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
         *args,
         **kwargs,
     ):
@@ -84,6 +85,8 @@ def registered_user_required(handler: FuncT[ParameterTypes, ReturnType]) -> Func
             )
         if ext_site_user:
             await ext_site_user_service.update_last_interaction(ext_site_user)
+        if user := await user_service.get_by_telegram_id(telegram_user.id):
+            await user_service.update_last_interaction(user)
 
     return decorated_handler
 
