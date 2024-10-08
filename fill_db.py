@@ -253,7 +253,7 @@ async def filling_user_and_external_site_user_in_db(
         created_at = user_fake.date_between(datetime.now() - timedelta(days=days_period), datetime.now())
         specializations = sample(CATEGORIES_FILL_DATA, k=randint(1, 3)) if role == UserRoles.VOLUNTEER else None
         user = User(
-            telegram_id=user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
+            telegram_id=100_000_000_000 + user_fake.unique.random_int(min=1, max=USERS_TABLE_ROWS),
             role=role,
             username=user_fake.unique.user_name(),
             email=email,

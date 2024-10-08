@@ -10,15 +10,14 @@ from src.bot.keyboards import (
     get_tasks_and_open_menu_keyboard,
     get_view_categories_keyboard,
 )
-from src.bot.services.category import CategoryService
-from src.bot.services.user import UserService
+from src.bot.services import CategoryService, ExternalSiteUserService, UserService
 from src.bot.utils import delete_previous_message, get_marked_list, registered_user_required
 from src.core.db.models import ExternalSiteUser
 from src.core.depends import Container
 from src.core.logging.utils import logger_decor
 from src.core.services.procharity_api import ProcharityAPI
 
-text_chose_category = (
+text_choose_category = (
     "Чтобы мне было понятнее, с какими задачами ты готов помогать фондам, "
     "отметь свои профессиональные компетенции (можно выбрать несколько). "
     'После этого нажми "Готово 👌"'
@@ -40,7 +39,7 @@ async def categories_callback(
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text=text_chose_category,
+        text=text_choose_category,
         reply_markup=await get_checked_categories_keyboard(categories, selected_categories_with_parents),
     )
 
@@ -122,7 +121,7 @@ async def subcategories_callback(
     parent_id = int(context.match.group(1))
     context.user_data["parent_id"] = parent_id
     selected_categories = await user_service.get_user_categories(update.effective_user.id)
-    await _display_chose_subcategories_message(update, parent_id, selected_categories)
+    await _display_choose_subcategories_message(update, parent_id, selected_categories)
 
 
 @logger_decor
@@ -132,27 +131,38 @@ async def select_subcategory_callback(
     context: ContextTypes.DEFAULT_TYPE,
     ext_site_user: ExternalSiteUser,
     user_service: UserService = Provide[Container.bot_services_container.bot_user_service],
+    site_user_service: ExternalSiteUserService = Provide[Container.bot_services_container.bot_site_user_service],
     procharity_api: ProcharityAPI = Provide[Container.core_services_container.procharity_api],
+    always_synchronize_ext_site_user: str = Provide[Container.settings.provided.always_synchronize_ext_site_user],
 ):
+    """Выводит список подкатегорий для выбора волонтером."""
+    query = update.callback_query
     subcategory_id = int(context.match.group(1))
-    selected_categories = await user_service.get_user_categories(update.effective_user.id)
+    telegram_id = update.effective_user.id
+    selected_categories = await user_service.get_user_categories(telegram_id)
 
     if subcategory_id not in selected_categories:
         selected_categories[subcategory_id] = None
-        await user_service.add_category_to_user(update.effective_user.id, subcategory_id)
+        await user_service.add_category_to_user(telegram_id, subcategory_id)
+    elif len(selected_categories) == 1:
+        popup_text = "Выбери хотя бы одну компетенцию."
+        return await context.bot.answer_callback_query(query.id, text=popup_text, show_alert=True)
     else:
         del selected_categories[subcategory_id]
-        await user_service.delete_category_from_user(update.effective_user.id, subcategory_id)
+        await user_service.delete_category_from_user(telegram_id, subcategory_id)
 
-    user = await user_service.get_by_telegram_id(update.effective_user.id)
-    if user and user.external_user:
-        await procharity_api.send_user_categories(user.external_user.external_id, selected_categories.keys())
+    selected_categories_ids = list(selected_categories)
+    if (
+        await procharity_api.send_user_categories(ext_site_user.external_id, selected_categories_ids)
+        or always_synchronize_ext_site_user
+    ):
+        await site_user_service.set_specializations(ext_site_user, selected_categories_ids)
 
     parent_id = context.user_data["parent_id"]
-    await _display_chose_subcategories_message(update, parent_id, selected_categories)
+    await _display_choose_subcategories_message(update, parent_id, selected_categories)
 
 
-async def _display_chose_subcategories_message(
+async def _display_choose_subcategories_message(
     update: Update,
     parent_id: int,
     selected_categories: dict[int, str],
@@ -183,7 +193,7 @@ async def back_subcategory_callback(
     selected_categories_with_parents = await user_service.get_user_categories_with_parents(update.effective_user.id)
 
     await query.message.edit_text(
-        text_chose_category,
+        text_choose_category,
         reply_markup=await get_checked_categories_keyboard(categories, selected_categories_with_parents),
     )
 

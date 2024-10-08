@@ -129,6 +129,10 @@ class Settings(BaseSettings):
         return urljoin("https://", f"//{v}")
 
     @property
+    def always_synchronize_ext_site_user(self) -> bool:
+        return not self.ACCESS_TOKEN_SEND_DATA_TO_PROCHARITY
+
+    @property
     def database_url(self) -> str:
         """Получить ссылку для подключения к DB."""
         return (
