@@ -71,6 +71,7 @@ class User(Base):
 
     external_id: Mapped[int | None] = mapped_column(ForeignKey("external_site_users.id"), nullable=True)
     external_user: Mapped["ExternalSiteUser"] = relationship(back_populates="user")
+    last_interaction: Mapped[datetime | None] = mapped_column(nullable=True)
 
     @property
     def is_volunteer(self) -> bool:
@@ -116,6 +117,7 @@ class ExternalSiteUser(ArchivableBase):
     has_mailing_profile: Mapped[bool] = mapped_column(nullable=True)
     has_mailing_my_tasks: Mapped[bool] = mapped_column(nullable=True)
     has_mailing_procharity: Mapped[bool] = mapped_column(nullable=True)
+    last_interaction: Mapped[datetime | None] = mapped_column(nullable=True)
 
     def __repr__(self):
         return f"<SiteUser {self.id}>"

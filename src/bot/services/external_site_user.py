@@ -62,3 +62,9 @@ class ExternalSiteUserService:
                 await self._repository.set_has_mailing_my_tasks(site_user, not site_user.has_mailing_my_tasks)
             case HasMailingField.procharity:
                 await self._repository.set_has_mailing_procharity(site_user, not site_user.has_mailing_procharity)
+
+    async def update_last_interaction(self, site_user: ExternalSiteUser) -> None:
+        """Обновляет last_interaction для site_user."""
+        if not site_user:
+            return
+        await self._repository.update_last_interaction(site_user)

@@ -162,3 +162,8 @@ class UserRepository(FilterableRepository):
 
         objects = await self._session.scalars(statement.order_by(desc(text(column_name))))
         return objects.all()
+
+    async def update_last_interaction(self, user: User) -> None:
+        """Обновляет статус User.last_interaction текущим временем."""
+        user.last_interaction = func.now()
+        await self.update(user.id, user)
