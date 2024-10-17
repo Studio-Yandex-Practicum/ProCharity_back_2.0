@@ -42,8 +42,6 @@ class AbstractRepository(abc.ABC, Generic[DatabaseModel]):
             await self._session.commit()
         except DuplicateColumnError as exc:
             raise AlreadyExistsException(instance) from exc
-
-        await self._session.refresh(instance)
         return instance
 
     async def remove(self, instance: DatabaseModel) -> None:
