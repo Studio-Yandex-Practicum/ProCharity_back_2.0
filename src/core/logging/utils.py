@@ -15,7 +15,7 @@ async def logging_updates(*args, **kwargs):
 
 
 def logger_decor(
-    coroutine: Callable[ParameterTypes, Awaitable[ReturnType]]
+    coroutine: Callable[ParameterTypes, Awaitable[ReturnType]],
 ) -> Callable[ParameterTypes, Awaitable[ReturnType]]:
     @wraps(coroutine)
     async def wrapper(*args: ParameterTypes.args, **kwargs: ParameterTypes.kwargs) -> ReturnType:
