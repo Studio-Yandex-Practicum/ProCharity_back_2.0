@@ -304,13 +304,9 @@ async def delete_all_data(
     session: async_sessionmaker[AsyncSession],
 ) -> None:
     """The function deletes data."""
-    await session.execute(
-        text(
-            """TRUNCATE TABLE
+    await session.execute(text("""TRUNCATE TABLE
             tasks, categories, unsubscribe_reason, users, external_site_users
-            RESTART IDENTITY CASCADE"""
-        )
-    )
+            RESTART IDENTITY CASCADE"""))
     await session.commit()
 
 
